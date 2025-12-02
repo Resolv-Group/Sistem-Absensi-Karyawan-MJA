@@ -2,7 +2,11 @@
 
     {{-- Left: Logo --}}
     <div class="flex items-center gap-3">
-        <div class="w-8 h-8 rounded-full bg-gray-300"></div>
+        <img
+            src="{{ asset('images/mja-logo.png') }}"
+            alt="MJA Logo"
+            class="w-8 h-8 object-contain"
+        >
     </div>
 
     {{-- Middle: Menu --}}
