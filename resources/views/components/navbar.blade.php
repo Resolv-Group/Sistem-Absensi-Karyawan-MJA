@@ -18,7 +18,6 @@
         </a>
     </li>
 
-
     <li class="relative pb-2 cursor-pointer">
         <a href="/daftar-pekerja"
             class="text-gray-700 hover:text-black {{ (Request::is('daftar-pekerja') || Request::is('t/pekerja') || Request::is('t/pekerja/*')) ? 'border-b-2 border-red-500 pb-2 text-black' : '' }}">
@@ -32,6 +31,7 @@
             Staff
         </a>
     </li>
+
 
     <li class="relative pb-2 cursor-pointer">
         <a href="/mitra-kerja"
