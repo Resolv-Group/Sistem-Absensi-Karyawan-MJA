@@ -21,7 +21,7 @@
 
     <x-navbar />
 
-    <div class="px-8">
+    <div class="px-16">
         @yield('header')
         @yield('content')
     </div>
