@@ -11,37 +11,58 @@
 
     {{-- Middle: Menu --}}
     <ul class="flex items-center gap-8 text-sm font-medium">
-        <li class="relative pb-2 cursor-pointer">
-            <a href="/dashboard" class="text-gray-700 hover:text-black">Dashboard</a>
-        </li>
+    <li class="relative pb-2 cursor-pointer">
+        <a href="/dashboard"
+            class="text-gray-700 hover:text-black {{ Request::is('dashboard') ? 'border-b-2 border-red-500 pb-2 text-black' : '' }}">
+            Dashboard
+        </a>
+    </li>
 
-        <li class="relative pb-2 cursor-pointer">
-            <a href="/daftar-pekerja" class="text-gray-700 border-red-500 pb-2">Pekerja</a>
-        </li>
 
-        <li class="relative pb-2 cursor-pointer">
-            <a href="/daftar-staff" class="text-gray-700 hover:text-black border-b-2 border-red-500 pb-2">Staff</a>
-        </li>
+    <li class="relative pb-2 cursor-pointer">
+        <a href="/daftar-pekerja"
+            class="text-gray-700 hover:text-black {{ (Request::is('daftar-pekerja') || Request::is('t/pekerja') || Request::is('t/pekerja/*')) ? 'border-b-2 border-red-500 pb-2 text-black' : '' }}">
+            Pekerja
+        </a>
+    </li>
 
-        <li class="relative pb-2 cursor-pointer">
-            <a href="#" class="text-gray-700 hover:text-black">Mitra Kerja</a>
-        </li>
+    <li class="relative pb-2 cursor-pointer">
+        <a href="/staff"
+            class="text-gray-700 hover:text-black {{ (Request::is('staff') || Request::is('t/staff') || Request::is('t/staff/*'))  ? 'border-b-2 border-red-500 pb-2 text-black' : '' }}">
+            Staff
+        </a>
+    </li>
 
-        <li class="relative pb-2 cursor-pointer">
-            <a href="#" class="text-gray-700 hover:text-black">Unit</a>
-        </li>
+    <li class="relative pb-2 cursor-pointer">
+        <a href="/mitra-kerja"
+            class="text-gray-700 hover:text-black {{ (Request::is('mitra-kerja') || Request::is('t/mitra-kerja') || Request::is('t/mitra-kerja/*')) ? 'border-b-2 border-red-500 pb-2 text-black' : '' }}">
+            Mitra Kerja
+        </a>
+    </li>
 
-        {{-- <li class="relative pb-2 cursor-pointer flex items-center gap-1">
+    <li class="relative pb-2 cursor-pointer">
+        <a href="/unit"
+            class="text-gray-700 hover:text-black {{ (Request::is('unit') || Request::is('t/unit') || Request::is('t/unit/*'))  ? 'border-b-2 border-red-500 pb-2 text-black' : '' }}">
+            Unit
+        </a>
+    </li>
+
+    <li class="relative pb-2 cursor-pointer">
+        <a href="/absensi"
+            class="text-gray-700 hover:text-black {{ (Request::is('absensi') || Request::is('t/absensi') || Request::is('t/absensi/*')) ? 'border-b-2 border-red-500 pb-2 text-black' : '' }}">
+            Absensi
+        </a>
+    </li>
+</ul>
+
+
+
+    {{-- <li class="relative pb-2 cursor-pointer flex items-center gap-1">
             <span>Time Management</span>
             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
             </svg>
         </li> --}}
-
-        <li class="relative pb-2 cursor-pointer">
-            <a href="#" class="text-gray-700 hover:text-black">Absensi</a>
-        </li>
-    </ul>
 
     {{-- Right: Profile Icon --}}
     <div>
