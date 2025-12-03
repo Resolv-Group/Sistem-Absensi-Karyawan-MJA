@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('provinsi', 100);
             $table->string('unit_kerja', 100);
             $table->string('rekening', 50)->nullable();
+            $table->string('nama_rek', 50)->nullable();
 
             $table->unsignedTinyInteger('rt')->nullable();
             $table->unsignedTinyInteger('rw')->nullable();

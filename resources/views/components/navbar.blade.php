@@ -19,20 +19,6 @@
     </li>
 
     <li class="relative pb-2 cursor-pointer">
-        <a href="/daftar-pekerja"
-            class="text-gray-700 hover:text-black {{ (Request::is('daftar-pekerja') || Request::is('t/pekerja') || Request::is('t/pekerja/*')) ? 'border-b-2 border-red-500 pb-2 text-black' : '' }}">
-            Pekerja
-        </a>
-    </li>
-
-    <li class="relative pb-2 cursor-pointer">
-        <a href="/staff"
-            class="text-gray-700 hover:text-black {{ (Request::is('staff') || Request::is('t/staff') || Request::is('t/staff/*'))  ? 'border-b-2 border-red-500 pb-2 text-black' : '' }}">
-            Staff
-        </a>
-    </li>
-
-    <li class="relative pb-2 cursor-pointer">
         <a href="/mitra-kerja"
             class="text-gray-700 hover:text-black {{ (Request::is('mitra-kerja') || Request::is('t/mitra-kerja') || Request::is('t/mitra-kerja/*')) ? 'border-b-2 border-red-500 pb-2 text-black' : '' }}">
             Mitra Kerja
