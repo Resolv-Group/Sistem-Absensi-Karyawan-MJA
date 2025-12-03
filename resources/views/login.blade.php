@@ -57,14 +57,14 @@
                 </button>
 
                 {{-- OR --}}
-                <div class="my-6 flex items-center">
+                {{-- <div class="my-6 flex items-center">
                     <div class="flex-grow border-t border-gray-300"></div>
                     <span class="px-3 text-sm text-gray-400">atau</span>
                     <div class="flex-grow border-t border-gray-300"></div>
-                </div>
+                </div> --}}
 
                 {{-- Other options --}}
-                <div class="space-y-3">
+                {{-- <div class="space-y-3">
 
                     <button type="button"
                         class="w-full py-2 border border-gray-300 rounded-lg flex items-center justify-center gap-2 hover:bg-gray-50 transition">
@@ -82,7 +82,7 @@
                         Sign in dengan nomor telepon
                     </button>
 
-                </div>
+                </div> --}}
 
             </form>
 
