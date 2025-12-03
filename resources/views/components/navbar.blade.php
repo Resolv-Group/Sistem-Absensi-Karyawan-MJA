@@ -16,11 +16,11 @@
         </li>
 
         <li class="relative pb-2 cursor-pointer">
-            <a href="/daftar-pekerja" class="text-gray-700 hover:text-black border-b-2 border-red-500 pb-2">Pekerja</a>
+            <a href="/daftar-pekerja" class="text-gray-700 border-red-500 pb-2">Pekerja</a>
         </li>
 
         <li class="relative pb-2 cursor-pointer">
-            <a href="#" class="text-gray-700 hover:text-black">Staff</a>
+            <a href="/daftar-staff" class="text-gray-700 hover:text-black border-b-2 border-red-500 pb-2">Staff</a>
         </li>
 
         <li class="relative pb-2 cursor-pointer">

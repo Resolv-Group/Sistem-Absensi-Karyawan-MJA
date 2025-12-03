@@ -26,8 +26,8 @@ return new class extends Migration
             $table->string('kecamatan', 100);
             $table->string('kota', 100);
             $table->string('provinsi', 100);
-            $table->string('unit_kerja', 100);
             $table->string('rekening', 50)->nullable();
+            $table->string('nama_rek', 50)->nullable();
 
             $table->unsignedTinyInteger('rt')->nullable();
             $table->unsignedTinyInteger('rw')->nullable();
@@ -36,15 +36,12 @@ return new class extends Migration
             $table->date('tgl_lahir');
             $table->date('tgl_bergabung');
             $table->date('tgl_resign')->nullable();
-            $table->date('masa_berlaku_pkwt')->nullable();
 
             $table->boolean('kelamin')->comment('1=laki,0=perempuan');
             $table->string('status_kawin', 50);
             $table->string('pendidikan', 50);
 
             $table->boolean('status_aktif')->default(1);
-            $table->unsignedTinyInteger('status_perjanjian_kerja');
-            $table->unsignedSmallInteger('jabatan');
 
             $table->unsignedTinyInteger('anak')->default(0);
 
