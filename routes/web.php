@@ -15,6 +15,7 @@ Route::get('/dashboard', function () {
 Route::middleware('web')->group(function(){
     Route::get('/daftar-pekerja', [PekerjaController::class, 'viewPekerjaMain'])->name('view.pekerja');
     Route::get('/t/pekerja', [PekerjaController::class, 'viewTambahPekerja'])->name('view.tambah.pekerja');
+    Route::get('/d/pekerja', [PekerjaController::class, 'viewDetailPekerja'])->name('view.detail.pekerja');
 });
 
 Route::middleware('web')->group(function(){

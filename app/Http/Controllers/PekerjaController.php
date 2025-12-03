@@ -14,4 +14,8 @@ class PekerjaController extends Controller
     function viewTambahPekerja() {
         return view('Pekerja.CRUD.tambah-pekerja');
     }
+    function viewDetailPekerja() {
+        return view('Pekerja.detail-pekerja');
+    }
+
 }

@@ -99,7 +99,7 @@
                             <td class="py-3 px-2 text-center">351618802891001</td>
                             <td class="py-3 px-2 text-center text-green-600">Aktif</td>
                             <td class="py-3 px-2 text-center">
-                                <button class="px-3 py-1 border rounded-lg text-xs hover:bg-gray-50">
+                                <a href="/d/pekerja" class="px-3 py-1 border rounded-lg text-xs hover:bg-gray-50">
                                     Detail
                                 </button>
                             </td>
