@@ -59,6 +59,8 @@ class PekerjaController extends Controller
             'hubungan_emergency' => 'required|string',
 
             'ibu_kandung' => 'string|max:255',
+
+            'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
         ]);
 
         // dd($request->all());
@@ -101,6 +103,8 @@ class PekerjaController extends Controller
             'telp_emergency' => $request->telp_emergency,
             'hubungan_emergency' => $request->hubungan_emergency,
             'ibu_kandung' => $request->ibu_kandung,
+
+            'foto' => $request->foto,
 
             'status_aktif' => 1
         ]);

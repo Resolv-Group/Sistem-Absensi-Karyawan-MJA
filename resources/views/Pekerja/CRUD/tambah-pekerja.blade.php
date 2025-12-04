@@ -52,19 +52,55 @@
 
             <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
                 {{-- Foto Profil (Left Side) --}}
-                <div class="md:col-span-3">
-                    <label class="block text-sm font-bold text-gray-700 mb-2">Foto Profil</label>
-                    <div class="relative w-full aspect-square bg-gray-50 rounded-xl border-2 border-dashed border-gray-400 hover:border-blue-500 hover:bg-blue-50 transition flex flex-col items-center justify-center text-center cursor-pointer group">
-                        <input type="file" name="foto_profil" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
-                        <svg class="mx-auto h-10 w-10 text-gray-400 group-hover:text-blue-500 transition" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
-                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            <div class="md:col-span-3">
+                <label class="block text-sm font-bold text-gray-700 mb-2">Foto Profil</label>
+
+                <div
+                    class="relative w-full aspect-square rounded-xl border-2 border-dashed border-gray-400 hover:border-blue-500 hover:bg-blue-50 transition overflow-hidden flex items-center justify-center bg-gray-50 cursor-pointer group"
+                    onclick="document.getElementById('fotoInput').click()"
+                >
+                    
+                    <!-- INPUT FILE -->
+                    <input
+                        type="file"
+                        id="fotoInput"
+                        name="foto"
+                        accept="image/*"
+                        class="hidden"
+                        onchange="previewPhoto(event)"
+                    >
+
+                    <!-- PLACEHOLDER -->
+                    <div id="placeholder" class="text-center pointer-events-none">
+                        <svg class="mx-auto h-10 w-10 text-gray-400 group-hover:text-blue-500 transition"
+                            stroke="currentColor"
+                            fill="none"
+                            viewBox="0 0 48 48">
+                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                         </svg>
-                        <div class="mt-2 text-xs text-gray-600 group-hover:text-gray-800">
-                            <span class="font-bold text-blue-600">Upload Foto</span>
-                            <p class="mt-1 font-medium">Max 2MB</p>
-                        </div>
+
+                        <p class="mt-2 text-xs text-gray-600">
+                            <span class="font-bold text-blue-600">Upload Foto</span><br>
+                            Max 2MB
+                        </p>
                     </div>
+
+                    <!-- PREVIEW -->
+                    <img id="previewImage" class="absolute inset-0 w-full h-full object-cover hidden" alt="Preview Foto">
+
+                    <!-- DELETE BUTTON -->
+                    <button
+                        type="button"
+                        id="removeBtn"
+                        onclick="removePhoto(event)"
+                        class="absolute top-2 right-2 bg-red-600 text-white w-8 h-8 rounded-full flex items-center justify-center shadow-md hover:bg-red-700 transition hidden"
+                    >
+                        ✕
+                    </button>
+
                 </div>
+            </div>
 
                 {{-- Fields (Right Side) --}}
                 <div class="md:col-span-9 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
@@ -347,4 +383,44 @@
 
     </form>
 </div>
+
+<!-- PREVIEW SCRIPT -->
+<script>
+    function previewPhoto(event) {
+        const input = event.target;
+        const preview = document.getElementById('previewImage');
+        const placeholder = document.getElementById('placeholder');
+        const removeButton = document.getElementById('removeBtn');
+
+        const file = input.files[0];
+        if (!file) return;
+
+        // Validasi ukuran max 2MB
+        if (file.size > 2 * 1024 * 1024) {
+            alert("Ukuran foto maksimal 2MB!");
+            input.value = "";
+            return;
+        }
+
+        // Preview image
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            preview.classList.remove('hidden');
+            placeholder.classList.add('hidden');
+            removeButton.classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function removePhoto(event) {
+        event.stopPropagation(); // Mencegah klik area upload
+
+        document.getElementById('fotoInput').value = "";
+        document.getElementById('previewImage').src = "";
+        document.getElementById('previewImage').classList.add('hidden');
+        document.getElementById('placeholder').classList.remove('hidden');
+        document.getElementById('removeBtn').classList.add('hidden');
+    }
+</script>
 @endsection
