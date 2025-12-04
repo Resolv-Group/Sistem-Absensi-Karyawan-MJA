@@ -26,7 +26,7 @@
     </li>
 
     <li class="relative pb-2 cursor-pointer">
-        <a href="/staff"
+        <a href="/daftar-staff"
             class="text-gray-700 hover:text-black {{ (Request::is('staff') || Request::is('t/staff') || Request::is('t/staff/*'))  ? 'border-b-2 border-red-500 pb-2 text-black' : '' }}">
             Staff
         </a>
