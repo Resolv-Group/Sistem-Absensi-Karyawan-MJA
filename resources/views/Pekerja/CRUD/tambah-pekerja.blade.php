@@ -24,8 +24,19 @@
         </div>
     </div>
 
+    @if ($errors->any())
+    <div class="bg-red-100 border border-red-400 text-red-700 p-4 rounded mb-4">
+        <ul>
+            @foreach ($errors->all() as $error)
+                <li>• {{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+    @endif
+
+
     {{-- FORM CARD --}}
-    <form action="" method="POST" enctype="multipart/form-data" class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+    <form action="/tambah-pekerja" method="POST" enctype="multipart/form-data" class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
         @csrf
 
         {{-- SECTION 1: Identitas Pribadi --}}
@@ -61,7 +72,7 @@
                     {{-- Nama Lengkap --}}
                     <div class="sm:col-span-2">
                         <label class="block text-sm font-bold text-gray-700 mb-1">Nama Lengkap</label>
-                        <input type="text" name="nama_lengkap" maxlength="255" autocomplete="off"
+                        <input type="text" name="nama" maxlength="255" autocomplete="off"
                                class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition"
                                placeholder="Sesuai KTP">
                     </div>
@@ -69,13 +80,13 @@
                     {{-- NIK --}}
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-1">NIK</label>
-                        <input type="text" name="nik" maxlength="17" autocomplete="off"
+                        <input type="text" name="nik" maxlength="16" autocomplete="off"
                                class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition"
                                placeholder="16 Digit Angka">
                     </div>
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-1">Nomor Kartu Keluarga</label>
-                        <input type="text" name="no_kk" maxlength="17" autocomplete="off"
+                        <input type="text" name="no_kk" maxlength="16" autocomplete="off"
                                class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition"
                                placeholder="16 Digit Angka">
                     </div>
@@ -91,14 +102,14 @@
                     {{-- Tanggal Lahir --}}
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-1">Tanggal Lahir</label>
-                        <input type="date" name="tanggal_lahir"
+                        <input type="date" name="tgl_lahir"
                                class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition">
                     </div>
 
                     {{-- Jenis Kelamin --}}
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-1">Jenis Kelamin</label>
-                        <select name="jenis_kelamin"
+                        <select name="kelamin"
                                 class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition">
                             <option value="1">Laki-laki</option>
                             <option value="0">Perempuan</option>
@@ -122,7 +133,7 @@
                     {{-- Status Perkawinan --}}
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-1">Status Perkawinan</label>
-                        <select name="status_perkawinan"
+                        <select name="status_kawin"
                                 class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition">
                             <option value="Belum Menikah">Belum Menikah</option>
                             <option value="Menikah">Menikah</option>
@@ -138,13 +149,13 @@
 
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-1">Tanggal Bergabung</label>
-                        <input type="date" name="tanggal_gabung"
+                        <input type="date" name="tgl_bergabung"
                                class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition">
                     </div>
 
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-1">Tanggal Resign</label>
-                        <input type="date" name="tanggal_resign"
+                        <input type="date" name="tgl_resign"
                                class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition">
                     </div>
                 </div>
@@ -168,15 +179,15 @@
                 {{-- Jalan --}}
                 <div class="sm:col-span-2">
                     <label class="block text-sm font-bold text-gray-700 mb-1">Jalan / Nama Gedung</label>
-                    <textarea name="jalan" rows="2" maxlength="255" autocomplete="off"
+                    <textarea name="alamat" rows="2" maxlength="255" autocomplete="off"
                               class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 min-h-16 max-h-40 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition"
                               placeholder="Jl. ABC No. 10, Blok A"></textarea>
                 </div>
 
-                {{-- Kelurahan --}}
+                {{-- Desa --}}
                 <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1">Kelurahan / Desa</label>
-                    <input type="text" name="kelurahan" maxlength="100" autocomplete="off"
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Desa</label>
+                    <input type="text" name="desa" maxlength="100" autocomplete="off"
                            class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition">
                 </div>
 
@@ -244,7 +255,7 @@
                     {{-- No Telepon --}}
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-1">Nomor Telepon</label>
-                        <input type="text" name="no_telepon" maxlength="16" autocomplete="off"
+                        <input type="text" name="telp" maxlength="16" autocomplete="off"
                                class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition">
                     </div>
 
@@ -252,7 +263,7 @@
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-1">Nama Bank</label>
-                            <select name="nama_bank"
+                            <select name="nama_rek"
                                     class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition">
                                 <option value="BCA">BCA</option>
                                 <option value="Mandiri">Mandiri</option>
@@ -261,7 +272,7 @@
                         </div>
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-1">No. Rekening</label>
-                            <input type="text" name="no_rekening" maxlength="20" autocomplete="off"
+                            <input type="text" name="rekening" maxlength="20" autocomplete="off"
                                    class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition">
                         </div>
                     </div>
@@ -283,21 +294,21 @@
                     {{-- Nama Kontak --}}
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-1">Nama Kontak</label>
-                        <input type="text" name="kontak_darurat_nama" maxlength="255" autocomplete="off"
+                        <input type="text" name="nama_emergency" maxlength="255" autocomplete="off"
                                class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition">
                     </div>
 
                     {{-- No Kontak --}}
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-1">Nomor Telepon</label>
-                        <input type="text" name="kontak_darurat_telepon" maxlength="16" autocomplete="off"
+                        <input type="text" name="telp_emergency" maxlength="16" autocomplete="off"
                                class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition">
                     </div>
 
                     {{-- Hubungan --}}
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-1">Hubungan</label>
-                        <select name="kontak_darurat_hubungan"
+                        <select name="hubungan_emergency"
                                 class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition">
                             <option value="Orang Tua">Orang Tua</option>
                             <option value="Saudara">Saudara</option>
@@ -308,7 +319,7 @@
                     {{-- Ibu Nama --}}
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-1">Ibu Kandung</label>
-                        <input type="text" name="atas_nama" maxlength="255" autocomplete="off"
+                        <input type="text" name="ibu_kandung" maxlength="255" autocomplete="off"
                                class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition">
                     </div>
                 </div>
