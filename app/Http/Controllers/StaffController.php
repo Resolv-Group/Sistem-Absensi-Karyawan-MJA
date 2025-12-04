@@ -14,4 +14,7 @@ class StaffController extends Controller
         return view('Staff.CRUD.tambah-staff');
     }
 
+    function viewDetailStaff() {
+        return view('Staff.detail-staff');
+    }
 }
