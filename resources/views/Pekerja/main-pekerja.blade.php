@@ -40,7 +40,7 @@
             </button>
 
             {{-- Add Button --}}
-            <a href="/t/pekerja"
+            <a href="{{route('view.tambah.pekerja')}}"
                class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 flex items-center gap-2">
                 <span>+ Tambah</span>
             </a>
@@ -99,9 +99,9 @@
                             <td class="py-3 px-2 text-center">351618802891001</td>
                             <td class="py-3 px-2 text-center text-green-600">Aktif</td>
                             <td class="py-3 px-2 text-center">
-                                <button class="px-3 py-1 border rounded-lg text-xs hover:bg-gray-50">
+                                <a href="{{route('view.detail.pekerja')}}" class="px-3 py-1 border rounded-lg text-xs hover:bg-gray-50">
                                     Detail
-                                </button>
+                                </a>
                             </td>
                         </tr>
                     @endfor

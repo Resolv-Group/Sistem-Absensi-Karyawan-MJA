@@ -1,7 +1,7 @@
 <nav class="w-full bg-white shadow-sm border-b px-8 py-3 flex items-center justify-between sticky top-0 z-50">
 
     {{-- Left: Logo --}}
-    <a href="/dashboard" class="flex items-center gap-3">
+    <a href="{{route('view.dashboard')}}" class="flex items-center gap-3">
         <img
             src="{{ asset('images/mja-logo.png') }}"
             alt="MJA Logo"
@@ -12,22 +12,22 @@
     {{-- Middle: Menu --}}
     <ul class="flex items-center gap-8 text-sm font-medium">
     <li class="relative pb-2 cursor-pointer">
-        <a href="/dashboard"
+        <a href="{{route('view.dashboard')}}"
             class="text-gray-700 hover:text-black {{ Request::is('dashboard') ? 'border-b-2 border-red-500 pb-2 text-black' : '' }}">
             Dashboard
         </a>
     </li>
 
     <li class="relative pb-2 cursor-pointer">
-        <a href="/daftar-pekerja"
-            class="text-gray-700 hover:text-black {{ (Request::is('daftar-pekerja') || Request::is('t/pekerja') || Request::is('t/pekerja/*')) ? 'border-b-2 border-red-500 pb-2 text-black' : '' }}">
+        <a href="{{route('view.pekerja')}}"
+            class="text-gray-700 hover:text-black {{ (Request::is('daftar-pekerja') || Request::is('pekerja') || Request::is('pekerja/*')) ? 'border-b-2 border-red-500 pb-2 text-black' : '' }}">
             Pekerja
         </a>
     </li>
 
     <li class="relative pb-2 cursor-pointer">
-        <a href="/daftar-staff"
-            class="text-gray-700 hover:text-black {{ (Request::is('staff') || Request::is('t/staff') || Request::is('t/staff/*'))  ? 'border-b-2 border-red-500 pb-2 text-black' : '' }}">
+        <a href="{{route('view.staff')}}"
+            class="text-gray-700 hover:text-black {{ (Request::is('daftar-staff') || Request::is('staff') || Request::is('staff/*'))  ? 'border-b-2 border-red-500 pb-2 text-black' : '' }}">
             Staff
         </a>
     </li>
@@ -35,26 +35,25 @@
 
     <li class="relative pb-2 cursor-pointer">
         <a href="/mitra-kerja"
-            class="text-gray-700 hover:text-black {{ (Request::is('mitra-kerja') || Request::is('t/mitra-kerja') || Request::is('t/mitra-kerja/*')) ? 'border-b-2 border-red-500 pb-2 text-black' : '' }}">
+            class="text-gray-700 hover:text-black {{ (Request::is('mitra-kerja') || Request::is('mitra-kerja') || Request::is('mitra-kerja/*')) ? 'border-b-2 border-red-500 pb-2 text-black' : '' }}">
             Mitra Kerja
         </a>
     </li>
 
     <li class="relative pb-2 cursor-pointer">
         <a href="/unit"
-            class="text-gray-700 hover:text-black {{ (Request::is('unit') || Request::is('t/unit') || Request::is('t/unit/*'))  ? 'border-b-2 border-red-500 pb-2 text-black' : '' }}">
+            class="text-gray-700 hover:text-black {{ (Request::is('unit') || Request::is('unit') || Request::is('unit/*'))  ? 'border-b-2 border-red-500 pb-2 text-black' : '' }}">
             Unit
         </a>
     </li>
 
     <li class="relative pb-2 cursor-pointer">
         <a href="/absensi"
-            class="text-gray-700 hover:text-black {{ (Request::is('absensi') || Request::is('t/absensi') || Request::is('t/absensi/*')) ? 'border-b-2 border-red-500 pb-2 text-black' : '' }}">
+            class="text-gray-700 hover:text-black {{ (Request::is('absensi') || Request::is('absensi') || Request::is('absensi/*')) ? 'border-b-2 border-red-500 pb-2 text-black' : '' }}">
             Absensi
         </a>
     </li>
 </ul>
-
 
 
     {{-- <li class="relative pb-2 cursor-pointer flex items-center gap-1">
