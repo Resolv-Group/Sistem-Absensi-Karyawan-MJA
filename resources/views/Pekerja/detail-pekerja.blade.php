@@ -72,9 +72,9 @@
                                     alt="Profile" class="w-full h-full object-cover">
                             </div>
                         </div>
-
+                            
                         {{-- Name & Unit --}}
-                        <h2 class="mt-4 text-xl font-bold text-gray-900">Dimas Indra Pratama</h2>
+                        <h2 class="mt-4 text-xl font-bold text-gray-900">{{ $pekerja->nama }}</h2>
                         <span
                             class="inline-block mt-2 px-3 py-1 text-xs font-semibold text-blue-700 bg-blue-50 rounded-full border border-blue-100">
                             PT. DOOR PAEYA
@@ -84,16 +84,16 @@
                         <div class="mt-8 text-left space-y-4 border-t border-gray-100 pt-6">
                             <div class="flex justify-between items-center">
                                 <span class="text-sm text-gray-500 font-medium">ID Pekerja</span>
-                                <span class="text-sm font-bold text-gray-900">42202424220011</span>
+                                <span class="text-sm font-bold text-gray-900">{{ $pekerja->id }}</span>
                             </div>
                             <div class="flex justify-between items-center">
                                 <span class="text-sm text-gray-500 font-medium">Tanggal Bergabung</span>
-                                <span class="text-sm font-bold text-gray-900">19 Feb, 2022</span>
+                                <span class="text-sm font-bold text-gray-900">{{ $pekerja->tgl_bergabung }}</span>
                             </div>
                             {{-- tgl resign akan Inactive kalau status = aktif  --}}
                             <div class="flex justify-between items-center">
                                 <span class="text-sm text-gray-500 font-medium">Tanggal Resign</span>
-                                <span class="text-sm font-bold text-gray-900">18 Feb, 2025</span>
+                                <span class="text-sm font-bold text-gray-900">{{ $pekerja->tgl_resign }}</span>
                             </div>
                             <div class="flex justify-between items-center">
                                 <span class="text-sm text-gray-500 font-medium">Divisi/Jabatan</span>
@@ -109,11 +109,19 @@
                             </div>
                             <div class="flex justify-between items-center">
                                 <span class="text-sm text-gray-500 font-medium">Status</span>
-                                <span
-                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
-                                    <span class="w-1.5 h-1.5 bg-green-600 rounded-full mr-1.5"></span>
-                                    Aktif
-                                </span>
+                                    @if($pekerja->status_aktif == 1)
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                                                    bg-green-100 text-green-800 border border-green-200">
+                                            <span class="w-1.5 h-1.5 bg-green-600 rounded-full mr-1.5"></span>
+                                            Aktif
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                                                    bg-red-100 text-red-800 border border-red-200">
+                                            <span class="w-1.5 h-1.5 bg-red-600 rounded-full mr-1.5"></span>
+                                            Non Aktif
+                                        </span>
+                                    @endif
                             </div>
                         </div>
                     </div>

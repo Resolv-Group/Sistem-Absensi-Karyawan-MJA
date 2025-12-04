@@ -19,6 +19,5 @@ class Pekerja extends Model
         'kelamin','status_kawin','pendidikan','status_aktif', 'anak',
 
         'nama_emergency','telp_emergency','hubungan_emergency','ibu_kandung',
-
     ];
 }

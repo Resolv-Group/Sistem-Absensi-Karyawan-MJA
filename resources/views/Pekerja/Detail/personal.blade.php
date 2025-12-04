@@ -10,35 +10,35 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8">
             <div>
                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Nama Lengkap</label>
-                <p class="text-base font-semibold text-gray-900">Dimas Indra Pratama</p>
+                <p class="text-base font-semibold text-gray-900">{{ $pekerja->nama }}</p>
             </div>
             <div>
                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Jenis Kelamin</label>
-                <p class="text-base font-semibold text-gray-900">Laki-Laki</p>
+                <p class="text-base font-semibold text-gray-900">{{ $pekerja->kelamin }}</p>
             </div>
             <div>
                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Tempat Lahir</label>
-                <p class="text-base font-semibold text-gray-900">Malang</p>
+                <p class="text-base font-semibold text-gray-900">{{ $pekerja->tempat_lahir }}</p>
             </div>
             <div>
                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Tanggal Lahir</label>
-                <p class="text-base font-semibold text-gray-900">20 Juni 1985</p>
+                <p class="text-base font-semibold text-gray-900">{{ $pekerja->tgl_lahir }}</p>
             </div>
             <div>
                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Pendidikan Terakhir</label>
-                <p class="text-base font-semibold text-gray-900">S1 Informatika</p>
+                <p class="text-base font-semibold text-gray-900">{{ $pekerja->pendidikan }}</p>
             </div>
             <div>
                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Status Kawin</label>
-                <p class="text-base font-semibold text-gray-900">K/0 (Menikah, 0 Anak)</p>
+                <p class="text-base font-semibold text-gray-900">{{ $pekerja->status_kawin }} ({{ $pekerja->anak }} Anak)</p>
             </div>
             <div>
                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">No.KK</label>
-                <p class="text-base font-semibold text-gray-900">1592385202341782</p>
+                <p class="text-base font-semibold text-gray-900">{{ $pekerja->no_kk }}</p>
             </div>
             <div>
                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">No.Rekening (Nama Bank)</label>
-                <p class="text-base font-semibold text-gray-900">4912385938293(BCA)</p>
+                <p class="text-base font-semibold text-gray-900">{{ $pekerja->rekening }}({{ $pekerja->nama_rek }})</p>
             </div>
         </div>
     </div>
@@ -53,23 +53,23 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8">
             <div class="md:col-span-2">
                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Alamat Lengkap</label>
-                <p class="text-base font-semibold text-gray-900">Jl. Tidar No.1 RT.001 / RW.002</p>
+                <p class="text-base font-semibold text-gray-900">{{ $pekerja->alamat }}</p>
             </div>
             <div>
                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Kelurahan / Desa</label>
-                <p class="text-base font-semibold text-gray-900">Merjosari</p>
+                <p class="text-base font-semibold text-gray-900">{{ $pekerja->desa }}</p>
             </div>
             <div>
                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Kecamatan</label>
-                <p class="text-base font-semibold text-gray-900">Lowokwaru</p>
+                <p class="text-base font-semibold text-gray-900">{{ $pekerja->kecamatan }}</p>
             </div>
             <div>
                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Kota / Kabupaten</label>
-                <p class="text-base font-semibold text-gray-900">Malang</p>
+                <p class="text-base font-semibold text-gray-900">{{ $pekerja->kota }}</p>
             </div>
             <div>
                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Provinsi</label>
-                <p class="text-base font-semibold text-gray-900">Jawa Timur</p>
+                <p class="text-base font-semibold text-gray-900">{{ $pekerja->provinsi }}</p>
             </div>
         </div>
     </div>

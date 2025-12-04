@@ -58,7 +58,7 @@
         <div class="grid grid-cols-4 gap-4 mb-4">
             <div>
                 <p class="text-xs text-gray-500">Periode</p>
-                <p class="font-semibold text-gray-800">November 2025</p>
+                <p class="font-semibold text-gray-800">{{ \Carbon\Carbon::now()->translatedFormat('F Y') }}</p>
             </div>
             <div>
                 <p class="text-xs text-gray-500">Total Karyawan</p>
@@ -90,21 +90,34 @@
                 </thead>
 
                 <tbody>
-                    @for ($i = 1; $i <= 10; $i++)
+                    @forelse ($pekerja as $p)
                         <tr class="border-b">
-                            <td class="py-3 px-2">Rina Kartikasari</td>
-                            <td class="py-3 px-2 text-center">4220242420011</td>
-                            <td class="py-3 px-2 text-center">720811234567</td>
-                            <td class="py-3 px-2 text-center">35168709210011</td>
-                            <td class="py-3 px-2 text-center">351618802891001</td>
-                            <td class="py-3 px-2 text-center text-green-600">Aktif</td>
+                            <td class="py-3 px-2">{{ $p->nama }}</td>
+                            <td class="py-3 px-2 text-center">{{ $p->id }}</td>
+                            <td class="py-3 px-2 text-center">{{ $p->rekening ?? '-' }}</td>
+                            <td class="py-3 px-2 text-center">{{ $p->no_kk }}</td>
+                            <td class="py-3 px-2 text-center">{{ $p->nik }}</td>
+                            <td class="py-3 px-2 text-center text-green-600">
+                                @if($p->status_aktif == 1)
+                                    <span class="text-green-600 font-semibold">Aktif</span>
+                                @else
+                                    <span class="text-red-600 font-semibold">Non Aktif</span>
+                                @endif
+                            </td>
                             <td class="py-3 px-2 text-center">
-                                <a href="{{route('view.detail.pekerja')}}" class="px-3 py-1 border rounded-lg text-xs hover:bg-gray-50">
-                                    Detail
+                                <a href="{{ route('view.detail.pekerja', $p->id) }}"
+                                class="px-3 py-1 border rounded-lg text-xs hover:bg-gray-50">
+                                Detail
                                 </a>
                             </td>
                         </tr>
-                    @endfor
+                    @empty
+                    <tr>
+                        <td colspan="7" class="text-center text-gray-500 py-6">
+                            Belum ada data pekerja.
+                        </td>
+                    </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
