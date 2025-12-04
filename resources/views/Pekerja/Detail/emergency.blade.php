@@ -7,15 +7,15 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8">
         <div>
             <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Nama Kontak</label>
-            <p class="text-base font-semibold text-gray-900">{{ $pekerja->emergency_nama ?? '-' }}</p>
+            <p class="text-base font-semibold text-gray-900">{{ $pekerja->nama_emergency ?? '-' }}</p>
         </div>
         <div>
             <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Hubungan</label>
-            <p class="text-base font-semibold text-gray-900">{{ $pekerja->emergency_hubungan ?? '-' }}</p>
+            <p class="text-base font-semibold text-gray-900">{{ $pekerja->hubungan_emergency ?? '-' }}</p>
         </div>
         <div>
             <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Nomor Telepon</label>
-            <p class="text-base font-semibold text-gray-900">{{ $pekerja->emergency_telp ?? '-' }}</p>
+            <p class="text-base font-semibold text-gray-900">{{ $pekerja->telp_emergency ?? '-' }}</p>
         </div>
         <div>
             <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Nama Ibu Kandung</label>

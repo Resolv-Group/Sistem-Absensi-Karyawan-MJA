@@ -8,21 +8,25 @@ use Illuminate\Support\Facades\Storage;
 
 class PekerjaController extends Controller
 {
-    function viewPekerjaMain(){
+    function viewPekerjaMain()
+    {
+        $pekerja = Pekerja::where('status_aktif', 1)->get();
 
-        return view('Pekerja.main-pekerja');
+        return view('Pekerja.main-pekerja', compact('pekerja'));
     }
 
     function viewTambahPekerja() {
         return view('Pekerja.CRUD.tambah-pekerja');
     }
 
-    function viewDetailPekerja() {
-        return view('Pekerja.detail-pekerja');
+    function viewDetailPekerja($id) {
+        $pekerja = Pekerja::where('id', $id)->first(); 
+
+        return view('Pekerja.detail-pekerja', compact('pekerja'));
     }
 
-}
-    function tambahPekerja(request $request) {
+
+    function tambahPekerja(request $request) 
     {
         // dd($request->all());
     
@@ -112,5 +116,6 @@ class PekerjaController extends Controller
         return redirect('/daftar-pekerja')->with('success', 'Pekerja berhasil ditambahkan.');
     }
     
-    }
 }
+
+
