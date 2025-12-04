@@ -9,15 +9,15 @@
             {{-- Left Side: Breadcrumb & Title --}}
             <div>
                 <nav class="flex text-sm font-medium text-gray-500 mb-2">
-                    <a href="/dashboard" class="hover:text-gray-700 transition">Dashboard</a>
+                    <a href="{{route('view.dashboard')}}" class="hover:text-gray-700 transition">Dashboard</a>
                     <span class="mx-2 text-gray-400">/</span>
-                    <a href="/daftar-pekerja" class="hover:text-gray-700 transition">Pekerja</a>
+                    <a href="{{route('view.staff')}}" class="hover:text-gray-700 transition">Staff</a>
                     <span class="mx-2 text-gray-400">/</span>
                     <span class="text-blue-600">Detail</span>
                 </nav>
 
                 <div class="flex items-center gap-4">
-                    <a href="/daftar-pekerja"
+                    <a href="{{route('view.staff')}}"
                         class="group p-2 rounded-full border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition shadow-sm">
                         <svg xmlns="http://www.w3.org/2000/svg"
                             class="h-5 w-5 transform group-hover:-translate-x-0.5 transition" fill="none"
@@ -27,8 +27,8 @@
                         </svg>
                     </a>
                     <div>
-                        <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Detail Pekerja</h1>
-                        <p class="text-sm text-gray-500 mt-1">Informasi lengkap data diri dan kepegawaian.</p>
+                        <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Detail Staff</h1>
+                        <p class="text-sm text-gray-500 mt-1">Informasi lengkap data diri staff.</p>
                     </div>
                 </div>
             </div>
@@ -61,30 +61,30 @@
             <div class="lg:col-span-1">
                 <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
                     {{-- Banner --}}
-                    <div class="h-32 bg-gradient-to-r from-blue-500 to-blue-600"></div>
+                    <div class="h-32 bg-gradient-to-r from-green-500 to-green-600"></div>
 
                     <div class="px-6 pb-6 relative text-center">
                         {{-- Avatar --}}
                         <div class="relative -mt-16 inline-block">
                             <div class="h-32 w-32 rounded-full border-4 border-white shadow-md bg-gray-200 overflow-hidden">
                                 {{-- Placeholder Image / Real Image --}}
-                                <img src="https://ui-avatars.com/api/?name=Dimas+Pratama&background=random&size=128"
+                                <img src="https://ui-avatars.com/api/?name=Rina+Kartikasari&background=random&size=128"
                                     alt="Profile" class="w-full h-full object-cover">
                             </div>
                         </div>
 
                         {{-- Name & Unit --}}
-                        <h2 class="mt-4 text-xl font-bold text-gray-900">Dimas Indra Pratama</h2>
+                        <h2 class="mt-4 text-xl font-bold text-gray-900">Rina Kartikasari</h2>
                         <span
-                            class="inline-block mt-2 px-3 py-1 text-xs font-semibold text-blue-700 bg-blue-50 rounded-full border border-blue-100">
-                            PT. DOOR PAEYA
+                            class="inline-block mt-2 px-3 py-1 text-xs font-semibold text-green-700 bg-green-50 rounded-full border border-green-100">
+                            HRD
                         </span>
 
                         {{-- Info List --}}
                         <div class="mt-8 text-left space-y-4 border-t border-gray-100 pt-6">
                             <div class="flex justify-between items-center">
-                                <span class="text-sm text-gray-500 font-medium">ID Pekerja</span>
-                                <span class="text-sm font-bold text-gray-900">42202424220011</span>
+                                <span class="text-sm text-gray-500 font-medium">ID Karyawan</span>
+                                <span class="text-sm font-bold text-gray-900">42202424220012</span>
                             </div>
                             <div class="flex justify-between items-center">
                                 <span class="text-sm text-gray-500 font-medium">Tanggal Bergabung</span>
@@ -96,19 +96,27 @@
                                 <span class="text-sm font-bold text-gray-900">18 Feb, 2025</span>
                             </div>
                             <div class="flex justify-between items-center">
-                                <span class="text-sm text-gray-500 font-medium">Divisi/Jabatan</span>
-                                <span class="text-sm font-bold text-gray-900">Intake Bag</span>
+                                <span class="text-sm text-gray-500 font-medium">Status Staff</span>
+                                <span class="text-sm font-bold text-gray-900">PKWTT</span>
                             </div>
                             <div class="flex justify-between items-center">
-                                <span class="text-sm text-gray-500 font-medium">Departemen</span>
-                                <span class="text-sm font-bold text-gray-900">Production</span>
+                                <span class="text-sm text-gray-500 font-medium">Masa PKWT</span>
+                                <span class="text-sm font-bold text-gray-900">18 Feb, 2025</span>
                             </div>
                             <div class="flex justify-between items-center">
-                                <span class="text-sm text-gray-500 font-medium">Pengupahan</span>
-                                <span class="text-sm font-bold text-gray-900">Bulanan</span>
+                                <span class="text-sm text-gray-500 font-medium">Unit Kerja</span>
+                                <span class="text-sm font-bold text-gray-900">-</span>
                             </div>
                             <div class="flex justify-between items-center">
-                                <span class="text-sm text-gray-500 font-medium">Status</span>
+                                <span class="text-sm text-gray-500 font-medium">Status Perjanjian Kerja</span>
+                                <span
+                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
+                                    <span class="w-1.5 h-1.5 bg-green-600 rounded-full mr-1.5"></span>
+                                    Aktif
+                                </span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-500 font-medium">Status Keaktifan</span>
                                 <span
                                     class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
                                     <span class="w-1.5 h-1.5 bg-green-600 rounded-full mr-1.5"></span>
@@ -148,12 +156,12 @@
 
                     <div class="p-8">
                         <div x-show="tab=='personal'">
-                            @include('Pekerja.Detail.personal')
+                            @include('Staff.Detail.personal')
+                        </div>
+                        <div x-show="tab=='emergency'">
+                            @include('Staff.Detail.emergency')
                         </div>
 
-                        <div x-show="tab=='emergency'">
-                            @include('Pekerja.Detail.emergency')
-                        </div>
                     </div>
 
                 </div>
