@@ -10,62 +10,129 @@ class PekerjaController extends Controller
 {
     function viewPekerjaMain()
     {
-        $pekerja = Pekerja::where('status_aktif', 1)->get();
+        $pekerja = Pekerja::where('status_aktif', 1)->paginate(5);
+        $totalPekerja = Pekerja::count(); // total pekerja
+        $pekerjaBaru  = Pekerja::where('created_at', '>=', now()->subMonth())->count(); // pekerja baru dari bulan lalu
+        $tidakAktif   = Pekerja::where('status_aktif', '!=', '1')->count(); // pekerja tidak aktif
 
-        return view('Pekerja.main-pekerja', compact('pekerja'));
+        return view('Pekerja.main-pekerja', compact('pekerja', 'totalPekerja', 'pekerjaBaru', 'tidakAktif'));
     }
 
-    function viewTambahPekerja() {
+    function viewTambahPekerja()
+    {
         return view('Pekerja.CRUD.tambah-pekerja');
     }
 
-    function viewDetailPekerja($id) {
-        $pekerja = Pekerja::where('id', $id)->first(); 
+    function viewDetailPekerja($id)
+    {
+        $pekerja = Pekerja::where('id', $id)->first();
+
+        $pekerja->image_base64 = 'data:image/jpeg;base64,' . base64_encode($pekerja->image_blob);
 
         return view('Pekerja.detail-pekerja', compact('pekerja'));
     }
 
-
-    function tambahPekerja(request $request) 
+    function tambahPekerja(request $request)
     {
         // dd($request->all());
-    
+
         // ✅ Validasi input
-        $request->validate([
-            'nama' => 'required|string|max:255',
-            'nik' => 'required|digits:16|unique:pekerja,nik',
-            'no_kk' => 'required|digits:16',
-            'tempat_lahir' => 'required|string|max:100',
-            'tgl_lahir' => 'required|date',
-            'kelamin' => 'required|boolean',
-            'pendidikan' => 'required|string',
-            'status_kawin' => 'required|string',
-            'anak' => 'nullable|integer|min:0',
-            'tgl_bergabung' => 'required|date',
-            'tgl_resign' => 'nullable|date',
+        $request->validate(
+            [
+                'nama' => 'required|string|max:255',
+                'nik' => 'required|digits:16|unique:pekerja,nik',
+                'no_kk' => 'required|digits:16',
+                'tempat_lahir' => 'required|string|max:100',
+                'tgl_lahir' => 'required|date',
+                'kelamin' => 'required|boolean',
+                'pendidikan' => 'required|string',
+                'status_kawin' => 'required|string',
+                'anak' => 'nullable|integer|min:0',
+                'tgl_bergabung' => 'required|date',
+                'tgl_resign' => 'nullable|date',
 
-            'alamat' => 'required|string',
-            'desa' => 'required|string',
-            'rt' => 'nullable|integer',
-            'rw' => 'nullable|integer',
-            'kota' => 'required|string',
-            'kecamatan' => 'required|string',
-            'provinsi' => 'required|string',
+                'alamat' => 'required|string',
+                'desa' => 'required|string',
+                'rt' => 'nullable|integer',
+                'rw' => 'nullable|integer',
+                'kota' => 'required|string',
+                'kecamatan' => 'required|string',
+                'provinsi' => 'required|string',
 
-            'email' => 'nullable|email',
-            'telp' => 'nullable|string|max:16',
+                'email' => 'nullable|email',
+                'telp' => 'nullable|string|max:16',
 
-            'nama_rek' => 'nullable|string',
-            'rekening' => 'nullable|string|max:30',
+                'nama_rek' => 'nullable|string',
+                'rekening' => 'nullable|string|max:30',
 
-            'nama_emergency' => 'required|string|max:255',
-            'telp_emergency' => 'required|string|max:16',
-            'hubungan_emergency' => 'required|string',
+                'nama_emergency' => 'required|string|max:255',
+                'telp_emergency' => 'required|string|max:16',
+                'hubungan_emergency' => 'required|string',
 
-            'ibu_kandung' => 'string|max:255',
+                'ibu_kandung' => 'string|max:255',
 
-            'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
-        ]);
+                'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            ],
+            [
+                // Identitas
+                'nama.required' => 'Nama tidak boleh kosong.',
+                'nama.max' => 'Nama maksimal 255 karakter.',
+
+                'nik.required' => 'NIK wajib diisi.',
+                'nik.digits' => 'NIK harus 16 digit angka.',
+                'nik.unique' => 'NIK sudah terdaftar, gunakan NIK lain.',
+
+                'no_kk.required' => 'No KK wajib diisi.',
+                'no_kk.digits' => 'No KK harus 16 digit angka.',
+
+                'tempat_lahir.required' => 'Tempat lahir wajib diisi.',
+                'tempat_lahir.max' => 'Tempat lahir maksimal 100 karakter.',
+
+                'tgl_lahir.required' => 'Tanggal lahir wajib diisi.',
+                'tgl_lahir.date' => 'Tanggal lahir tidak valid.',
+
+                'kelamin.required' => 'Jenis kelamin wajib dipilih.',
+                'kelamin.boolean' => 'Format jenis kelamin tidak valid.',
+
+                'pendidikan.required' => 'Pendidikan wajib diisi.',
+                'status_kawin.required' => 'Status perkawinan wajib diisi.',
+
+                'anak.integer' => 'Jumlah anak harus angka.',
+                'anak.min' => 'Minimal nilai anak adalah 0.',
+
+                'tgl_bergabung.required' => 'Tanggal bergabung wajib diisi.',
+                'tgl_bergabung.date' => 'Tanggal bergabung tidak valid.',
+
+                'tgl_resign.date' => 'Tanggal resign tidak valid.',
+
+                // Alamat
+                'alamat.required' => 'Alamat wajib diisi.',
+                'desa.required' => 'Desa wajib diisi.',
+                'rt.integer' => 'RT harus berupa angka.',
+                'rw.integer' => 'RW harus berupa angka.',
+                'kota.required' => 'Kota wajib diisi.',
+                'kecamatan.required' => 'Kecamatan wajib diisi.',
+                'provinsi.required' => 'Provinsi wajib diisi.',
+
+                // Kontak
+                'email.email' => 'Format email tidak valid.',
+                'telp.max' => 'No telepon maksimal 16 karakter.',
+
+                // Bank
+                'rekening.max' => 'No rekening maksimal 30 karakter.',
+
+                // Emergency
+                'nama_emergency.required' => 'Nama kontak darurat wajib diisi.',
+                'telp_emergency.required' => 'No telepon darurat wajib diisi.',
+                'telp_emergency.max' => 'No telepon darurat maksimal 16 karakter.',
+                'hubungan_emergency.required' => 'Hubungan dengan kontak darurat wajib diisi.',
+
+                // Foto
+                'foto.image' => 'File foto harus berupa gambar.',
+                'foto.mimes' => 'Format foto harus jpg/jpeg/png.',
+                'foto.max' => 'Ukuran foto maksimal 2MB.',
+            ],
+        );
 
         // dd($request->all());
 
@@ -76,7 +143,7 @@ class PekerjaController extends Controller
         // }
 
         // ✅ Simpan ke database
-        Pekerja::create([
+        $pekerja = Pekerja::create([
             'nama' => $request->nama,
             'nik' => $request->nik,
             'no_kk' => $request->no_kk,
@@ -110,12 +177,11 @@ class PekerjaController extends Controller
 
             'foto' => $request->foto,
 
-            'status_aktif' => 1
+            'status_aktif' => 1,
         ]);
 
-        return redirect('/daftar-pekerja')->with('success', 'Pekerja berhasil ditambahkan.');
+        return redirect()
+            ->route('view.tambah.pekerja')
+            ->with('success', 'Data Pekerja ' . $pekerja->nama . ' berhasil ditambahkan.');
     }
-    
 }
-
-

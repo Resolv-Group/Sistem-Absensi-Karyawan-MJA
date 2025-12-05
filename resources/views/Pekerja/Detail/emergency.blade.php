@@ -7,7 +7,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8">
         <div>
             <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Nama Kontak</label>
-            <p class="text-base font-semibold text-gray-900">{{ $pekerja->nama_emergency ?? '-' }}</p>
+            <p class="text-base font-semibold text-gray-900 break-words">{{ ucwords($pekerja->nama_emergency ?? '-') }}</p>
         </div>
         <div>
             <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Hubungan</label>
@@ -19,7 +19,7 @@
         </div>
         <div>
             <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Nama Ibu Kandung</label>
-            <p class="text-base font-semibold text-gray-900">{{ $pekerja->ibu_kandung ?? '-' }}</p>
+            <p class="text-base font-semibold text-gray-900 break-words">{{ ucwords($pekerja->ibu_kandung ?? '-') }}</p>
         </div>
     </div>
 </div>
