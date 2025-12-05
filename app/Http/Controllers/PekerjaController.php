@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Pekerja;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Storage;
 
 class PekerjaController extends Controller
@@ -35,9 +36,8 @@ class PekerjaController extends Controller
     function tambahPekerja(request $request)
     {
         // dd($request->all());
-
-        // ✅ Validasi input
-        $request->validate(
+        try {
+            $request->validate(
             [
                 'nama' => 'required|string|max:255',
                 'nik' => 'required|digits:16|unique:pekerja,nik',
@@ -137,10 +137,10 @@ class PekerjaController extends Controller
         // dd($request->all());
 
         // ✅ Upload foto
-        // $fotoPath = null;
-        // if ($request->hasFile('foto_profil')) {
-        //     $fotoPath = $request->file('foto_profil')->store('foto-pekerja', 'public');
-        // }
+        $fotoBlob = null;
+        if ($request->hasFile('foto')) {
+            $fotoBlob = file_get_contents($request->file('foto')->getRealPath());
+        }
 
         // ✅ Simpan ke database
         $pekerja = Pekerja::create([
@@ -175,7 +175,7 @@ class PekerjaController extends Controller
             'hubungan_emergency' => $request->hubungan_emergency,
             'ibu_kandung' => $request->ibu_kandung,
 
-            'foto' => $request->foto,
+            'foto' => $fotoBlob,
 
             'status_aktif' => 1,
         ]);
@@ -183,5 +183,13 @@ class PekerjaController extends Controller
         return redirect()
             ->route('view.tambah.pekerja')
             ->with('success', 'Data Pekerja ' . $pekerja->nama . ' berhasil ditambahkan.');
+        } catch (QueryException $e) {
+    // If the DB fails, we catch it here so Laravel doesn't try to render the blob
+    // We only return the text message, not the binary data
+    dd('Database Error Occurred:', $e->getMessage());
+} catch (\Exception $e) {
+    dd('General Error:', $e->getMessage());
+}
+
     }
 }

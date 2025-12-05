@@ -65,13 +65,18 @@
                         {{-- Avatar --}}
                         <div class="relative -mt-16 inline-block">
                             <div class="h-32 w-32 rounded-full border-4 border-white shadow-md bg-gray-200 overflow-hidden">
-                                {{-- Placeholder Image / Real Image --}}
+
+                                {{-- Check if our custom accessor returns data --}}
                                 @if ($pekerja->image_base64)
-                                    <img src="{{ $pekerja->image_base64 }}" class="w-48 h-48 object-cover" />
+                                    {{-- Display the Base64 image --}}
+                                    <img src="{{ $pekerja->image_base64 }}" alt="Foto {{ $pekerja->nama }}"
+                                        class="w-full h-full object-cover" />
                                 @else
-                                    <img src="https://ui-avatars.com/api/?name=Dimas+Pratama&background=random&size=128"
-                                        alt="Profile" class="w-full h-full object-cover">
+                                    {{-- Fallback image --}}
+                                    <img src="https://ui-avatars.com/api/?name={{ urlencode($pekerja->nama) }}&background=random&size=128"
+                                        alt="Profile Placeholder" class="w-full h-full object-cover">
                                 @endif
+
                             </div>
                         </div>
 
@@ -100,7 +105,7 @@
                             <div class="flex justify-between items-center">
                                 <span class="text-sm text-gray-500 font-medium">Tanggal Resign</span>
                                 <span
-                                    class="text-sm font-bold text-gray-900">{{ formatTanggal($pekerja->tgl_resign) ?? '-'}}</span>
+                                    class="text-sm font-bold text-gray-900">{{ formatTanggal($pekerja->tgl_resign) ?? '-' }}</span>
                             </div>
                             <div class="flex justify-between items-center">
                                 <span class="text-sm text-gray-500 font-medium">Status</span>
