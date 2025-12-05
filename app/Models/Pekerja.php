@@ -17,6 +17,7 @@ class Pekerja extends Model
         'kelamin' => JenisKelamin::class,
     ];
 
+
     protected $fillable = [
         'nama','nik','no_kk','email','telp','foto','alamat','desa','kecamatan','kota','provinsi',
 
@@ -26,4 +27,20 @@ class Pekerja extends Model
 
         'nama_emergency','telp_emergency','hubungan_emergency','ibu_kandung',
     ];
+
+    protected $hidden = [
+        'foto',
+    ];
+
+    public function getImageBase64Attribute()
+    {
+        // Check if the 'foto' column has data
+        if ($this->foto) {
+            // Convert binary data to a Base64 string that HTML can read
+            return 'data:image/jpeg;base64,' . base64_encode($this->foto);
+        }
+
+        // Return null if no photo exists
+        return null;
+    }
 }
