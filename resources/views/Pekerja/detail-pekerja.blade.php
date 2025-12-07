@@ -9,8 +9,6 @@
             {{-- Left Side: Breadcrumb & Title --}}
             <div>
                 <nav class="flex text-sm font-medium text-gray-500 mb-2">
-                    <a href="/dashboard" class="hover:text-gray-700 transition">Dashboard</a>
-                    <span class="mx-2 text-gray-400">/</span>
                     <a href="/daftar-pekerja" class="hover:text-gray-700 transition">Pekerja</a>
                     <span class="mx-2 text-gray-400">/</span>
                     <span class="text-blue-600">Detail</span>
@@ -67,14 +65,27 @@
                         {{-- Avatar --}}
                         <div class="relative -mt-16 inline-block">
                             <div class="h-32 w-32 rounded-full border-4 border-white shadow-md bg-gray-200 overflow-hidden">
-                                {{-- Placeholder Image / Real Image --}}
-                                <img src="https://ui-avatars.com/api/?name=Dimas+Pratama&background=random&size=128"
-                                    alt="Profile" class="w-full h-full object-cover">
+
+                                {{-- Check if our custom accessor returns data --}}
+                                @if ($pekerja->image_base64)
+                                    {{-- Display the Base64 image --}}
+                                    <img src="{{ $pekerja->image_base64 }}" alt="Foto {{ $pekerja->nama }}"
+                                        class="w-full h-full object-cover" />
+                                @else
+                                    {{-- Fallback image --}}
+                                    <img src="https://ui-avatars.com/api/?name={{ urlencode($pekerja->nama) }}&background=random&size=128"
+                                        alt="Profile Placeholder" class="w-full h-full object-cover">
+                                @endif
+
                             </div>
                         </div>
-                            
+
                         {{-- Name & Unit --}}
-                        <h2 class="mt-4 text-xl font-bold text-gray-900">{{ $pekerja->nama }}</h2>
+                        <h2 class="mt-4 text-xl font-bold text-gray-900">
+                            {{ Str::limit(ucwords(collect(explode(' ', strtolower($pekerja->nama)))->take(2)->implode(' ')),15) }}
+                        </h2>
+
+
                         <span
                             class="inline-block mt-2 px-3 py-1 text-xs font-semibold text-blue-700 bg-blue-50 rounded-full border border-blue-100">
                             PT. DOOR PAEYA
@@ -88,40 +99,31 @@
                             </div>
                             <div class="flex justify-between items-center">
                                 <span class="text-sm text-gray-500 font-medium">Tanggal Bergabung</span>
-                                <span class="text-sm font-bold text-gray-900">{{ $pekerja->tgl_bergabung }}</span>
+                                <span
+                                    class="text-sm font-bold text-gray-900">{{ formatTanggal($pekerja->tgl_bergabung) }}</span>
                             </div>
-                            {{-- tgl resign akan Inactive kalau status = aktif  --}}
                             <div class="flex justify-between items-center">
                                 <span class="text-sm text-gray-500 font-medium">Tanggal Resign</span>
-                                <span class="text-sm font-bold text-gray-900">{{ $pekerja->tgl_resign }}</span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-sm text-gray-500 font-medium">Divisi/Jabatan</span>
-                                <span class="text-sm font-bold text-gray-900">Intake Bag</span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-sm text-gray-500 font-medium">Departemen</span>
-                                <span class="text-sm font-bold text-gray-900">Production</span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-sm text-gray-500 font-medium">Pengupahan</span>
-                                <span class="text-sm font-bold text-gray-900">Bulanan</span>
+                                <span
+                                    class="text-sm font-bold text-gray-900">{{ formatTanggal($pekerja->tgl_resign) ?? '-' }}</span>
                             </div>
                             <div class="flex justify-between items-center">
                                 <span class="text-sm text-gray-500 font-medium">Status</span>
-                                    @if($pekerja->status_aktif == 1)
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                                @if ($pekerja->status_aktif == 1)
+                                    <span
+                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                                                     bg-green-100 text-green-800 border border-green-200">
-                                            <span class="w-1.5 h-1.5 bg-green-600 rounded-full mr-1.5"></span>
-                                            Aktif
-                                        </span>
-                                    @else
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                                        <span class="w-1.5 h-1.5 bg-green-600 rounded-full mr-1.5"></span>
+                                        Aktif
+                                    </span>
+                                @else
+                                    <span
+                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                                                     bg-red-100 text-red-800 border border-red-200">
-                                            <span class="w-1.5 h-1.5 bg-red-600 rounded-full mr-1.5"></span>
-                                            Non Aktif
-                                        </span>
-                                    @endif
+                                        <span class="w-1.5 h-1.5 bg-red-600 rounded-full mr-1.5"></span>
+                                        Non Aktif
+                                    </span>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -149,7 +151,7 @@
                             <button @click="tab='salary'"
                                 :class="tab == 'salary' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'"
                                 class="whitespace-nowrap py-4 px-1 font-medium text-sm">
-                                Riwayat Gaji
+                                PKWT
                             </button>
                         </nav>
                     </div>

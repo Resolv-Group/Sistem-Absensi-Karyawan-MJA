@@ -14,6 +14,10 @@
     {{-- Alpine Js --}}
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
+    {{-- Sweet Alert 2 --}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
     <style>
         body {
             font-family: 'Poppins', sans-serif;
@@ -29,6 +33,8 @@
         @yield('content')
     </div>
 
+    @yield('scripts')
+
     <!-- Loading Screen -->
     <div id="loading-screen" class="fixed inset-0 bg-gray-100 flex items-center justify-center z-50 hidden">
         <div class="text-center">
@@ -42,6 +48,9 @@
             border-top-color: #3498db;
         }
     </style>
+
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
 
     <script>
         const loadingScreen = document.getElementById('loading-screen');
