@@ -188,7 +188,7 @@ class PekerjaController extends Controller
         } catch (QueryException $e) {
         // If the DB fails, we catch it here so Laravel doesn't try to render the blob
         // We only return the text message, not the binary data
-        dd('Database Error Occurred:', $e->getMessage());
+            // dd('Database Error Occurred:', $e->getMessage());
         } catch (\Exception $e) {
             dd('General Error:', $e->getMessage());
         }
@@ -209,7 +209,7 @@ class PekerjaController extends Controller
         $request->validate(
             [
                 'nama' => 'required|string|max:255',
-                
+
                 'nik' => [
                 'required',
                 'digits:16',
@@ -314,7 +314,7 @@ class PekerjaController extends Controller
             ],
         );
 
-        
+
 
         $data = $request->except('foto', '_token', '_method');
 

@@ -24,5 +24,6 @@ Route::middleware('web')->group(function(){
     Route::get('/daftar-staff', [StaffController::class, 'viewStaffMain'])->name('view.staff');
     Route::get('/staff/tambah', [StaffController::class, 'viewTambahStaff'])->name('view.tambah.staff');
     Route::get('/staff/detail', [StaffController::class, 'viewDetailStaff'])->name('view.detail.staff');
+    Route::POST('/tambah-staff', [StaffController::class, 'tambahStaff'])->name('tambah.staff.post');
 });
 

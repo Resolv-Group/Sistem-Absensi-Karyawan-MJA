@@ -88,11 +88,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // --- RULES ---
     if (tglLahir) tglLahir.max = today;          // Birth date cannot be in future
     if (tglBergabung) tglBergabung.max = today;  // Join date cannot be in future
-
-
 });
-
-
 
 function phoneFieldHandler(inputClass, fieldName = "Nomor Telepon", min = 10, max = 15) {
     const input = document.querySelector(inputClass);
@@ -202,7 +198,7 @@ document.getElementById('save-btn').addEventListener('click', function(){
         cancelButtonText: 'Cek lagi'
     }).then((result) => {
         if (result.isConfirmed) {
-            document.getElementById('formTambahPekerja').submit();
+            document.getElementById('formTambahStaff').submit();
         }
     });
 });
