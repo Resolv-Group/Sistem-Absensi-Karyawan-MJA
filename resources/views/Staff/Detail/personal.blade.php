@@ -13,8 +13,8 @@
                 <p class="text-base font-semibold text-gray-900">Rina Kartikasari Wijaya</p>
             </div>
             <div>
-                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Jenis Kelamin</label>
-                <p class="text-base font-semibold text-gray-900">Perempuan</p>
+                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">No.NIK</label>
+                <p class="text-base font-semibold text-gray-900">1592302341782</p>
             </div>
             <div>
                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Tempat Lahir</label>
@@ -23,6 +23,10 @@
             <div>
                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Tanggal Lahir</label>
                 <p class="text-base font-semibold text-gray-900">20 Januari 1998</p>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Jenis Kelamin</label>
+                <p class="text-base font-semibold text-gray-900">Perempuan</p>
             </div>
             <div>
                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Pendidikan Terakhir</label>
@@ -36,10 +40,7 @@
                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">No.KK</label>
                 <p class="text-base font-semibold text-gray-900">1592385202341782</p>
             </div>
-            <div>
-                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">No.Rekening (Nama Bank)</label>
-                <p class="text-base font-semibold text-gray-900">4912385938293(BCA)</p>
-            </div>
+
         </div>
     </div>
 
@@ -49,8 +50,19 @@
             <h3 class="text-lg font-bold text-gray-900 whitespace-nowrap">Informasi Kontak & Alamat</h3>
             <div class="h-px bg-gray-200 w-full"></div>
         </div>
-
         <div class="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8">
+            <div class="md:col-span-2">
+                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Email</label>
+                <p class="text-base font-semibold text-gray-900">email123@gmail.com</p>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Nomor Telepon Pribadi</label>
+                <p class="text-base font-semibold text-gray-900">08123792137889</p>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">No.Rekening (Nama Bank)</label>
+                <p class="text-base font-semibold text-gray-900">4912385938293(BCA)</p>
+            </div>
             <div class="md:col-span-2">
                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Alamat Lengkap</label>
                 <p class="text-base font-semibold text-gray-900">Jl. Mawar No.16 RT.002 / RW.003</p>

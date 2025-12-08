@@ -1,131 +1,205 @@
 @extends('layout')
 
 @section('header')
-    <x-header title="Daftar staff" subtitle="List semua karyawan" />
+    <x-header title="Daftar Staff" subtitle="List semua staff" />
 @endsection
 
 @section('content')
-
     {{-- ================================
-        ACTION BAR (Search + Filter + Add)
+        1. STATS OVERVIEW CARD
     ================================= --}}
-    <div class="flex flex-wrap items-center justify-between mb-4">
-
-        {{-- LEFT: Search Bar --}}
-        <div class="relative">
-            <input
-                type="text"
-                placeholder="Cari staff..."
-                class="border rounded-lg pl-10 pr-3 py-2 text-sm w-64 focus:outline-none focus:ring-1 focus:ring-blue-500"
-            >
-            <svg xmlns="http://www.w3.org/2000/svg"
-                class="h-5 w-5 text-gray-400 absolute left-3 top-2.5"
-                viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <circle cx="11" cy="11" r="7" stroke-width="2"/>
-                <path d="M20 20L17 17" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-        </div>
-
-        {{-- RIGHT: Filter + Add Button --}}
-        <div class="flex items-center gap-3">
-            {{-- Filter Button --}}
-            <button class="border px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg"
-                    class="h-5 w-5"
-                    viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L14 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 018 21v-7.586L3.293 6.707A1 1 0 013 6V4z"/>
-                </svg>
-                Filter
-            </button>
-
-            {{-- Add Button --}}
-            <a href="{{route('view.tambah.staff')}}"
-               class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 flex items-center gap-2">
-                <span>+ Tambah</span>
+    <div class="bg-white border border-gray-200 rounded-xl p-6 mb-8 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-sm font-semibold text-gray-800">
+                Periode: <span class="text-gray-500 font-normal">{{ \Carbon\Carbon::now()->translatedFormat('F Y') }}</span>
+            </h2>
+            <a href="#" class="text-sm text-blue-600 hover:underline flex items-center gap-1">
+                Lihat detail <span>&rarr;</span>
             </a>
         </div>
 
-    </div>
-
-
-    {{-- ================================
-        TABLE WRAPPER
-    ================================= --}}
-    <div class="bg-white border rounded-xl p-4 shadow-sm">
-
-        {{-- Stats --}}
-        <div class="grid grid-cols-4 gap-4 mb-4">
-            <div>
-                <p class="text-xs text-gray-500">Periode</p>
-                <p class="font-semibold text-gray-800">November 2025</p>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            {{-- Stat Item --}}
+            <div class="border-r border-gray-100 last:border-0">
+                <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Total Staff</p>
+                <p class="mt-1 text-2xl font-bold text-gray-900">1234</p>
             </div>
-            <div>
-                <p class="text-xs text-gray-500">Total Karyawan</p>
-                <p class="font-semibold text-gray-800">100</p>
+            <div class="border-r border-gray-100 last:border-0">
+                <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Staff Baru</p>
+                <p class="mt-1 text-2xl font-bold text-gray-900">123</p>
             </div>
-            <div>
-                <p class="text-xs text-gray-500">Karyawan Baru</p>
-                <p class="font-semibold text-gray-800">20</p>
-            </div>
-            <div>
-                <p class="text-xs text-gray-500">Non-aktif</p>
-                <p class="font-semibold text-gray-800">10</p>
+            <div class="border-r border-gray-100 last:border-0">
+                <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Tidak Aktif</p>
+                <p class="mt-1 text-2xl font-bold text-gray-900">2</p>
             </div>
         </div>
+    </div>
 
-        {{-- Table --}}
+    {{-- ================================
+        3. TOOLBAR & FILTERS
+    ================================= --}}
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+
+        {{-- Left: View Switcher (Visual only) --}}
+        <div class="bg-gray-100 p-1 rounded-lg inline-flex">
+            <button
+                class="bg-white shadow-sm px-3 py-1.5 rounded-md text-sm font-medium text-gray-800 flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                </svg>
+                Directory
+            </button>
+        </div>
+
+        {{-- Right: Search & Actions --}}
+        <div class="flex flex-1 justify-end items-center gap-3">
+
+            {{-- Search Bar --}}
+            <div class="relative w-full max-w-xs">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg class="h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </div>
+                <input type="text"
+                    class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    placeholder="Search staff...">
+            </div>
+
+            {{-- Add Button --}}
+            <a href="{{ route('view.tambah.staff') }}"
+                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                Tambah Staff
+            </a>
+        </div>
+    </div>
+
+    {{-- ================================
+        4. MAIN TABLE
+    ================================= --}}
+    <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
         <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-                <thead class="text-gray-600 border-b bg-gray-50">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
                     <tr>
-                        <th class="py-2 px-2 text-left">Nama</th>
-                        <th class="py-2 px-2">ID Karyawan</th>
-                        <th class="py-2 px-2">No Rekening</th>
-                        <th class="py-2 px-2">No KK</th>
-                        <th class="py-2 px-2">No KTP/NIK</th>
-                        <th class="py-2 px-2">Status</th>
-                        <th class="py-2 px-2">Action</th>
+                        <th scope="col" class="px-6 py-3 text-left">
+                            <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                        </th>
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Nama Pekerja
+                        </th>
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            ID Pekerja
+                        </th>
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            KTP / KK
+                        </th>
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Nomor Rekening
+                        </th>
+                        <th scope="col"
+                            class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Status
+                        </th>
+                        <th scope="col" class="relative px-6 py-3">
+                            <span class="sr-only">Actions</span>
+                        </th>
                     </tr>
                 </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {{-- @forelse ($pekerja as $p) --}}
+                        <tr class="hover:bg-gray-50 transition-colors duration-150">
+                            {{-- Checkbox --}}
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            </td>
 
-                <tbody>
-                    @for ($i = 1; $i <= 10; $i++)
-                        <tr class="border-b">
-                            <td class="py-3 px-2">Rina Kartikasari</td>
-                            <td class="py-3 px-2 text-center">4220242420011</td>
-                            <td class="py-3 px-2 text-center">720811234567</td>
-                            <td class="py-3 px-2 text-center">35168709210011</td>
-                            <td class="py-3 px-2 text-center">351618802891001</td>
-                            <td class="py-3 px-2 text-center text-green-600">Aktif</td>
-                            <td class="py-3 px-2 text-center">
-                                <a href="{{route('view.detail.staff')}}" class="px-3 py-1 border rounded-lg text-xs hover:bg-gray-50">
+                            {{-- Name & Avatar --}}
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-9 w-9">
+                                            <img class="h-9 w-9 rounded-full bg-gray-200"
+                                                src="https://ui-avatars.com/api/?name=JL&background=random&color=fff&size=128">
+
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900">nama</div>
+                                        <div class="text-xs text-gray-500">Bergabung:
+                                            20 Januari 2020
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+
+                            {{-- ID & Job --}}
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900 font-semibold">1</div>
+                            </td>
+
+                            {{-- KTP / NIK --}}
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-xs text-gray-500">
+                                    <span class="block">NIK: <span
+                                            class="text-gray-700 font-medium">7582375823</span></span>
+                                    <span class="block mt-0.5">KK : <span
+                                            class="text-gray-700 font-medium">27834782834</span></span>
+                                </div>
+                            </td>
+
+                            {{-- Rekening --}}
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                3489084029
+                            </td>
+
+                            {{-- Status Pill --}}
+                            <td class="px-6 py-4 whitespace-nowrap text-center">
+
+                                <span
+                                    class="inline-flex px-3 py-1 text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 border border-green-200">
+                                    Aktif
+                                </span>
+
+                            </td>
+
+                            {{-- Actions --}}
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <a href="{{ route('view.detail.staff') }}"
+                                    class="text-blue-600 hover:text-blue-900 border border-blue-200 hover:bg-blue-50 rounded-lg px-3 py-1.5 transition">
                                     Detail
                                 </a>
                             </td>
                         </tr>
-                    @endfor
+                    {{-- @empty --}}
+                        {{-- <tr>
+                            <td colspan="7" class="px-6 py-10 text-center text-gray-500">
+                                <div class="flex flex-col items-center justify-center">
+                                    <svg class="w-12 h-12 text-gray-300 mb-3" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
+                                        </path>
+                                    </svg>
+                                    <p>Data Pekerja Saat Ini Tidak Tersedia...</p>
+                                </div>
+                            </td>
+                        </tr> --}}
+                    {{-- @endforelse --}}
                 </tbody>
             </table>
         </div>
 
-        {{-- Pagination --}}
-        <div class="flex justify-between items-center mt-4 text-xs text-gray-600">
-            <p>Menampilkan 1–10 dari 10.430 hasil</p>
-
-            <div class="flex items-center gap-1">
-                <button class="px-2 py-1 border rounded-md">Sebelumnya</button>
-                <button class="px-3 py-1 border rounded-md bg-gray-200">1</button>
-                <button class="px-3 py-1 border rounded-md">2</button>
-                <button class="px-3 py-1 border rounded-md">3</button>
-                <button class="px-3 py-1 border rounded-md">...</button>
-                <button class="px-3 py-1 border rounded-md">12</button>
-                <button class="px-2 py-1 border rounded-md">Selanjutnya</button>
-            </div>
-        </div>
-
+        {{-- Footer / Pagination --}}
+        {{-- {{ $pekerja->links('vendor.pagination.custom') }} --}}
     </div>
-
 @endsection
-
-

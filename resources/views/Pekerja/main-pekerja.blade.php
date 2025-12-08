@@ -6,8 +6,7 @@
 
 @section('content')
     {{-- ================================
-         1. STATS OVERVIEW CARD
-         (Mimics the "Overview of period" section)
+        1. STATS OVERVIEW CARD
     ================================= --}}
     <div class="bg-white border border-gray-200 rounded-xl p-6 mb-8 shadow-sm">
         <div class="flex items-center justify-between mb-4">
@@ -37,7 +36,7 @@
     </div>
 
     {{-- ================================
-         3. TOOLBAR & FILTERS
+        3. TOOLBAR & FILTERS
     ================================= --}}
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
 
@@ -83,7 +82,7 @@
     </div>
 
     {{-- ================================
-         4. MAIN TABLE
+        4. MAIN TABLE
     ================================= --}}
     <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
         <div class="overflow-x-auto">

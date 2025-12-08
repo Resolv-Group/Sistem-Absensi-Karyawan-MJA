@@ -153,6 +153,11 @@
                                 class="whitespace-nowrap py-4 px-1 font-medium text-sm">
                                 PKWT
                             </button>
+                            <button @click="tab='history'"
+                                :class="tab == 'history' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'"
+                                class="whitespace-nowrap py-4 px-1 font-medium text-sm">
+                                Histori
+                            </button>
                         </nav>
                     </div>
 

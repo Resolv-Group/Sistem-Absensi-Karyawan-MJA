@@ -504,7 +504,7 @@
                         </div>
 
                         {{-- Hubungan --}}
-                        <div x-data="{ open: false, selected: '{{ old('hubungan_emergency') }}' || '', list: ['Orang Tua', 'Saudara', 'Pasangan'] }" class="relative">
+                        <div x-data="{ open: false, selected: '{{ old('hubungan_emergency') }}' || '', list: ['Orang Tua', 'Saudara', 'Pasangan', 'Wali'] }" class="relative">
                             <label class="block text-sm font-bold text-gray-700 mb-1">Hubungan</label>
 
                             <input type="hidden" name="hubungan_emergency" x-model="selected">
