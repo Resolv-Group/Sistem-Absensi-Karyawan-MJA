@@ -169,6 +169,10 @@
                         <div x-show="tab=='emergency'">
                             @include('Pekerja.Detail.emergency')
                         </div>
+
+                        <div x-show="tab=='history'">
+                            @include('Pekerja.Detail.histori')
+                        </div>
                     </div>
 
                 </div>

@@ -89,132 +89,152 @@
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th scope="col" class="px-6 py-3 text-left">
+                        <th class="px-6 py-3 text-left w-10">
                             <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                         </th>
-                        <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Nama Pekerja
+                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                            Identitas Pekerja
                         </th>
-                        <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            ID Pekerja
+                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                            Kontak
                         </th>
-                        <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            KTP / KK
+                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                            Domisili
                         </th>
-                        <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Nomor Rekening
-                        </th>
-                        <th scope="col"
-                            class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">
                             Status
                         </th>
-                        <th scope="col" class="relative px-6 py-3">
-                            <span class="sr-only">Actions</span>
-                        </th>
+                        <th class="relative px-6 py-3"><span class="sr-only">Actions</span></th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     @forelse ($pekerja as $p)
-                        <tr class="hover:bg-gray-50 transition-colors duration-150">
-                            {{-- Checkbox --}}
+                        <tr class="hover:bg-gray-50 transition-colors duration-150 group">
+
+                            {{-- CHECKBOX --}}
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                             </td>
 
-                            {{-- Name & Avatar --}}
+                            {{-- COL 1: IDENTITAS --}}
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
-                                    <div class="flex-shrink-0 h-9 w-9">
-
-                                        {{-- Logic: Check if Blob Image exists --}}
+                                    <div class="flex-shrink-0 h-10 w-10">
                                         @if ($p->image_base64)
-                                            {{-- Show Real Image --}}
-                                            {{-- Added 'object-cover' so the image doesn't get squashed --}}
-                                            <img class="h-9 w-9 rounded-full object-cover border border-gray-200"
+                                            <img class="h-10 w-10 rounded-full object-cover border border-gray-200"
                                                 src="{{ $p->image_base64 }}" alt="{{ $p->nama }}">
                                         @else
-                                            {{-- Show Placeholder (UI Avatars) --}}
-                                            <img class="h-9 w-9 rounded-full bg-gray-200"
+                                            <img class="h-10 w-10 rounded-full bg-gray-200"
                                                 src="https://ui-avatars.com/api/?name={{ urlencode($p->nama) }}&background=random&color=fff&size=128"
-                                                alt="{{ $p->nama }}">
+                                                alt="">
                                         @endif
-
                                     </div>
                                     <div class="ml-4">
-                                        <div class="text-sm font-medium text-gray-900">{{ $p->nama }}</div>
-                                        <div class="text-xs text-gray-500">Bergabung:
-                                            {{ formatTanggal($p->tgl_bergabung) }}
+                                        <div class="text-sm font-bold text-gray-900">{{ $p->nama }}</div>
+                                        <div class="text-xs text-gray-500 font-mono mt-0.5 tracking-wide">
+                                            NIK: {{ $p->nik }}
                                         </div>
                                     </div>
                                 </div>
                             </td>
 
-                            {{-- ID & Job --}}
+                            {{-- COL 2: KONTAK --}}
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900 font-semibold">{{ $p->id }}</div>
-                            </td>
-
-                            {{-- KTP / NIK --}}
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-xs text-gray-500">
-                                    <span class="block">NIK: <span
-                                            class="text-gray-700 font-medium">{{ $p->nik }}</span></span>
-                                    <span class="block mt-0.5">KK : <span
-                                            class="text-gray-700 font-medium">{{ $p->no_kk }}</span></span>
+                                <div class="flex flex-col gap-1">
+                                    {{-- Email --}}
+                                    <div class="flex items-center text-sm text-gray-700">
+                                        <svg class="w-4 h-4 text-gray-400 mr-2 flex-shrink-0" fill="none"
+                                            stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
+                                            </path>
+                                        </svg>
+                                        <span class="truncate max-w-[150px]"
+                                            title="{{ $p->email }}">{{ $p->email ?? '-' }}</span>
+                                    </div>
+                                    {{-- Phone --}}
+                                    <div class="flex items-center text-xs text-gray-500">
+                                        <svg class="w-4 h-4 text-gray-400 mr-2 flex-shrink-0" fill="none"
+                                            stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z">
+                                            </path>
+                                        </svg>
+                                        {{ $p->telp ?? '-' }}
+                                    </div>
                                 </div>
                             </td>
 
-                            {{-- Rekening --}}
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ $p->rekening ?? '-' }}
+                            {{-- COL 3: DOMISILI & MASA KERJA (UPDATED) --}}
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex flex-col gap-1">
+                                    {{-- Domisili (Icon Map) --}}
+                                    <div class="flex items-center text-sm text-gray-900 font-medium">
+                                        <svg class="w-4 h-4 text-gray-400 mr-2 flex-shrink-0" fill="none"
+                                            stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
+                                            </path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        </svg>
+                                        {{ ucwords(strtolower($p->kota)) }}
+                                    </div>
+
+                                    {{-- Masa Kerja (Icon Jam/Waktu) --}}
+                                    <div class="flex items-center text-xs text-gray-500">
+                                        <svg class="w-4 h-4 text-gray-400 mr-2 flex-shrink-0" fill="none"
+                                            stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        {{ \Carbon\Carbon::parse($p->tgl_bergabung)->diffForHumans(null, true) }} bergabung
+                                    </div>
+                                </div>
                             </td>
 
-                            {{-- Status Pill --}}
+                            {{-- COL 4: STATUS --}}
                             <td class="px-6 py-4 whitespace-nowrap text-center">
-                                @if ($p->status_aktif == 1)
+                                @if ($p->status_aktif)
                                     <span
-                                        class="inline-flex px-3 py-1 text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 border border-green-200">
+                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
+                                        <span class="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5"></span>
                                         Aktif
                                     </span>
                                 @else
                                     <span
-                                        class="inline-flex px-3 py-1 text-xs leading-5 font-semibold rounded-full bg-red-50 text-red-600 border border-red-200">
-                                        Tidak Aktif
+                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 border border-red-200">
+                                        <span class="w-1.5 h-1.5 bg-red-500 rounded-full mr-1.5"></span>
+                                        Non-Aktif
                                     </span>
                                 @endif
                             </td>
 
-                            {{-- Actions --}}
+                            {{-- COL 5: ACTIONS --}}
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <a href="{{ route('view.detail.pekerja', $p->id) }}"
-                                    class="text-blue-600 hover:text-blue-900 border border-blue-200 hover:bg-blue-50 rounded-lg px-3 py-1.5 transition">
-                                    Detail
-                                </a>
+                                <div class="flex justify-end gap-2">
+                                    <a href="{{ route('view.ubah.pekerja', $p->id) }}"
+                                        class="text-blue-600 hover:text-blue-900 border border-blue-200 hover:bg-blue-50 rounded-lg px-3 py-1.5 transition text-xs font-semibold">
+                                        Edit
+                                    </a>
+                                    <a href="{{ route('view.detail.pekerja', $p->id) }}"
+                                        class="text-blue-600 hover:text-blue-900 border border-blue-200 hover:bg-blue-50 rounded-lg px-3 py-1.5 transition text-xs font-semibold">
+                                        Detail
+                                    </a>
+                                </div>
                             </td>
+
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="px-6 py-10 text-center text-gray-500">
-                                <div class="flex flex-col items-center justify-center">
-                                    <svg class="w-12 h-12 text-gray-300 mb-3" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
-                                        </path>
-                                    </svg>
-                                    <p>Data Pekerja Saat Ini Tidak Tersedia...</p>
-                                </div>
+                            <td colspan="6" class="px-6 py-10 text-center text-gray-500">
+                                Belum ada data pekerja.
                             </td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
-
         {{-- Footer / Pagination --}}
         {{ $pekerja->links('vendor.pagination.custom') }}
     </div>
