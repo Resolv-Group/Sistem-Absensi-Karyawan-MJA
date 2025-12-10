@@ -6,13 +6,13 @@
         {{-- HEADER SECTION --}}
         <div class="mb-8">
             <nav class="flex text-sm font-medium text-gray-500 mb-2">
-                <a href="/daftar-pekerja" class="hover:text-gray-700 transition">Staff</a>
+                <a href="/daftar-staff" class="hover:text-gray-700 transition">Staff</a>
                 <span class="mx-2 text-gray-400">/</span>
                 <span class="text-blue-600">Tambah</span>
             </nav>
 
             <div class="flex items-center gap-4">
-                <a href="/daftar-pekerja"
+                <a href="/daftar-staff"
                     class="group p-2 rounded-full border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition shadow-sm">
                     <svg xmlns="http://www.w3.org/2000/svg"
                         class="h-5 w-5 transform group-hover:-translate-x-0.5 transition" fill="none" viewBox="0 0 24 24"
@@ -296,7 +296,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
 
                     {{-- 1. Jabatan --}}
-                    <div x-data="{ open: false, selected: '{{ old('jabatan') }}' || '', list: ['Staff', 'Supervisor', 'Manager', 'Direktur', 'HRD', 'IT Support', 'Finance', 'General Affair'] }" class="relative">
+                    <div x-data="{ open: false, selected: '{{ old('jabatan') }}' || '', list: ['Staff', 'Supervisor', 'Manager', 'Direktur', 'HRD', 'IT', 'Akuntan'] }" class="relative">
                         <label class="block text-sm font-bold text-gray-700 mb-1">Jabatan</label>
 
                         <input type="hidden" name="jabatan" x-model="selected">
@@ -329,7 +329,7 @@
 
                     {{-- 2. Unit Kerja --}}
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">Penempatan PT(Unit Kerja)</label>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Penempatan PT (Unit Kerja)</label>
                         <input type="text" name="unit_kerja" maxlength="100" autocomplete="off"
                             class="w-full rounded-lg shadow-sm
                             @error('unit_kerja') border-red-500 bg-red-50 @else border-gray-500 bg-gray-50 @enderror
@@ -606,7 +606,7 @@
                         </div>
 
                         {{-- Hubungan --}}
-                        <div x-data="{ open: false, selected: '{{ old('hubungan_emergency') }}' || '', list: ['Orang Tua', 'Saudara', 'Pasangan'] }" class="relative">
+                        <div x-data="{ open: false, selected: '{{ old('hubungan_emergency') }}' || '', list: ['Orang Tua', 'Saudara', 'Pasangan', 'Wali'] }" class="relative">
                             <label class="block text-sm font-bold text-gray-700 mb-1">Hubungan</label>
 
                             <input type="hidden" name="hubungan_emergency" x-model="selected">
