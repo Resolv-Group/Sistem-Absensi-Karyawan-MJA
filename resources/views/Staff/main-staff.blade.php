@@ -263,30 +263,30 @@
 
                             {{-- 3. MASA KERJA (Join Date + Years) --}}
                             <td class="px-6 py-4 whitespace-nowrap">
-    <div class="flex flex-col gap-1">
+                                <div class="flex flex-col gap-1">
 
-        {{-- Tanggal Bergabung (Icon Kalender) --}}
-        <div class="flex items-center text-sm text-gray-900 font-medium">
-            <svg class="w-4 h-4 text-gray-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-            </svg>
-            {{-- Ganti dengan variabel dinamis jika perlu: --}}
-            {{-- {{ \Carbon\Carbon::parse($p->tgl_bergabung)->translatedFormat('d F Y') }} --}}
-            15 Februari 2025
-        </div>
+                                    {{-- Tanggal Bergabung (Icon Kalender) --}}
+                                    <div class="flex items-center text-sm text-gray-900 font-medium">
+                                        <svg class="w-4 h-4 text-gray-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                        </svg>
+                                        {{-- Ganti dengan variabel dinamis jika perlu: --}}
+                                        {{-- {{ \Carbon\Carbon::parse($p->tgl_bergabung)->translatedFormat('d F Y') }} --}}
+                                        15 Februari 2025
+                                    </div>
 
-        {{-- Durasi Kerja (Icon Jam) --}}
-        <div class="flex items-center text-xs text-gray-500">
-            <svg class="w-4 h-4 text-gray-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-            {{-- Ganti dengan variabel dinamis jika perlu: --}}
-            {{-- {{ \Carbon\Carbon::parse($p->tgl_bergabung)->diffForHumans(null, true) }} kerja --}}
-            10 hari kerja
-        </div>
+                                    {{-- Durasi Kerja (Icon Jam) --}}
+                                    <div class="flex items-center text-xs text-gray-500">
+                                        <svg class="w-4 h-4 text-gray-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        {{-- Ganti dengan variabel dinamis jika perlu: --}}
+                                        {{-- {{ \Carbon\Carbon::parse($p->tgl_bergabung)->diffForHumans(null, true) }} kerja --}}
+                                        10 hari kerja
+                                    </div>
 
-    </div>
-</td>
+                                </div>
+                            </td>
 
                             {{-- 4. STATUS --}}
                             <td class="px-6 py-4 whitespace-nowrap text-center">
