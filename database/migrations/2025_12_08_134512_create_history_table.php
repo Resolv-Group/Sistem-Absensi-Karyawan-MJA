@@ -16,6 +16,7 @@ return new class extends Migration
             $table->bigIncrements('id_history'); 
             $table->unsignedBigInteger('foreign_id'); 
             $table->string('nama_tabel', 100); 
+            $table->string('jabatan', 100); 
             $table->unsignedBigInteger('updated_by')->nullable(); 
             $table->timestamp('waktu')->useCurrent(); 
 

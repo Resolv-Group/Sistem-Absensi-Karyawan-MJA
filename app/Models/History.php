@@ -13,6 +13,7 @@ class History extends Model
     protected $fillable = [
         'foreign_id',
         'nama_tabel',
+        'jabatan',
         'updated_by',
         'waktu'
     ];
