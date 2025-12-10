@@ -7,6 +7,8 @@ use App\Models\Pekerja;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use App\Models\History;
+use Illuminate\Support\Facades\Auth;
 
 
 class PekerjaController extends Controller
@@ -330,6 +332,13 @@ class PekerjaController extends Controller
 
         // ✅ UPDATE DATA
         $pekerja->update($data);
+
+        // History::create([
+        // 'foreign_id' => $pekerja->id,
+        // 'nama_tabel' => 'pekerjas',
+        // 'updated_by' => auth()->id(),
+        // 'when' => now()
+        // ]);
 
         // ✅ KEMBALI KE DETAIL PEKERJA (LEBIH BAGUS DARIPADA KE LIST)
         return redirect()->route('view.detail.pekerja', $id)

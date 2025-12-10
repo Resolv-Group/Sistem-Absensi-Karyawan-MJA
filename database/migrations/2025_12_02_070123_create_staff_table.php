@@ -40,8 +40,8 @@ return new class extends Migration
             $table->string('pendidikan', 50);
 
             $table->boolean('status_aktif')->default(1);
-            $table->unsignedTinyInteger('status_perjanjian_kerja');
-            $table->unsignedSmallInteger('jabatan');
+            $table->string('status_perjanjian_kerja');
+            $table->string('jabatan');
 
             $table->unsignedTinyInteger('anak')->default(0);
 
