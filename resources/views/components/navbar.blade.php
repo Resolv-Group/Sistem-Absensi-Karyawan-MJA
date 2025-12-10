@@ -18,19 +18,25 @@
         </a>
     </li>
 
+    @if(in_array(Auth::user()->role, ['admin','hrd','pic']))
     <li class="relative pb-2 cursor-pointer">
-        <a href="{{route('view.pekerja')}}"
-            class="text-gray-700 hover:text-black {{ (Request::is('daftar-pekerja') || Request::is('pekerja') || Request::is('pekerja/*')) ? 'border-b-2 border-red-500 pb-2 text-black' : '' }}">
+        <a href="{{ route('view.pekerja') }}"
+        class="text-gray-700 hover:text-black {{ Request::is('daftar-pekerja') || Request::is('pekerja*') ? 'border-b-2 border-red-500 pb-2 text-black' : '' }}">
             Pekerja
         </a>
     </li>
+    @endif
 
+
+    @if(in_array(Auth::user()->role, ['admin','hrd','akuntan']))
     <li class="relative pb-2 cursor-pointer">
-        <a href="{{route('view.staff')}}"
-            class="text-gray-700 hover:text-black {{ (Request::is('daftar-staff') || Request::is('staff') || Request::is('staff/*'))  ? 'border-b-2 border-red-500 pb-2 text-black' : '' }}">
+        <a href="{{ route('view.staff') }}"
+        class="text-gray-700 hover:text-black {{ Request::is('daftar-staff') || Request::is('staff*') ? 'border-b-2 border-red-500 pb-2 text-black' : '' }}">
             Staff
         </a>
     </li>
+    @endif
+
 
 
     <li class="relative pb-2 cursor-pointer">
