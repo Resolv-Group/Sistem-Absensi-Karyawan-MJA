@@ -15,7 +15,7 @@ class PekerjaController extends Controller
 {
     function viewPekerjaMain()
     {
-        $pekerja = Pekerja::where('status_aktif', 1)->paginate(5);
+        $pekerja = Pekerja::where('status_aktif', 1)->paginate(10);
         $totalPekerja = Pekerja::count(); // total pekerja
         $pekerjaBaru  = Pekerja::where('created_at', '>=', now()->subMonth())->count(); // pekerja baru dari bulan lalu
         $tidakAktif   = Pekerja::where('status_aktif', '!=', '1')->count(); // pekerja tidak aktif

@@ -18,6 +18,10 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 Route::get('/dashboard', [DashboardController::class, 'viewDashboardMain'])->name('view.dashboard')->middleware('auth');
 
+Route::get('/profil/{id}', function () {
+    return view('profil');
+})->name('view.profil');
+
 // Route::middleware('auth')->group(function(){
 //     Route::get('/daftar-pekerja', [PekerjaController::class, 'viewPekerjaMain'])->name('view.pekerja');
 //     Route::get('/pekerja/tambah', [PekerjaController::class, 'viewTambahPekerja'])->name('view.tambah.pekerja');
@@ -45,7 +49,7 @@ Route::middleware(['auth', 'role:hrd,akuntan,admin'])->group(function(){
 Route::middleware(['auth', 'role:hrd,admin'])->group(function(){
 
     Route::get('/staff/detail/{id}', [StaffController::class, 'viewDetailStaff'])->name('view.detail.staff');
-    Route::get('/staff/ubah/{id}', [StaffController::class, 'view.ubah.staff'])->name('view.ubah.staff');
+    Route::get('/staff/ubah/{id}', [StaffController::class, 'ubahStaff'])->name('view.ubah.staff');
     Route::put('/staff/ubah/{id}', [StaffController::class, 'updateStaff'])->name('update.staff');
 
 });

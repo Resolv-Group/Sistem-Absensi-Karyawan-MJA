@@ -53,6 +53,9 @@
             </div>
         </div>
 
+        {{-- Success Notification Floating Center --}}
+        <x-notification />
+
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
             {{-- LEFT COLUMN: Profile Card --}}
@@ -100,7 +103,7 @@
                             <div class="flex justify-between items-center">
                                 <span class="text-sm text-gray-500 font-medium">Tanggal Bergabung</span>
                                 <span
-                                    class="text-sm font-bold text-gray-900">{{ formatTanggal($pekerja->tgl_bergabung) }}</span>
+                                    class="text-sm font-bold text-gray-900">{{ formatTanggal($pekerja->tgl_bergabung) ?? '-'}}</span>
                             </div>
                             <div class="flex justify-between items-center">
                                 <span class="text-sm text-gray-500 font-medium">Tanggal Resign</span>
@@ -124,6 +127,10 @@
                                         Non Aktif
                                     </span>
                                 @endif
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-500 font-medium">Dibuat Tanggal: </span>
+                                <span class="text-sm font-bold text-gray-900">{{formatTanggal($pekerja->created_at)}}</span>
                             </div>
                         </div>
                     </div>

@@ -41,7 +41,7 @@ class LoginController extends Controller
             $request->session()->regenerate();
 
             $user = Auth::user();
-            
+
             return redirect()->route('view.dashboard');
 
         }
@@ -62,6 +62,6 @@ class LoginController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('login');
-    }
+        return redirect()->route('login')->with('success', 'Logout berhasil! Silahkan login kembali.');
+}
 }
