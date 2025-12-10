@@ -340,9 +340,9 @@
                     {{-- 3. Masa Berlaku PKWT --}}
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-1">Masa Berlaku PKWT</label>
-                        <input type="date" name="tgl_resign"
+                        <input type="date" name="masa_berlaku_pkwt"
                             class="tanggal-input w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition cursor-pointer"
-                            value="{{ old('tgl_resign') }}">
+                            value="{{ old('masa_berlaku_pkwt') }}">
                     </div>
 
                     {{-- 4. Status Karyawan --}}
