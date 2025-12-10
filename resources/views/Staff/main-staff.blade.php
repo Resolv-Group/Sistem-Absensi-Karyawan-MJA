@@ -22,15 +22,15 @@
             {{-- Stat Item --}}
             <div class="border-r border-gray-100 last:border-0">
                 <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Total Staff</p>
-                <p class="mt-1 text-2xl font-bold text-gray-900">{{$totalStaff}}</p>
+                <p class="mt-1 text-2xl font-bold text-gray-900">{{ $totalStaff }}</p>
             </div>
             <div class="border-r border-gray-100 last:border-0">
                 <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Staff Baru</p>
-                <p class="mt-1 text-2xl font-bold text-gray-900">{{$staffBaru}}</p>
+                <p class="mt-1 text-2xl font-bold text-gray-900">{{ $staffBaru }}</p>
             </div>
             <div class="border-r border-gray-100 last:border-0">
                 <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Tidak Aktif</p>
-                <p class="mt-1 text-2xl font-bold text-gray-900">{{$tidakAktif}}</p>
+                <p class="mt-1 text-2xl font-bold text-gray-900">{{ $tidakAktif }}</p>
             </div>
         </div>
     </div>
@@ -146,7 +146,7 @@
                                     <div class="ml-4">
                                         <div class="text-sm font-bold text-gray-900">{{ $s->nama }}</div>
                                         <div class="text-xs text-gray-500 font-mono mt-0.5">
-                                            ID: {{ $s->nik }}
+                                            Nik: {{ $s->nik }}
                                         </div>
                                     </div>
                                 </div>
@@ -224,11 +224,11 @@
 
         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
             <div class="flex justify-end gap-2">
-                <a href=""
+                <a href="{{ route('view.ubah.staff', $s->id) }}"
                     class="text-blue-600 hover:text-blue-900 border border-blue-200 hover:bg-blue-50 rounded-lg px-3 py-1.5 transition text-xs font-semibold">
                     Edit
                 </a>
-                <a href="{{ route('view.detail.staff') }}"
+                <a href="{{ route('view.detail.staff', $s->id) }}"
                     class="text-blue-600 hover:text-blue-900 border border-blue-200 hover:bg-blue-50 rounded-lg px-3 py-1.5 transition text-xs font-semibold">
                     Detail
                 </a>
@@ -250,56 +250,13 @@
             </td>
         </tr>
         @endforelse
-        <tr class="hover:bg-gray-50 transition-colors duration-150 group">
 
-            {{-- 4. STATUS --}}
-            <td class="px-6 py-4 whitespace-nowrap text-center">
-                <span
-                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
-                    <span class="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5"></span>
-                    Aktif
-                </span>
-            </td>
-
-            {{-- Actions --}}
-            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                <div class="flex justify-end gap-2">
-
-                </div>
-            </td>
-        </tr>
         </tbody>
         </table>
+        {{-- Footer / Pagination --}}
+        {{ $staff->links('vendor.pagination.custom') }}
     </div>
-</td>
 
-                            {{-- 4. STATUS --}}
-                            <td class="px-6 py-4 whitespace-nowrap text-center">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
-                                        <span class="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5"></span>
-                                        Aktif
-                                    </span>
-                            </td>
 
-                            {{-- Actions --}}
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <div class="flex justify-end gap-2">
-                                    <a href=""
-                                        class="text-blue-600 hover:text-blue-900 border border-blue-200 hover:bg-blue-50 rounded-lg px-3 py-1.5 transition text-xs font-semibold">
-                                        Edit
-                                    </a>
-                                    <a href=""
-                                        class="text-blue-600 hover:text-blue-900 border border-blue-200 hover:bg-blue-50 rounded-lg px-3 py-1.5 transition text-xs font-semibold">
-                                        Detail
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                </tbody>
-            </table>
-        </div>
-
-    {{-- Footer / Pagination --}}
-    {{-- {{ $sekerja->links('vendor.pagination.custom') }} --}}
     </div>
 @endsection

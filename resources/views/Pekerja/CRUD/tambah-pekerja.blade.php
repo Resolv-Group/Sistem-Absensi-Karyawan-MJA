@@ -39,8 +39,8 @@
         @endif
 
         {{-- FORM CARD --}}
-        <form id="formTambahPekerja" action="{{route('tambah.pekerja.post')}}" method="POST" enctype="multipart/form-data"
-            class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+        <form id="formTambahPekerja" action="{{ route('tambah.pekerja.post') }}" method="POST"
+            enctype="multipart/form-data" class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
             @csrf
 
             {{-- SECTION 1: Identitas Pribadi --}}
@@ -268,11 +268,11 @@
                         </div>
 
                         <div>
-    <label class="block text-sm font-bold text-gray-700 mb-1">Tanggal Resign</label>
-    <input type="date" name="tgl_resign"
-        class="tanggal-input w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition cursor-pointer"
-        value="{{ old('tgl_resign') }}">
-</div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Tanggal Resign</label>
+                            <input type="date" name="tgl_resign"
+                                class="tanggal-input w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition cursor-pointer"
+                                value="{{ old('tgl_resign') }}">
+                        </div>
 
                     </div>
                 </div>
@@ -409,7 +409,8 @@
                         {{-- No Telepon --}}
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-1">Nomor Telepon Pribadi</label>
-                            <input type="text" name="telp" maxlength="13" autocomplete="off" placeholder="08123xxxx"
+                            <input type="text" name="telp" maxlength="13" autocomplete="off"
+                                placeholder="08123xxxx"
                                 class="telp_pribadi-input w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition"
                                 value="{{ old('telp') }}">
                         </div>
@@ -453,7 +454,8 @@
                             <!-- NOMOR REKENING (tetap seperti punyamu) -->
                             <div>
                                 <label class="block text-sm font-bold text-gray-700 mb-1">No. Rekening</label>
-                                <input type="text" name="rekening" maxlength="16" autocomplete="off" placeholder="7823xxxxx"
+                                <input type="text" name="rekening" maxlength="16" autocomplete="off"
+                                    placeholder="7823xxxxx"
                                     class="rekening-input w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition"
                                     placeholder="Nomor Rekening" value="{{ old('rekening') }}">
                             </div>
@@ -480,7 +482,8 @@
                         {{-- Nama Kontak --}}
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-1">Nama Kontak</label>
-                            <input type="text" name="nama_emergency" maxlength="255" autocomplete="off" placeholder="Nama Kontak Emergency"
+                            <input type="text" name="nama_emergency" maxlength="255" autocomplete="off"
+                                placeholder="Nama Kontak Emergency"
                                 class="w-full rounded-lg shadow-sm
                                 @error('nama_emergency') border-red-500 bg-red-50 @else border-gray-500 bg-gray-50 @enderror
                                 border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition"
@@ -493,7 +496,8 @@
                         {{-- No Kontak --}}
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-1">Nomor Telepon</label>
-                            <input type="text" name="telp_emergency" maxlength="13" autocomplete="off" placeholder="Nomor Telepon Kontak Emergency"
+                            <input type="text" name="telp_emergency" maxlength="13" autocomplete="off"
+                                placeholder="Nomor Telepon Kontak Emergency"
                                 class="telp_emergency-input w-full rounded-lg shadow-sm
                                 @error('telp_emergency') border-red-500 bg-red-50 @else border-gray-500 bg-gray-50 @enderror
                                 border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition"
@@ -533,7 +537,8 @@
                         {{-- Ibu Nama --}}
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-1">Ibu Kandung</label>
-                            <input type="text" name="ibu_kandung" maxlength="255" autocomplete="off" placeholder="Nama Ibu Kandung"
+                            <input type="text" name="ibu_kandung" maxlength="255" autocomplete="off"
+                                placeholder="Nama Ibu Kandung"
                                 class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition"
                                 value="{{ old('ibu_kandung') }}">
                         </div>
@@ -543,7 +548,7 @@
 
             {{-- FOOTER / ACTIONS --}}
             <div class="bg-gray-50 px-8 py-5 flex items-center justify-end gap-3 border-t border-gray-200">
-                <a href="{{route('view.pekerja')}}"
+                <a href="{{ route('view.pekerja') }}"
                     class="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 transition shadow-sm">
                     Batalkan
                 </a>
@@ -570,25 +575,24 @@
 @endsection
 
 @section('scripts')
-
     <script src="/js/tambah-pekerja.js"></script>
 
-    @if(session('success'))
+    @if (session('success'))
         <script>
-        Swal.fire({
-            title: "{{ session('success') }}",
-            text: "Apakah Anda mau menambah data lagi?",
-            icon: 'success',
-            showDenyButton: true,
-            confirmButtonText: "Tambah lagi",
-            denyButtonText: "Ke daftar pekerja",
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = "{{ route('view.tambah.pekerja') }}";
-            } else {
-                window.location.href = "{{ route('view.pekerja') }}";
-            }
-        });
+            Swal.fire({
+                title: "{{ session('success') }}",
+                text: "Apakah Anda mau menambah data lagi?",
+                icon: 'success',
+                showDenyButton: true,
+                confirmButtonText: "Tambah lagi",
+                denyButtonText: "Ke daftar pekerja",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = "{{ route('view.tambah.pekerja') }}";
+                } else {
+                    window.location.href = "{{ route('view.pekerja') }}";
+                }
+            });
         </script>
     @endif
 @endsection

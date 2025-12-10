@@ -43,7 +43,7 @@
                     class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition shadow-sm">
                     Cetak Data
                 </button>
-                <a href="#"
+                <a href="{{route('view.ubah.staff', $staff->id)}}"
                     class="px-4 py-2 text-sm font-medium text-white bg-black border border-black rounded-lg hover:bg-gray-800 transition shadow-sm flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
@@ -54,6 +54,9 @@
                 </a>
             </div>
         </div>
+
+        {{-- Success Notification Floating Center --}}
+        <x-notification />
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
@@ -67,45 +70,53 @@
                         {{-- Avatar --}}
                         <div class="relative -mt-16 inline-block">
                             <div class="h-32 w-32 rounded-full border-4 border-white shadow-md bg-gray-200 overflow-hidden">
-                                {{-- Placeholder Image / Real Image --}}
-                                <img src="https://ui-avatars.com/api/?name=Rina+Kartikasari&background=random&size=128"
-                                    alt="Profile" class="w-full h-full object-cover">
+                                {{-- Check if our custom accessor returns data --}}
+                                @if ($staff->image_base64)
+                                    {{-- Display the Base64 image --}}
+                                    <img src="{{ $staff->image_base64 }}" alt="Foto {{ $staff->nama }}"
+                                        class="w-full h-full object-cover" />
+                                @else
+                                    {{-- Fallback image --}}
+                                    <img src="https://ui-avatars.com/api/?name={{ urlencode($staff->nama) }}&background=random&size=128"
+                                        alt="Profile Placeholder" class="w-full h-full object-cover">
+                                @endif
+
                             </div>
                         </div>
 
                         {{-- Name & Unit --}}
-                        <h2 class="mt-4 text-xl font-bold text-gray-900">Rina Kartikasari</h2>
+                        <h2 class="mt-4 text-xl font-bold text-gray-900">{{$staff->nama}}</h2>
                         <span
                             class="inline-block mt-2 px-3 py-1 text-xs font-semibold text-green-700 bg-green-50 rounded-full border border-green-100">
-                            HRD
+                            {{$staff->jabatan}}
                         </span>
 
                         {{-- Info List --}}
                         <div class="mt-8 text-left space-y-4 border-t border-gray-100 pt-6">
                             <div class="flex justify-between items-center">
                                 <span class="text-sm text-gray-500 font-medium">ID Karyawan</span>
-                                <span class="text-sm font-bold text-gray-900">42202424220012</span>
+                                <span class="text-sm font-bold text-gray-900">{{$staff->id}}</span>
                             </div>
                             <div class="flex justify-between items-center">
                                 <span class="text-sm text-gray-500 font-medium">Tanggal Bergabung</span>
-                                <span class="text-sm font-bold text-gray-900">19 Feb, 2022</span>
+                                <span class="text-sm font-bold text-gray-900">{{formatTanggal($staff->tgl_bergabung)}}</span>
                             </div>
                             {{-- tgl resign akan Inactive kalau status = aktif  --}}
                             <div class="flex justify-between items-center">
                                 <span class="text-sm text-gray-500 font-medium">Tanggal Resign</span>
-                                <span class="text-sm font-bold text-gray-900">18 Feb, 2025</span>
+                                <span class="text-sm font-bold text-gray-900">{{formatTanggal($staff->tgl_resign)}}</span>
                             </div>
                             <div class="flex justify-between items-center">
                                 <span class="text-sm text-gray-500 font-medium">Status Staff</span>
-                                <span class="text-sm font-bold text-gray-900">PKWTT</span>
+                                <span class="text-sm font-bold text-gray-900">{{$staff->status_perjanjian_kerja}}</span>
                             </div>
                             <div class="flex justify-between items-center">
                                 <span class="text-sm text-gray-500 font-medium">Masa PKWT</span>
-                                <span class="text-sm font-bold text-gray-900">18 Feb, 2025</span>
+                                <span class="text-sm font-bold text-gray-900">{{formatTanggal($staff->masa_berlaku_pkwt)}}</span>
                             </div>
                             <div class="flex justify-between items-center">
                                 <span class="text-sm text-gray-500 font-medium">Unit Kerja</span>
-                                <span class="text-sm font-bold text-gray-900">-</span>
+                                <span class="text-sm font-bold text-gray-900">{{$staff->unit_kerja}}</span>
                             </div>
                             <div class="flex justify-between items-center">
                                 <span class="text-sm text-gray-500 font-medium">Status Perjanjian Kerja</span>
@@ -117,11 +128,25 @@
                             </div>
                             <div class="flex justify-between items-center">
                                 <span class="text-sm text-gray-500 font-medium">Status Keaktifan</span>
-                                <span
-                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
-                                    <span class="w-1.5 h-1.5 bg-green-600 rounded-full mr-1.5"></span>
-                                    Aktif
-                                </span>
+                                @if ($staff->status_aktif == 1)
+                                    <span
+                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                                    bg-green-100 text-green-800 border border-green-200">
+                                        <span class="w-1.5 h-1.5 bg-green-600 rounded-full mr-1.5"></span>
+                                        Aktif
+                                    </span>
+                                @else
+                                    <span
+                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                                    bg-red-100 text-red-800 border border-red-200">
+                                        <span class="w-1.5 h-1.5 bg-red-600 rounded-full mr-1.5"></span>
+                                        Non Aktif
+                                    </span>
+                                @endif
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-500 font-medium">Dibuat Tanggal: </span>
+                                <span class="text-sm font-bold text-gray-900">{{formatTanggal($staff->created_at)}}</span>
                             </div>
                         </div>
                     </div>

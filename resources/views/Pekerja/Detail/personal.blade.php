@@ -65,7 +65,7 @@
             </div>
             <div class="md:col-span-2">
                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Alamat Lengkap</label>
-                <p class="text-base font-semibold text-gray-900">{{ ucwords($pekerja->alamat) }}</p>
+                <p class="text-base font-semibold text-gray-900">{{ ucwords($pekerja->alamat) }}, {{"RT $pekerja->rt"}} {{"RW $pekerja->rw"}}</p>
             </div>
             <div>
                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Kelurahan / Desa</label>

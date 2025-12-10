@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Hash;
 class StaffController extends Controller
 {
     function viewStaffMain(){
-        $staff = Staff::where('status_aktif', 1)->paginate(5);
+        $staff = Staff::where('status_aktif', 1)->paginate(10);
         $totalStaff = Staff::count(); // total pekerja
         $staffBaru  = Staff::where('created_at', '>=', now()->subMonth())->count(); // pekerja baru dari bulan lalu
         $tidakAktif   = Staff::where('status_aktif', '!=', '1')->count(); // pekerja tidak aktif
@@ -28,8 +28,13 @@ class StaffController extends Controller
         return view('Staff.CRUD.tambah-staff');
     }
 
-    function viewDetailStaff() {
-        return view('Staff.detail-staff');
+    function viewDetailStaff($id) {
+
+        $staff = Staff::where('id', $id)->first();
+
+        $staff->image_base64 = 'data:image/jpeg;base64,' . base64_encode($staff->image_blob);
+
+        return view('Staff.detail-staff', compact('staff'));
     }
 
         function tambahStaff(request $request)
@@ -236,5 +241,19 @@ class StaffController extends Controller
         } catch (\Exception $e) {
             dd('General Error:', $e->getMessage());
         }
+    }
+
+    function ubahStaff(request $request, $id)
+    {
+        $staff = Staff::findOrFail($id);
+
+
+        return view('Staff.CRUD.ubah-staff', compact('staff'));
+    }
+
+    function updateStaff(Request $request, $id) {
+
+        return redirect()->route('view.detail.staff', $id)
+                        ->with('success', 'Data staff berhasil diperbarui');
     }
 }

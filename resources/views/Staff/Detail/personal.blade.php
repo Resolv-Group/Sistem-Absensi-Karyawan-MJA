@@ -10,35 +10,35 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8">
             <div>
                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Nama Lengkap</label>
-                <p class="text-base font-semibold text-gray-900">Rina Kartikasari Wijaya</p>
+                <p class="text-base font-semibold text-gray-900 break-words">{{ ucwords($staff->nama) }}</p>
             </div>
             <div>
                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">No.NIK</label>
-                <p class="text-base font-semibold text-gray-900">1592302341782</p>
+                <p class="text-base font-semibold text-gray-900">{{ $staff->nik }}</p>
             </div>
             <div>
                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Tempat Lahir</label>
-                <p class="text-base font-semibold text-gray-900">Jakarta</p>
+                <p class="text-base font-semibold text-gray-900">{{ ucwords($staff->tempat_lahir) }}</p>
             </div>
             <div>
                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Tanggal Lahir</label>
-                <p class="text-base font-semibold text-gray-900">20 Januari 1998</p>
+                <p class="text-base font-semibold text-gray-900">{{ formatTanggal($staff->tgl_lahir) }}</p>
             </div>
             <div>
                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Jenis Kelamin</label>
-                <p class="text-base font-semibold text-gray-900">Perempuan</p>
+                <p class="text-base font-semibold text-gray-900">{{ $staff->kelamin->label()}}</p>
             </div>
             <div>
                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Pendidikan Terakhir</label>
-                <p class="text-base font-semibold text-gray-900">SMA / Sederajat</p>
+                <p class="text-base font-semibold text-gray-900">{{ $staff->pendidikan }}</p>
             </div>
             <div>
                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Status Kawin</label>
-                <p class="text-base font-semibold text-gray-900">K/1 (Menikah, 1 Anak)</p>
+                <p class="text-base font-semibold text-gray-900">{{ $staff->status_kawin }} ({{ $staff->anak }} Anak)</p>
             </div>
             <div>
                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">No.KK</label>
-                <p class="text-base font-semibold text-gray-900">1592385202341782</p>
+                <p class="text-base font-semibold text-gray-900">{{ $staff->no_kk }}</p>
             </div>
 
         </div>
@@ -53,35 +53,35 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8">
             <div class="md:col-span-2">
                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Email</label>
-                <p class="text-base font-semibold text-gray-900">email123@gmail.com</p>
+                <p class="text-base font-semibold text-gray-900">{{ $staff->email }}</p>
             </div>
             <div>
                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Nomor Telepon Pribadi</label>
-                <p class="text-base font-semibold text-gray-900">08123792137889</p>
+                <p class="text-base font-semibold text-gray-900">{{ $staff->telp }}</p>
             </div>
             <div>
                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">No.Rekening (Nama Bank)</label>
-                <p class="text-base font-semibold text-gray-900">4912385938293(BCA)</p>
+                <p class="text-base font-semibold text-gray-900">{{ $staff->rekening }} ({{ $staff->nama_rek }})</p>
             </div>
             <div class="md:col-span-2">
                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Alamat Lengkap</label>
-                <p class="text-base font-semibold text-gray-900">Jl. Mawar No.16 RT.002 / RW.003</p>
+                <p class="text-base font-semibold text-gray-900">{{ ucwords($staff->alamat) }}, {{"RT $staff->rt"}} {{"RW $staff->rw"}}</p>
             </div>
             <div>
                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Kelurahan / Desa</label>
-                <p class="text-base font-semibold text-gray-900">Simomulyo</p>
+                <p class="text-base font-semibold text-gray-900">{{ ucwords($staff->desa) }}</p>
             </div>
             <div>
                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Kecamatan</label>
-                <p class="text-base font-semibold text-gray-900">Cilacap</p>
+                <p class="text-base font-semibold text-gray-900">{{ ucwords($staff->kecamatan) }}</p>
             </div>
             <div>
                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Kota / Kabupaten</label>
-                <p class="text-base font-semibold text-gray-900">Surabaya</p>
+                <p class="text-base font-semibold text-gray-900">{{ ucwords($staff->kota) }}</p>
             </div>
             <div>
                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Provinsi</label>
-                <p class="text-base font-semibold text-gray-900">Jawa Timur</p>
+                <p class="text-base font-semibold text-gray-900">{{ ucwords($staff->provinsi) }}</p>
             </div>
         </div>
     </div>
