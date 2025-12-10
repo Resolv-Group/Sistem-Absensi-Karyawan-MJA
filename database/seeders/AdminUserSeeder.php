@@ -7,6 +7,7 @@ use Illuminate\Database\Seeder;
 use App\Models\User;
 use App\Models\Pekerja;
 use App\Models\Staff;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Faker\Factory as Faker;
 
@@ -70,11 +71,11 @@ class AdminUserSeeder extends Seeder
 
             // ==================
             // ✅ AUTOMATIC USER ACCOUNT
-            // ==================
+            // ==================   
             User::create([
                 'name' => $staff->nama,
                 'email' => $staff->email,
-                'password' => Hash::make('password123'),
+                'password' => Hash::make(Carbon::parse($staff->tgl_lahir)->format('d-m-Y')),
                 'role' => strtolower($staff->jabatan),
                 'staff_id' => $staff->id
             ]);
