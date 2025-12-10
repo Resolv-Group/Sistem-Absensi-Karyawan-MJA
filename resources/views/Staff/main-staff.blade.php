@@ -271,6 +271,33 @@
         </tbody>
         </table>
     </div>
+</td>
+
+                            {{-- 4. STATUS --}}
+                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
+                                        <span class="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5"></span>
+                                        Aktif
+                                    </span>
+                            </td>
+
+                            {{-- Actions --}}
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <div class="flex justify-end gap-2">
+                                    <a href=""
+                                        class="text-blue-600 hover:text-blue-900 border border-blue-200 hover:bg-blue-50 rounded-lg px-3 py-1.5 transition text-xs font-semibold">
+                                        Edit
+                                    </a>
+                                    <a href=""
+                                        class="text-blue-600 hover:text-blue-900 border border-blue-200 hover:bg-blue-50 rounded-lg px-3 py-1.5 transition text-xs font-semibold">
+                                        Detail
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                </tbody>
+            </table>
+        </div>
 
     {{-- Footer / Pagination --}}
     {{-- {{ $sekerja->links('vendor.pagination.custom') }} --}}
