@@ -73,7 +73,7 @@ class AdminUserSeeder extends Seeder
 
             // ==================
             // ✅ AUTOMATIC USER ACCOUNT
-            // ==================   
+            // ==================
             User::create([
                 'name' => $staff->nama,
                 'email' => $staff->email,
@@ -109,7 +109,10 @@ class AdminUserSeeder extends Seeder
                 'kecamatan' => $faker->citySuffix,
                 'kota' => $faker->city,
                 'provinsi' => $faker->state,
+                'email' => $faker->unique()->safeEmail,
                 'telp' => $faker->phoneNumber,
+                'rekening' => $faker->bankAccountNumber,
+                'nama_rek' => $faker->name,
                 'nama_emergency' => $faker->name,
                 'ibu_kandung' => $faker->name,
                 'tgl_resign' => $faker->date(),

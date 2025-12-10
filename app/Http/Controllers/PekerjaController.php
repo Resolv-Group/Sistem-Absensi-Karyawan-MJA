@@ -188,11 +188,15 @@ class PekerjaController extends Controller
             ->route('view.tambah.pekerja')
             ->with('success', 'Data Pekerja ' . $pekerja->nama . ' berhasil ditambahkan.');
         } catch (QueryException $e) {
-        // If the DB fails, we catch it here so Laravel doesn't try to render the blob
-        // We only return the text message, not the binary data
-            // dd('Database Error Occurred:', $e->getMessage());
+            // Tangani error database dan kirim ke front-end melalui session error
+            return back()
+                ->withInput()
+                ->withErrors(['database' => $e->getMessage()]);
         } catch (\Exception $e) {
-            dd('General Error:', $e->getMessage());
+            // Tangani error umum dan kirim ke front-end melalui session error
+            return back()
+                ->withInput()
+                ->withErrors(['general' => $e->getMessage()]);
         }
     }
 
