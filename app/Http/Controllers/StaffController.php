@@ -16,7 +16,12 @@ use Illuminate\Support\Facades\Hash;
 class StaffController extends Controller
 {
     function viewStaffMain(){
-        return view('Staff.main-staff');
+        $staff = Staff::where('status_aktif', 1)->paginate(5);
+        $totalStaff = Staff::count(); // total pekerja
+        $staffBaru  = Staff::where('created_at', '>=', now()->subMonth())->count(); // pekerja baru dari bulan lalu
+        $tidakAktif   = Staff::where('status_aktif', '!=', '1')->count(); // pekerja tidak aktif
+
+        return view('Staff.main-staff', compact('staff', 'totalStaff', 'staffBaru', 'tidakAktif'));
     }
 
     function viewTambahStaff() {
@@ -45,7 +50,7 @@ class StaffController extends Controller
                 'tgl_bergabung' => 'required|date',
                 'tgl_resign' => 'nullable|date',
 
-                
+
 
                 'alamat' => 'required|string',
                 'desa' => 'required|string',
@@ -55,7 +60,7 @@ class StaffController extends Controller
                 'kecamatan' => 'required|string',
                 'provinsi' => 'required|string',
 
-                
+
 
                 'email' => 'nullable|email',
                 'telp' => 'nullable|string|max:16',
@@ -204,7 +209,7 @@ class StaffController extends Controller
         if (array_key_exists($request->jabatan, $roleMapping)) {
 
             $plainPassword = Carbon::parse($request->tgl_lahir)->format('d-m-Y');
-            
+
             $password = Hash::make($plainPassword);
 
             $user = User::create([

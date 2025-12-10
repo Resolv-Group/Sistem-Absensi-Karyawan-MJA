@@ -36,35 +36,43 @@ function removePhoto(event) {
     document.getElementById('removeBtn').classList.add('hidden');
 }
 
-function numericFieldHandler(inputClass, fieldName) {
+function numericFieldHandler(inputClass, fieldName, requiredLength = null) {
     const input = document.querySelector(inputClass);
-
     if (!input) return;
 
     input.addEventListener('input', (e) => {
-        const oldValue = e.target.value;
-        const newValue = oldValue.replace(/[^0-9]/g, '');
+        let val = e.target.value.replace(/[^0-9]/g, '');
+        e.target.value = val;
 
         const errorId = `error-${fieldName}`;
         let errorEl = document.getElementById(errorId);
 
-        // Jika input mengandung non-number
-        if (oldValue !== newValue) {
-            e.target.value = newValue;
+        // Validasi default: hanya angka
+        let errorMsg = "";
+        if (val !== e.target.value) {
+            errorMsg = `Input ${fieldName} hanya boleh angka`;
+        }
 
+        // Validasi panjang wajib 16 digit
+        if (requiredLength && val.length > 0 && val.length !== requiredLength) {
+            errorMsg = `${fieldName} harus ${requiredLength} digit`;
+        }
+
+        // Jika ada error → tampilkan styling & pesan
+        if (errorMsg) {
             input.classList.add('border-red-500', 'bg-red-50');
             input.classList.remove('border-gray-500', 'bg-gray-50');
 
-            // Tampilkan error jika belum ada
             if (!errorEl) {
                 errorEl = document.createElement('p');
                 errorEl.id = errorId;
                 errorEl.className = "text-red-600 text-xs mt-1";
-                errorEl.textContent = `Input ${fieldName} hanya boleh angka`;
                 input.insertAdjacentElement('afterend', errorEl);
             }
+            errorEl.textContent = errorMsg;
+
         } else {
-            // Jika input valid → hilangkan error
+            // tidak error
             input.classList.remove('border-red-500', 'bg-red-50');
             input.classList.add('border-gray-500', 'bg-gray-50');
             errorEl?.remove();
@@ -72,9 +80,10 @@ function numericFieldHandler(inputClass, fieldName) {
     });
 }
 
+
 // Apply untuk masing-masing
-numericFieldHandler('.nik-input', 'NIK');
-numericFieldHandler('.no_kk-input', 'No KK');
+numericFieldHandler('.nik-input', 'NIK', 16);
+numericFieldHandler('.no_kk-input', 'No KK', 16);
 numericFieldHandler('.anak-input', 'Anak')
 numericFieldHandler('.rt-input', 'RT');
 numericFieldHandler('.rw-input', 'RW');
@@ -88,8 +97,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // --- RULES ---
     if (tglLahir) tglLahir.max = today;          // Birth date cannot be in future
     if (tglBergabung) tglBergabung.max = today;  // Join date cannot be in future
-
-
 });
 
 
