@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use App\Models\History;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
@@ -202,12 +203,14 @@ class StaffController extends Controller
         // Cek apakah jabatan masuk daftar role login
         if (array_key_exists($request->jabatan, $roleMapping)) {
 
-            $plainPassword = formatTanggal($request->tgl_lahir);
+            $plainPassword = Carbon::parse($request->tgl_lahir)->format('d-m-Y');
             
+            $password = Hash::make($plainPassword);
+
             $user = User::create([
                 'name'     => $staff->nama,
                 'email'    => $staff->email,
-                'password' => $plainPassword,
+                'password' => $password,
                 'role'     => $roleMapping[$request->jabatan],
                 'staff_id' => $staff->id,
             ]);
