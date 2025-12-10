@@ -22,15 +22,15 @@
             {{-- Stat Item --}}
             <div class="border-r border-gray-100 last:border-0">
                 <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Total Staff</p>
-                <p class="mt-1 text-2xl font-bold text-gray-900">1234</p>
+                <p class="mt-1 text-2xl font-bold text-gray-900">{{$totalStaff}}</p>
             </div>
             <div class="border-r border-gray-100 last:border-0">
                 <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Staff Baru</p>
-                <p class="mt-1 text-2xl font-bold text-gray-900">123</p>
+                <p class="mt-1 text-2xl font-bold text-gray-900">{{$staffBaru}}</p>
             </div>
             <div class="border-r border-gray-100 last:border-0">
                 <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Tidak Aktif</p>
-                <p class="mt-1 text-2xl font-bold text-gray-900">2</p>
+                <p class="mt-1 text-2xl font-bold text-gray-900">{{$tidakAktif}}</p>
             </div>
         </div>
     </div>
@@ -84,7 +84,7 @@
     {{-- ================================
         4. MAIN TABLE
     ================================= --}}
-        <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+    <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
@@ -94,22 +94,26 @@
                         </th>
 
                         {{-- COLUMN 1: IDENTITY  --}}
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
                             Pegawai
                         </th>
 
                         {{-- COLUMN 2: CONTACT --}}
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
                             Kontak
                         </th>
 
                         {{-- COLUMN 3: TENURE --}}
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
                             Masa Kerja
                         </th>
 
                         {{-- COLUMN 4: STATUS  --}}
-                        <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">
+                        <th scope="col"
+                            class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">
                             Status
                         </th>
 
@@ -120,7 +124,7 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     {{-- Loop through data --}}
-                    {{-- @forelse ($pekerja as $p)
+                    @forelse ($staff as $s)
                         <tr class="hover:bg-gray-50 transition-colors duration-150 group">
 
                             <td class="px-6 py-4 whitespace-nowrap">
@@ -130,18 +134,19 @@
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
                                     <div class="flex-shrink-0 h-10 w-10">
-                                        @if($p->image_base64)
+                                        @if ($s->image_base64)
                                             <img class="h-10 w-10 rounded-full object-cover border border-gray-200"
-                                                 src="{{ $p->image_base64 }}" alt="{{ $p->nama }}">
+                                                src="{{ $s->image_base64 }}" alt="{{ $s->nama }}">
                                         @else
                                             <img class="h-10 w-10 rounded-full bg-gray-200"
-                                                 src="https://ui-avatars.com/api/?name={{ urlencode($p->nama) }}&background=random&color=fff&size=128" alt="">
+                                                src="https://ui-avatars.com/api/?name={{ urlencode($s->nama) }}&background=random&color=fff&size=128"
+                                                alt="">
                                         @endif
                                     </div>
                                     <div class="ml-4">
-                                        <div class="text-sm font-bold text-gray-900">{{ $p->nama }}</div>
+                                        <div class="text-sm font-bold text-gray-900">{{ $s->nama }}</div>
                                         <div class="text-xs text-gray-500 font-mono mt-0.5">
-                                            ID: {{ $p->nik }}
+                                            ID: {{ $s->nik }}
                                         </div>
                                     </div>
                                 </div>
@@ -150,171 +155,124 @@
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex flex-col">
                                     <div class="flex items-center text-sm text-gray-700">
-                                        <svg class="w-4 h-4 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                                        {{ $p->email ?? '-' }}
-                                    </div>
-                                    <div class="flex items-center text-xs text-gray-500 mt-1">
-                                        <svg class="w-4 h-4 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
-                                        {{ $p->telp ?? '-' }}
-                                    </div>
-                                </div>
-                            </td>
-
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">
-                                    {{ \Carbon\Carbon::parse($p->tgl_bergabung)->translatedFormat('d M Y') }}
-                                </div>
-                                <div class="text-xs text-gray-500 mt-0.5">
-                                    {{ \Carbon\Carbon::parse($p->tgl_bergabung)->diffForHumans(null, true) }} kerja
-                                </div>
-                            </td>
-
-                            <td class="px-6 py-4 whitespace-nowrap text-center">
-                                @if($p->status_aktif == 1)
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
-                                        <span class="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5"></span>
-                                        Aktif
-                                    </span>
-                                @else
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 border border-red-200">
-                                        <span class="w-1.5 h-1.5 bg-red-500 rounded-full mr-1.5"></span>
-                                        Non-Aktif
-                                    </span>
-                                @endif
-                            </td>
-
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <div class="flex justify-end gap-2">
-                                    <a href="#" class="text-gray-400 hover:text-blue-600 transition-colors">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                                    </a>
-                                    <a href="{{ route('view.detail.staff') }}"
-                                       class="text-blue-600 hover:text-blue-900 font-semibold text-xs border border-blue-200 hover:bg-blue-50 rounded px-3 py-1.5 transition">
-                                        Detail
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="6" class="px-6 py-10 text-center text-gray-500">
-                                <div class="flex flex-col items-center justify-center">
-                                    <svg class="w-12 h-12 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                                    <p class="font-medium">Belum ada data staff.</p>
-                                    <p class="text-sm mt-1">Silakan tambah staff baru.</p>
-                                </div>
-                            </td>
-                        </tr>
-                    @endforelse --}}
-                        <tr class="hover:bg-gray-50 transition-colors duration-150 group">
-
-                            {{-- Checkbox --}}
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                            </td>
-
-                            {{-- 1. PEGAWAI (Avatar + Name + Employee ID) --}}
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="flex items-center">
-                                    <div class="flex-shrink-0 h-10 w-10">
-
-                                            <img class="h-10 w-10 rounded-full bg-gray-200"
-                                                 src="https://ui-avatars.com/api/?name=KR&background=random&color=fff&size=128" alt="">
-
-                                    </div>
-                                    <div class="ml-4">
-                                        <div class="text-sm font-bold text-gray-900">Dina Kartika</div>
-                                        <div class="text-xs text-gray-500 font-mono mt-0.5">
-                                            ID: 1
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
-
-                            {{-- 2. KONTAK (Email + Phone) --}}
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="flex flex-col gap-1">
-                                    {{-- Email --}}
-                                    <div class="flex items-center text-sm text-gray-700">
-                                        <svg class="w-4 h-4 text-gray-400 mr-2 flex-shrink-0" fill="none"
-                                            stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="w-4 h-4 text-gray-400 mr-2" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
                                             </path>
                                         </svg>
-                                        {{-- <span class="truncate max-w-[150px]"
-                                            title="{{ $p->email }}">{{ $p->email ?? '-' }}</span> --}}
-                                        <span class="truncate max-w-[150px]"
-                                            title="email123@gmail.com">email123@gmail.com</span>
+                                        {{ $s->email ?? '-' }}
                                     </div>
-                                    {{-- Phone --}}
-                                    <div class="flex items-center text-xs text-gray-500">
-                                        <svg class="w-4 h-4 text-gray-400 mr-2 flex-shrink-0" fill="none"
-                                            stroke="currentColor" viewBox="0 0 24 24">
+                                    <div class="flex items-center text-xs text-gray-500 mt-1">
+                                        <svg class="w-4 h-4 text-gray-400 mr-2" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z">
                                             </path>
                                         </svg>
-                                        {{-- {{ $p->telp ?? '-' }} --}}
-                                        08512387213798
+                                        {{ $s->telp ?? '-' }}
                                     </div>
                                 </div>
                             </td>
 
-                            {{-- 3. MASA KERJA (Join Date + Years) --}}
                             <td class="px-6 py-4 whitespace-nowrap">
-    <div class="flex flex-col gap-1">
+                                <div class="flex flex-col gap-1">
 
-        {{-- Tanggal Bergabung (Icon Kalender) --}}
-        <div class="flex items-center text-sm text-gray-900 font-medium">
-            <svg class="w-4 h-4 text-gray-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-            </svg>
-            {{-- Ganti dengan variabel dinamis jika perlu: --}}
-            {{-- {{ \Carbon\Carbon::parse($p->tgl_bergabung)->translatedFormat('d F Y') }} --}}
-            15 Februari 2025
-        </div>
+                                    {{-- Tanggal Bergabung (Icon Kalender) --}}
+                                    <div class="flex items-center text-sm text-gray-900 font-medium">
+                                        <svg class="w-4 h-4 text-gray-400 mr-2 flex-shrink-0" fill="none"
+                                            stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                            </path>
+                                        </svg>
+                                        {{-- Ganti dengan variabel dinamis jika perlu: --}}
+                                        {{ \Carbon\Carbon::parse($s->tgl_bergabung)->translatedFormat('d F Y') }}
+                                    </div>
 
-        {{-- Durasi Kerja (Icon Jam) --}}
-        <div class="flex items-center text-xs text-gray-500">
-            <svg class="w-4 h-4 text-gray-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-            {{-- Ganti dengan variabel dinamis jika perlu: --}}
-            {{-- {{ \Carbon\Carbon::parse($p->tgl_bergabung)->diffForHumans(null, true) }} kerja --}}
-            10 hari kerja
-        </div>
+                                    {{-- Durasi Kerja (Icon Jam) --}}
+                                    <div class="flex items-center text-xs text-gray-500">
+                                        <svg class="w-4 h-4 text-gray-400 mr-2 flex-shrink-0" fill="none"
+                                            stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        {{-- Ganti dengan variabel dinamis jika perlu: --}}
+                                        {{ \Carbon\Carbon::parse($s->tgl_bergabung)->diffForHumans(null, true) }} kerja
+                                    </div>
 
-    </div>
-</td>
-
-                            {{-- 4. STATUS --}}
-                            <td class="px-6 py-4 whitespace-nowrap text-center">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
-                                        <span class="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5"></span>
-                                        Aktif
-                                    </span>
-                            </td>
-
-                            {{-- Actions --}}
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <div class="flex justify-end gap-2">
-                                    <a href=""
-                                        class="text-blue-600 hover:text-blue-900 border border-blue-200 hover:bg-blue-50 rounded-lg px-3 py-1.5 transition text-xs font-semibold">
-                                        Edit
-                                    </a>
-                                    <a href="{{ route('view.detail.staff') }}"
-                                        class="text-blue-600 hover:text-blue-900 border border-blue-200 hover:bg-blue-50 rounded-lg px-3 py-1.5 transition text-xs font-semibold">
-                                        Detail
-                                    </a>
                                 </div>
                             </td>
-                        </tr>
-                </tbody>
-            </table>
         </div>
+        </td>
 
-        {{-- Footer / Pagination --}}
-        {{-- {{ $pekerja->links('vendor.pagination.custom') }} --}}
+        <td class="px-6 py-4 whitespace-nowrap text-center">
+            @if ($s->status_aktif == 1)
+                <span
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
+                    <span class="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5"></span>
+                    Aktif
+                </span>
+            @else
+                <span
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 border border-red-200">
+                    <span class="w-1.5 h-1.5 bg-red-500 rounded-full mr-1.5"></span>
+                    Non-Aktif
+                </span>
+            @endif
+        </td>
+
+        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+            <div class="flex justify-end gap-2">
+                <a href=""
+                    class="text-blue-600 hover:text-blue-900 border border-blue-200 hover:bg-blue-50 rounded-lg px-3 py-1.5 transition text-xs font-semibold">
+                    Edit
+                </a>
+                <a href="{{ route('view.detail.staff') }}"
+                    class="text-blue-600 hover:text-blue-900 border border-blue-200 hover:bg-blue-50 rounded-lg px-3 py-1.5 transition text-xs font-semibold">
+                    Detail
+                </a>
+            </div>
+        </td>
+        </tr>
+    @empty
+        <tr>
+            <td colspan="6" class="px-6 py-10 text-center text-gray-500">
+                <div class="flex flex-col items-center justify-center">
+                    <svg class="w-12 h-12 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
+                        </path>
+                    </svg>
+                    <p class="font-medium">Belum ada data staff.</p>
+                    <p class="text-sm mt-1">Silakan tambah staff baru.</p>
+                </div>
+            </td>
+        </tr>
+        @endforelse
+        <tr class="hover:bg-gray-50 transition-colors duration-150 group">
+
+            {{-- 4. STATUS --}}
+            <td class="px-6 py-4 whitespace-nowrap text-center">
+                <span
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
+                    <span class="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5"></span>
+                    Aktif
+                </span>
+            </td>
+
+            {{-- Actions --}}
+            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <div class="flex justify-end gap-2">
+
+                </div>
+            </td>
+        </tr>
+        </tbody>
+        </table>
+    </div>
+
+    {{-- Footer / Pagination --}}
+    {{-- {{ $sekerja->links('vendor.pagination.custom') }} --}}
     </div>
 @endsection
