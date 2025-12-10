@@ -59,6 +59,8 @@ class AdminUserSeeder extends Seeder
                 'nama_rek' => $faker->name,
                 'nama_emergency' => $faker->name,
                 'ibu_kandung' => $faker->name,
+                'tgl_resign' => $faker->date(),
+                'masa_berlaku_pkwt' => $faker->date(),
 
                 'hubungan_emergency' => $faker->randomElement(['Orang Tua', 'Pasangan', 'Wali']),
                 'telp_emergency' => $faker->phoneNumber,
@@ -99,6 +101,9 @@ class AdminUserSeeder extends Seeder
                 'tgl_bergabung' => now(),
                 'alamat' => $faker->address,
                 'desa' => $faker->word,
+                'rekening' => $faker->bankAccountNumber,
+                'nama_rek' => $faker->name,
+                'email' => $faker->unique()->safeEmail,
                 'rt' => rand(1,10),
                 'rw' => rand(1,10),
                 'kecamatan' => $faker->citySuffix,
@@ -107,6 +112,7 @@ class AdminUserSeeder extends Seeder
                 'telp' => $faker->phoneNumber,
                 'nama_emergency' => $faker->name,
                 'ibu_kandung' => $faker->name,
+                'tgl_resign' => $faker->date(),
 
                 'hubungan_emergency' => $faker->randomElement(['Orang Tua', 'Pasangan', 'Wali']),
                 'telp_emergency' => $faker->phoneNumber,

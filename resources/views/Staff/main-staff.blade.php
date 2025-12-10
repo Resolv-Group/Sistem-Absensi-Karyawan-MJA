@@ -303,7 +303,7 @@
                                         class="text-blue-600 hover:text-blue-900 border border-blue-200 hover:bg-blue-50 rounded-lg px-3 py-1.5 transition text-xs font-semibold">
                                         Edit
                                     </a>
-                                    <a href="{{ route('view.detail.staff') }}"
+                                    <a href=""
                                         class="text-blue-600 hover:text-blue-900 border border-blue-200 hover:bg-blue-50 rounded-lg px-3 py-1.5 transition text-xs font-semibold">
                                         Detail
                                     </a>

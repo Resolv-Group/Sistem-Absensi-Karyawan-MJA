@@ -31,7 +31,7 @@
             <h2 class="text-xl font-semibold text-gray-800 mb-6">Sign in</h2>
 
             {{-- Form --}}
-            <form action="" method="POST">
+            <form method="POST" action="{{ route('login.process') }}">
                 @csrf
 
                 {{-- Email --}}
