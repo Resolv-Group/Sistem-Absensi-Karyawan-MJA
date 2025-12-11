@@ -43,10 +43,13 @@ class AdminUserSeeder extends Seeder
                 'telp' => $faker->phoneNumber,
                 'rekening' => $faker->bankAccountNumber,
                 'nama_rek' => $faker->name,
+
                 'nama_emergency' => $faker->name,
                 'ibu_kandung' => $faker->name,
                 'tgl_resign' => $faker->date(),
                 'masa_berlaku_pkwt' => $faker->date(),
+                'perusahaan' => $faker->name,
+
                 'hubungan_emergency' => 'Orang Tua',
                 'telp_emergency' => $faker->phoneNumber,
                 'jabatan' => $faker->randomElement(['PIC','HRD','Akuntan']),
@@ -149,6 +152,7 @@ class AdminUserSeeder extends Seeder
                 'nama_rek' => $role['jabatan'],
                 'nama_emergency' => 'Emergency',
                 'ibu_kandung' => $faker->name,
+                'perusahaan' => $faker->name,
                 'tgl_resign' => null,
                 'masa_berlaku_pkwt' => null,
                 'hubungan_emergency' => 'Orang Tua',
