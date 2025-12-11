@@ -43,6 +43,7 @@ class AdminUserSeeder extends Seeder
                 'telp' => $faker->phoneNumber,
                 'rekening' => $faker->bankAccountNumber,
                 'nama_rek' => $faker->name,
+
                 'nama_emergency' => $faker->name,
                 'ibu_kandung' => $faker->name,
                 'tgl_resign' => $faker->date(),
@@ -150,6 +151,7 @@ class AdminUserSeeder extends Seeder
                 'nama_rek' => $role['jabatan'],
                 'nama_emergency' => 'Emergency',
                 'ibu_kandung' => $faker->name,
+                'perusahaan' => $faker->name,
                 'tgl_resign' => null,
                 'masa_berlaku_pkwt' => null,
                 'perusahaan' => $faker->name,
