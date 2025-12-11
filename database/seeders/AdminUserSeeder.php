@@ -49,7 +49,6 @@ class AdminUserSeeder extends Seeder
                 'tgl_resign' => $faker->date(),
                 'masa_berlaku_pkwt' => $faker->date(),
                 'perusahaan' => $faker->name,
-
                 'hubungan_emergency' => 'Orang Tua',
                 'telp_emergency' => $faker->phoneNumber,
                 'jabatan' => $faker->randomElement(['PIC','HRD','Akuntan']),
@@ -155,6 +154,7 @@ class AdminUserSeeder extends Seeder
                 'perusahaan' => $faker->name,
                 'tgl_resign' => null,
                 'masa_berlaku_pkwt' => null,
+                'perusahaan' => $faker->name,
                 'hubungan_emergency' => 'Orang Tua',
                 'telp_emergency' => '08111111111',
                 'jabatan' => $role['jabatan'],

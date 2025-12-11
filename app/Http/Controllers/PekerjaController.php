@@ -34,7 +34,11 @@ class PekerjaController extends Controller
 
         $pekerja->image_base64 = 'data:image/jpeg;base64,' . base64_encode($pekerja->image_blob);
 
-        return view('Pekerja.detail-pekerja', compact('pekerja'));
+        $historiPekerja = History::where('foreign_id', $id)
+        ->where('nama_tabel', 'pekerja')
+        ->get();
+
+        return view('Pekerja.detail-pekerja', compact('pekerja', 'historiPekerja'));
     }
 
     function tambahPekerja(request $request)

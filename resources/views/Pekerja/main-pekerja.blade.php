@@ -13,9 +13,9 @@
             <h2 class="text-sm font-semibold text-gray-800">
                 Periode: <span class="text-gray-500 font-normal">{{ \Carbon\Carbon::now()->translatedFormat('F Y') }}</span>
             </h2>
-            <a href="#" class="text-sm text-blue-600 hover:underline flex items-center gap-1">
+            {{-- <a href="#" class="text-sm text-blue-600 hover:underline flex items-center gap-1">
                 Lihat detail <span>&rarr;</span>
-            </a>
+            </a> --}}
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -48,7 +48,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
                 </svg>
-                Directory
+                List Daftar
             </button>
         </div>
 
@@ -89,8 +89,8 @@
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-6 py-3 text-left w-10">
-                            <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                            No.
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
                             Identitas Pekerja
@@ -113,7 +113,7 @@
 
                             {{-- CHECKBOX --}}
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                {{ ($pekerja->currentPage() - 1) * $pekerja->perPage() + $loop->iteration }}.
                             </td>
 
                             {{-- COL 1: IDENTITAS --}}
