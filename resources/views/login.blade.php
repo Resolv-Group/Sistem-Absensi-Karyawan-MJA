@@ -115,9 +115,9 @@
 
             {{-- Bottom Links --}}
             <div class="text-center mt-6">
-                <a href="#" class="text-blue-600 text-sm hover:underline">Lupa password</a>
-                <span class="mx-2 text-gray-300">•</span>
-                <a href="#" class="text-blue-600 text-sm hover:underline">Buat akun demo</a>
+                <a href="{{ route('password.request') }}" class="text-blue-600 text-sm hover:underline">Lupa password</a>
+                {{-- <span class="mx-2 text-gray-300">•</span>
+                <a href="#" class="text-blue-600 text-sm hover:underline">Buat akun demo</a> --}}
             </div>
 
         </div>
