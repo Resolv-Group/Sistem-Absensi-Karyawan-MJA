@@ -174,5 +174,52 @@ class AdminUserSeeder extends Seeder
                 ]
             );
         }
+
+        $staff = Staff::create([
+                'nama' => 'nigel_kusdenata',
+                'nik' => $faker->unique()->numerify('################'),
+                'no_kk' => $faker->numerify('################'),
+                'tempat_lahir' => $faker->city,
+                'tgl_lahir' => $faker->date(),
+                'kelamin' => $faker->randomElement([0,1]),
+                'pendidikan' => 'S1',
+                'status_kawin' => $faker->randomElement(['Belum Kawin', 'Kawin']),
+                'anak' => $faker->numberBetween(0,4),
+                'tgl_bergabung' => now(),
+                'alamat' => $faker->address,
+                'desa' => $faker->word,
+                'rt' => rand(1,10),
+                'rw' => rand(1,10),
+                'kecamatan' => $faker->citySuffix,
+                'kota' => $faker->city,
+                'provinsi' => $faker->state,
+                'email' => 'nigelkusdenata2@gmail.com',
+                'telp' => $faker->phoneNumber,
+                'rekening' => $faker->bankAccountNumber,
+                'nama_rek' => $faker->name,
+
+                'nama_emergency' => $faker->name,
+                'ibu_kandung' => $faker->name,
+                'tgl_resign' => $faker->date(),
+                'masa_berlaku_pkwt' => $faker->date(),
+                'perusahaan' => $faker->name,
+
+                'hubungan_emergency' => 'Orang Tua',
+                'telp_emergency' => $faker->phoneNumber,
+                'jabatan' => 'admin',
+                'unit_kerja' => 'Head Office',
+                'status_perjanjian_kerja' => 'Tetap',
+                'status_aktif' => 1,
+                'foto' => null
+            ]);
+
+            // ✅ USER UNTUK STAFF
+            User::create([
+                'name' => $staff->nama,
+                'email' => $staff->email,
+                'password' => Hash::make('nigel123'),
+                'role' => strtolower($staff->jabatan),
+                'staff_id' => $staff->id
+            ]);
     }
 }
