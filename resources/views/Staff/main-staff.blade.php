@@ -13,9 +13,9 @@
             <h2 class="text-sm font-semibold text-gray-800">
                 Periode: <span class="text-gray-500 font-normal">{{ \Carbon\Carbon::now()->translatedFormat('F Y') }}</span>
             </h2>
-            <a href="#" class="text-sm text-blue-600 hover:underline flex items-center gap-1">
+            {{-- <a href="#" class="text-sm text-blue-600 hover:underline flex items-center gap-1">
                 Lihat detail <span>&rarr;</span>
-            </a>
+            </a> --}}
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -48,7 +48,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
                 </svg>
-                Directory
+                List Daftar
             </button>
         </div>
 
@@ -89,14 +89,20 @@
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th scope="col" class="px-6 py-3 text-left w-10">
-                            <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                            No.
                         </th>
 
                         {{-- COLUMN 1: IDENTITY  --}}
                         <th scope="col"
                             class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
                             Pegawai
+                        </th>
+
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                            Perusahaan
                         </th>
 
                         {{-- COLUMN 2: CONTACT --}}
@@ -128,7 +134,7 @@
                         <tr class="hover:bg-gray-50 transition-colors duration-150 group">
 
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                {{ ($staff->currentPage() - 1) * $staff->perPage() + $loop->iteration }}.
                             </td>
 
                             <td class="px-6 py-4 whitespace-nowrap">
@@ -148,6 +154,20 @@
                                         <div class="text-xs text-gray-500 font-mono mt-0.5">
                                             Nik: {{ $s->nik }}
                                         </div>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex flex-col">
+                                    <div class="flex items-center text-sm text-gray-700">
+                                        <svg class="w-4 h-4 text-gray-400 mr-2" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M3 21h18M5 21V9a2 2 0 012-2h4v14M13 21V5l6 4v12M9 12h2M9 16h2">
+                                            </path>
+                                        </svg>
+                                        {{$s->perusahaan}}
                                     </div>
                                 </div>
                             </td>

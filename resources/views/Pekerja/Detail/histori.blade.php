@@ -1,162 +1,84 @@
-{{-- Section 3: Riwayat Aktivitas / History --}}
-<div>
-    {{-- Section Header --}}
-    <div class="flex items-center gap-4 mb-6">
-        <h3 class="text-lg font-bold text-gray-900 whitespace-nowrap">Riwayat Perubahan</h3>
-        <div class="h-px bg-gray-200 w-full"></div>
-    </div>
-
-    {{-- History Table --}}
-    <div class="overflow-hidden border border-gray-200 rounded-lg">
+{{-- History Table --}}
+    <div class="overflow-hidden border border-gray-200 rounded-lg shadow-sm">
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
-                    {{-- Column 1: Activity Name --}}
-                    <th scope="col"
-                        class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                    {{-- Column 1: Aktivitas (Left Aligned) --}}
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider w-[40%]">
                         Aktivitas
                     </th>
 
-                    {{-- Column 2: Updated By --}}
-                    <th scope="col"
-                        class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                    {{-- Column 2: Diperbarui Oleh (CENTER ALIGNED) --}}
+                    <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider w-[35%]">
                         Diperbarui Oleh
                     </th>
 
-                    {{-- Column 3: When --}}
-                    <th scope="col"
-                        class="px-6 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">
+                    {{-- Column 3: Waktu (Right Aligned) --}}
+                    <th scope="col" class="px-6 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider w-[25%]">
                         Waktu
                     </th>
                 </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
 
-                {{-- Example Loop: Replace $histories with your actual variable --}}
-                {{-- @forelse($pekerja->logs ?? [] as $log)
-                        <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm font-semibold text-gray-900">
-                                    {{ $log->activity ?? 'Update Data' }}
-                                </div>
-                                <div class="text-xs text-gray-500">
-                                    {{ $log->description ?? 'Melakukan perubahan data profil' }}
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                    {{ $log->user->name ?? 'Admin' }}
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-500">
-                                {{ \Carbon\Carbon::parse($log->created_at)->format('d M Y, H:i') }}
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="3" class="px-6 py-8 text-center text-gray-500 text-sm">
-                                Belum ada riwayat aktivitas yang tercatat.
-                            </td>
-                        </tr>
-                    @endforelse --}}
+                @forelse($historiPekerja as $log)
+                    <tr class="hover:bg-gray-50 transition-colors duration-150">
 
-                {{-- STATIC EXAMPLE (Delete this block when integrating backend) --}}
-                <!-- Static Example Item 1 -->
-                <tr class="hover:bg-gray-50 transition-colors">
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm font-semibold text-gray-900">Perubahan Data Diri</div>
-                        <div class="text-xs text-gray-500">Update alamat domisili</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span
-                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                            HRD Staff
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-500">
-                        09 Des 2025, 10:30
-                    </td>
-                </tr>
-                <!-- Static Example Item 2 -->
-                <tr class="hover:bg-gray-50 transition-colors">
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm font-semibold text-gray-900">Pendaftaran Karyawan</div>
-                        <div class="text-xs text-gray-500">Input data awal ke sistem</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span
-                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                            Super Admin
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-500">
-                        01 Jan 2024, 08:00
-                    </td>
-                </tr>
-                <tr class="hover:bg-gray-50 transition-colors">
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm font-semibold text-gray-900">Pendaftaran Karyawan</div>
-                        <div class="text-xs text-gray-500">Input data awal ke sistem</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span
-                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                            Super Admin
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-500">
-                        01 Jan 2024, 08:00
-                    </td>
-                </tr>
-                <tr class="hover:bg-gray-50 transition-colors">
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm font-semibold text-gray-900">Pendaftaran Karyawan</div>
-                        <div class="text-xs text-gray-500">Input data awal ke sistem</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span
-                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                            Super Admin
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-500">
-                        01 Jan 2024, 08:00
-                    </td>
-                </tr>
-                <tr class="hover:bg-gray-50 transition-colors">
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm font-semibold text-gray-900">Pendaftaran Karyawan</div>
-                        <div class="text-xs text-gray-500">Input data awal ke sistem</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span
-                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                            Super Admin
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-500">
-                        01 Jan 2024, 08:00
-                    </td>
-                </tr>
-                {{-- END STATIC EXAMPLE --}}
+                        {{-- 1. Aktivitas --}}
+                        <td class="px-6 py-4 align-top">
+                            <div class="flex flex-col">
+                                <span class="text-sm font-bold text-gray-900 leading-snug">
+                                    {{ $log->activity ?? 'Update Data' }}
+                                </span>
+                                <span class="text-xs text-gray-500 mt-1 leading-relaxed">
+                                    {{ $log->description ?? 'Melakukan perubahan data' }}
+                                </span>
+                            </div>
+                        </td>
+
+                        {{-- 2. Diperbarui Oleh (CENTERED) --}}
+                        <td class="px-6 py-4 align-top">
+                            {{-- Added 'items-center' to center content horizontally --}}
+                            <div class="flex flex-col items-center justify-center gap-1.5">
+                                {{-- Nama --}}
+                                <span class="text-sm font-bold text-gray-800 tracking-tight">
+                                    {{ $log->staff->nama ?? 'System' }}
+                                </span>
+
+                                {{-- Jabatan (Centered Badge) --}}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-indigo-50 text-indigo-700 border border-indigo-100">
+                                    {{ $log->jabatan ?? 'ADMIN' }}
+                                </span>
+                            </div>
+                        </td>
+
+                        {{-- 3. Waktu --}}
+                        <td class="px-6 py-4 whitespace-nowrap text-right align-top">
+                            <div class="flex flex-col items-end">
+                                <span class="text-sm font-semibold text-gray-900">
+                                    {{ \Carbon\Carbon::parse($log->waktu)->format('d M Y') }}
+                                </span>
+                                <span class="text-xs text-gray-500 mt-0.5 font-mono">
+                                    {{ \Carbon\Carbon::parse($log->waktu)->format('H:i') }}
+                                </span>
+                            </div>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="3" class="px-6 py-10 text-center text-gray-500 text-sm bg-gray-50">
+                            Belum ada riwayat aktivitas.
+                        </td>
+                    </tr>
+                @endforelse
 
             </tbody>
         </table>
+
+        {{-- Footer Button --}}
         <div class="bg-gray-50 px-6 py-3 border-t border-gray-200">
-            {{-- Replace '#' with route('name') later --}}
             <a href="#"
                 class="w-full flex items-center justify-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors group">
-                Lihat Seluruh Riwayat
-                {{-- Animated Arrow Icon --}}
-                <svg xmlns="http://www.w3.org/2000/svg"
-                    class="h-4 w-4 transform group-hover:translate-x-1 transition-transform" fill="none"
-                    viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                </svg>
             </a>
         </div>
     </div>
-
-
-</div>

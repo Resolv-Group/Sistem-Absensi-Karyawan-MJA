@@ -30,13 +30,13 @@
     {{-- Right Side: Secondary Actions (The "Surprise") --}}
     {{-- This fills the empty space on the right and aligns with the professional vibe --}}
     <div class="flex items-center gap-3">
-        <span class="text-xs text-gray-400 hidden md:inline-block">Last sync: {{ now()->format('H:i') }}</span>
+        <span class="text-xs text-gray-400 hidden md:inline-block">Data Update Terakhir: {{ now()->format('d M Y H:i') }}</span>
 
-        <button class="inline-flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-gray-900 hover:border-gray-300 transition shadow-sm">
+        {{-- <button class="inline-flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-gray-900 hover:border-gray-300 transition shadow-sm">
             <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
             </svg>
             Export Report
-        </button>
+        </button> --}}
     </div>
 </div>

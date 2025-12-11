@@ -343,15 +343,24 @@
                         @enderror
                     </div>
 
-
-                    {{-- 2. Unit Kerja --}}
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">Penempatan PT (Unit Kerja)</label>
-                        <input type="text" name="unit_kerja" maxlength="100" autocomplete="off"
-                            class="w-full rounded-lg shadow-sm
-                            @error('unit_kerja') border-red-500 bg-red-50 @else border-gray-500 bg-gray-50 @enderror
-                            border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition"
-                            placeholder="cth: PT.MJA" value="{{ old('unit_kerja', $staff->unit_kerja) }}">
+                    {{-- 2. Unit Kerja & Nama Perusahaan --}}
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Penempatan PT (Unit Kerja)</label>
+                            <input type="text" name="unit_kerja" maxlength="100" autocomplete="off"
+                                class="w-full rounded-lg shadow-sm
+                                @error('unit_kerja') border-red-500 bg-red-50 @else border-gray-500 bg-gray-50 @enderror
+                                border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition"
+                                placeholder="-" value="{{ old('unit_kerja', $staff->unit_kerja) }}">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Nama Perusahaan PT</label>
+                            <input type="text" name="perusahaan" maxlength="100" autocomplete="off"
+                                class="w-full rounded-lg shadow-sm
+                                @error('perusahaan') border-red-500 bg-red-50 @else border-gray-500 bg-gray-50 @enderror
+                                border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition"
+                                placeholder="cth: PT.MJA" value="{{ old('perusahaan', $staff->perusahaan) }}">
+                        </div>
                     </div>
 
                     {{-- 3. Masa Berlaku PKWT --}}
@@ -498,6 +507,71 @@
                             <input type="email" name="email" maxlength="255" autocomplete="off"
                                 value="{{ old('email', $staff->email) }}"
                                 class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition">
+                        </div>
+
+                        {{-- NEW: Password & Confirmation (Side by Side) --}}
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {{-- Password --}}
+                            <div x-data="{ show: false }">
+                                <label class="block text-sm font-bold text-gray-700 mb-1">Password</label>
+                                <div class="relative">
+                                    <input :type="show ? 'text' : 'password'" name="password" autocomplete="new-password"
+                                        placeholder="Minimal 8 karakter"
+                                        class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 pl-3 pr-10 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition">
+
+                                    {{-- Eye Icon --}}
+                                    <button type="button" @click="show = !show"
+                                        class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-blue-600 focus:outline-none">
+
+                                        {{-- Icon Eye Open --}}
+                                        <svg x-show="!show" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
+                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                        </svg>
+
+                                        {{-- Icon Eye Slashed --}}
+                                        <svg x-show="show" style="display: none;" xmlns="http://www.w3.org/2000/svg"
+                                            class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+
+                            {{-- Konfirmasi Password --}}
+                            <div x-data="{ show: false }">
+                                <label class="block text-sm font-bold text-gray-700 mb-1">Konfirmasi Password</label>
+                                <div class="relative">
+                                    <input :type="show ? 'text' : 'password'" name="password_confirmation"
+                                        autocomplete="new-password" placeholder="Ulangi password"
+                                        class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 pl-3 pr-10 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition">
+
+                                    {{-- Eye Icon --}}
+                                    <button type="button" @click="show = !show"
+                                        class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-blue-600 focus:outline-none">
+
+                                        {{-- Icon Eye Open --}}
+                                        <svg x-show="!show" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
+                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                        </svg>
+
+                                        {{-- Icon Eye Slashed --}}
+                                        <svg x-show="show" style="display: none;" xmlns="http://www.w3.org/2000/svg"
+                                            class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
 
                         {{-- No Telepon --}}
