@@ -34,6 +34,7 @@ return new class extends Migration
             $table->date('tgl_bergabung');
             $table->date('tgl_resign')->nullable();
             $table->date('masa_berlaku_pkwt')->nullable();
+            $table->string('perusahaan', 100);
 
             $table->boolean('kelamin')->comment('1=laki,0=perempuan');
             $table->string('status_kawin', 50);
