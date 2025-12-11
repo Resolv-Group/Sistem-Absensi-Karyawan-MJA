@@ -23,10 +23,10 @@ class Staff extends Model
 
         'unit_kerja','rekening','nama_rek','rt','rw','tempat_lahir','tgl_lahir','tgl_bergabung','tgl_resign',
 
-        'masa_berlaku_pkwt', 
+        'masa_berlaku_pkwt', 'perusahaan',
 
         'kelamin','status_kawin','pendidikan','status_aktif',
-        
+
         'status_perjanjian_kerja', 'jabatan', 'anak',
 
         'nama_emergency','telp_emergency','hubungan_emergency','ibu_kandung',

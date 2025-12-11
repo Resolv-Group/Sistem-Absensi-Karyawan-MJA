@@ -34,7 +34,11 @@ class StaffController extends Controller
 
         $staff->image_base64 = 'data:image/jpeg;base64,' . base64_encode($staff->image_blob);
 
-        return view('Staff.detail-staff', compact('staff'));
+        $historiStaff = History::where('foreign_id', $id)
+        ->where('nama_tabel', 'staff')
+        ->get();
+
+        return view('Staff.detail-staff', compact('staff', 'historiStaff'));
     }
 
         function tambahStaff(request $request)
@@ -297,7 +301,7 @@ class StaffController extends Controller
                 'unit_kerja' => 'required|string',
                 'status_perjanjian_kerja' => 'required|string',
                 'jabatan' => 'required|string',
-                
+
 
                 'nama_emergency' => 'required|string|max:255',
                 'telp_emergency' => 'required|string|max:16',
@@ -306,6 +310,8 @@ class StaffController extends Controller
                 'ibu_kandung' => 'string|max:255',
 
                 'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+
+                'password' => 'nullable|min:8|confirmed',
             ],
             [
                 // Identitas
@@ -371,6 +377,9 @@ class StaffController extends Controller
                 'foto.image' => 'File foto harus berupa gambar.',
                 'foto.mimes' => 'Format foto harus jpg/jpeg/png.',
                 'foto.max' => 'Ukuran foto maksimal 2MB.',
+
+                'password.min' => 'Password minimal 8 karakter.',
+                'password.confirmed' => 'Konfirmasi password tidak sesuai.',
             ],
         );
 
@@ -386,7 +395,7 @@ class StaffController extends Controller
             $staff->foto = $foto;
         }
 
-        
+
         // ✅ Cari user berdasarkan staff_id (LEBIH AMAN)
         $user = User::where('email', $staff->email)->first();
 
@@ -403,11 +412,11 @@ class StaffController extends Controller
         ]);
 
         // ✅ Jika password diisi
-        // if ($request->filled('password')) {
-        //     $user->update([
-        //         'password' => Hash::make($request->password)
-        //     ]);
-        // }
+        if ($request->filled('password')) {
+            $user->update([
+                'password' => Hash::make($request->password)
+            ]);
+        }
 
         // ✅ UPDATE DATA
         $staff->update($data);

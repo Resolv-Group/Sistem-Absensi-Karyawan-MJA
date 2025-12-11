@@ -17,4 +17,9 @@ class History extends Model
         'updated_by',
         'waktu'
     ];
+
+    public function staff()
+    {
+        return $this->belongsTo(Staff::class, 'updated_by');
+    }
 }

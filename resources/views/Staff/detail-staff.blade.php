@@ -39,10 +39,10 @@
                     class="px-4 py-2 text-sm font-medium text-red-600 bg-red-50 border border-red-100 rounded-lg hover:bg-red-100 transition shadow-sm">
                     Nonaktifkan
                 </button>
-                <button
+                {{-- <button
                     class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition shadow-sm">
                     Cetak Data
-                </button>
+                </button> --}}
                 <a href="{{route('view.ubah.staff', $staff->id)}}"
                     class="px-4 py-2 text-sm font-medium text-white bg-black border border-black rounded-lg hover:bg-gray-800 transition shadow-sm flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
@@ -88,7 +88,7 @@
                         <h2 class="mt-4 text-xl font-bold text-gray-900">{{$staff->nama}}</h2>
                         <span
                             class="inline-block mt-2 px-3 py-1 text-xs font-semibold text-green-700 bg-green-50 rounded-full border border-green-100">
-                            {{$staff->jabatan}}
+                            {{$staff->perusahaan}}
                         </span>
 
                         {{-- Info List --}}
@@ -96,6 +96,13 @@
                             <div class="flex justify-between items-center">
                                 <span class="text-sm text-gray-500 font-medium">ID Karyawan</span>
                                 <span class="text-sm font-bold text-gray-900">{{$staff->id}}</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-500 font-medium">Jabatan</span>
+                                <span
+                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
+                                    {{$staff->jabatan}}
+                                </span>
                             </div>
                             <div class="flex justify-between items-center">
                                 <span class="text-sm text-gray-500 font-medium">Tanggal Bergabung</span>
@@ -171,15 +178,10 @@
                                 class="whitespace-nowrap py-4 px-1 font-medium text-sm">
                                 Emergency Contact
                             </button>
-                            <button @click="tab='salary'"
-                                :class="tab == 'salary' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'"
-                                class="whitespace-nowrap py-4 px-1 font-medium text-sm">
-                                Riwayat Gaji
-                            </button>
                             <button @click="tab='history'"
                                 :class="tab == 'history' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'"
                                 class="whitespace-nowrap py-4 px-1 font-medium text-sm">
-                                Histori
+                                Riwayat
                             </button>
                         </nav>
                     </div>

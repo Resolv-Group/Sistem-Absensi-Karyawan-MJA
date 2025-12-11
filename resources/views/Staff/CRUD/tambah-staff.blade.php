@@ -326,15 +326,24 @@
                         @enderror
                     </div>
 
-
-                    {{-- 2. Unit Kerja --}}
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">Penempatan PT (Unit Kerja)</label>
-                        <input type="text" name="unit_kerja" maxlength="100" autocomplete="off"
-                            class="w-full rounded-lg shadow-sm
-                            @error('unit_kerja') border-red-500 bg-red-50 @else border-gray-500 bg-gray-50 @enderror
-                            border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition"
-                            placeholder="cth: PT.MJA" value="{{ old('unit_kerja') }}">
+                    {{-- 2. Unit Kerja & Nama Perusahaan --}}
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Penempatan PT (Unit Kerja)</label>
+                            <input type="text" name="unit_kerja" maxlength="100" autocomplete="off"
+                                class="w-full rounded-lg shadow-sm
+                                @error('unit_kerja') border-red-500 bg-red-50 @else border-gray-500 bg-gray-50 @enderror
+                                border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition"
+                                placeholder="-" value="{{ old('unit_kerja') }}">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Nama Perusahaan</label>
+                            <input type="text" name="perusahaan" maxlength="100" autocomplete="off"
+                                class="w-full rounded-lg shadow-sm
+                                @error('perusahaan') border-red-500 bg-red-50 @else border-gray-500 bg-gray-50 @enderror
+                                border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition"
+                                placeholder="cth: PT.MJA" value="{{ old('perusahaan') }}">
+                        </div>
                     </div>
 
                     {{-- 3. Masa Berlaku PKWT --}}

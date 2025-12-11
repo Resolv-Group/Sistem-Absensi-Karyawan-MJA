@@ -87,12 +87,21 @@
                         <h2 class="mt-4 text-xl font-bold text-gray-900">
                             {{ Str::limit(ucwords(collect(explode(' ', strtolower($pekerja->nama)))->take(2)->implode(' ')),15) }}
                         </h2>
-
-
-                        <span
-                            class="inline-block mt-2 px-3 py-1 text-xs font-semibold text-blue-700 bg-blue-50 rounded-full border border-blue-100">
-                            PT. DOOR PAEYA
-                        </span>
+                        @if ($pekerja->status_aktif == 1)
+                            <span
+                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                                    bg-green-100 text-green-800 border border-green-200">
+                                <span class="w-1.5 h-1.5 bg-green-600 rounded-full mr-1.5"></span>
+                                Aktif
+                            </span>
+                        @else
+                            <span
+                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                                    bg-red-100 text-red-800 border border-red-200">
+                                <span class="w-1.5 h-1.5 bg-red-600 rounded-full mr-1.5"></span>
+                                Non Aktif
+                            </span>
+                        @endif
 
                         {{-- Info List --}}
                         <div class="mt-8 text-left space-y-4 border-t border-gray-100 pt-6">
@@ -103,7 +112,7 @@
                             <div class="flex justify-between items-center">
                                 <span class="text-sm text-gray-500 font-medium">Tanggal Bergabung</span>
                                 <span
-                                    class="text-sm font-bold text-gray-900">{{ formatTanggal($pekerja->tgl_bergabung) ?? '-'}}</span>
+                                    class="text-sm font-bold text-gray-900">{{ formatTanggal($pekerja->tgl_bergabung) ?? '-' }}</span>
                             </div>
                             <div class="flex justify-between items-center">
                                 <span class="text-sm text-gray-500 font-medium">Tanggal Resign</span>
@@ -111,26 +120,9 @@
                                     class="text-sm font-bold text-gray-900">{{ formatTanggal($pekerja->tgl_resign) ?? '-' }}</span>
                             </div>
                             <div class="flex justify-between items-center">
-                                <span class="text-sm text-gray-500 font-medium">Status</span>
-                                @if ($pekerja->status_aktif == 1)
-                                    <span
-                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                                    bg-green-100 text-green-800 border border-green-200">
-                                        <span class="w-1.5 h-1.5 bg-green-600 rounded-full mr-1.5"></span>
-                                        Aktif
-                                    </span>
-                                @else
-                                    <span
-                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                                    bg-red-100 text-red-800 border border-red-200">
-                                        <span class="w-1.5 h-1.5 bg-red-600 rounded-full mr-1.5"></span>
-                                        Non Aktif
-                                    </span>
-                                @endif
-                            </div>
-                            <div class="flex justify-between items-center">
                                 <span class="text-sm text-gray-500 font-medium">Dibuat Tanggal: </span>
-                                <span class="text-sm font-bold text-gray-900">{{formatTanggal($pekerja->created_at)}}</span>
+                                <span
+                                    class="text-sm font-bold text-gray-900">{{ formatTanggal($pekerja->created_at) }}</span>
                             </div>
                         </div>
                     </div>
