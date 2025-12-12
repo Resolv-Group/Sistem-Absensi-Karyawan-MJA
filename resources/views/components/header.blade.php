@@ -11,7 +11,7 @@
         <nav class="flex items-center text-xs text-gray-500 mb-2 space-x-2">
             <a href="#" class="hover:text-blue-600 transition-colors">Dashboard</a>
             <span class="text-gray-300">/</span>
-            <span class="font-medium text-gray-700">HR Management</span>
+            <span class="font-medium text-gray-700">Pekerja Manajemen</span>
         </nav>
 
         {{-- 2. Main Title --}}
