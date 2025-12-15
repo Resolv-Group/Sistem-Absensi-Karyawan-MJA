@@ -33,7 +33,7 @@ class PekerjaController extends Controller
 
         // 2. Query the database with the filter
         $pekerja = Pekerja::when($q, function ($query) use ($q) {
-            $query->where('nama', 'LIKE', "%$q%")->orWhere('nik', 'LIKE', "%$q%"); // Optional: Add more fields to search
+            $query->where('nama', 'LIKE', "%$q%")->orWhere('nik', 'LIKE', "%$q%");
         })
             ->orderBy('created_at', 'desc')
             ->paginate(10)
@@ -45,7 +45,6 @@ class PekerjaController extends Controller
         }
 
         // 4. Otherwise, return the full page (header, sidebar, etc)
-        // Make sure 'pekerja.main-pekerja' matches your actual folder/filename structure
         return view('pekerja.main-pekerja', compact('pekerja', 'totalPekerja', 'pekerjaBaru', 'tidakAktif'));
     }
 

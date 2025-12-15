@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\MitraKerjaController;
 use App\Http\Controllers\PekerjaController;
 use App\Http\Controllers\StaffController;
 use Illuminate\Support\Facades\Route;
@@ -82,6 +83,13 @@ Route::middleware(['auth', 'role:hrd,pic,admin'])->group(function(){
     Route::POST('/tambah-pekerja', [PekerjaController::class, 'tambahPekerja'])->name('tambah.pekerja.post');
     Route::get('/pekerja/ubah/{id}', [PekerjaController::class, 'ubahPekerja'])->name('view.ubah.pekerja');
     Route::put('/pekerja/ubah/{id}', [PekerjaController::class, 'updatePekerja'])->name('update.pekerja');
+
+    Route::get('/mitra-kerja', [MitraKerjaController::class, 'viewMitraKerjaMain'])->name('view.mitra-kerja');
+    Route::get('/mitra-kerja/tambah', [MitraKerjaController::class, 'viewTambahMitraKerja'])->name('view.tambah.mitra-kerja');
+    Route::get('/mitra-kerja/detail/{id}', [MitraKerjaController::class, 'viewDetailMitraKerja'])->name('view.detail.mitra-kerja');
+    Route::POST('/tambah-mitra-kerja', [MitraKerjaController::class, 'tambahMitraKerja'])->name('tambah.mitra-kerja.post');
+    Route::get('/mitra-kerja/ubah/{id}', [MitraKerjaController::class, 'ubahMitraKerja'])->name('view.ubah.mitra-kerja');
+    Route::put('/mitra-kerja/ubah/{id}', [MitraKerjaController::class, 'updateMitraKerja'])->name('update.mitra-kerja');
 
 });
 

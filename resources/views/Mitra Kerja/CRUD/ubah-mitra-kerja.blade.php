@@ -2,10 +2,11 @@
 
 @section('content')
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
         {{-- HEADER SECTION --}}
         <div class="mb-8">
             <nav class="flex text-sm font-medium text-gray-500 mb-2">
-                <a href="/daftar-pekerja" class="hover:text-gray-700 transition">Staff</a>
+                <a href="/daftar-pekerja" class="hover:text-gray-700 transition">Pekerja</a>
                 <span class="mx-2 text-gray-400">/</span>
                 <span class="text-blue-600">Ubah</span>
             </nav>
@@ -22,7 +23,7 @@
                     </svg>
                 </a>
                 <div>
-                    <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Ubah Staff</h1>
+                    <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Ubah Pekerja</h1>
                     <p class="text-sm text-gray-500 mt-1">Isi formulir di bawah untuk mengubah data pekerja.</p>
                 </div>
             </div>
@@ -38,8 +39,10 @@
             </div>
         @endif
 
+
+
         {{-- FORM CARD --}}
-        <form action="{{ route('update.staff', $staff->id) }}" method="POST" enctype="multipart/form-data"
+        <form action="{{ route('update.pekerja', $pekerja->id) }}" method="POST" enctype="multipart/form-data"
             class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
 
             @csrf
@@ -74,7 +77,7 @@
 
                             <!-- PLACEHOLDER -->
                             <div id="placeholder"
-                                class="text-center pointer-events-none {{ $staff->foto ? 'hidden' : '' }}">
+                                class="text-center pointer-events-none {{ $pekerja->foto ? 'hidden' : '' }}">
                                 <svg class="mx-auto h-10 w-10 text-gray-400 group-hover:text-blue-500 transition"
                                     stroke="currentColor" fill="none" viewBox="0 0 48 48">
                                     <path
@@ -90,14 +93,14 @@
 
                             <!-- PREVIEW -->
                             <img id="previewImage"
-                                class="absolute inset-0 w-full h-full object-cover {{ $staff->foto ? '' : 'hidden' }}"
-                                src="{{ $staff->foto ? 'data:image/jpeg;base64,' . base64_encode($staff->foto) : '' }}"
+                                class="absolute inset-0 w-full h-full object-cover {{ $pekerja->foto ? '' : 'hidden' }}"
+                                src="{{ $pekerja->foto ? 'data:image/jpeg;base64,' . base64_encode($pekerja->foto) : '' }}"
                                 alt="Preview Foto" />
 
 
                             <!-- DELETE BUTTON -->
                             <button type="button" id="removeBtn" onclick="removePhoto(event)"
-                                class="absolute top-2 right-2 bg-red-600 text-white w-8 h-8 rounded-full flex items-center justify-center shadow-md hover:bg-red-700 transition {{ $staff->foto ? '' : 'hidden' }}">
+                                class="absolute top-2 right-2 bg-red-600 text-white w-8 h-8 rounded-full flex items-center justify-center shadow-md hover:bg-red-700 transition {{ $pekerja->foto ? '' : 'hidden' }}">
                                 ✕
                             </button>
 
@@ -112,7 +115,7 @@
                         <div class="sm:col-span-2">
                             <label class="block text-sm font-bold text-gray-700 mb-1">Nama Lengkap</label>
                             <input type="text" name="nama" maxlength="255" autocomplete="off"
-                                value="{{ old('nama', $staff->nama) }}"
+                                value="{{ old('nama', $pekerja->nama) }}"
                                 class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition"
                                 placeholder="Sesuai KTP">
                         </div>
@@ -122,14 +125,14 @@
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-1">NIK</label>
                             <input type="text" name="nik" maxlength="16" autocomplete="off"
-                                value="{{ old('nik', $staff->nik) }}"
+                                value="{{ old('nik', $pekerja->nik) }}"
                                 class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition"
                                 placeholder="16 Digit Angka">
                         </div>
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-1">Nomor Kartu Keluarga</label>
                             <input type="text" name="no_kk" maxlength="16" autocomplete="off"
-                                value="{{ old('no_kk', $staff->no_kk) }}"
+                                value="{{ old('no_kk', $pekerja->no_kk) }}"
                                 class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition"
                                 placeholder="16 Digit Angka">
                         </div>
@@ -138,7 +141,7 @@
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-1">Tempat Lahir</label>
                             <input type="text" name="tempat_lahir" maxlength="100" autocomplete="off"
-                                value="{{ old('tempat_lahir', $staff->tempat_lahir) }}"
+                                value="{{ old('tempat_lahir', $pekerja->tempat_lahir) }}"
                                 class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition"
                                 placeholder="Kota Kelahiran">
                         </div>
@@ -146,14 +149,14 @@
                         {{-- Tanggal Lahir --}}
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-1">Tanggal Lahir</label>
-                            <input type="date" name="tgl_lahir" value="{{ old('tgl_lahir', $staff->tgl_lahir) }}"
+                            <input type="date" name="tgl_lahir" value="{{ old('tgl_lahir', $pekerja->tgl_lahir) }}"
                                 class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition">
                         </div>
 
                         {{-- Jenis Kelamin --}}
                         <div x-data="{
                             open: false,
-                            selected: '{{ old('kelamin', $staff->kelamin ?? '') }}',
+                            selected: '{{ old('kelamin', $pekerja->kelamin ?? '') }}',
                             list: [
                                 { value: '1', label: 'Laki-laki' },
                                 { value: '0', label: 'Perempuan' }
@@ -192,7 +195,7 @@
                         {{-- Pendidikan --}}
                         <div x-data="{
                             open: false,
-                            selected: '{{ old('pendidikan', $staff->pendidikan ?? '') }}',
+                            selected: '{{ old('pendidikan', $pekerja->pendidikan ?? '') }}',
                             list: ['TK', 'SD', 'SMP', 'SMA/SMK', 'D3', 'S1']
                         }" class="relative">
 
@@ -228,7 +231,7 @@
                         {{-- Status Perkawinan --}}
                         <div x-data="{
                             open: false,
-                            selected: '{{ old('status_kawin', $staff->status_kawin ?? '') }}',
+                            selected: '{{ old('status_kawin', $pekerja->status_kawin ?? '') }}',
                             list: ['Belum Menikah', 'Menikah']
                         }" class="relative">
                             <label class="block text-sm font-bold text-gray-700 mb-1">Status Perkawinan</label>
@@ -265,7 +268,7 @@
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-1">Jumlah Anak</label>
                             <input type="text" name="anak" maxlength="2" autocomplete="off"
-                                value="{{ old('anak', $staff->anak) }}"
+                                value="{{ old('anak', $pekerja->anak) }}"
                                 class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition"
                                 placeholder="Kota Kelahiran" value="0">
                         </div>
@@ -273,134 +276,16 @@
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-1">Tanggal Bergabung</label>
                             <input type="date" name="tgl_bergabung"
-                                value="{{ old('tgl_bergabung', $staff->tgl_bergabung) }}"
+                                value="{{ old('tgl_bergabung', $pekerja->tgl_bergabung) }}"
                                 class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition">
                         </div>
 
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-1">Tanggal Resign</label>
-                            <input type="date" name="tgl_resign" value="{{ old('tgl_resign', $staff->tgl_resign) }}"
+                            <input type="date" name="tgl_resign" value="{{ old('tgl_resign', $pekerja->tgl_resign) }}"
                                 class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition">
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <div class="border-t border-gray-100"></div>
-
-            {{-- SECTION 2: Deskripsi Pekerjaan --}}
-            <div class="p-8">
-                {{-- Section Header --}}
-                <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
-                    <div class="p-2 bg-blue-50 text-blue-600 rounded-lg">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                        </svg>
-                    </div>
-                    <h2 class="text-lg font-semibold text-gray-900">Deskripsi Pekerjaan</h2>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
-
-                    {{-- 1. Jabatan --}}
-                    <div x-data="{
-                        open: false,
-                        selected: '{{ old('jabatan', $staff->jabatan ?? '') }}',
-                        list: ['Staff', 'Supervisor', 'Manager', 'Direktur', 'HRD', 'IT', 'Akuntan']
-                    }" class="relative">
-
-                        <label class="block text-sm font-bold text-gray-700 mb-1">Jabatan</label>
-
-                        <input type="hidden" name="jabatan" x-model="selected">
-
-                        <div @click="open=!open"
-                            class="border border-gray-500 bg-gray-50 rounded-lg py-2.5 px-3 cursor-pointer flex justify-between items-center select-none shadow-sm hover:border-blue-500 hover:ring-1 hover:ring-blue-200 transition">
-                            <span x-text="selected || 'Pilih Jabatan'"
-                                :class="selected ? 'text-gray-900' : 'text-gray-400'"></span>
-                            <svg class="w-4 h-4 text-gray-500" :class="{ 'rotate-180': open }" fill="none"
-                                stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M19 9l-7 7-7-7" />
-                            </svg>
-                        </div>
-
-                        <ul x-show="open" @click.outside="open=false" x-transition.opacity.duration.200ms
-                            class="absolute w-full mt-1 border border-gray-200 bg-white rounded-lg shadow-xl overflow-y-auto max-h-60 z-50">
-                            <template x-for="item in list" :key="item">
-                                <li @click="selected=item; open=false"
-                                    class="px-3 py-2.5 text-sm hover:bg-blue-50 hover:text-blue-700 cursor-pointer transition border-b border-gray-50 last:border-0"
-                                    x-text="item">
-                                </li>
-                            </template>
-                        </ul>
-                        @error('jabatan')
-                            <p class="text-red-600 text-xs mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    {{-- 2. Unit Kerja & Nama Perusahaan --}}
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-1">Penempatan PT (Unit Kerja)</label>
-                            <input type="text" name="unit_kerja" maxlength="100" autocomplete="off"
-                                class="w-full rounded-lg shadow-sm
-                                @error('unit_kerja') border-red-500 bg-red-50 @else border-gray-500 bg-gray-50 @enderror
-                                border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition"
-                                placeholder="-" value="{{ old('unit_kerja', $staff->unit_kerja) }}">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-1">Nama Perusahaan PT</label>
-                            <input type="text" name="perusahaan" maxlength="100" autocomplete="off"
-                                class="w-full rounded-lg shadow-sm
-                                @error('perusahaan') border-red-500 bg-red-50 @else border-gray-500 bg-gray-50 @enderror
-                                border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition"
-                                placeholder="cth: PT.MJA" value="{{ old('perusahaan', $staff->perusahaan) }}">
-                        </div>
-                    </div>
-
-                    {{-- 3. Masa Berlaku PKWT --}}
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">Masa Berlaku PKWT</label>
-                        <input type="date" name="masa_berlaku_pkwt"
-                            class="tanggal-input w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition cursor-pointer"
-                            value="{{ old('masa_berlaku_pkwt', $staff->masa_berlaku_pkwt) }}">
-                    </div>
-
-                    {{-- 4. Status Karyawan --}}
-                    <div x-data="{
-                        open: false,
-                        selected: '{{ old('status_perjanjian_kerja', $staff->status_perjanjian_kerja ?? '') }}',
-                        list: ['Tetap (Permanent)', 'Kontrak (PKWT)', 'Probation', 'Magang / Internship']
-                    }" class="relative">
-
-                        <label class="block text-sm font-bold text-gray-700 mb-1">Status Karyawan</label>
-
-                        <input type="hidden" name="status_perjanjian_kerja" x-model="selected">
-
-                        <div @click="open=!open"
-                            class="border border-gray-500 bg-gray-50 rounded-lg py-2.5 px-3 cursor-pointer flex justify-between items-center select-none shadow-sm hover:border-blue-500 hover:ring-1 hover:ring-blue-200 transition">
-                            <span x-text="selected || 'Pilih Status'"
-                                :class="selected ? 'text-gray-900' : 'text-gray-400'"></span>
-                            <svg class="w-4 h-4 text-gray-500" :class="{ 'rotate-180': open }" fill="none"
-                                stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M19 9l-7 7-7-7" />
-                            </svg>
-                        </div>
-
-                        <ul x-show="open" @click.outside="open=false" x-transition.opacity.duration.200ms
-                            class="absolute w-full mt-1 border border-gray-200 bg-white rounded-lg shadow-xl overflow-y-auto max-h-60 z-50">
-                            <template x-for="item in list" :key="item">
-                                <li @click="selected=item; open=false"
-                                    class="px-3 py-2.5 text-sm hover:bg-blue-50 hover:text-blue-700 cursor-pointer transition border-b border-gray-50 last:border-0"
-                                    x-text="item">
-                                </li>
-                            </template>
-                        </ul>
-                    </div>
-
                 </div>
             </div>
 
@@ -425,7 +310,7 @@
                         <label class="block text-sm font-bold text-gray-700 mb-1">Jalan / Nama Gedung</label>
                         <textarea name="alamat" rows="2" maxlength="255" autocomplete="off"
                             class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 min-h-16 max-h-40 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition"
-                            placeholder="Jl. ABC No. 10, Blok A">{{ old('alamat', $staff->alamat) }}</textarea>
+                            placeholder="Jl. ABC No. 10, Blok A">{{ old('alamat', $pekerja->alamat) }}</textarea>
                     </div>
 
 
@@ -433,7 +318,7 @@
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-1">Desa</label>
                         <input type="text" name="desa" maxlength="100" autocomplete="off"
-                            value="{{ old('desa', $staff->desa) }}"
+                            value="{{ old('desa', $pekerja->desa) }}"
                             class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition">
                     </div>
 
@@ -442,13 +327,13 @@
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-1">RT</label>
                             <input type="text" name="rt" maxlength="3" autocomplete="off"
-                                value="{{ old('rt', $staff->rt) }}"
+                                value="{{ old('rt', $pekerja->rt) }}"
                                 class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition">
                         </div>
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-1">RW</label>
                             <input type="text" name="rw" maxlength="3" autocomplete="off"
-                                value="{{ old('rw', $staff->rw) }}"
+                                value="{{ old('rw', $pekerja->rw) }}"
                                 class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition">
                         </div>
                     </div>
@@ -457,7 +342,7 @@
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-1">Kota / Kabupaten</label>
                         <input type="text" name="kota" maxlength="100" autocomplete="off"
-                            value="{{ old('kota', $staff->kota) }}"
+                            value="{{ old('kota', $pekerja->kota) }}"
                             class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition">
                     </div>
 
@@ -466,13 +351,13 @@
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-1">Kecamatan</label>
                             <input type="text" name="kecamatan" maxlength="100" autocomplete="off"
-                                value="{{ old('kecamatan', $staff->kecamatan) }}"
+                                value="{{ old('kecamatan', $pekerja->kecamatan) }}"
                                 class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition">
                         </div>
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-1">Provinsi</label>
                             <input type="text" name="provinsi" maxlength="100" autocomplete="off"
-                                value="{{ old('provinsi', $staff->provinsi) }}"
+                                value="{{ old('provinsi', $pekerja->provinsi) }}"
                                 class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition">
                         </div>
                     </div>
@@ -502,80 +387,15 @@
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-1">Email Pribadi</label>
                             <input type="email" name="email" maxlength="255" autocomplete="off"
-                                value="{{ old('email', $staff->email) }}"
+                                value="{{ old('email', $pekerja->email) }}"
                                 class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition">
-                        </div>
-
-                        {{-- NEW: Password & Confirmation (Side by Side) --}}
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {{-- Password --}}
-                            <div x-data="{ show: false }">
-                                <label class="block text-sm font-bold text-gray-700 mb-1">Password</label>
-                                <div class="relative">
-                                    <input :type="show ? 'text' : 'password'" name="password" autocomplete="new-password"
-                                        placeholder="Minimal 8 karakter"
-                                        class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 pl-3 pr-10 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition">
-
-                                    {{-- Eye Icon --}}
-                                    <button type="button" @click="show = !show"
-                                        class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-blue-600 focus:outline-none">
-
-                                        {{-- Icon Eye Open --}}
-                                        <svg x-show="!show" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
-                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                        </svg>
-
-                                        {{-- Icon Eye Slashed --}}
-                                        <svg x-show="show" style="display: none;" xmlns="http://www.w3.org/2000/svg"
-                                            class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-
-                            {{-- Konfirmasi Password --}}
-                            <div x-data="{ show: false }">
-                                <label class="block text-sm font-bold text-gray-700 mb-1">Konfirmasi Password</label>
-                                <div class="relative">
-                                    <input :type="show ? 'text' : 'password'" name="password_confirmation"
-                                        autocomplete="new-password" placeholder="Ulangi password"
-                                        class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 pl-3 pr-10 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition">
-
-                                    {{-- Eye Icon --}}
-                                    <button type="button" @click="show = !show"
-                                        class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-blue-600 focus:outline-none">
-
-                                        {{-- Icon Eye Open --}}
-                                        <svg x-show="!show" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
-                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                        </svg>
-
-                                        {{-- Icon Eye Slashed --}}
-                                        <svg x-show="show" style="display: none;" xmlns="http://www.w3.org/2000/svg"
-                                            class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
                         </div>
 
                         {{-- No Telepon --}}
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-1">Nomor Telepon</label>
                             <input type="text" name="telp" maxlength="16" autocomplete="off"
-                                value="{{ old('telp', $staff->telp) }}"
+                                value="{{ old('telp', $pekerja->telp) }}"
                                 class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition">
                         </div>
 
@@ -583,7 +403,7 @@
                         <div class="grid grid-cols-2 gap-4">
                             <div x-data="{
                                 open: false,
-                                selected: '{{ old('nama_rek', $staff->nama_rek ?? '') }}',
+                                selected: '{{ old('nama_rek', $pekerja->nama_rek ?? '') }}',
                                 list: ['BCA', 'BRI', 'BNI', 'Mandiri', 'CIMB Niaga', 'BTN', 'Bank Permata', 'Bank Danamon', 'Bank Mega', 'Panin Bank', 'OCBC NISP', 'Maybank Indonesia', 'BSI', 'Bank Jago', 'SeaBank', 'Bank Neo Commerce']
                             }" class="relative">
                                 <label class="block text-sm font-bold text-gray-700 mb-1">Nama Bank</label>
@@ -620,7 +440,7 @@
                             <div>
                                 <label class="block text-sm font-bold text-gray-700 mb-1">No. Rekening</label>
                                 <input type="text" name="rekening" maxlength="20" autocomplete="off"
-                                    value="{{ old('rekening', $staff->rekening) }}"
+                                    value="{{ old('rekening', $pekerja->rekening) }}"
                                     class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition">
                             </div>
                         </div>
@@ -645,7 +465,7 @@
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-1">Nama Kontak</label>
                             <input type="text" name="nama_emergency" maxlength="255" autocomplete="off"
-                                value="{{ old('nama_emergency', $staff->nama_emergency) }}"
+                                value="{{ old('nama_emergency', $pekerja->nama_emergency) }}"
                                 class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition">
                         </div>
 
@@ -653,14 +473,14 @@
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-1">Nomor Telepon</label>
                             <input type="text" name="telp_emergency" maxlength="16" autocomplete="off"
-                                value="{{ old('telp_emergency', $staff->telp_emergency) }}"
+                                value="{{ old('telp_emergency', $pekerja->telp_emergency) }}"
                                 class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition">
                         </div>
 
                         {{-- Hubungan --}}
                         <div x-data="{
                             open: false,
-                            selected: '{{ old('hubungan_emergency', $staff->hubungan_emergency ?? '') }}',
+                            selected: '{{ old('hubungan_emergency', $pekerja->hubungan_emergency ?? '') }}',
                             list: ['Orang Tua', 'Saudara', 'Pasangan', 'Wali']
                         }" class="relative">
                             <label class="block text-sm font-bold text-gray-700 mb-1">Hubungan</label>
@@ -698,7 +518,7 @@
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-1">Ibu Kandung</label>
                             <input type="text" name="ibu_kandung" maxlength="255" autocomplete="off"
-                                value="{{ old('ibu_kandung', $staff->ibu_kandung) }}"
+                                value="{{ old('ibu_kandung', $pekerja->ibu_kandung) }}"
                                 class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition">
                         </div>
                     </div>
@@ -707,7 +527,7 @@
 
             {{-- FOOTER / ACTIONS --}}
             <div class="bg-gray-50 px-8 py-5 flex items-center justify-end gap-3 border-t border-gray-200">
-                <a href="{{ url()->previous() }}"
+                <a href="{{ route('view.detail.pekerja', $pekerja->id) }}"
                     class="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg
                 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 transition shadow-sm">
                     Batalkan
