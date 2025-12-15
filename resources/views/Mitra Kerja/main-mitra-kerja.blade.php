@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('header')
-    <x-header title="Daftar Staff" subtitle="List semua staff" breadcrumbs="Staff Manajemen"/>
+    <x-header title="Daftar Mitra Kerja" subtitle="List semua mitra kerja" breadcrumbs="Mitra Kerja Manajemen"/>
 @endsection
 
 @section('content')
@@ -21,16 +21,16 @@
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
             {{-- Stat Item --}}
             <div class="border-r border-gray-100 last:border-0">
-                <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Total Staff</p>
-                <p class="mt-1 text-2xl font-bold text-gray-900">{{ $totalStaff }}</p>
+                <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Total Mitra Kerja</p>
+                <p class="mt-1 text-2xl font-bold text-gray-900">1</p>
             </div>
             <div class="border-r border-gray-100 last:border-0">
-                <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Staff Baru</p>
-                <p class="mt-1 text-2xl font-bold text-gray-900">{{ $staffBaru }}</p>
+                <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Mitra Baru</p>
+                <p class="mt-1 text-2xl font-bold text-gray-900">2</p>
             </div>
             <div class="border-r border-gray-100 last:border-0">
                 <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Tidak Aktif</p>
-                <p class="mt-1 text-2xl font-bold text-gray-900">{{ $tidakAktif }}</p>
+                <p class="mt-1 text-2xl font-bold text-gray-900">3</p>
             </div>
         </div>
     </div>
@@ -64,20 +64,20 @@
                     </svg>
                 </div>
 
-                <input id="searchInput" type="text" data-url="{{ route('view.staff') }}"
+                <input id="searchInput" type="text" data-url="{{ route('view.mitra-kerja') }}"
                     class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg bg-white
                 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                    placeholder="Cari staff - Nama, NIK...">
+                    placeholder="Cari Nama Mitra Kerja">
             </div>
 
             {{-- Add Button --}}
-            <a href="{{ route('view.tambah.staff') }}"
+            <a href="{{ route('view.tambah.mitra-kerja') }}"
                 class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                 <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                 </svg>
-                Tambah Staff
+                Mitra Kerja
             </a>
         </div>
     </div>
@@ -85,12 +85,11 @@
     {{-- ================================
         4. MAIN TABLE
     ================================= --}}
-
     <div id="table-wrapper">
-        @include('staff.partials.staff-table')
+        @include('Mitra Kerja.partials.mitra-kerja-table')
     </div>
 @endsection
 
 @section('scripts')
-    <script src="/js/main-staff.js"></script>
+    <script src="/js/main-mitra-kerja.js"></script>
 @endsection

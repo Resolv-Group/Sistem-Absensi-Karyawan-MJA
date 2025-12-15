@@ -13,14 +13,14 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            
+
             $table->string('name');
             $table->string('email')->unique();
 
             $table->string('password');
 
             // ROLE USER
-            $table->enum('role', ['pic', 'akuntan', 'hrd', 'admin'])->default('pic');
+            $table->enum('role', ['pic', 'akuntan', 'hrd', 'admin', 'staff', 'it', 'supervisor', 'manager', 'direktur'])->default('pic');
 
             // RELASI KE STAFF (BOLEH NULL JIKA ADMIN)
             $table->foreignId('staff_id')

@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('header')
-    <x-header title="Daftar Pekerja" subtitle="List semua karyawan" />
+    <x-header title="Daftar Pekerja" subtitle="List semua karyawan" breadcrumbs="Pekerja Manajemen"/>
 @endsection
 
 @section('content')
@@ -67,7 +67,7 @@
                 <input id="searchInput" type="text" data-url="{{ route('view.pekerja') }}"
                     class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg bg-white
                 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                    placeholder="Search pekerja...">
+                    placeholder="Cari pekerja - Nama, NIK...">
             </div>
 
             {{-- Add Button --}}

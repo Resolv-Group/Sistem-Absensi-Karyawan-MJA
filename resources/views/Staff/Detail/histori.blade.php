@@ -76,9 +76,9 @@
         </table>
 
         {{-- Footer Button --}}
-        <div class="bg-gray-50 px-6 py-3 border-t border-gray-200">
+        {{-- <div class="bg-gray-50 px-6 py-3 border-t border-gray-200">
             <a href="#"
                 class="w-full flex items-center justify-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors group">
             </a>
-        </div>
+        </div> --}}
     </div>

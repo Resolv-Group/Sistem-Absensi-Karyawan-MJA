@@ -1,6 +1,7 @@
 @props([
     'title',
     'subtitle' => null,
+    'breadcrumbs' => null,
 ])
 
 <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 py-8">
@@ -11,7 +12,7 @@
         <nav class="flex items-center text-xs text-gray-500 mb-2 space-x-2">
             <a href="#" class="hover:text-blue-600 transition-colors">Dashboard</a>
             <span class="text-gray-300">/</span>
-            <span class="font-medium text-gray-700">Pekerja Manajemen</span>
+            <span class="font-medium text-gray-700">{{$breadcrumbs}}</span>
         </nav>
 
         {{-- 2. Main Title --}}
