@@ -450,4 +450,95 @@ class StaffController extends Controller
         }
 
     }
+
+    function updateProfilStaff(Request $request, $id) {
+        try {
+            $staff = Staff::findOrFail($id);
+
+            $request->validate(
+                [
+                    'nama' => 'required|string|max:255',
+
+                    'email' => 'nullable|email',
+                    'telp' => 'nullable|string|max:16',
+
+                    'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+
+                    'password' => 'nullable|min:8|confirmed',
+                ],
+                [
+                    // Identitas
+                    'nama.required' => 'Nama tidak boleh kosong.',
+                    'nama.max' => 'Nama maksimal 255 karakter.',
+
+                    // Kontak
+                    'email.email' => 'Format email tidak valid.',
+                    'telp.max' => 'No telepon maksimal 16 karakter.',
+
+                    // Foto
+                    'foto.image' => 'File foto harus berupa gambar.',
+                    'foto.mimes' => 'Format foto harus jpg/jpeg/png.',
+                    'foto.max' => 'Ukuran foto maksimal 2MB.',
+
+                    'password.min' => 'Password minimal 8 karakter.',
+                    'password.confirmed' => 'Konfirmasi password tidak sesuai.',
+                ],
+            );
+
+            $data = $request->except('foto', '_token', '_method');
+
+            if ($request->remove_foto == '1') {
+                $staff->foto = null;
+            }
+
+            // ✅ JIKA FOTO DIGANTI
+            if ($request->hasFile('foto')) {
+                $foto = file_get_contents($request->file('foto')->getRealPath());
+                $staff->foto = $foto;
+            }
+
+            // ✅ Cari user berdasarkan staff_id (LEBIH AMAN)
+            $user = User::where('email', $staff->email)->first();
+
+            // dd($user);
+
+            if (!$user) {
+                return back()->with('error', 'User login staff tidak ditemukan.');
+            }
+
+            // ✅ Update akun user
+            $user->update([
+                'name' => $request->nama,
+                'email' => $request->email,
+            ]);
+
+            // ✅ Jika password diisi
+            if ($request->filled('password')) {
+                $user->update([
+                    'password' => Hash::make($request->password),
+                ]);
+            }
+
+            // ✅ UPDATE DATA
+            $staff->update($data);
+
+            History::create([
+                'foreign_id' => $staff->id,
+                'nama_tabel' => 'staff', // konsisten
+                'updated_by' => auth()->id() ?? 0,
+                'jabatan' => optional(auth()->user()->staff)->jabatan ?? 'system',
+                'when' => now(),
+            ]);
+
+            // ✅ KEMBALI KE DETAIL STAFF (LEBIH BAGUS DARIPADA KE LIST)
+
+            return redirect()->route('view.detail.staff', $id)->with('success', 'Data staff berhasil diperbarui');
+        } catch (QueryException $e) {
+            // If the DB fails, we catch it here so Laravel doesn't try to render the blob
+            // We only return the text message, not the binary data
+            dd('Database Error Occurred:', $e->getMessage());
+        } catch (\Exception $e) {
+            dd('General Error:', $e->getMessage());
+        }
+    }
 }

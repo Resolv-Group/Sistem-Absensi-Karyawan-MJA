@@ -23,7 +23,7 @@
     <div class="flex items-center justify-center min-h-screen px-4 relative">
 
         {{-- Success Notification Floating Center --}}
-        <x-notification />
+        <x-toast />
 
         {{-- Card --}}
         <div class="bg-white w-full max-w-md rounded-xl shadow p-8">

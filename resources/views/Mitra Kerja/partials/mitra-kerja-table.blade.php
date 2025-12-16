@@ -141,7 +141,7 @@
                 </a>
 
                 <!-- Detail -->
-                <a href="#"
+                <a href="{{route('view.detail.mitra-kerja')}}"
                     class="text-blue-600 hover:text-blue-900 border border-blue-200 hover:bg-blue-50
                rounded-lg p-2 transition"
                     title="Detail">
