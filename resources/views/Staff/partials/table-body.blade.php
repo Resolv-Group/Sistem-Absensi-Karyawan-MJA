@@ -1,7 +1,7 @@
 @forelse ($staff as $s)
     <tr class="hover:bg-gray-50 transition-colors duration-150 group">
 
-        <td class="px-6 py-4 whitespace-nowrap">
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 align-top">
             {{ ($staff->currentPage() - 1) * $staff->perPage() + $loop->iteration }}.
         </td>
 

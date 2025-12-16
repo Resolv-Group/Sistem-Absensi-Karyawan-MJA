@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Mitra Jua Abadi</title>
 
     <!-- Tailwind -->
@@ -27,6 +28,7 @@
 <body class="bg-gray-100 min-h-screen">
 
     <x-navbar />
+    <x-notification />
 
     <div class="px-16">
         @yield('header')

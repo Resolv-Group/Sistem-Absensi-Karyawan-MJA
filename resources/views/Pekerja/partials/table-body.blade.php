@@ -1,6 +1,6 @@
 @forelse ($pekerja as $p)
     <tr class="hover:bg-gray-50 transition-colors duration-150 group">
-        <td class="px-6 py-4 whitespace-nowrap">
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 align-top">
             {{ ($pekerja->currentPage() - 1) * $pekerja->perPage() + $loop->iteration }}.
         </td>
 

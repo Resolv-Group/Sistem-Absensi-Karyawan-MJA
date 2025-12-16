@@ -3,9 +3,11 @@
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
+use App\Http\Controllers\BidangUsahaController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MitraKerjaController;
 use App\Http\Controllers\PekerjaController;
+use App\Http\Controllers\ProfilController;
 use App\Http\Controllers\StaffController;
 use Illuminate\Support\Facades\Route;
 
@@ -25,6 +27,9 @@ Route::get('/dashboard', [DashboardController::class, 'viewDashboardMain'])->nam
 
 //PROFIL
 Route::get('/profil/{id}', function () { return view('profil'); })->name('view.profil');
+Route::PUT('/profil/update', [ProfilController::class, 'update'])
+    ->name('profil.update')
+    ->middleware('auth');
 
 //AUTH
 Route::get('/forgot-password', [PasswordResetLinkController::class, 'create'])
@@ -86,11 +91,12 @@ Route::middleware(['auth', 'role:hrd,pic,admin'])->group(function(){
 
     Route::get('/mitra-kerja', [MitraKerjaController::class, 'viewMitraKerjaMain'])->name('view.mitra-kerja');
     Route::get('/mitra-kerja/tambah', [MitraKerjaController::class, 'viewTambahMitraKerja'])->name('view.tambah.mitra-kerja');
-    Route::get('/mitra-kerja/detail/{id}', [MitraKerjaController::class, 'viewDetailMitraKerja'])->name('view.detail.mitra-kerja');
+    Route::get('/mitra-kerja/detail', [MitraKerjaController::class, 'viewDetailMitraKerja'])->name('view.detail.mitra-kerja');
     Route::POST('/tambah-mitra-kerja', [MitraKerjaController::class, 'tambahMitraKerja'])->name('tambah.mitra-kerja.post');
     Route::get('/mitra-kerja/ubah/{id}', [MitraKerjaController::class, 'ubahMitraKerja'])->name('view.ubah.mitra-kerja');
     Route::put('/mitra-kerja/ubah/{id}', [MitraKerjaController::class, 'updateMitraKerja'])->name('update.mitra-kerja');
 
+    Route::POST('/tambah-bidang-usaha', [BidangUsahaController::class, 'tambahBidangUsaha'])->name('tambah.bidang-usaha.post');
 });
 
 

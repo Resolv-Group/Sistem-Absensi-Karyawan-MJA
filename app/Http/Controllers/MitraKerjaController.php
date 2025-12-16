@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BidangUsaha;
 use Illuminate\Http\Request;
 
 class MitraKerjaController extends Controller
@@ -11,11 +12,14 @@ class MitraKerjaController extends Controller
     }
 
     function viewTambahMitraKerja() {
-        return view('Mitra Kerja.CRUD.tambah-mitra-kerja');
+
+        $bidangUsahaList = BidangUsaha::select('id as val', 'nama as label')->get();
+
+        return view('Mitra Kerja.CRUD.tambah-mitra-kerja', compact('bidangUsahaList'));
     }
 
     function viewDetailMitraKerja(Request $request) {
-
+        return view('Mitra Kerja.detail-mitra-kerja');
     }
 
     function tambahMitraKerja(Request $request) {

@@ -42,7 +42,7 @@
 
 
         {{-- FORM CARD --}}
-        <form action="{{ route('update.pekerja', $pekerja->id) }}" method="POST" enctype="multipart/form-data"
+        <form action="#" method="POST" enctype="multipart/form-data"
             class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
 
             @csrf
