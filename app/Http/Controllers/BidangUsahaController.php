@@ -14,7 +14,7 @@ class BidangUsahaController extends Controller
             $validated = $request->validate([
                 'nama' => 'required|string|max:255|unique:bidang_usaha,nama',
             ]);
-
+            
             // 2. Create Data
             $bidang = BidangUsaha::create([
                 'nama' => $validated['nama'],

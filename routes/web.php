@@ -64,6 +64,9 @@ Route::post('/reset-password', [NewPasswordController::class, 'store'])
 //     Route::POST('/tambah-staff', [StaffController::class, 'tambahStaff'])->name('tambah.staff.post');
 // });
 
+//MitraKerja
+
+
 Route::middleware(['auth', 'role:hrd,akuntan,admin'])->group(function(){
 
     Route::get('/daftar-staff', [StaffController::class, 'viewStaffMain'])->name('view.staff');
