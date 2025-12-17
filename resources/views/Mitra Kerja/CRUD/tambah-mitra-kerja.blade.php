@@ -201,7 +201,6 @@
                                     </li>
                                 </ul>
 
-                                {{-- 4. MODAL (Keep the same modal code as before, just updated triggers) --}}
                                 {{-- 4. MODAL (Fixed Animation) --}}
                                 <div x-show="showModal" style="display: none;" class="relative z-50"
                                     aria-labelledby="modal-title" role="dialog" aria-modal="true">
@@ -505,8 +504,8 @@
                     class="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-2 focus:ring-gray-200 transition shadow-sm">
                     Batalkan
                 </a>
-                <button type="submit" id="save-btn"
-                    class="flex items-center gap-2 px-6 py-2.5 text-sm font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition shadow-md hover:shadow-lg">
+                <button type="button" name="action" value="save" id="save-btn"
+                    class="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition shadow-sm">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />

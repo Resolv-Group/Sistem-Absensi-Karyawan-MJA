@@ -1,101 +1,90 @@
-@forelse ($pekerja as $p)
+@forelse ($mitraKerja as $mk)
     <tr class="hover:bg-gray-50 transition-colors duration-150 group">
-        <td class="px-6 py-4 whitespace-nowrap">
-            {{ ($pekerja->currentPage() - 1) * $pekerja->perPage() + $loop->iteration }}.
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 align-top">
+            {{ ($mitraKerja->currentPage() - 1) * $mitraKerja->perPage() + $loop->iteration }}.
         </td>
 
-        <td class="px-6 py-4 whitespace-nowrap">
-            <div class="flex items-center">
+        <td class="px-6 py-4 whitespace-nowrap align-top">
+            <div class="flex items-start">
                 <div class="flex-shrink-0 h-10 w-10">
-                    @if ($p->image_base64)
-                        <img class="h-10 w-10 rounded-full object-cover border border-gray-200"
-                            src="{{ $p->image_base64 }}" alt="{{ $p->nama }}">
+                    @if ($mk->image_base64)
+                        <img class="h-10 w-10 rounded-lg bg-orange-100 flex items-center justify-center text-orange-600 font-bold"
+                            src="{{ $mk->image_base64 }}" alt="{{ $mk->nama_mitra }}">
                     @else
-                        <img class="h-10 w-10 rounded-full bg-gray-200"
-                            src="https://ui-avatars.com/api/?name={{ urlencode($p->nama) }}&background=random&color=fff&size=128"
+                        <img class="h-10 w-10 rounded-lg bg-orange-100 flex items-center justify-center text-orange-600 font-bold"
+                            src="https://ui-avatars.com/api/?name={{ urlencode($mk->nama_mitra) }}&background=random&color=fff&size=128"
                             alt="">
                     @endif
                 </div>
                 <div class="ml-4">
-                    <div class="text-sm font-bold text-gray-900">{{ $p->nama }}</div>
-                    <div class="text-xs text-gray-500 font-mono mt-0.5 tracking-wide">
-                        NIK: {{ $p->nik }}
+                    <div class="text-sm font-bold text-gray-900">{{ $mk->nama_mitra }}</div>
+                    <div class="text-xs text-gray-500 mt-0.5">Telp : {{ $mk->telp_perusahaan }}</div>
+                    {{-- <div class="text-xs text-gray-500">Sidoarjo, Jawa Timur</div> --}}
+                </div>
+            </div>
+        </td>
+
+        <td class="px-6 py-4 whitespace-nowrap text-center align-top">
+            <span class="inline-flex items-center px-2.5 py-1 rounded-md text-sm font-bold bg-gray-100 text-gray-800">
+                100
+            </span>
+            <div class="text-[10px] text-gray-400 mt-1 uppercase tracking-wider">Orang</div>
+        </td>
+
+        {{-- <td class="px-6 py-4 whitespace-nowrap align-top">
+                    <div class="flex flex-col gap-4">
+                        <!-- PIC 1 -->
+                        <div class="flex gap-3">
+                            <img class="h-8 w-8 rounded-full bg-gray-200" src="https://ui-avatars.com/api/?name=Siti+A&background=random&color=fff" alt="">
+                            <div class="flex flex-col">
+                                <span class="text-sm font-medium text-gray-900">Siti Aminah</span>
+                                <span class="text-xs text-gray-500 mb-0.5">Direktur Utama</span>
+                                <div class="flex items-center gap-2 text-xs text-gray-500">
+                                    <span class="flex items-center gap-1 hover:text-blue-600 cursor-pointer">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                                        Email
+                                    </span>
+                                    <span class="text-gray-300">|</span>
+                                    <span class="flex items-center gap-1 hover:text-blue-600 cursor-pointer">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                                        0813-9876...
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
+                </td> --}}
+
+        <td class="px-6 py-4 whitespace-nowrap text-center align-top">
+            <span
+                class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100">
+                {{ $mk->bidangUsaha->nama }}
+            </span>
         </td>
 
-        <td class="px-6 py-4 whitespace-nowrap">
-            <div class="flex flex-col gap-1">
-                <div class="flex items-center text-sm text-gray-700">
-                    <svg class="w-4 h-4 text-gray-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor"
-                        viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
-                        </path>
-                    </svg>
-                    <span class="truncate max-w-[150px]">{{ $p->email ?? '-' }}</span>
-                </div>
-
-                <div class="flex items-center text-xs text-gray-500">
-                    <svg class="w-4 h-4 text-gray-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor"
-                        viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z">
-                        </path>
-                    </svg>
-                    {{ $p->telp ?? '-' }}
-                </div>
-            </div>
+        <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-600 align-top">
+            {{ \Carbon\Carbon::parse($mk->tgl_mulai_kerjasama )->translatedFormat('d F Y') }}
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-red-600 font-medium align-top">
+            {{ \Carbon\Carbon::parse($mk->tgl_mulai_kerjasama )->translatedFormat('d F Y') }}
         </td>
 
-        <td class="px-6 py-4 whitespace-nowrap">
-            <div class="flex flex-col gap-1">
-                <div class="flex items-center text-sm text-gray-900 font-medium">
-                    <svg class="w-4 h-4 text-gray-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor"
-                        viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
-                        </path>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                    </svg>
-                    {{ ucwords(strtolower($p->kota)) }}
-                </div>
+        <td class="px-6 py-4 whitespace-nowrap text-center align-top">
+            @php($badge = $mk->status_badge)
 
-                <div class="flex items-center text-sm text-gray-900">
-                    <svg class="w-4 h-4 text-gray-400 mr-2 flex-shrink-0" fill="none" stroke="currentColor"
-                        viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
-                        </path>
-                    </svg>
-                    {{-- Ganti dengan variabel dinamis jika perlu: --}}
-                    {{ \Carbon\Carbon::parse($p->tgl_bergabung)->translatedFormat('d F Y') }}
-                </div>
-            </div>
-        </td>
+            <span
+                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                {{ $badge['bg'] }} {{ $badge['textColor'] }} border {{ $badge['border'] }}">
 
-        <td class="px-6 py-4 whitespace-nowrap text-center">
-            @if ($p->status_aktif)
-                <span
-                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
-                    <span class="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5"></span>
-                    Aktif
-                </span>
-            @else
-                <span
-                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 border border-red-200">
-                    <span class="w-1.5 h-1.5 bg-red-500 rounded-full mr-1.5"></span>
-                    Non-Aktif
-                </span>
-            @endif
+                <span class="w-1.5 h-1.5 rounded-full mr-1.5 {{ $badge['dot'] }}"></span>
+                {{ $badge['text'] }}
+            </span>
         </td>
 
         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
             <div class="flex justify-end gap-2">
                 <!-- Edit -->
-                <a href="{{ route('view.ubah.pekerja', $p->id) }}"
+                <a href="{{ route('view.ubah.mitra-kerja', $mk->id) }}"
                     class="text-blue-600 hover:text-blue-900 border border-blue-200 hover:bg-blue-50
                rounded-lg p-2 transition"
                     title="Edit">
@@ -107,7 +96,7 @@
                 </a>
 
                 <!-- Detail -->
-                <a href="{{ route('view.detail.pekerja', $p->id) }}"
+                <a href="{{ route('view.detail.mitra-kerja', $mk->id) }}"
                     class="text-blue-600 hover:text-blue-900 border border-blue-200 hover:bg-blue-50
                rounded-lg p-2 transition"
                     title="Detail">

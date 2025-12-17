@@ -22,15 +22,15 @@
             {{-- Stat Item --}}
             <div class="border-r border-gray-100 last:border-0">
                 <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Total Mitra Kerja</p>
-                <p class="mt-1 text-2xl font-bold text-gray-900">1</p>
+                <p class="mt-1 text-2xl font-bold text-gray-900">{{ $totalMitra }}</p>
             </div>
             <div class="border-r border-gray-100 last:border-0">
                 <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Mitra Baru</p>
-                <p class="mt-1 text-2xl font-bold text-gray-900">2</p>
+                <p class="mt-1 text-2xl font-bold text-gray-900">{{ $mitraBaru }}</p>
             </div>
             <div class="border-r border-gray-100 last:border-0">
                 <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Tidak Aktif</p>
-                <p class="mt-1 text-2xl font-bold text-gray-900">3</p>
+                <p class="mt-1 text-2xl font-bold text-gray-900">{{ $tidakAktif }}</p>
             </div>
         </div>
     </div>

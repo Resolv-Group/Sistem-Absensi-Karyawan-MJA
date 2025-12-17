@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 class MitraKerja extends Model
@@ -19,6 +20,96 @@ class MitraKerja extends Model
         'tgl_akhir_mou',
         'status_mou',
         'status_aktif',
-        'logo'
+        'foto'
     ];
+
+    public function getImageBase64Attribute()
+    {
+        // Check if the 'foto' column has data
+        if ($this->foto) {
+            // Convert binary data to a Base64 string that HTML can read
+            return 'data:image/jpeg;base64,' . base64_encode($this->foto);
+        }
+
+        // Return null if no photo exists
+        return null;
+    }
+
+    public function bidangUsaha()
+    {
+        return $this->belongsTo(BidangUsaha::class, 'bidang_usaha_id');
+    }
+
+    protected $appends = ['status_mou', 'status_badge'];
+
+    public function getStatusMouAttribute(): string
+    {
+        $diff = Carbon::today()->diffInDays(
+            Carbon::parse($this->tgl_akhir_mou),
+            false
+        );
+
+        if ($diff < 0) return 'Tidak AKtif';
+        if ($diff <= 30) return 'Perpanjangan';
+        return 'Aktif Disnaker';
+    }
+
+    public function getStatusBadgeAttribute(): array
+    {
+        return match ($this->status_mou) {
+            'Tidak Aktif' => [
+                'text' => 'Habis',
+                'bg' => 'bg-red-100',
+                'textColor' => 'text-red-800',
+                'border' => 'border-red-200',
+                'dot' => 'bg-red-500',
+            ],
+            'Perpanjangan' => [
+                'text' => 'Segera Habis',
+                'bg' => 'bg-yellow-100',
+                'textColor' => 'text-yellow-800',
+                'border' => 'border-yellow-200',
+                'dot' => 'bg-yellow-500',
+            ],
+            default => [
+                'text' => 'Aktif Disnaker',
+                'bg' => 'bg-green-100',
+                'textColor' => 'text-green-800',
+                'border' => 'border-green-200',
+                'dot' => 'bg-green-500',
+            ],
+        };
+    }
+
+    public function getTelpFormattedAttribute()
+    {
+        if (!$this->telp_perusahaan) return '-';
+
+        // buang selain angka
+        $number = preg_replace('/\D/', '', $this->telp_perusahaan);
+
+        // normalisasi +62 → 0
+        if (str_starts_with($number, '62')) {
+            $number = '0' . substr($number, 2);
+        }
+
+        // validasi panjang (HP Indo biasanya 10–13 digit)
+        if (strlen($number) < 10) return $number;
+
+        // 0812-0000-0000
+        return preg_replace(
+            '/^(\d{4})(\d{4})(\d{4,})$/',
+            '$1-$2-$3',
+            $number
+        );
+    }
+
+    public function getAlamatFormattedAttribute()
+    {
+        if (!$this->alamat) return '-';
+
+        return collect(explode(',', $this->alamat))
+            ->map(fn ($line) => trim($line))
+            ->implode('<br>');
+    }
 }

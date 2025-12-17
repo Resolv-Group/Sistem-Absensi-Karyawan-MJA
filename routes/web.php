@@ -94,7 +94,7 @@ Route::middleware(['auth', 'role:hrd,pic,admin'])->group(function(){
 
     Route::get('/mitra-kerja', [MitraKerjaController::class, 'viewMitraKerjaMain'])->name('view.mitra-kerja');
     Route::get('/mitra-kerja/tambah', [MitraKerjaController::class, 'viewTambahMitraKerja'])->name('view.tambah.mitra-kerja');
-    Route::get('/mitra-kerja/detail', [MitraKerjaController::class, 'viewDetailMitraKerja'])->name('view.detail.mitra-kerja');
+    Route::get('/mitra-kerja/detail/{id}', [MitraKerjaController::class, 'viewDetailMitraKerja'])->name('view.detail.mitra-kerja');
     Route::POST('/tambah-mitra-kerja', [MitraKerjaController::class, 'tambahMitraKerja'])->name('tambah.mitra-kerja.post');
     Route::get('/mitra-kerja/ubah/{id}', [MitraKerjaController::class, 'ubahMitraKerja'])->name('view.ubah.mitra-kerja');
     Route::put('/mitra-kerja/ubah/{id}', [MitraKerjaController::class, 'updateMitraKerja'])->name('update.mitra-kerja');
