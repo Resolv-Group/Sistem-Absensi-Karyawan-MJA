@@ -731,6 +731,18 @@
 
     <!-- PREVIEW SCRIPT -->
     <script>
+        function showToast(message, type = 'error') {
+            Swal.fire({
+                toast: true,
+                position: 'top',
+                icon: type, // success | error | warning | info
+                title: message,
+                showConfirmButton: false,
+                timer: 2500,
+                timerProgressBar: true
+            });
+        }
+
         function previewPhoto(event) {
             const input = event.target;
             const preview = document.getElementById('previewImage');
@@ -742,7 +754,7 @@
 
             // Validasi ukuran max 2MB
             if (file.size > 2 * 1024 * 1024) {
-                alert("Ukuran foto maksimal 2MB!");
+                showToast('Ukuran foto maksimal 2MB');
                 input.value = "";
                 return;
             }
