@@ -35,7 +35,7 @@
             <div class="flex items-center gap-3">
                 <button
                     onclick="confirmToggleStatus({{ $mitraKerja->id }}, {{ $mitraKerja->status_aktif }})"
-                    class="px-4 py-2 text-sm font-medium    
+                    class="px-4 py-2 text-sm font-medium
                         {{ $mitraKerja->status_aktif ? 'text-red-600 bg-red-50 border-red-100 hover:bg-red-100'
                                                 : 'text-emerald-600 bg-emerald-50 border-emerald-100 hover:bg-emerald-100' }}
                         border rounded-lg transition shadow-sm">
@@ -86,13 +86,13 @@
                         <h2 class="mt-4 text-xl font-bold text-gray-900 leading-tight">
                             {{ Str::limit(ucwords(collect(explode(' ', strtolower($mitraKerja->nama_mitra)))->take(2)->implode(' ')),15) }}
                         </h2>
-                        
+
                         <div class="mt-2 flex justify-center gap-2">
                             @if($mitraKerja->status_mou === "Aktif Disnaker")
                                 <span
                                     class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
                                     <span class="w-1.5 h-1.5 bg-green-600 rounded-full mr-1.5"></span>
-                                    Aktif Disnaker
+                                    {{ $mitraKerja->status_mou }}
                                 </span>
                             @elseif($mitraKerja->status_mou === "Perpanjangan")
                                 <span
@@ -102,7 +102,7 @@
                                 </span>
                             @elseif($mitraKerja->status_mou === "Tidak Aktif")
                                 <span
-                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-red-800 border border-red-200">
+                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 border border-red-200">
                                     <span class="w-1.5 h-1.5 bg-red-600 rounded-full mr-1.5"></span>
                                     Tidak Aktif
                                 </span>
