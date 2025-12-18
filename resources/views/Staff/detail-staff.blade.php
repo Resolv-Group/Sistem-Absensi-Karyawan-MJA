@@ -36,8 +36,12 @@
             {{-- Right Side: Action Buttons --}}
             <div class="flex items-center gap-3">
                 <button
-                    class="px-4 py-2 text-sm font-medium text-red-600 bg-red-50 border border-red-100 rounded-lg hover:bg-red-100 transition shadow-sm">
-                    Nonaktifkan
+                    onclick="confirmToggleStatus({{ $staff->id }}, {{ $staff->status_aktif }})"
+                    class="px-4 py-2 text-sm font-medium
+                        {{ $staff->status_aktif ? 'text-red-600 bg-red-50 border-red-100 hover:bg-red-100'
+                                                : 'text-emerald-600 bg-emerald-50 border-emerald-100 hover:bg-emerald-100' }}
+                        border rounded-lg transition shadow-sm">
+                    {{ $staff->status_aktif ? 'Nonaktifkan' : 'Aktifkan' }}
                 </button>
                 {{-- <button
                     class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition shadow-sm">
@@ -226,3 +230,48 @@
         </div>
     </div>
 @endsection
+
+<script>
+function confirmToggleStatus(id, statusAktif) {
+    const isAktif = statusAktif == 1;
+
+    Swal.fire({
+        title: isAktif ? 'Nonaktifkan staff?' : 'Aktifkan staff?',
+        text: isAktif
+            ? 'staff ini akan dinonaktifkan.'
+            : 'staff ini akan diaktifkan kembali.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: isAktif ? '#dc2626' : '#059669',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: isAktif ? 'Ya, nonaktifkan' : 'Ya, aktifkan',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch(`/staff/toggle-status/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(res => {
+                if (!res.ok) throw new Error();
+                return res.json();
+            })
+            .then(data => {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil',
+                    text: data.message,
+                    timer: 1500,
+                    showConfirmButton: false
+                }).then(() => location.reload());
+            })
+            .catch(() => {
+                Swal.fire('Error', 'Terjadi kesalahan', 'error');
+            });
+        }
+    });
+}
+</script>

@@ -46,6 +46,8 @@ class MitraKerjaController extends Controller
     function viewDetailMitraKerja($id)
     {
         $mitraKerja = MitraKerja::where('id', $id)->first();
+        
+        // dd($mitraKerja);
 
         $mitraKerja->image_base64 = 'data:image/jpeg;base64,' . base64_encode($mitraKerja->image_blob);
 
@@ -199,5 +201,19 @@ class MitraKerjaController extends Controller
                 ->withInput()
                 ->withErrors(['general' => $e->getMessage()]);
         }
+    }
+
+    public function toggleStatus($id)
+    {
+        $mitraKerja = MitraKerja::findOrFail($id);
+
+        $mitraKerja->status_aktif = !$mitraKerja->status_aktif;
+        $mitraKerja->save();
+
+        return response()->json([
+            'message' => $mitraKerja->status_aktif
+                ? 'Mitra Kerja berhasil diaktifkan'
+                : 'Mitra Kerja berhasil dinonaktifkan'
+        ]);
     }
 }

@@ -399,4 +399,30 @@ class PekerjaController extends Controller
         // ✅ KEMBALI KE DETAIL PEKERJA (LEBIH BAGUS DARIPADA KE LIST)
         return redirect()->route('view.detail.pekerja', $id)->with('success', 'Data pekerja berhasil diperbarui');
     }
+
+    public function toggleStatus($id)
+    {
+        $pekerja = Pekerja::findOrFail($id);
+
+        $pekerja->status_aktif = !$pekerja->status_aktif;
+        $pekerja->save();
+
+        History::create([
+            'foreign_id' => $pekerja->id,
+            'nama_tabel' => 'pekerja', // konsisten
+            'updated_by' => auth()->id() ?? 0,
+            'jabatan' => optional(auth()->user()->staff)->jabatan ?? 'system',
+            'when' => now(),
+        ]);
+
+        return response()->json([
+            'message' => $pekerja->status_aktif
+                ? 'Pekerja berhasil diaktifkan'
+                : 'Pekerja berhasil dinonaktifkan'
+        ]);
+    }
+
+
+
+    
 }

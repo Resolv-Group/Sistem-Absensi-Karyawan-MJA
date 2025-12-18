@@ -541,4 +541,26 @@ class StaffController extends Controller
             dd('General Error:', $e->getMessage());
         }
     }
+
+    public function toggleStatus($id)
+    {
+        $staff = Staff::findOrFail($id);
+
+        $staff->status_aktif = !$staff->status_aktif;
+        $staff->save();
+
+        History::create([
+            'foreign_id' => $staff->id,
+            'nama_tabel' => 'staff', // konsisten
+            'updated_by' => auth()->id() ?? 0,
+            'jabatan' => optional(auth()->user()->staff)->jabatan ?? 'system',
+            'when' => now(),
+        ]);
+
+        return response()->json([
+            'message' => $staff->status_aktif
+                ? 'Staff berhasil diaktifkan'
+                : 'Staff berhasil dinonaktifkan'
+        ]);
+    }
 }
