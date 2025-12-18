@@ -43,46 +43,46 @@ class MitraKerja extends Model
         return $this->belongsTo(BidangUsaha::class, 'bidang_usaha_id');
     }
 
-    protected $appends = ['status_mou', 'status_badge'];
+    // protected $appends = ['status_mou', 'status_badge'];
 
-    public function getStatusMouAttribute(): string
-    {
-        $diff = Carbon::today()->diffInDays(
-            Carbon::parse($this->tgl_akhir_mou),
-            false
-        );
+    // public function getStatusMouAttribute(): string
+    // {
+    //     $diff = Carbon::today()->diffInDays(
+    //         Carbon::parse($this->tgl_akhir_mou),
+    //         false
+    //     );
 
-        if ($diff < 0) return 'Tidak AKtif';
-        if ($diff <= 30) return 'Perpanjangan';
-        return 'Aktif Disnaker';
-    }
+    //     if ($diff < 0) return 'Tidak AKtif';
+    //     if ($diff <= 30) return 'Perpanjangan';
+    //     return 'Aktif Disnaker';
+    // }
 
-    public function getStatusBadgeAttribute(): array
-    {
-        return match ($this->status_mou) {
-            'Tidak Aktif' => [
-                'text' => 'Habis',
-                'bg' => 'bg-red-100',
-                'textColor' => 'text-red-800',
-                'border' => 'border-red-200',
-                'dot' => 'bg-red-500',
-            ],
-            'Perpanjangan' => [
-                'text' => 'Segera Habis',
-                'bg' => 'bg-yellow-100',
-                'textColor' => 'text-yellow-800',
-                'border' => 'border-yellow-200',
-                'dot' => 'bg-yellow-500',
-            ],
-            default => [
-                'text' => 'Aktif Disnaker',
-                'bg' => 'bg-green-100',
-                'textColor' => 'text-green-800',
-                'border' => 'border-green-200',
-                'dot' => 'bg-green-500',
-            ],
-        };
-    }
+    // public function getStatusBadgeAttribute(): array
+    // {
+    //     return match ($this->status_mou) {
+    //         'Tidak Aktif' => [
+    //             'text' => 'Habis',
+    //             'bg' => 'bg-red-100',
+    //             'textColor' => 'text-red-800',
+    //             'border' => 'border-red-200',
+    //             'dot' => 'bg-red-500',
+    //         ],
+    //         'Perpanjangan' => [
+    //             'text' => 'Segera Habis',
+    //             'bg' => 'bg-yellow-100',
+    //             'textColor' => 'text-yellow-800',
+    //             'border' => 'border-yellow-200',
+    //             'dot' => 'bg-yellow-500',
+    //         ],
+    //         default => [
+    //             'text' => 'Aktif Disnaker',
+    //             'bg' => 'bg-green-100',
+    //             'textColor' => 'text-green-800',
+    //             'border' => 'border-green-200',
+    //             'dot' => 'bg-green-500',
+    //         ],
+    //     };
+    // }
 
     public function getTelpFormattedAttribute()
 {

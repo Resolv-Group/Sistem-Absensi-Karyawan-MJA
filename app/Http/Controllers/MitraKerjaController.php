@@ -46,12 +46,12 @@ class MitraKerjaController extends Controller
     function viewDetailMitraKerja($id)
     {
         $mitraKerja = MitraKerja::where('id', $id)->first();
-        
-        // dd($mitraKerja);
 
         $mitraKerja->image_base64 = 'data:image/jpeg;base64,' . base64_encode($mitraKerja->image_blob);
 
         $historiMitra = History::where('foreign_id', $id)->where('nama_tabel', 'pekerja')->get();
+
+        // dd($mitraKerja);
 
         return view('Mitra Kerja.detail-mitra-kerja', compact('mitraKerja', 'historiMitra'));
     }

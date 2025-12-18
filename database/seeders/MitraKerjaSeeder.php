@@ -30,7 +30,7 @@ class MitraKerjaSeeder extends Seeder
                 'alamat' => $faker->address,
                 'tgl_mulai_kerjasama' => $faker->date(),
                 'tgl_akhir_mou' => $faker->date(),
-                'status_mou' => $faker->randomElement(array: ['Aktif Disnaker','Perpanjangan', 'Tidak Aktif']),
+                'status_mou' => $faker->randomElement(['Aktif Disnaker','Perpanjangan', 'Tidak Aktif']),
                 'status_aktif' => 1,
                 'foto' => null,
             ]);
