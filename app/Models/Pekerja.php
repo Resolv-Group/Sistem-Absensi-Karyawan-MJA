@@ -17,9 +17,8 @@ class Pekerja extends Model
         'kelamin' => JenisKelamin::class,
     ];
 
-
     protected $fillable = [
-        'nama','nik','no_kk','email','telp','foto','alamat','desa','kecamatan','kota','provinsi',
+        'nama','nik','no_kk','email','telp','foto', 'dokumen' ,'alamat','desa','kecamatan','kota','provinsi',
 
         'rekening','nama_rek','rt','rw','tempat_lahir','tgl_lahir','tgl_bergabung','tgl_resign',
 

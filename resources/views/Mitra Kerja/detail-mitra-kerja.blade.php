@@ -172,8 +172,8 @@
                                 :class="tab == 'contract' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'"
                                 class="whitespace-nowrap py-4 px-1 font-medium text-sm">
                                 Kontrak & MoU
-                            </button>
-                            <button @click="tab='workers'"
+                            </button> --}}
+                            {{-- <button @click="tab='workers'"
                                 :class="tab == 'workers' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'"
                                 class="whitespace-nowrap py-4 px-1 font-medium text-sm">
                                 Tenaga Kerja
@@ -187,8 +187,8 @@
                         </div>
                         {{-- <div x-show="tab=='contract'">
                             @include('Mitra Kerja.Detail.contract')
-                        </div>
-                        <div x-show="tab=='workers'">
+                        </div> --}}
+                        {{-- <div x-show="tab=='workers'">
                             @include('Mitra Kerja.Detail.workers')
                         </div> --}}
 

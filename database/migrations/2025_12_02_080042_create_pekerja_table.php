@@ -19,7 +19,9 @@ return new class extends Migration
             $table->string('no_kk', 30)->nullable();
             $table->string('email', 150)->nullable();
             $table->string('telp', 30)->nullable();
+
             $table->binary('foto')->nullable();
+            // $table->longBlob('dokumen')->nullable();
 
             $table->string('alamat', 255);
             $table->string('desa', 100);

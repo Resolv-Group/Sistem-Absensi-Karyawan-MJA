@@ -3,10 +3,13 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class MitraKerja extends Model
 {
+    use HasFactory;
+
     protected $table = 'mitra_kerja';
 
     protected $fillable = [
@@ -20,7 +23,7 @@ class MitraKerja extends Model
         'tgl_akhir_mou',
         'status_mou',
         'status_aktif',
-        'foto'
+        'foto',
     ];
 
     public function getImageBase64Attribute()
@@ -82,27 +85,41 @@ class MitraKerja extends Model
     }
 
     public function getTelpFormattedAttribute()
-    {
-        if (!$this->telp_perusahaan) return '-';
+{
+    if (!$this->telp_perusahaan) return '-';
 
-        // buang selain angka
-        $number = preg_replace('/\D/', '', $this->telp_perusahaan);
+    // 1. Buang selain angka
+    $number = preg_replace('/\D/', '', $this->telp_perusahaan);
 
-        // normalisasi +62 → 0
-        if (str_starts_with($number, '62')) {
-            $number = '0' . substr($number, 2);
-        }
+    // 2. Normalisasi +62 → 0
+    if (str_starts_with($number, '62')) {
+        $number = '0' . substr($number, 2);
+    }
 
-        // validasi panjang (HP Indo biasanya 10–13 digit)
-        if (strlen($number) < 10) return $number;
-
-        // 0812-0000-0000
+    // 3. Nomor HP (08...)
+    if (str_starts_with($number, '08')) {
+        // 0812-0000-0000 (4-4-4+)
         return preg_replace(
             '/^(\d{4})(\d{4})(\d{4,})$/',
             '$1-$2-$3',
             $number
         );
     }
+
+    // 4. Telepon rumah (02x / 03x / dll)
+    // contoh: 021xxxxxxx → 021-xxxxxxx
+    // contoh: 031xxxxxx  → 031-xxxxxx
+    if (preg_match('/^0\d{2}/', $number)) {
+        return preg_replace(
+            '/^(\d{3})(\d+)$/',
+            '$1-$2',
+            $number
+        );
+    }
+
+    // 5. Fallback (kalau format aneh)
+    return $number;
+}
 
     public function getAlamatFormattedAttribute()
     {

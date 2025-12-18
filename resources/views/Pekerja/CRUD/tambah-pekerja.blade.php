@@ -544,6 +544,72 @@
                         </div>
                     </div>
                 </div>
+
+                {{-- FILE UPLOAD SECTION --}}
+                {{-- <div class="col-span-1 md:col-span-12 mt-2" x-data="{ fileName: null }">
+                    <label class="block text-sm font-bold text-gray-700 mb-2">
+                        Dokumen Kontrak / MoU <span class="text-xs font-normal text-gray-500 ml-1">(PDF, JPG, PNG max
+                            5MB)</span>
+                    </label>
+
+                    <div class="relative group">
+                        <input type="file" name="dokumen" id="file_kontrak"
+                            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                            accept=".pdf,.jpg,.jpeg,.png"
+                            @change="fileName = $event.target.files[0] ? $event.target.files[0].name : null">
+
+                        <div
+                            class="w-full border-2 border-dashed border-gray-300 rounded-xl bg-gray-50
+                    group-hover:border-blue-500 group-hover:bg-blue-50/50 transition-all duration-200
+                    flex flex-col items-center justify-center py-8 px-4 text-center">
+
+                            <div x-show="!fileName" class="flex flex-col items-center">
+                                <div
+                                    class="p-3 bg-white text-blue-600 rounded-full shadow-sm mb-3 group-hover:scale-110 transition-transform">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 011.414.586l5.414 5.414a1 1 0 01.586 1.414V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                </div>
+                                <p class="text-sm font-semibold text-gray-700">
+                                    <span class="text-blue-600 group-hover:underline">Klik untuk upload</span> atau drag &
+                                    drop file
+                                </p>
+                                <p class="text-xs text-gray-500 mt-1">Lampirkan scan kontrak atau dokumen legalitas
+                                    terkait.</p>
+                            </div>
+
+                            <div x-show="fileName" style="display: none;"
+                                class="flex items-center gap-3 bg-blue-100/50 px-4 py-2 rounded-lg border border-blue-200">
+                                <div class="bg-blue-600 text-white p-1.5 rounded-md">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </div>
+                                <div class="text-left">
+                                    <p class="text-sm font-bold text-gray-900" x-text="fileName"></p>
+                                    <p class="text-xs text-blue-600 font-medium">Siap untuk diupload</p>
+                                </div>
+                                <button type="button"
+                                    @click.prevent="fileName = null; document.getElementById('file_kontrak').value = ''"
+                                    class="ml-2 text-gray-400 hover:text-red-500 z-20 relative">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
+                                        fill="currentColor">
+                                        <path fill-rule="evenodd"
+                                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                            clip-rule="evenodd" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    @error('file_kontrak')
+                        <p class="text-red-600 text-xs mt-1">{{ $message }}</p>
+                    @enderror
+                </div> --}}
             </div>
 
             {{-- FOOTER / ACTIONS --}}

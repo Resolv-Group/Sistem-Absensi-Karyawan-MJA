@@ -41,7 +41,7 @@
 
         {{-- FORM CARD --}}
         <form id="formTambahMitraKerja" action="{{ route('tambah.mitra-kerja.post') }}" method="POST" enctype="multipart/form-data"
-            class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden max-w-5xl mx-auto">
+            class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
             @csrf
 
             {{-- HEADER --}}

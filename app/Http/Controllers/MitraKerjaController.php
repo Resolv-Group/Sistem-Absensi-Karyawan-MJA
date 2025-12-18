@@ -10,8 +10,8 @@ use Illuminate\Http\Request;
 
 class MitraKerjaController extends Controller
 {
-    function viewMitraKerjaMain(Request $request) {
-
+    function viewMitraKerjaMain(Request $request)
+    {
         $totalMitra = MitraKerja::count(); // total pekerja
         $mitraBaru = MitraKerja::where('created_at', '>=', now()->subMonth())->count(); // pekerja baru dari bulan lalu
         $tidakAktif = MitraKerja::where('status_aktif', '!=', '1')->count(); // pekerja tidak aktif
@@ -36,15 +36,15 @@ class MitraKerjaController extends Controller
         return view('Mitra Kerja.main-mitra-kerja', compact('mitraKerja', 'totalMitra', 'mitraBaru', 'tidakAktif'));
     }
 
-    function viewTambahMitraKerja() {
-
+    function viewTambahMitraKerja()
+    {
         $bidangUsahaList = BidangUsaha::select('id as val', 'nama as label')->get();
 
         return view('Mitra Kerja.CRUD.tambah-mitra-kerja', compact('bidangUsahaList'));
     }
 
-    function viewDetailMitraKerja($id) {
-
+    function viewDetailMitraKerja($id)
+    {
         $mitraKerja = MitraKerja::where('id', $id)->first();
 
         $mitraKerja->image_base64 = 'data:image/jpeg;base64,' . base64_encode($mitraKerja->image_blob);
@@ -58,22 +58,25 @@ class MitraKerjaController extends Controller
     {
         // dd($request->all());
         try {
-            $request->validate([
-                'nama_mitra'          => 'required|string|max:255',
-                'bidang_usaha_id'     => 'required|integer',
-                'pimpinan'            => 'required|string|max:255',
-                'telp_perusahaan'     => 'required|string|max:20',
-                'status_pajak'        => 'required|string',
-                'alamat'              => 'required|string',
-                'tgl_mulai_kerjasama' => 'required|date',
-                'tgl_akhir_mou'       => 'nullable|date|after_or_equal:tgl_mulai_kerjasama',
-                'status_mou'          => 'required|string',
-                'foto'                => 'nullable|image|mimes:png,jpg,jpeg|max:2048',
-            ], [
-                'nama_mitra.required' => 'Nama mitra wajib diisi',
-                'foto.image'          => 'foto harus berupa gambar',
-                'foto.max'            => 'Ukuran foto maksimal 2MB',
-            ]);
+            $request->validate(
+                [
+                    'nama_mitra' => 'required|string|max:255',
+                    'bidang_usaha_id' => 'required|integer',
+                    'pimpinan' => 'required|string|max:255',
+                    'telp_perusahaan' => 'required|string|max:20',
+                    'status_pajak' => 'required|string',
+                    'alamat' => 'required|string',
+                    'tgl_mulai_kerjasama' => 'required|date',
+                    'tgl_akhir_mou' => 'nullable|date|after_or_equal:tgl_mulai_kerjasama',
+                    'status_mou' => 'required|string',
+                    'foto' => 'nullable|image|mimes:png,jpg,jpeg|max:2048',
+                ],
+                [
+                    'nama_mitra.required' => 'Nama mitra wajib diisi',
+                    'foto.image' => 'foto harus berupa gambar',
+                    'foto.max' => 'Ukuran foto maksimal 2MB',
+                ],
+            );
 
             // dd($request->all());
 
@@ -116,47 +119,48 @@ class MitraKerjaController extends Controller
         }
     }
 
-
-    function ubahMitraKerja(Request $request, $id) {
-
+    function ubahMitraKerja(Request $request, $id)
+    {
         $mitraKerja = MitraKerja::findOrFail($id);
 
-        $bidangUsahaList = BidangUsaha::select('id', 'nama')
-            ->orderBy('nama')
-            ->get()
-            ->map(fn ($b) => [
-                'val'   => $b->id,
+        $bidangUsahaList = BidangUsaha::select('id', 'nama')->orderBy('nama')->get()->map(
+            fn($b) => [
+                'val' => $b->id,
                 'label' => $b->nama,
-            ]);
+            ],
+        );
 
         return view('Mitra Kerja.CRUD.ubah-mitra-kerja', compact('mitraKerja', 'bidangUsahaList'));
     }
 
-    function updateMitraKerja(Request $request, $id) {
+    function updateMitraKerja(Request $request, $id)
+    {
         // dd($request->all());
 
         $mitraKerja = MitraKerja::findOrFail($id);
 
-
-            $request->validate([
-                'nama_mitra'          => 'required|string|max:255',
-                'bidang_usaha_id'     => 'required|integer',
-                'pimpinan'            => 'required|string|max:255',
-                'telp_perusahaan'     => 'required|string|max:20',
-                'status_pajak'        => 'required|string',
-                'alamat'              => 'required|string',
+        $request->validate(
+            [
+                'nama_mitra' => 'required|string|max:255',
+                'bidang_usaha_id' => 'required|integer',
+                'pimpinan' => 'required|string|max:255',
+                'telp_perusahaan' => 'required|string|max:20',
+                'status_pajak' => 'required|string',
+                'alamat' => 'required|string',
                 'tgl_mulai_kerjasama' => 'required|date',
-                'tgl_akhir_mou'       => 'nullable|date|after_or_equal:tgl_mulai_kerjasama',
-                'status_mou'          => 'required|string',
-                'foto'                => 'nullable|image|mimes:png,jpg,jpeg|max:2048',
-            ], [
+                'tgl_akhir_mou' => 'nullable|date|after_or_equal:tgl_mulai_kerjasama',
+                'status_mou' => 'required|string',
+                'foto' => 'nullable|image|mimes:png,jpg,jpeg|max:2048',
+            ],
+            [
                 'nama_mitra.required' => 'Nama mitra wajib diisi',
-                'foto.image'          => 'foto harus berupa gambar',
-                'foto.max'            => 'Ukuran foto maksimal 2MB',
-            ]);
+                'foto.image' => 'foto harus berupa gambar',
+                'foto.max' => 'Ukuran foto maksimal 2MB',
+            ],
+        );
 
-            // dd($request->all());
- try {
+        // dd($request->all());
+        try {
             $data = $request->except('foto', '_token', '_method');
 
             if ($request->remove_foto == '1') {

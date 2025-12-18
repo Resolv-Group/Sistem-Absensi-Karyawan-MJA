@@ -396,7 +396,7 @@
                             <label class="block text-sm font-bold text-gray-700 mb-1">Nomor Telepon</label>
                             <input type="text" name="telp" maxlength="16" autocomplete="off"
                                 value="{{ old('telp', $pekerja->telp) }}"
-                                class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition">
+                                class="telp-input w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition">
                         </div>
 
                         {{-- Bank Info --}}
@@ -474,7 +474,7 @@
                             <label class="block text-sm font-bold text-gray-700 mb-1">Nomor Telepon</label>
                             <input type="text" name="telp_emergency" maxlength="16" autocomplete="off"
                                 value="{{ old('telp_emergency', $pekerja->telp_emergency) }}"
-                                class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition">
+                                class="telp_emergency-input w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition">
                         </div>
 
                         {{-- Hubungan --}}
@@ -551,6 +551,55 @@
 
     <!-- PREVIEW SCRIPT -->
     <script>
+        function phoneFieldHandler(inputClass, fieldName = "Nomor Telepon", min = 10, max = 15) {
+            const input = document.querySelector(inputClass);
+            if (!input) return;
+
+            input.addEventListener('input', (e) => {
+                const oldValue = e.target.value;
+                const newValue = oldValue.replace(/[^0-9]/g, '');
+                const errorId = `error-${fieldName.replace(/\s+/g, '').toLowerCase()}`;
+
+                // 1. GET THE PARENT WRAPPER (The <div class="relative">)
+                const wrapper = input.parentElement;
+
+                let errorEl = document.getElementById(errorId);
+
+                // Sanitize value (numbers only)
+                if (oldValue !== newValue) e.target.value = newValue;
+
+                // Validate length
+                if (newValue.length < min || newValue.length > max) {
+                    // Style the Input
+                    input.classList.add('border-red-500', 'bg-red-50');
+                    input.classList.remove('border-gray-500', 'bg-gray-50');
+
+                    // Create Error Message if it doesn't exist
+                    if (!errorEl) {
+                        errorEl = document.createElement('p');
+                        errorEl.id = errorId;
+                        errorEl.className = "text-red-600 text-xs mt-1 ml-1";
+                        errorEl.textContent = `${fieldName} harus terdiri dari ${min}-${max} angka`;
+
+                        // 2. INSERT ERROR AFTER THE WRAPPER (Outside the relative div)
+                        wrapper.insertAdjacentElement('afterend', errorEl);
+                    }
+                } else {
+                    // Clear Error
+                    input.classList.remove('border-red-500', 'bg-red-50');
+                    input.classList.add('border-gray-500', 'bg-gray-50');
+
+                    if (errorEl) {
+                        errorEl.remove();
+                    }
+                }
+            });
+        }
+
+        // Initialize
+        phoneFieldHandler('.telp-input', "Nomor Telepon Pribadi", 10, 13);
+        phoneFieldHandler('.telp_emergency-input', "Nomor Telepon Emergency", 10, 13);
+
         function showToast(message, type = 'error') {
             Swal.fire({
                 toast: true,
