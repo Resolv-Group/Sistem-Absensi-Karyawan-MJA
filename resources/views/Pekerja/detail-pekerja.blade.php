@@ -37,10 +37,10 @@
                     class="px-4 py-2 text-sm font-medium text-red-600 bg-red-50 border border-red-100 rounded-lg hover:bg-red-100 transition shadow-sm">
                     Nonaktifkan
                 </button>
-                <button
+                {{-- <button
                     class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition shadow-sm">
                     Cetak Data
-                </button>
+                </button> --}}
                 <a href="{{ route('view.ubah.pekerja', $pekerja->id) }}"
                     class="px-4 py-2 text-sm font-medium text-white bg-black border border-black rounded-lg hover:bg-gray-800 transition shadow-sm flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
@@ -125,7 +125,28 @@
                                     class="text-sm font-bold text-gray-900">{{ formatTanggal($pekerja->created_at) }}</span>
                             </div>
                         </div>
+                        <div class="mt-6 grid grid-cols-2 gap-3">
+                            <a href="tel:{{ $pekerja->telp }}" title="{{ $pekerja->telp }}"
+                                class="flex items-center justify-center gap-2 w-full py-2 text-sm font-medium text-gray-700 bg-gray-50 rounded-lg hover:bg-gray-100 border border-gray-200 transition">
+                                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z">
+                                    </path>
+                                </svg>
+                                Telepon
+                            </a>
+                            <a href="mailto:{{ $pekerja->email }}" title="{{ $pekerja->email }}"
+                                class="flex items-center justify-center gap-2 w-full py-2 text-sm font-medium text-gray-700 bg-gray-50 rounded-lg hover:bg-gray-100 border border-gray-200 transition">
+                                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
+                                </path>
+                                </svg>
+                                Email
+                            </a>
+                        </div>
                     </div>
+
                 </div>
             </div>
 
@@ -147,8 +168,8 @@
                                 class="whitespace-nowrap py-4 px-1 font-medium text-sm">
                                 Emergency Contact
                             </button>
-                            <button @click="tab='salary'"
-                                :class="tab == 'salary' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'"
+                            <button @click="tab='PKWT'"
+                                :class="tab == 'PKWT' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'"
                                 class="whitespace-nowrap py-4 px-1 font-medium text-sm">
                                 PKWT
                             </button>
@@ -167,6 +188,9 @@
 
                         <div x-show="tab=='emergency'">
                             @include('Pekerja.Detail.emergency')
+                        </div>
+                        <div x-show="tab=='PKWT'">
+                            @include('Pekerja.Detail.contract')
                         </div>
 
                         <div x-show="tab=='history'">

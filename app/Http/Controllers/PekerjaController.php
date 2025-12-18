@@ -53,6 +53,33 @@ class PekerjaController extends Controller
         return view('Pekerja.CRUD.tambah-pekerja');
     }
 
+    public function showDokumen($id, Request $request)
+    {
+        // 1. Find the record
+        $data = Pekerja::findOrFail($id);
+
+        // 2. Check if blob exists
+        if (!$data->dokumen) {
+            abort(404, 'Dokumen tidak ditemukan.');
+        }
+
+        // 3. Detect the MIME type (PDF, JPG, PNG) from the binary data
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $mimeType = $finfo->buffer($data->dokumen);
+
+        // 4. Determine if it's "View" (inline) or "Download" (attachment)
+        // If URL has ?download=true, we force download.
+        $disposition = $request->has('download') ? 'attachment' : 'inline';
+
+        // Generate a filename
+        $filename = 'dokumen-mitra-' . $id;
+
+        // 5. Return the binary data as a proper HTTP response
+        return response($data->dokumen)
+            ->header('Content-Type', $mimeType)
+            ->header('Content-Disposition', $disposition . '; filename="' . $filename . '"');
+    }
+
     function viewDetailPekerja($id)
     {
         $pekerja = Pekerja::where('id', $id)->first();
@@ -103,6 +130,8 @@ class PekerjaController extends Controller
                     'ibu_kandung' => 'string|max:255',
 
                     'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+                    // 'dokumen' => 'nullable|image|mimes:png,jpg,jpeg,pdf|max:2048',
+                    'dokumen' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
                 ],
                 [
                     // Identitas
@@ -173,6 +202,11 @@ class PekerjaController extends Controller
                 $fotoBlob = file_get_contents($request->file('foto')->getRealPath());
             }
 
+            $dokumenBlob = null;
+            if ($request->hasFile('dokumen')) {
+                $dokumenBlob = file_get_contents($request->file('dokumen')->getRealPath());
+            }
+
             // ✅ Simpan ke database
             $pekerja = Pekerja::create([
                 'nama' => $request->nama,
@@ -207,6 +241,7 @@ class PekerjaController extends Controller
                 'ibu_kandung' => $request->ibu_kandung,
 
                 'foto' => $fotoBlob,
+                'dokumen' => $dokumenBlob,
 
                 'status_aktif' => 1,
             ]);

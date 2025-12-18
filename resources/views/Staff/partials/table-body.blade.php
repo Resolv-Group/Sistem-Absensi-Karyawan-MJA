@@ -5,7 +5,7 @@
             {{ ($staff->currentPage() - 1) * $staff->perPage() + $loop->iteration }}.
         </td>
 
-        <td class="px-6 py-4 whitespace-nowrap">
+        <td class="px-6 py-4 whitespace-nowrap max-w-[450px]">
             <div class="flex items-center">
                 <div class="flex-shrink-0 h-10 w-10">
                     @if ($s->image_base64)
@@ -17,8 +17,8 @@
                             alt="">
                     @endif
                 </div>
-                <div class="ml-4">
-                    <div class="text-sm font-bold text-gray-900">{{ $s->nama }}</div>
+                <div class="ml-4 min-w-0">
+                    <div class="text-sm font-bold text-gray-900 truncate max-w-xs" title="{{ $s->nama }}">{{ $s->nama }}</div>
                     <div class="text-xs text-gray-500 font-mono mt-0.5">
                         Nik: {{ $s->nik }}
                     </div>

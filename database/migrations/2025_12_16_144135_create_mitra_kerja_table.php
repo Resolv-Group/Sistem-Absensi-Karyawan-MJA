@@ -20,7 +20,7 @@ return new class extends Migration
             $table->binary('foto')->nullable();
 
             $table->integer('bidang_usaha_id');       // Bidang Usaha (bisa FK nanti)
-            
+
             $table->string('telp_perusahaan', 20); // Telp Perusahaan
 
             $table->boolean('status_aktif')->default(1); // Status Aktif
