@@ -80,6 +80,7 @@ Route::middleware(['auth', 'role:hrd,admin'])->group(function(){
     Route::get('/staff/detail/{id}', [StaffController::class, 'viewDetailStaff'])->name('view.detail.staff');
     Route::get('/staff/ubah/{id}', [StaffController::class, 'ubahStaff'])->name('view.ubah.staff');
     Route::put('/staff/ubah/{id}', [StaffController::class, 'updateStaff'])->name('update.staff');
+    Route::put('/staff/toggle-status/{id}', [StaffController::class, 'toggleStatus']);
 
 });
 
@@ -91,8 +92,9 @@ Route::middleware(['auth', 'role:hrd,pic,admin'])->group(function(){
     Route::POST('/tambah-pekerja', [PekerjaController::class, 'tambahPekerja'])->name('tambah.pekerja.post');
     Route::get('/pekerja/ubah/{id}', [PekerjaController::class, 'ubahPekerja'])->name('view.ubah.pekerja');
     Route::put('/pekerja/ubah/{id}', [PekerjaController::class, 'updatePekerja'])->name('update.pekerja');
-    Route::get('/pekerja/dokumen/{id}', [PekerjaController::class, 'showDokumen'])
-    ->name('pekerja.dokumen.show');
+    // Route::get('/pekerja/dokumen/{id}', [PekerjaController::class, 'showDokumen'])->name('pekerja.dokumen.show');
+    Route::put('/pekerja/toggle-status/{id}', [PekerjaController::class, 'toggleStatus']);
+    
 
     Route::get('/mitra-kerja', [MitraKerjaController::class, 'viewMitraKerjaMain'])->name('view.mitra-kerja');
     Route::get('/mitra-kerja/tambah', [MitraKerjaController::class, 'viewTambahMitraKerja'])->name('view.tambah.mitra-kerja');
@@ -100,6 +102,7 @@ Route::middleware(['auth', 'role:hrd,pic,admin'])->group(function(){
     Route::POST('/tambah-mitra-kerja', [MitraKerjaController::class, 'tambahMitraKerja'])->name('tambah.mitra-kerja.post');
     Route::get('/mitra-kerja/ubah/{id}', [MitraKerjaController::class, 'ubahMitraKerja'])->name('view.ubah.mitra-kerja');
     Route::put('/mitra-kerja/ubah/{id}', [MitraKerjaController::class, 'updateMitraKerja'])->name('update.mitra-kerja');
+    Route::put('/mitra-kerja/toggle-status/{id}', [MitraKerjaController::class, 'toggleStatus']);
 
 
     Route::POST('/tambah-bidang-usaha', [BidangUsahaController::class, 'tambahBidangUsaha'])->name('tambah.bidang-usaha.post');

@@ -34,8 +34,12 @@
             {{-- Right Side: Action Buttons --}}
             <div class="flex items-center gap-3">
                 <button
-                    class="px-4 py-2 text-sm font-medium text-red-600 bg-red-50 border border-red-100 rounded-lg hover:bg-red-100 transition shadow-sm">
-                    Akhiri Kerjasama
+                    onclick="confirmToggleStatus({{ $mitraKerja->id }}, {{ $mitraKerja->status_aktif }})"
+                    class="px-4 py-2 text-sm font-medium    
+                        {{ $mitraKerja->status_aktif ? 'text-red-600 bg-red-50 border-red-100 hover:bg-red-100'
+                                                : 'text-emerald-600 bg-emerald-50 border-emerald-100 hover:bg-emerald-100' }}
+                        border rounded-lg transition shadow-sm">
+                    {{ $mitraKerja->status_aktif ? 'Nonaktifkan' : 'Aktifkan' }}
                 </button>
                 <a href="{{ route('view.ubah.mitra-kerja', $mitraKerja->id) }}"
                     class="px-4 py-2 text-sm font-medium text-white bg-black border border-black rounded-lg hover:bg-gray-800 transition shadow-sm flex items-center gap-2">
@@ -82,21 +86,21 @@
                         <h2 class="mt-4 text-xl font-bold text-gray-900 leading-tight">
                             {{ Str::limit(ucwords(collect(explode(' ', strtolower($mitraKerja->nama_mitra)))->take(2)->implode(' ')),15) }}
                         </h2>
-
+                        
                         <div class="mt-2 flex justify-center gap-2">
-                            @if($mitraKerja->status_aktif == 0)
+                            @if($mitraKerja->status_mou === "Aktif Disnaker")
                                 <span
                                     class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
                                     <span class="w-1.5 h-1.5 bg-green-600 rounded-full mr-1.5"></span>
                                     Aktif Disnaker
                                 </span>
-                            @elseif($mitraKerja->status_aktif == 1)
+                            @elseif($mitraKerja->status_mou === "Perpanjangan")
                                 <span
                                     class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 border border-yellow-200">
                                     <span class="w-1.5 h-1.5 bg-yellow-600 rounded-full mr-1.5"></span>
                                     Segera Habis
                                 </span>
-                            @else
+                            @elseif($mitraKerja->status_mou === "Tidak Aktif")
                                 <span
                                     class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-red-800 border border-red-200">
                                     <span class="w-1.5 h-1.5 bg-red-600 rounded-full mr-1.5"></span>
@@ -201,3 +205,48 @@
         </div>
     </div>
 @endsection
+
+<script>
+function confirmToggleStatus(id, statusAktif) {
+    const isAktif = statusAktif == 1;
+
+    Swal.fire({
+        title: isAktif ? 'Nonaktifkan Mitra Kerja?' : 'Aktifkan Mitra Kerja?',
+        text: isAktif
+            ? 'Mitra Kerja ini akan dinonaktifkan.'
+            : 'Mitra Kerja ini akan diaktifkan kembali.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: isAktif ? '#dc2626' : '#059669',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: isAktif ? 'Ya, nonaktifkan' : 'Ya, aktifkan',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch(`/mitra-kerja/toggle-status/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(res => {
+                if (!res.ok) throw new Error();
+                return res.json();
+            })
+            .then(data => {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil',
+                    text: data.message,
+                    timer: 1500,
+                    showConfirmButton: false
+                }).then(() => location.reload());
+            })
+            .catch(() => {
+                Swal.fire('Error', 'Terjadi kesalahan', 'error');
+            });
+        }
+    });
+}
+</script>
