@@ -14,6 +14,13 @@ class MitraKerjaController extends Controller
     {
         $totalMitra = MitraKerja::count(); // total pekerja
         $mitraBaru = MitraKerja::where('created_at', '>=', now()->subMonth())->count(); // pekerja baru dari bulan lalu
+        $mitraMendekati = MitraKerja::where('status_aktif', 1)
+            ->whereNotNull('tgl_akhir_mou')
+            ->whereBetween('tgl_akhir_mou', [
+                now(),
+                now()->addDays(30)
+            ])
+            ->count();
         $tidakAktif = MitraKerja::where('status_aktif', '!=', '1')->count(); // pekerja tidak aktif
 
         // 1. Capture the search query
@@ -33,7 +40,7 @@ class MitraKerjaController extends Controller
         }
 
         // 4. Otherwise, return the full page (header, sidebar, etc)
-        return view('Mitra Kerja.main-mitra-kerja', compact('mitraKerja', 'totalMitra', 'mitraBaru', 'tidakAktif'));
+        return view('Mitra Kerja.main-mitra-kerja', compact('mitraKerja', 'totalMitra', 'mitraBaru', 'mitraMendekati', 'tidakAktif'));
     }
 
     function viewTambahMitraKerja()

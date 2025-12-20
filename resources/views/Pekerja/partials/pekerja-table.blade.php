@@ -13,13 +13,16 @@
                         Identitas Pekerja
                     </th>
                     <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
-                        Kontak
+                        Nomor KPJ
                     </th>
                     <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
-                        Domisili
+                        Penempatan Kerja (Unit)
                     </th>
                     <th class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">
-                        Status
+                        Status PKWT
+                    </th>
+                    <th class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">
+                        Status Keaktifan
                     </th>
                     <th class="relative px-6 py-3"><span class="sr-only">Actions</span></th>
                 </tr>

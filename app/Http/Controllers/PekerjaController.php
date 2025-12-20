@@ -33,7 +33,7 @@ class PekerjaController extends Controller
 
         // 2. Query the database with the filter
         $pekerja = Pekerja::when($q, function ($query) use ($q) {
-            $query->where('nama', 'LIKE', "%$q%")->orWhere('nik', 'LIKE', "%$q%");
+            $query->where('nama', 'LIKE', "%$q%")->orWhere('nik', 'LIKE', "%$q%")->orWhere('kpj', 'LIKE', "%$q%");
         })
             ->orderBy('created_at', 'desc')
             ->paginate(10)
@@ -98,7 +98,7 @@ class PekerjaController extends Controller
             $request->validate(
                 [
                     'nama' => 'required|string|max:255',
-                    'id_pekerja' => 'nullable|string',                    
+                    'id_pekerja' => 'nullable|string',
                     'nik' => 'required|digits:16|unique:pekerja,nik',
                     'no_kk' => 'required|digits:16',
                     'tempat_lahir' => 'required|string|max:100',
@@ -120,7 +120,7 @@ class PekerjaController extends Controller
 
                     'email' => 'nullable|email',
                     'telp' => 'nullable|string|max:16',
-                    'kpj' => 'required|string|max:13', 
+                    'kpj' => 'required|string|max:13',
 
                     'nama_rek' => 'nullable|string',
                     'rekening' => 'nullable|string|max:30',
@@ -310,7 +310,7 @@ class PekerjaController extends Controller
 
                 'nama_rek' => 'nullable|string',
                 'rekening' => 'nullable|string|max:30',
-                'kpj' => 'required|string|max:13', 
+                'kpj' => 'required|string|max:13',
 
                 'nama_emergency' => 'required|string|max:255',
                 'telp_emergency' => 'required|string|max:16',
@@ -434,5 +434,5 @@ class PekerjaController extends Controller
 
 
 
-    
+
 }

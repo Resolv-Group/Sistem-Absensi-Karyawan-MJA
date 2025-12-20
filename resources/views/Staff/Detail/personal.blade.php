@@ -17,12 +17,12 @@
                 <p class="text-base font-semibold text-gray-900">{{ $staff->nik }}</p>
             </div>
             <div>
-                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Tempat Lahir</label>
-                <p class="text-base font-semibold text-gray-900">{{ ucwords($staff->tempat_lahir) }}</p>
+                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Tempat & Tanggal Lahir</label>
+                <p class="text-base font-semibold text-gray-900">{{ ucwords($staff->tempat_lahir) }}, {{ formatTanggal($staff->tgl_lahir) }}</p>
             </div>
             <div>
-                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Tanggal Lahir</label>
-                <p class="text-base font-semibold text-gray-900">{{ formatTanggal($staff->tgl_lahir) }}</p>
+                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">No.KPJ</label>
+                <p class="text-base font-semibold text-gray-900">{{ $staff->kpj }}</p>
             </div>
             <div>
                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Jenis Kelamin</label>

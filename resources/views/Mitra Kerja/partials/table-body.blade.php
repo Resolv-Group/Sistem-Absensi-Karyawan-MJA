@@ -17,7 +17,8 @@
                     @endif
                 </div>
                 <div class="ml-4 min-w-0">
-                    <div class="text-sm font-bold text-gray-900 truncate max-w-xs" title="{{ $mk->nama_mitra }}">{{ $mk->nama_mitra }}</div>
+                    <div class="text-sm font-bold text-gray-900 truncate max-w-xs" title="{{ $mk->nama_mitra }}">
+                        {{ $mk->nama_mitra }}</div>
                     <div class="text-xs text-gray-500 mt-0.5">Telp : {{ $mk->telp_perusahaan }}</div>
                     {{-- <div class="text-xs text-gray-500">Sidoarjo, Jawa Timur</div> --}}
                 </div>
@@ -63,23 +64,37 @@
         </td>
 
         <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-600 align-top">
-            {{ \Carbon\Carbon::parse($mk->tgl_mulai_kerjasama )->translatedFormat('d F Y') }}
+            {{ \Carbon\Carbon::parse($mk->tgl_mulai_kerjasama)->translatedFormat('d F Y') }}
         </td>
-        {{-- <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-red-600 font-medium align-top">
-            {{ \Carbon\Carbon::parse($mk->tgl_akhir_mou )->translatedFormat('d F Y') }}
-        </td> --}}
+        <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-red-600  align-top">
+            {{-- {{ \Carbon\Carbon::parse($mk->tgl_akhir_mou )->translatedFormat('d F Y') }} --}}
+            <span
+                class="
+                    {{ $mk->tgl_mou_auto === 'Segera Habis' ? 'text-yellow-700 font-semibold' : '' }}
+                    {{ $mk->tgl_mou_auto === 'Expired' ? 'text-red-700 font-semibold' : 'text-gray-600' }}
+                ">
+                {{ \Carbon\Carbon::parse($mk->tgl_akhir_mou)->format('d M Y') }}
+            </span>
+        </td>
 
-        {{-- <td class="px-6 py-4 whitespace-nowrap text-center align-top">
-            @php($badge = $mk->status_badge)
+        <td class="px-6 py-4 whitespace-nowrap text-center align-top">
+            @php
+                $status = $mk->status_mou_auto;
+
+                $statusClass = match ($status) {
+                    'Aktif' => 'bg-green-100 text-green-800 border-green-200',
+                    'Segera Habis' => 'bg-yellow-100 text-yellow-800 border-yellow-200',
+                    'Kadaluarsa' => 'bg-red-100 text-red-800 border-red-200',
+                    'Tanpa MoU' => 'bg-gray-100 text-gray-600 border-gray-200',
+                    default => 'bg-gray-100 text-gray-800 border-gray-200',
+                };
+            @endphp
 
             <span
-                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                {{ $badge['bg'] }} {{ $badge['textColor'] }} border {{ $badge['border'] }}">
-
-                <span class="w-1.5 h-1.5 rounded-full mr-1.5 {{ $badge['dot'] }}"></span>
-                {{ $badge['text'] }}
+                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border {{ $statusClass }}">
+                {{ $status }}
             </span>
-        </td> --}}
+        </td>
 
         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
             <div class="flex justify-end gap-2">

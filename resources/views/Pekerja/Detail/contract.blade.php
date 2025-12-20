@@ -17,7 +17,7 @@
                 </svg>
             </div>
             <div>
-                <p class="text-sm font-medium text-blue-800">Status MoU Saat Ini</p>
+                <p class="text-sm font-medium text-blue-800">Status PKWT Saat Ini</p>
                 <p class="text-lg font-bold text-blue-900">Aktif - Valid</p>
             </div>
         </div>

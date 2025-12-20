@@ -17,15 +17,16 @@
                             Pegawai
                         </th>
 
+                        {{-- COLUMN 2: Perusahaan --}}
                         <th scope="col"
                             class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
                             Perusahaan
                         </th>
 
-                        {{-- COLUMN 2: CONTACT --}}
+                        {{-- COLUMN 3: KPJ --}}
                         <th scope="col"
                             class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
-                            Kontak
+                            Nomor KPJ
                         </th>
 
                         {{-- COLUMN 3: TENURE --}}
@@ -37,7 +38,12 @@
                         {{-- COLUMN 4: STATUS  --}}
                         <th scope="col"
                             class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">
-                            Status
+                            Status PKWT
+                        </th>
+
+                        <th scope="col"
+                            class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">
+                            Status Keaktifan
                         </th>
 
                         <th scope="col" class="relative px-6 py-3">

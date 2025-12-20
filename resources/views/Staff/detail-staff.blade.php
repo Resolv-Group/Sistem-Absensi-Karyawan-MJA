@@ -9,15 +9,15 @@
             {{-- Left Side: Breadcrumb & Title --}}
             <div>
                 <nav class="flex text-sm font-medium text-gray-500 mb-2">
-                    <a href="{{route('view.dashboard')}}" class="hover:text-gray-700 transition">Dashboard</a>
+                    <a href="{{ route('view.dashboard') }}" class="hover:text-gray-700 transition">Dashboard</a>
                     <span class="mx-2 text-gray-400">/</span>
-                    <a href="{{route('view.staff')}}" class="hover:text-gray-700 transition">Staff</a>
+                    <a href="{{ route('view.staff') }}" class="hover:text-gray-700 transition">Staff</a>
                     <span class="mx-2 text-gray-400">/</span>
                     <span class="text-blue-600">Detail</span>
                 </nav>
 
                 <div class="flex items-center gap-4">
-                    <a href="{{route('view.staff')}}"
+                    <a href="{{ route('view.staff') }}"
                         class="group p-2 rounded-full border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition shadow-sm">
                         <svg xmlns="http://www.w3.org/2000/svg"
                             class="h-5 w-5 transform group-hover:-translate-x-0.5 transition" fill="none"
@@ -35,11 +35,11 @@
 
             {{-- Right Side: Action Buttons --}}
             <div class="flex items-center gap-3">
-                <button
-                    onclick="confirmToggleStatus({{ $staff->id }}, {{ $staff->status_aktif }})"
+                <button onclick="confirmToggleStatus({{ $staff->id }}, {{ $staff->status_aktif }})"
                     class="px-4 py-2 text-sm font-medium
-                        {{ $staff->status_aktif ? 'text-red-600 bg-red-50 border-red-100 hover:bg-red-100'
-                                                : 'text-emerald-600 bg-emerald-50 border-emerald-100 hover:bg-emerald-100' }}
+                        {{ $staff->status_aktif
+                            ? 'text-red-600 bg-red-50 border-red-100 hover:bg-red-100'
+                            : 'text-emerald-600 bg-emerald-50 border-emerald-100 hover:bg-emerald-100' }}
                         border rounded-lg transition shadow-sm">
                     {{ $staff->status_aktif ? 'Nonaktifkan' : 'Aktifkan' }}
                 </button>
@@ -47,7 +47,7 @@
                     class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition shadow-sm">
                     Cetak Data
                 </button> --}}
-                <a href="{{route('view.ubah.staff', $staff->id)}}"
+                <a href="{{ route('view.ubah.staff', $staff->id) }}"
                     class="px-4 py-2 text-sm font-medium text-white bg-black border border-black rounded-lg hover:bg-gray-800 transition shadow-sm flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
@@ -65,122 +65,117 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
             {{-- LEFT COLUMN: Profile Card --}}
+            {{-- LEFT COLUMN: Profile Card --}}
             <div class="lg:col-span-1">
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-                    {{-- Banner --}}
-                    <div class="h-32 bg-gradient-to-r from-green-500 to-green-600"></div>
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden sticky top-8">
 
-                    <div class="px-6 pb-6 relative text-center">
-                        {{-- Avatar --}}
-                        <div class="relative -mt-16 inline-block">
-                            <div class="h-32 w-32 rounded-full border-4 border-white shadow-md bg-gray-200 overflow-hidden">
-                                {{-- Check if our custom accessor returns data --}}
+                    {{-- Banner & Avatar --}}
+                    <div class="relative">
+                        <div class="h-32 bg-gradient-to-br from-green-500 to-emerald-700"></div>
+                        <div class="absolute -bottom-16 left-0 right-0 flex justify-center">
+                            <div
+                                class="h-32 w-32 rounded-full border-[5px] border-white shadow-lg bg-gray-100 overflow-hidden">
                                 @if ($staff->image_base64)
-                                    {{-- Display the Base64 image --}}
                                     <img src="{{ $staff->image_base64 }}" alt="Foto {{ $staff->nama }}"
                                         class="w-full h-full object-cover" />
                                 @else
-                                    {{-- Fallback image --}}
                                     <img src="https://ui-avatars.com/api/?name={{ urlencode($staff->nama) }}&background=random&size=128"
                                         alt="Profile Placeholder" class="w-full h-full object-cover">
                                 @endif
-
                             </div>
-                        </div>
-
-                        {{-- Name & Unit --}}
-                        <h2 class="mt-4 text-xl font-bold text-gray-900">{{$staff->nama}}</h2>
-                        <span
-                            class="inline-block mt-2 px-3 py-1 text-xs font-semibold text-green-700 bg-green-50 rounded-full border border-green-100">
-                            {{$staff->perusahaan}}
-                        </span>
-
-                        {{-- Info List --}}
-                        <div class="mt-8 text-left space-y-4 border-t border-gray-100 pt-6">
-                            <div class="flex justify-between items-center">
-                                <span class="text-sm text-gray-500 font-medium">ID Karyawan</span>
-                                <span class="text-sm font-bold text-gray-900">{{$staff->id}}</span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-sm text-gray-500 font-medium">Jabatan</span>
-                                <span
-                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
-                                    {{$staff->jabatan}}
-                                </span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-sm text-gray-500 font-medium">Tanggal Bergabung</span>
-                                <span class="text-sm font-bold text-gray-900">{{formatTanggal($staff->tgl_bergabung)}}</span>
-                            </div>
-                            {{-- tgl resign akan Inactive kalau status = aktif  --}}
-                            <div class="flex justify-between items-center">
-                                <span class="text-sm text-gray-500 font-medium">Tanggal Resign</span>
-                                <span class="text-sm font-bold text-gray-900">{{formatTanggal($staff->tgl_resign)}}</span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-sm text-gray-500 font-medium">Status Staff</span>
-                                <span class="text-sm font-bold text-gray-900">{{$staff->status_perjanjian_kerja}}</span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-sm text-gray-500 font-medium">Masa PKWT</span>
-                                <span class="text-sm font-bold text-gray-900">{{formatTanggal($staff->masa_berlaku_pkwt)}}</span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-sm text-gray-500 font-medium">Unit Kerja</span>
-                                <span class="text-sm font-bold text-gray-900">{{$staff->unit_kerja}}</span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-sm text-gray-500 font-medium">Status Perjanjian Kerja</span>
-                                <span
-                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
-                                    <span class="w-1.5 h-1.5 bg-green-600 rounded-full mr-1.5"></span>
-                                    Aktif
-                                </span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-sm text-gray-500 font-medium">Status Keaktifan</span>
-                                @if ($staff->status_aktif == 1)
-                                    <span
-                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                                    bg-green-100 text-green-800 border border-green-200">
-                                        <span class="w-1.5 h-1.5 bg-green-600 rounded-full mr-1.5"></span>
-                                        Aktif
-                                    </span>
-                                @else
-                                    <span
-                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                                    bg-red-100 text-red-800 border border-red-200">
-                                        <span class="w-1.5 h-1.5 bg-red-600 rounded-full mr-1.5"></span>
-                                        Non Aktif
-                                    </span>
-                                @endif
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-sm text-gray-500 font-medium">Dibuat Tanggal: </span>
-                                <span class="text-sm font-bold text-gray-900">{{formatTanggal($staff->created_at)}}</span>
-                            </div>
-                        </div>
-                        <div class="mt-6 grid grid-cols-2 gap-3">
-                            <a href="tel:{{ $staff->telp }}" title="{{ $staff->telp }}"
-                                class="flex items-center justify-center gap-2 w-full py-2 text-sm font-medium text-gray-700 bg-gray-50 rounded-lg hover:bg-gray-100 border border-gray-200 transition">
-                                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z">
-                                    </path>
-                                </svg>
-                                Telepon
-                            </a>
-                            <a href="mailto:{{ $staff->email }}" title="{{ $staff->email }}"
-                                class="flex items-center justify-center gap-2 w-full py-2 text-sm font-medium text-gray-700 bg-gray-50 rounded-lg hover:bg-gray-100 border border-gray-200 transition">
-                                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
-                                </path>
-                                </svg>
-                                Email
-                            </a>
                         </div>
                     </div>
+
+                    {{-- Identity Section --}}
+                    <div class="pt-20 pb-6 px-6 text-center">
+                        <h2 class="text-xl font-bold text-gray-900 leading-tight">{{ $staff->nama }}</h2>
+                        <p class="text-sm font-medium text-gray-500 mt-1">{{ $staff->jabatan }}</p>
+
+                        {{-- Status Badges (Centered) --}}
+                        <div class="mt-4 flex flex-wrap justify-center gap-2">
+                            {{-- Status Keaktifan --}}
+                            @if ($staff->status_aktif == 1)
+                                <span
+                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-50 text-green-700 border border-green-200">
+                                    <span class="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5"></span>
+                                    Aktif
+                                </span>
+                            @else
+                                <span
+                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-50 text-red-700 border border-red-200">
+                                    <span class="w-1.5 h-1.5 bg-red-500 rounded-full mr-1.5"></span>
+                                    Non Aktif
+                                </span>
+                            @endif
+
+                            <span
+                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200">
+                                {{ $staff->perusahaan }}
+                            </span>
+                        </div>
+                    </div>
+
+                    {{-- Quick Stats Grid (Cleaner than a list) --}}
+                    <div class="px-6 pb-6">
+                        <div class="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                            <div class="grid grid-cols-2 gap-y-4 gap-x-2">
+
+                                {{-- ID Staff --}}
+                                <div class="col-span-1">
+                                    <p class="text-xs text-gray-500 uppercase tracking-wider font-semibold">ID Staff</p>
+                                    <p class="text-sm font-bold text-gray-900 mt-0.5 truncate">{{ $staff->id_staff }}</p>
+                                </div>
+
+                                {{-- Unit Kerja --}}
+                                <div class="col-span-1">
+                                    <p class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Unit Kerja</p>
+                                    <p class="text-sm font-bold text-gray-900 mt-0.5 truncate"
+                                        title="{{ $staff->unit_kerja }}">{{ $staff->unit_kerja }}</p>
+                                </div>
+
+                                {{-- Bergabung --}}
+                                <div class="col-span-1">
+                                    <p class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Bergabung</p>
+                                    <p class="text-sm font-medium text-gray-700 mt-0.5">
+                                        {{ formatTanggal($staff->tgl_bergabung) }}</p>
+                                </div>
+
+                                {{-- Status PKWT --}}
+                                <div class="col-span-1">
+                                    <p class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Tipe PKWT</p>
+                                    <p class="text-sm font-medium text-gray-700 mt-0.5">
+                                        {{ $staff->status_perjanjian_kerja }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Contact Actions (Distinct Footer) --}}
+                    <div class="border-t border-gray-100 grid grid-cols-2 divide-x divide-gray-100">
+                        <a href="tel:{{ $staff->telp }}"
+                            class="flex items-center justify-center gap-2 py-4 text-sm font-medium text-gray-600 hover:text-green-600 hover:bg-gray-50 transition group">
+                            <svg class="w-5 h-5 text-gray-400 group-hover:text-green-500 transition" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                            </svg>
+                            <span>Call</span>
+                        </a>
+                        <a href="mailto:{{ $staff->email }}"
+                            class="flex items-center justify-center gap-2 py-4 text-sm font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-50 transition group">
+                            <svg class="w-5 h-5 text-gray-400 group-hover:text-blue-500 transition" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                            <span>Email</span>
+                        </a>
+                    </div>
+                </div>
+
+                {{-- Optional: If you really need the extra dates, put them in a small collapsible text below the card or leave them for the tabs --}}
+                <div class="mt-4 text-center">
+                    <p class="text-xs text-gray-400">Data dibuat pada {{ formatTanggal($staff->created_at) }}</p>
                 </div>
             </div>
 
@@ -232,46 +227,46 @@
 @endsection
 
 <script>
-function confirmToggleStatus(id, statusAktif) {
-    const isAktif = statusAktif == 1;
+    function confirmToggleStatus(id, statusAktif) {
+        const isAktif = statusAktif == 1;
 
-    Swal.fire({
-        title: isAktif ? 'Nonaktifkan staff?' : 'Aktifkan staff?',
-        text: isAktif
-            ? 'staff ini akan dinonaktifkan.'
-            : 'staff ini akan diaktifkan kembali.',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: isAktif ? '#dc2626' : '#059669',
-        cancelButtonColor: '#6b7280',
-        confirmButtonText: isAktif ? 'Ya, nonaktifkan' : 'Ya, aktifkan',
-        cancelButtonText: 'Batal'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            fetch(`/staff/toggle-status/${id}`, {
-                method: 'PUT',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Accept': 'application/json'
-                }
-            })
-            .then(res => {
-                if (!res.ok) throw new Error();
-                return res.json();
-            })
-            .then(data => {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Berhasil',
-                    text: data.message,
-                    timer: 1500,
-                    showConfirmButton: false
-                }).then(() => location.reload());
-            })
-            .catch(() => {
-                Swal.fire('Error', 'Terjadi kesalahan', 'error');
-            });
-        }
-    });
-}
+        Swal.fire({
+            title: isAktif ? 'Nonaktifkan staff?' : 'Aktifkan staff?',
+            text: isAktif ?
+                'staff ini akan dinonaktifkan.' :
+                'staff ini akan diaktifkan kembali.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: isAktif ? '#dc2626' : '#059669',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: isAktif ? 'Ya, nonaktifkan' : 'Ya, aktifkan',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`/staff/toggle-status/${id}`, {
+                        method: 'PUT',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(res => {
+                        if (!res.ok) throw new Error();
+                        return res.json();
+                    })
+                    .then(data => {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil',
+                            text: data.message,
+                            timer: 1500,
+                            showConfirmButton: false
+                        }).then(() => location.reload());
+                    })
+                    .catch(() => {
+                        Swal.fire('Error', 'Terjadi kesalahan', 'error');
+                    });
+            }
+        });
+    }
 </script>

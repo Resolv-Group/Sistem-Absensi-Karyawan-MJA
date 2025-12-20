@@ -98,7 +98,7 @@
                                 <span
                                     class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 border border-yellow-200">
                                     <span class="w-1.5 h-1.5 bg-yellow-600 rounded-full mr-1.5"></span>
-                                    Segera Habis
+                                    Perpanjangan
                                 </span>
                             @elseif($mitraKerja->status_mou === "Tidak Aktif")
                                 <span
