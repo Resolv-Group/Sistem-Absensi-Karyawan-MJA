@@ -64,6 +64,7 @@ class StaffController extends Controller
             $request->validate(
                 [
                     'nama' => 'required|string|max:255',
+                    'id_staff' => 'nullable|string',
                     'nik' => 'required|digits:16|unique:staff,nik',
                     'no_kk' => 'required|digits:16',
                     'tempat_lahir' => 'required|string|max:100',
@@ -85,6 +86,7 @@ class StaffController extends Controller
 
                     'email' => 'nullable|email',
                     'telp' => 'nullable|string|max:16',
+                    'kpj' => 'required|string|max:13', 
 
                     'nama_rek' => 'nullable|string',
                     'rekening' => 'nullable|string|max:30',
@@ -150,10 +152,12 @@ class StaffController extends Controller
                     'kota.required' => 'Kota wajib diisi.',
                     'kecamatan.required' => 'Kecamatan wajib diisi.',
                     'provinsi.required' => 'Provinsi wajib diisi.',
+                    'kpj.required' => 'KPJ wajib diisi.',
 
                     // Kontak
                     'email.email' => 'Format email tidak valid.',
                     'telp.max' => 'No telepon maksimal 16 karakter.',
+                    'kpj' => 'KPJ maksimal 13 karakter',
 
                     // Bank
                     'rekening.max' => 'No rekening maksimal 30 karakter.',
@@ -182,6 +186,7 @@ class StaffController extends Controller
             // ✅ Simpan ke database
             $staff = Staff::create([
                 'nama' => $request->nama,
+                'id_staff' => $request->id_staff,
                 'nik' => $request->nik,
                 'no_kk' => $request->no_kk,
                 'tempat_lahir' => $request->tempat_lahir,
@@ -203,6 +208,7 @@ class StaffController extends Controller
 
                 'email' => $request->email,
                 'telp' => $request->telp,
+                'kpj' => $request->kpj,
 
                 'rekening' => $request->rekening,
                 'nama_rek' => $request->nama_rek,
@@ -278,6 +284,7 @@ class StaffController extends Controller
             $request->validate(
                 [
                     'nama' => 'required|string|max:255',
+                    'id_staff' => 'nullable|string',
 
                     'nik' => ['required', 'digits:16', Rule::unique('staff', 'nik')->ignore($id)],
 
@@ -302,6 +309,7 @@ class StaffController extends Controller
 
                     'email' => 'nullable|email',
                     'telp' => 'nullable|string|max:16',
+                    'kpj' => 'required|string|max:13', 
 
                     'nama_rek' => 'nullable|string',
                     'rekening' => 'nullable|string|max:30',
@@ -370,6 +378,9 @@ class StaffController extends Controller
                     'kecamatan.required' => 'Kecamatan wajib diisi.',
                     'provinsi.required' => 'Provinsi wajib diisi.',
 
+                    'kpj.required' => 'KPJ wajib diisi.',
+                    'kpj' => 'KPJ maksimal 13 karakter',
+                    
                     // Kontak
                     'email.email' => 'Format email tidak valid.',
                     'telp.max' => 'No telepon maksimal 16 karakter.',
