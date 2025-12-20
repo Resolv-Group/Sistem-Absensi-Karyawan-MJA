@@ -109,8 +109,16 @@
                         {{-- SECTION 1: Identitas Perusahaan --}}
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
 
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-1">ID Mitra<span
+                                        class="text-red-500">*</span></label>
+                                <input type="text" name="id_mitra" placeholder="719237981"
+                                    class="w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white focus:border-blue-500 focus:ring-blue-200 transition py-2.5 px-4 text-sm font-medium"
+                                    value="{{ old('id_mitra') }}" maxlength="16">
+                            </div>
+
                             {{-- Nama Mitra --}}
-                            <div class="sm:col-span-2">
+                            <div>
                                 <label class="block text-sm font-bold text-gray-700 mb-1">Nama Perusahaan / Mitra <span
                                         class="text-red-500">*</span></label>
                                 <input type="text" name="nama_mitra" placeholder="PT. Contoh Sejahtera Abadi"

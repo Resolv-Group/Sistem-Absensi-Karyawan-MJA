@@ -29,6 +29,10 @@
                 <p class="mt-1 text-2xl font-bold text-gray-900">{{ $mitraBaru }}</p>
             </div>
             <div class="border-r border-gray-100 last:border-0">
+                <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Mendekati</p>
+                <p class="mt-1 text-2xl font-bold text-gray-900">{{ $mitraMendekati }}</p>
+            </div>
+            <div class="border-r border-gray-100 last:border-0">
                 <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Tidak Aktif</p>
                 <p class="mt-1 text-2xl font-bold text-gray-900">{{ $tidakAktif }}</p>
             </div>

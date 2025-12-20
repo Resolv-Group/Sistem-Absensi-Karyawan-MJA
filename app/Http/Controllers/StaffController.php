@@ -29,6 +29,7 @@ class StaffController extends Controller
             $query
                 ->where('nama', 'LIKE', "%$q%")
                 ->orWhere('nik', 'LIKE', "%$q%")
+                ->orWhere('kpj', 'LIKE', "%$q%")
                 ->Where('status_aktif', 1);
         })
             ->orderBy('created_at', 'desc')
@@ -86,7 +87,7 @@ class StaffController extends Controller
 
                     'email' => 'nullable|email',
                     'telp' => 'nullable|string|max:16',
-                    'kpj' => 'required|string|max:13', 
+                    'kpj' => 'required|string|max:13',
 
                     'nama_rek' => 'nullable|string',
                     'rekening' => 'nullable|string|max:30',
@@ -309,7 +310,7 @@ class StaffController extends Controller
 
                     'email' => 'nullable|email',
                     'telp' => 'nullable|string|max:16',
-                    'kpj' => 'required|string|max:13', 
+                    'kpj' => 'required|string|max:13',
 
                     'nama_rek' => 'nullable|string',
                     'rekening' => 'nullable|string|max:30',
@@ -380,7 +381,7 @@ class StaffController extends Controller
 
                     'kpj.required' => 'KPJ wajib diisi.',
                     'kpj' => 'KPJ maksimal 13 karakter',
-                    
+
                     // Kontak
                     'email.email' => 'Format email tidak valid.',
                     'telp.max' => 'No telepon maksimal 16 karakter.',

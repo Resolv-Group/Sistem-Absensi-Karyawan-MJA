@@ -99,8 +99,24 @@
                     {{-- Fields (Right Side) --}}
                     <div class="md:col-span-9 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
 
+
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">ID Pekerja</label>
+
+                            <input type="text" name="id_pekerja" maxlength="16" autocomplete="off"
+                                class="id-input w-full rounded-lg shadow-sm border
+                                @error('id_pekerja') border-red-500 bg-red-50 @else border-gray-500 bg-gray-50 @enderror
+                                text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400
+                                focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition"
+                                placeholder="Input ID Karyawan" value="{{ old('id_pekerja') }}">
+
+                            @error('id_pekerja')
+                                <p class=" text-red-600 text-xs mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
                         {{-- Nama Lengkap --}}
-                        <div class="sm:col-span-2">
+                        <div>
                             <label class="block text-sm font-bold text-gray-700 mb-1">Nama Lengkap</label>
                             <input type="text" name="nama" maxlength="255" autocomplete="off"
                                 class="nama-input w-full rounded-lg shadow-sm border
@@ -111,6 +127,7 @@
                             @error('nama')
                                 <p class="text-red-600 text-xs mt-1">{{ $message }}</p>
                             @enderror
+
                         </div>
 
                         {{-- NIK --}}
