@@ -19,11 +19,11 @@ class Staff extends Model
 
 
     protected $fillable = [
-        'nama','nik','no_kk','email','telp','foto','alamat','desa','kecamatan','kota','provinsi',
+        'nama','id_staff','nik','no_kk','email','telp','foto','alamat','desa','kecamatan','kota','provinsi',
 
         'unit_kerja','rekening','nama_rek','rt','rw','tempat_lahir','tgl_lahir','tgl_bergabung','tgl_resign',
 
-        'masa_berlaku_pkwt', 'perusahaan',
+        'masa_berlaku_pkwt', 'perusahaan','kpj',
 
         'kelamin','status_kawin','pendidikan','status_aktif',
 

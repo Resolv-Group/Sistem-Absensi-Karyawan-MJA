@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('pekerja', function (Blueprint $table) {
             $table->id();
+            $table->string('id_pekerja', 32);
 
             $table->string('nama', 150);
             $table->string('nik', 30)->unique();
@@ -38,6 +39,7 @@ return new class extends Migration
             $table->date('tgl_lahir');
             $table->date('tgl_bergabung');
             $table->date('tgl_resign')->nullable();
+            $table->string('kpj', 13);
 
             $table->boolean('kelamin')->comment('1=laki,0=perempuan');
             $table->string('status_kawin', 50);
