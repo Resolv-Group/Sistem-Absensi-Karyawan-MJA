@@ -23,7 +23,7 @@ class AdminUserSeeder extends Seeder
 
             $staff = Staff::create([
                 'nama' => $faker->name,
-                'id_staff' => $faker->number,
+                'id_staff' => $faker->unique()->numerify('################'),
                 'nik' => $faker->unique()->numerify('################'),
                 'no_kk' => $faker->numerify('################'),
                 'tempat_lahir' => $faker->city,
@@ -45,7 +45,7 @@ class AdminUserSeeder extends Seeder
                 'rekening' => $faker->bankAccountNumber,
                 'nama_rek' => $faker->name,
 
-                'kpj' => $faker->number,
+                'kpj' => $faker->unique()->numerify('#############'),
                 'nama_emergency' => $faker->name,
                 'ibu_kandung' => $faker->name,
                 'tgl_resign' => $faker->date(),
@@ -77,7 +77,7 @@ class AdminUserSeeder extends Seeder
 
             Pekerja::create([
                 'nama' => $faker->name,
-                'id_pekerja' => $faker->number,
+                'id_pekerja' => $faker->unique()->numerify('################'),
                 'nik' => $faker->unique()->numerify('################'),
                 'no_kk' => $faker->numerify('################'),
                 'tempat_lahir' => $faker->city,
@@ -101,7 +101,7 @@ class AdminUserSeeder extends Seeder
                 // KONTAK
                 'email' => $faker->safeEmail,
                 'telp' => $faker->phoneNumber,
-                'kpj' => $faker->number,
+                'kpj' => $faker->unique()->numerify('#############'),
 
                 // BANK
                 'rekening' => $faker->bankAccountNumber,
@@ -133,7 +133,7 @@ class AdminUserSeeder extends Seeder
 
             $staff = Staff::create([
                 'nama' => $role['jabatan'].' System',
-                'id_staff' => $faker->number,
+                'id_staff' => $faker->unique()->numerify('################'),
                 'nik' => $faker->unique()->numerify('################'),
                 'no_kk' => $faker->numerify('################'),
                 'tempat_lahir' => $faker->city,
@@ -159,7 +159,7 @@ class AdminUserSeeder extends Seeder
                 'perusahaan' => $faker->name,
                 'tgl_resign' => null,
                 'masa_berlaku_pkwt' => null,
-                'kpj' => $faker->number,
+                'kpj' => $faker->unique()->numerify('#############'),
                 'hubungan_emergency' => 'Orang Tua',
                 'telp_emergency' => '08111111111',
                 'jabatan' => $role['jabatan'],
