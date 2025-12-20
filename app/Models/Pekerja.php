@@ -20,7 +20,7 @@ class Pekerja extends Model
     protected $fillable = [
         'nama','id_pekerja','nik','no_kk','email','telp','foto', 'dokumen' ,'alamat','desa','kecamatan','kota','provinsi',
 
-        'rekening','nama_rek','rt','rw','tempat_lahir','tgl_lahir','tgl_bergabung','tgl_resign',
+        'rekening','nama_rek','rt','rw','tempat_lahir','tgl_lahir','tgl_bergabung','tgl_resign','kpj',
 
         'kelamin','status_kawin','pendidikan','status_aktif', 'anak',
 
