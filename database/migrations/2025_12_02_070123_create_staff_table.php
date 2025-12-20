@@ -9,6 +9,7 @@ return new class extends Migration
     public function up(): void {
         Schema::create('staff', function (Blueprint $table) {
             $table->id();
+            $table->string('id_staff', 32);
 
             $table->string('nama', 150);
             $table->string('nik', 30)->unique();
@@ -35,6 +36,7 @@ return new class extends Migration
             $table->date('tgl_resign')->nullable();
             $table->date('masa_berlaku_pkwt')->nullable();
             $table->string('perusahaan', 100);
+            $table->string('kpj', 13);
 
             $table->boolean('kelamin')->comment('1=laki,0=perempuan');
             $table->string('status_kawin', 50);
