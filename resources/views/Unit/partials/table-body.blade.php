@@ -1,71 +1,91 @@
 @forelse ($unit as $u)
-    <tr class="hover:bg-gray-50 transition-colors duration-150 group">
-        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 align-top">
+    <tr class="hover:bg-gray-50 transition-colors duration-200 group border-b border-gray-100 last:border-0">
+
+        {{-- 1. INDEX --}}
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400 font-medium w-1">
             {{ ($unit->currentPage() - 1) * $unit->perPage() + $loop->iteration }}.
         </td>
 
-        <td class="px-6 py-4 whitespace-nowrap align-top max-w-[450px]">
-            <div class="flex items-start">
-                {{-- <div class="flex-shrink-0 h-10 w-10">
-                    @if ($u->image_base64)
-                        <img class="h-10 w-10 rounded-lg bg-orange-100 flex items-center justify-center text-orange-600 font-bold"
-                            src="{{ $u->image_base64 }}" alt="{{ $u->nama_unit }}">
-                    @else
-                        <img class="h-10 w-10 rounded-lg bg-orange-100 flex items-center justify-center text-orange-600 font-bold"
-                            src="https://ui-avatars.com/api/?name={{ urlencode($u->nama_unit) }}&background=random&color=fff&size=128"
-                            alt="">
-                    @endif
-                </div> --}}
-                <div class="ml-4 min-w-0">
-                    <div class="text-sm font-bold text-gray-900 truncate max-w-xs" title="{{ $u->nama_unit }}">
-                        {{ $u->namaMitra->nama_mitra }}</div>
-                    {{-- <div class="text-xs text-gray-500 mt-0.5">Telp : {{ $mk->telp_perusahaan }}</div> --}}
-                    {{-- <div class="text-xs text-gray-500">Sidoarjo, Jawa Timur</div> --}}
+        {{-- 2. UNIT / MITRA NAME --}}
+        <td class="px-6 py-4 align-middle">
+            <div class="flex items-center gap-4">
+                {{-- Generated Avatar / Icon --}}
+                <div
+                    class="flex-shrink-0 h-10 w-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-sm shadow-sm border border-blue-100">
+                    {{ substr($u->namaMitra->nama_mitra ?? 'U', 0, 1) }}
+                </div>
+
+                <div class="min-w-0">
+                    {{-- Main Text (Mitra Name) --}}
+                    <div class="text-sm font-bold text-gray-900 truncate max-w-[200px]"
+                        title="{{ $u->namaMitra->nama_mitra }}">
+                        {{ $u->namaMitra->nama_mitra }}
+                    </div>
+                    {{-- Sub Text (Unit Name or ID) --}}
+                    <div class="text-xs text-gray-500 mt-0.5 flex items-center gap-1">
+                        <span class="truncate max-w-[150px]">{{ $u->nama_unit ?? 'Unit Umum' }}</span>
+                    </div>
                 </div>
             </div>
         </td>
 
-        <td class="px-6 py-4 whitespace-nowrap text-center align-top">
-            <span class="inline-flex items-center px-2.5 py-1 rounded-md text-sm font-bold bg-gray-100 text-gray-800">
-                {{ $u->id }}
-            </span>
-        </td>
-        <td class="px-6 py-4 whitespace-nowrap text-center align-top">
-            <span
-                class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100">
-                {{ optional(optional($u->picUnit)->staff)->nama ?? '-' }}
+        {{-- 3. ID (Monospace for technical look) --}}
+        <td class="px-6 py-4 whitespace-nowrap text-center">
+            <span class="font-mono text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded border border-gray-200">
+                #{{ $u->id }}
             </span>
         </td>
 
+        {{-- 4. PIC (Clean look with icon) --}}
+        <td class="px-6 py-4 whitespace-nowrap">
+            <div class="flex items-center justify-center gap-2 text-gray-600">
+                @if (optional(optional($u->picUnit)->staff)->nama)
+                    <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                    <span class="text-sm font-medium">{{ optional($u->picUnit->staff)->nama }}</span>
+                @else
+                    <span class="text-xs text-gray-400 italic">Belum diset</span>
+                @endif
+            </div>
+        </td>
+
+        {{-- 5. PAYMENT SYSTEM --}}
         @php
-            $sistemPengajian = [
-                1 => 'Harian',
-                2 => 'Borongan',
-            ];
+            $sistemPengajian = [1 => 'Harian', 2 => 'Borongan'];
+            $colors = [1 => 'text-purple-600 bg-purple-50', 2 => 'text-orange-600 bg-orange-50'];
         @endphp
-
-        <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-600 align-top">
-            {{ $sistemPengajian[$u->sistem_pengajian] ?? '-' }}
+        <td class="px-6 py-4 whitespace-nowrap text-center">
+            <span
+                class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium {{ $colors[$u->sistem_pengajian] ?? 'text-gray-600 bg-gray-50' }}">
+                {{ $sistemPengajian[$u->sistem_pengajian] ?? '-' }}
+            </span>
         </td>
-        <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-600 align-top">
+
+        {{-- 6. STAT (Total Workers) --}}
+        <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-600 font-medium">
             100
         </td>
+
+        {{-- 7. STATUS --}}
         <td class="px-6 py-4 whitespace-nowrap text-center">
             @if ($u->status_aktif == 1)
-                <span
-                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
-                    <span class="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5"></span>
+                <div
+                    class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">
+                    <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full mr-1.5 animate-pulse"></span>
                     Aktif
-                </span>
+                </div>
             @else
-                <span
-                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 border border-red-200">
-                    <span class="w-1.5 h-1.5 bg-red-500 rounded-full mr-1.5"></span>
+                <div
+                    class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200">
+                    <span class="w-1.5 h-1.5 bg-gray-400 rounded-full mr-1.5"></span>
                     Non-Aktif
-                </span>
+                </div>
             @endif
         </td>
 
+        {{-- 8. ACTIONS --}}
         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
             <div class="flex justify-end gap-2">
                 <!-- Edit -->
