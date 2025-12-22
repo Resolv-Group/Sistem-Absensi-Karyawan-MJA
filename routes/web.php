@@ -106,7 +106,7 @@ Route::middleware(['auth', 'role:hrd,pic,admin'])->group(function(){
     Route::put('/mitra-kerja/toggle-status/{id}', [MitraKerjaController::class, 'toggleStatus']);
 
     Route::get('/unit', [UnitController::class, 'viewUnitMain'])->name('view.unit');
-    Route::get('/unit/tambah-harian', [UnitController::class, 'viewTambahUnitHarian'])->name('view.tambah.unit-harian');
+    Route::get('/unit/tambah', [UnitController::class, 'viewTambahUnit'])->name('view.tambah.unit');
     Route::get('/unit/tambah-borongan', [UnitController::class, 'viewTambahUnitBorongan'])->name('view.tambah.unit-borongan');
     Route::get('/unit/detail/{id}', [UnitController::class, 'viewDetailUnit'])->name('view.detail.unit');
     Route::POST('/tambah-unit-harian', [UnitController::class, 'tambahUnitHarian'])->name('tambah.unit-harian.post');
