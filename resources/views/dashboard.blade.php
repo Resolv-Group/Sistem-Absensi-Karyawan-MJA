@@ -100,6 +100,8 @@
                         open: false,
                         selected: '{{ $selectedYear }}',
                         list: [
+                            { val: '2027', label: 'Tahun 2027' },
+                            { val: '2026', label: 'Tahun 2026' },
                             { val: '2025', label: 'Tahun 2025' },
                             { val: '2024', label: 'Tahun 2024' },
                             { val: '2023', label: 'Tahun 2023' }
