@@ -108,15 +108,14 @@
                     {{-- Fields (Right Side) --}}
                     <div class="md:col-span-9 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
 
-                        {{-- Nama Lengkap --}}
-                        <div class="sm:col-span-2">
-                            <label class="block text-sm font-bold text-gray-700 mb-1">Nama Lengkap</label>
-                            <input type="text" name="nama" maxlength="255" autocomplete="off"
-                                value="{{ old('nama', $staff->nama) }}"
+                        {{-- ID Staff --}}
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">ID Staff</label>
+                            <input type="text" name="id_staff" maxlength="16" autocomplete="off"
+                                value="{{ old('id_staff', $staff->id_staff) }}"
                                 class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition"
-                                placeholder="Sesuai KTP">
+                                placeholder="16 Digit Angka">
                         </div>
-
 
                         {{-- NIK --}}
                         <div>
@@ -126,6 +125,25 @@
                                 class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition"
                                 placeholder="16 Digit Angka">
                         </div>
+
+                        {{-- Nama Lengkap --}}
+                        <div class="sm:col-span-2">
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Nama Lengkap</label>
+                            <input type="text" name="nama" maxlength="255" autocomplete="off"
+                                value="{{ old('nama', $staff->nama) }}"
+                                class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition"
+                                placeholder="Sesuai KTP">
+                        </div>
+
+                        {{-- kpj --}}
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">No.KPJ (BPJS)</label>
+                            <input type="text" name="kpj" maxlength="11" autocomplete="off"
+                                value="{{ old('kpj', $staff->kpj) }}"
+                                class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition"
+                                placeholder="11 Digit Angka">
+                        </div>
+
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-1">Nomor Kartu Keluarga</label>
                             <input type="text" name="no_kk" maxlength="16" autocomplete="off"

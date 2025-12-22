@@ -113,8 +113,23 @@
                                 <p class="text-red-600 text-xs mt-1">{{ $message }}</p>
                             @enderror
                         </div>
-                        {{-- Nama Lengkap --}}
+                        {{-- NIK --}}
                         <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">NIK</label>
+
+                            <input type="text" name="nik" maxlength="16" autocomplete="off"
+                                class="nik-input w-full rounded-lg shadow-sm border
+                                @error('nik') border-red-500 bg-red-50 @else border-gray-500 bg-gray-50 @enderror
+                                text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400
+                                focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition"
+                                placeholder="16 Digit Angka" value="{{ old('nik') }}">
+
+                            @error('nik')
+                                <p class="error-nik text-red-600 text-xs mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        {{-- Nama Lengkap --}}
+                        <div class="sm:col-span-2">
                             <label class="block text-sm font-bold text-gray-700 mb-1">Nama Lengkap</label>
                             <input type="text" name="nama" maxlength="255" autocomplete="off"
                                 class="nama-input w-full rounded-lg shadow-sm border
@@ -129,16 +144,16 @@
 
                         {{-- NIK --}}
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-1">NIK</label>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">No.KPJ (BPJS)</label>
 
-                            <input type="text" name="nik" maxlength="16" autocomplete="off"
-                                class="nik-input w-full rounded-lg shadow-sm border
-                                @error('nik') border-red-500 bg-red-50 @else border-gray-500 bg-gray-50 @enderror
+                            <input type="text" name="kpj" maxlength="11" autocomplete="off"
+                                class="kpj-input w-full rounded-lg shadow-sm border
+                                @error('kpj') border-red-500 bg-red-50 @else border-gray-500 bg-gray-50 @enderror
                                 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400
                                 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition"
-                                placeholder="16 Digit Angka" value="{{ old('nik') }}">
+                                placeholder="11 Digit Angka" value="{{ old('kpj') }}">
 
-                            @error('nik')
+                            @error('kpj')
                                 <p class="error-nik text-red-600 text-xs mt-1">{{ $message }}</p>
                             @enderror
                         </div>

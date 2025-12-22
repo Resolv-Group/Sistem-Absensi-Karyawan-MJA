@@ -73,19 +73,11 @@
         </td>
 
         <td class="px-6 py-4 whitespace-nowrap text-center">
-            @if ($p->status_aktif)
-                <span
-                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
-                    <span class="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5"></span>
-                    Aktif
-                </span>
-            @else
-                <span
-                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 border border-red-200">
-                    <span class="w-1.5 h-1.5 bg-red-500 rounded-full mr-1.5"></span>
-                    Non-Aktif
-                </span>
-            @endif
+            <span
+                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 border border-red-200">
+                <span class="w-1.5 h-1.5 bg-red-500 rounded-full mr-1.5"></span>
+                Non-Aktif
+            </span>
         </td>
 
         <td class="px-6 py-4 whitespace-nowrap text-center">
@@ -136,7 +128,15 @@
 @empty
     <tr>
         <td colspan="6" class="px-6 py-10 text-center text-gray-500">
-            Tidak ditemukan.
+            <div class="flex flex-col items-center justify-center">
+                <svg class="w-12 h-12 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
+                    </path>
+                </svg>
+                <p class="font-medium">Belum ada data pekerja.</p>
+                <p class="text-sm mt-1">Silakan tambah pekerja baru.</p>
+            </div>
         </td>
     </tr>
 @endforelse

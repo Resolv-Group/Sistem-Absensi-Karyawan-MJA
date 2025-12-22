@@ -35,6 +35,8 @@
         @yield('content')
     </div>
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
     @yield('scripts')
 
     <!-- Loading Screen -->
@@ -52,6 +54,7 @@
     </style>
 
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
 
 
     <script>

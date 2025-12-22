@@ -10,8 +10,41 @@ use Illuminate\Http\Request;
 
 class MitraKerjaController extends Controller
 {
+    // function viewMitraKerjaMain(Request $request)
+    // {
+    //     $totalMitra = MitraKerja::count(); // total pekerja
+    //     $mitraBaru = MitraKerja::where('created_at', '>=', now()->subMonth())->count(); // pekerja baru dari bulan lalu
+    //     $mitraMendekati = MitraKerja::where('status_aktif', 1)
+    //         ->whereNotNull('tgl_akhir_mou')
+    //         ->whereBetween('tgl_akhir_mou', [
+    //             now(),
+    //             now()->addDays(30)
+    //         ])
+    //         ->count();
+    //     $tidakAktif = MitraKerja::where('status_aktif', '!=', '1')->count(); // pekerja tidak aktif
+
+    //     // 1. Capture the search query
+    //     $q = $request->input('q');
+
+    //     // 2. Query the database with the filter
+    //     $mitraKerja = MitraKerja::when($q, function ($query) use ($q) {
+    //         $query->where('nama_mitra', 'LIKE', "%$q%");
+    //     })
+    //         ->orderBy('created_at', 'desc')
+    //         ->paginate(10)
+    //         ->withQueryString(); // Keeps the search term in the pagination links
+
+    //     // 3. If it's an AJAX request (from JS), return ONLY the table partial
+    //     if ($request->ajax()) {
+    //         return view('Mitra Kerja.partials.mitra-kerja-table', compact('mitraKerja'))->render();
+    //     }
+
+    //     // 4. Otherwise, return the full page (header, sidebar, etc)
+    //     return view('Mitra Kerja.main-mitra-kerja', compact('mitraKerja', 'totalMitra', 'mitraBaru', 'mitraMendekati', 'tidakAktif'));
+    // }
     function viewMitraKerjaMain(Request $request)
     {
+        // --- 1. CALCULATE STATS (Top Cards) ---
         $totalMitra = MitraKerja::count(); // total pekerja
         $mitraBaru = MitraKerja::where('created_at', '>=', now()->subMonth())->count(); // pekerja baru dari bulan lalu
         $mitraMendekati = MitraKerja::where('status_aktif', 1)
@@ -23,23 +56,48 @@ class MitraKerjaController extends Controller
             ->count();
         $tidakAktif = MitraKerja::where('status_aktif', '!=', '1')->count(); // pekerja tidak aktif
 
-        // 1. Capture the search query
-        $q = $request->input('q');
+        // --- 2. BUILD QUERY ---
+        $query = MitraKerja::query();
 
-        // 2. Query the database with the filter
-        $mitraKerja = MitraKerja::when($q, function ($query) use ($q) {
-            $query->where('nama_mitra', 'LIKE', "%$q%");
-        })
-            ->orderBy('created_at', 'desc')
-            ->paginate(10)
-            ->withQueryString(); // Keeps the search term in the pagination links
+        // A. Filter by Search (Name, NIK, KPJ)
+        // We check for 'search' (from new JS) or 'q' (fallback)
+        $search = $request->input('search') ?? $request->input('q');
 
-        // 3. If it's an AJAX request (from JS), return ONLY the table partial
+        $query->when($search, function ($q) use ($search) {
+            $q->where(function ($sub) use ($search) {
+                $sub->where('nama_mitra', 'LIKE', "%{$search}%"); // Ensure column name is 'no_kpj' or 'kpj' based on your DB
+            });
+        });
+
+        // B. Filter by Status (Exact Match)
+        // We use $request->filled() to ensure we don't filter if value is empty/null
+        $query->when($request->filled('status'), function ($q) use ($request) {
+            $q->where('status_aktif', $request->status);
+        });
+
+        // C. Filter by Date Range (Tanggal Bergabung)
+        $query->when($request->start_date, function ($q) use ($request) {
+            $q->whereDate('tgl_akhir_mou', '>=', $request->start_date);
+        });
+
+        $query->when($request->end_date, function ($q) use ($request) {
+            $q->whereDate('tgl_akhir_mou', '<=', $request->end_date);
+        });
+
+        // --- 3. FETCH DATA ---
+        $mitraKerja = $query->orderBy('created_at', 'desc')
+                        ->paginate(10)
+                        ->withQueryString();
+
+
+        // --- 4. RETURN RESPONSE ---
+
+        // If AJAX request (from the search/filter script), return ONLY the table partial
         if ($request->ajax()) {
             return view('Mitra Kerja.partials.mitra-kerja-table', compact('mitraKerja'))->render();
         }
 
-        // 4. Otherwise, return the full page (header, sidebar, etc)
+        // Otherwise return the full page
         return view('Mitra Kerja.main-mitra-kerja', compact('mitraKerja', 'totalMitra', 'mitraBaru', 'mitraMendekati', 'tidakAktif'));
     }
 
