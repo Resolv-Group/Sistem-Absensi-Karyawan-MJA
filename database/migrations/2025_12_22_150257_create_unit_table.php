@@ -25,6 +25,7 @@ return new class extends Migration
             $table->char('nama_unit');
             $table->integer('persentase_management_fee');
             $table->integer('sistem_pengajian');
+            $table->integer('status_aktif')->default(1);
 
             $table->timestamps();
         });
