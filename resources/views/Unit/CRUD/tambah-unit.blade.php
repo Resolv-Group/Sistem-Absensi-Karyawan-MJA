@@ -6,7 +6,7 @@
         {{-- HEADER SECTION --}}
         <div class="mb-8">
             <nav class="flex text-sm font-medium text-gray-500 mb-2">
-                <a href="/mitra-kerja" class="hover:text-gray-700 transition">Mitra Kerja</a>
+                <a href="/mitra-kerja" class="hover:text-gray-700 transition">Unit</a>
                 <span class="mx-2 text-gray-400">/</span>
                 <span class="text-blue-600">Tambah</span>
             </nav>
@@ -22,8 +22,8 @@
                     </svg>
                 </a>
                 <div>
-                    <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Tambah Mitra Kerja</h1>
-                    <p class="text-sm text-gray-500 mt-1">Isi formulir di bawah untuk mendaftarkan informasi mitra kerja
+                    <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Tambah Unit</h1>
+                    <p class="text-sm text-gray-500 mt-1">Isi formulir di bawah untuk mendaftarkan informasi Unit
                         baru.</p>
                 </div>
             </div>
@@ -55,7 +55,7 @@
                         </svg>
                     </div>
                     <div>
-                        <h2 class="text-xl font-bold text-gray-900">Tambah Mitra Kerja</h2>
+                        <h2 class="text-xl font-bold text-gray-900">Tambah Unit</h2>
                         <p class="text-sm text-gray-500">Lengkapi data identitas perusahaan dan status kontrak.</p>
                     </div>
                 </div>
@@ -63,45 +63,7 @@
 
             <div class="p-8">
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
-
-                    {{-- LEFT COLUMN: Logo Upload --}}
-                    <div class="md:col-span-4 lg:col-span-3 space-y-4">
-                        <label class="block text-sm font-bold text-gray-700">Logo Perusahaan</label>
-
-                        <div class="relative w-full aspect-square rounded-2xl border-2 border-dashed border-gray-300 hover:border-blue-500 hover:bg-blue-50/50 transition overflow-hidden flex flex-col items-center justify-center bg-gray-50 cursor-pointer group"
-                            onclick="document.getElementById('fotoInput').click()">
-
-                            <input type="file" id="fotoInput" name="foto" accept="image/*" class="hidden"
-                                onchange="previewPhoto(event)">
-
-                            {{-- Placeholder --}}
-                            <div id="placeholder" class="text-center pointer-events-none p-4">
-                                <div
-                                    class="bg-white p-3 rounded-full shadow-sm inline-block mb-3 group-hover:scale-110 transition-transform duration-200">
-                                    <svg class="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24"
-                                        stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                    </svg>
-                                </div>
-                                <p class="text-sm font-semibold text-gray-900">Upload Logo</p>
-                                <p class="text-xs text-gray-500 mt-1">PNG, JPG (Max 2MB)</p>
-                            </div>
-
-                            {{-- Preview --}}
-                            <img id="previewImage" class="absolute inset-0 w-full h-full object-cover hidden"
-                                alt="Preview Foto">
-
-                            {{-- Remove Button --}}
-                            <button type="button" id="removeBtn" onclick="removePhoto(event)"
-                                class="absolute top-2 right-2 bg-white text-red-600 p-1.5 rounded-full shadow-md hover:bg-red-50 transition hidden z-10">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M6 18L18 6M6 6l12 12"></path>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
+                    
 
                     {{-- RIGHT COLUMN: Form Inputs --}}
                     <div class="md:col-span-8 lg:col-span-9 space-y-8">
@@ -110,7 +72,7 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
 
                             <div>
-                                <label class="block text-sm font-bold text-gray-700 mb-1">ID Mitra<span
+                                <label class="block text-sm font-bold text-gray-700 mb-1">ID Unit<span
                                         class="text-red-500">*</span></label>
                                 <input type="text" name="id_mitra" placeholder="719237981"
                                     class="w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white focus:border-blue-500 focus:ring-blue-200 transition py-2.5 px-4 text-sm font-medium"
@@ -119,7 +81,7 @@
 
                             {{-- Nama Mitra --}}
                             <div>
-                                <label class="block text-sm font-bold text-gray-700 mb-1">Nama Perusahaan / Mitra <span
+                                <label class="block text-sm font-bold text-gray-700 mb-1">Nama Unit<span
                                         class="text-red-500">*</span></label>
                                 <input type="text" name="nama_mitra" placeholder="PT. Contoh Sejahtera Abadi"
                                     class="w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white focus:border-blue-500 focus:ring-blue-200 transition py-2.5 px-4 text-sm font-medium"
@@ -130,18 +92,7 @@
 
                                 {{-- Label & Add Button --}}
                                 <div class="flex justify-between items-center mb-1">
-                                    <label class="block text-sm font-bold text-gray-700">Bidang Usaha</label>
-
-                                    {{-- Quick Add Trigger --}}
-                                    <button type="button" @click="openModal()"
-                                        class="text-xs flex items-center gap-1 text-blue-600 hover:text-blue-800 font-semibold transition"
-                                        title="Tambah Bidang Usaha Baru">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M12 4v16m8-8H4"></path>
-                                        </svg>
-                                        Tambah Baru
-                                    </button>
+                                    <label class="block text-sm font-bold text-gray-700">Mitra Kerja</label>              
                                 </div>
 
                                 {{-- 1. HIDDEN INPUT (Stores the ID for the backend) --}}
@@ -325,51 +276,16 @@
                                     </div>
                                 </div>
                             </div>
-
-                            {{-- Pimpinan --}}
-                            <div>
-                                <label class="block text-sm font-bold text-gray-700 mb-1">Nama Pimpinan</label>
-                                <div class="relative">
-                                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z">
-                                            </path>
-                                        </svg>
-                                    </span>
-                                    <input type="text" name="pimpinan" placeholder="Nama Direktur"
-                                        class="w-full pl-10 rounded-lg border-gray-300 bg-gray-50 focus:bg-white focus:border-blue-500 focus:ring-blue-200 transition py-2.5 px-4 text-sm font-medium"
-                                        value="{{ old('pimpinan') }}">
-                                </div>
-                            </div>
-
-                            {{-- Telepon --}}
-                            <div>
-                                <label class="block text-sm font-bold text-gray-700 mb-1">No. Telp Perusahaan</label>
-                                <div class="relative">
-                                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
-
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z">
-                                            </path>
-                                        </svg>
-                                    </span>
-                                    <input type="text" name="telp_perusahaan" placeholder="021-xxxx / 081-xxxx"
-                                        maxlength="13"
-                                        class="telp_perusahaan-input w-full pl-10 rounded-lg border-gray-300 bg-gray-50 focus:bg-white focus:border-blue-500 focus:ring-blue-200 transition py-2.5 px-4 text-sm font-medium"
-                                        value="{{ old('telp_perusahaan') }}">
-                                </div>
-                            </div>
-
-                            <div x-data="{ open: false, selected: '{{ old('status_pajak') }}' || '', list: ['PKP (Pengusaha Kena Pajak)', 'NON-PKP', ] }" class="relative">
-                                <label class="block text-sm font-bold text-gray-700 mb-1">Status Pajak</label>
+                
+                            {{-- Sistem Pengajian --}}
+                            <div x-data="{ open: false, selected: '{{ old('status_pajak') }}' || 'Harian', list: ['Harian', 'Borongan', ] }" class="relative">
+                                <label class="block text-sm font-bold text-gray-700 mb-1">Sistem Pengajian</label>
 
                                 <input type="hidden" name="status_pajak" x-model="selected">
 
                                 <div @click="open=!open"
                                     class=" bg-gray-50 rounded-lg py-2.5 px-3 cursor-pointer flex justify-between items-center select-none shadow-sm hover:border-gray-200 hover:ring-1 hover:ring-gray-200 transition">
-                                    <span x-text="selected || 'Pilih Status Pajak'"
+                                    <span x-text="selected || 'Pilih Sistem Pengajian'"
                                         :class="selected ? 'text-gray-900' : 'text-gray-400'"></span>
                                     <svg class="w-4 h-4 text-gray-500" :class="{ 'rotate-180': open }" fill="none"
                                         stroke="currentColor" viewBox="0 0 24 24">
@@ -394,7 +310,7 @@
 
                             {{-- Alamat (New from ERD) --}}
                             <div class="sm:col-span-2">
-                                <label class="block text-sm font-bold text-gray-700 mb-1">Alamat Lengkap</label>
+                                <label class="block text-sm font-bold text-gray-700 mb-1">Dokumen</label>
                                 <textarea name="alamat" rows="3" placeholder="Jl. Raya Utama No. 123, Kecamatan..."
                                     class="w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white focus:border-blue-500 focus:ring-blue-200 transition py-2.5 px-4 text-sm font-medium resize-none">{{ old('alamat') }}</textarea>
                             </div>
@@ -416,7 +332,7 @@
 
                             {{-- Mulai Kerjasama --}}
                             <div>
-                                <label class="block text-sm font-bold text-gray-700 mb-1">Mulai Kerjasama</label>
+                                <label class="block text-sm font-bold text-gray-700 mb-1">Mulai Perjanjian</label>
                                 <div class="relative">
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                         <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor"
@@ -435,7 +351,7 @@
 
                             {{-- Berakhir MoU --}}
                             <div>
-                                <label class="block text-sm font-bold text-gray-700 mb-1">Berakhir MoU</label>
+                                <label class="block text-sm font-bold text-gray-700 mb-1">Akhir Perjanjian</label>
                                 <div class="relative">
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                         <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor"
@@ -451,53 +367,23 @@
                                 </div>
                             </div>
 
-                            {{-- Status MoU (Consistent Design) --}}
-                            <div x-data="{ open: false, selected: '{{ old('status_mou') }}' || 'Aktif Disnaker', list: ['Aktif Disnaker', 'Perpanjangan', 'Tidak Aktif'] }" class="relative">
-                                <label class="block text-sm font-bold text-gray-700 mb-1">Status MoU</label>
-                                <input type="hidden" name="status_mou" x-model="selected">
+                            {{-- Management Fee --}}
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-1">Management Fee</label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
 
-                                <button type="button" @click="open=!open"
-                                    class="w-full bg-gray-50 border border-gray-300 rounded-lg py-2.5 px-4 flex justify-between items-center text-sm font-medium hover:bg-white focus:ring-2 focus:ring-blue-200 focus:border-blue-500 transition">
-                                    <div class="flex items-center gap-2">
-                                        <span class="w-2 h-2 rounded-full"
-                                            :class="{
-                                                'bg-green-500': selected == 'Aktif Disnaker',
-                                                'bg-yellow-500': selected ==
-                                                    'Perpanjangan',
-                                                'bg-red-500': selected.includes('Tidak')
-                                            }">
-                                        </span>
-                                        <span x-text="selected" class="text-gray-900"></span>
-                                    </div>
-                                    <svg class="w-4 h-4 text-gray-500 transform transition-transform"
-                                        :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 9l-7 7-7-7"></path>
-                                    </svg>
-                                </button>
-
-                                {{-- UPDATED: Added 'bottom-full mb-1 origin-bottom' to make it open upwards --}}
-                                <ul x-show="open" @click.outside="open=false" x-transition.opacity
-                                    class="absolute w-full bottom-full mb-1 bg-white border border-gray-200 rounded-lg shadow-xl z-50 py-1 origin-bottom">
-                                    <template x-for="item in list" :key="item">
-                                        <li @click="selected=item; open=false"
-                                            class="px-4 py-2.5 text-sm hover:bg-blue-50 hover:text-blue-600 cursor-pointer transition flex items-center gap-2">
-                                            <span class="w-2 h-2 rounded-full"
-                                                :class="{
-                                                    'bg-green-500': item == 'Aktif Disnaker',
-                                                    'bg-yellow-500': item ==
-                                                        'Perpanjangan',
-                                                    'bg-red-500': item.includes('Tidak')
-                                                }">
-                                            </span>
-                                            <span x-text="item"></span>
-                                        </li>
-                                    </template>
-                                </ul>
-                                @error('status_mou')
-                                    <p class="text-red-600 text-xs mt-1">{{ $message }}</p>
-                                @enderror
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z">
+                                            </path>
+                                        </svg>
+                                    </span>
+                                    <input type="text" name="telp_perusahaan" placeholder="021-xxxx / 081-xxxx"
+                                        maxlength="13"
+                                        class="telp_perusahaan-input w-full pl-10 rounded-lg border-gray-300 bg-gray-50 focus:bg-white focus:border-blue-500 focus:ring-blue-200 transition py-2.5 px-4 text-sm font-medium"
+                                        value="{{ old('telp_perusahaan') }}">
+                                </div>
                             </div>
 
                         </div>
