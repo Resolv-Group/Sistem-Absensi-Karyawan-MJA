@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Staff;
 use Illuminate\Database\QueryException;
 use App\Models\MitraKerja;
+use Illuminate\Support\Facades\DB;
 
 class UnitController extends Controller
 {
@@ -80,6 +81,7 @@ class UnitController extends Controller
 
     function tambahUnit(Request $request)
     {
+        // dd($request->all());
         try {
             $request->validate(
                 [
@@ -91,6 +93,10 @@ class UnitController extends Controller
                     'dokumen_mou' => 'file|mimes:png,jpg,jpeg,pdf|max:2048',
                     'persentase_management_fee' => 'required|int',
                     'sistem_pengajian' => 'required|int',
+
+                    'pic_ids' => 'required|array|min:1',
+                    'pic_ids.*' => 'exists:staff,id',
+                    
                 ],
                 [
                     'id_unit.required' => 'ID Unit wajib diisi',
@@ -108,6 +114,8 @@ class UnitController extends Controller
                     'persentase_management_fee.max' => 'Persentase maksimal 100%',
 
                     'sistem_pengajian.required' => 'Sistem pengajian wajib dipilih',
+
+                    'pic_ids.required' => 'PIC wajib dipilih minimal 1',
                 ],
             );
 
@@ -133,6 +141,18 @@ class UnitController extends Controller
 
                 'status_aktif' => 1,
             ]);
+
+            // dd($unit);  
+            $picIds = $request->pic_ids;
+
+            foreach ($picIds as $picId) {
+                DB::table('pic_unit')->insert([
+                    'id_unit' => $request->id_unit, // atau $unit->id_unit
+                    'id_pic' => $picId,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
 
             return redirect()
                 ->route('view.tambah.unit')
