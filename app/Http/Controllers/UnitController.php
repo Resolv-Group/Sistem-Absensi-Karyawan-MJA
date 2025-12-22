@@ -68,27 +68,27 @@ class UnitController extends Controller
         // Otherwise return the full page
         return view('Unit.main-unit', compact('unit', 'totalUnit', 'unitBaru', 'tidakAktif'));
     }
-  
+
   public function viewTambahUnit()
     {
-        $picList = Staff::select('id as val', 'nama as label')->get();
+        $picList = Staff::select('id as val', 'nama as label')->where('jabatan', 'PIC')->get();
 
         $mitraKerjaList = MitraKerja::select('id as val', 'nama_mitra as label')->get();
 
         return view('Unit.CRUD.tambah-unit', compact('picList', 'mitraKerjaList'));
     }
-    
+
     function tambahUnit(Request $request)
     {
         try {
             $request->validate(
                 [
                     'id_unit' => 'nullable|string|max:255',
-                    'id_mitra_kerja' => 'required|char',
+                    'id_mitra_kerja' => 'required|string',
                     'mulai_perjanjian' => 'required|date',
                     'akhir_perjanjian' => 'required|date|after_or_equal:mulai_perjanjian',
-                    'nama_unit' => 'required|char',
-                    'dokumen_mou' => 'nullable|image|mimes:png,jpg,jpeg,pdf|max:2048',
+                    'nama_unit' => 'required|string',
+                    'dokumen_mou' => 'file|mimes:png,jpg,jpeg,pdf|max:2048',
                     'persentase_management_fee' => 'required|int',
                     'sistem_pengajian' => 'required|int',
                 ],
@@ -116,7 +116,7 @@ class UnitController extends Controller
             // ✅ Upload dokumen
             $dokumen = null;
             if ($request->hasFile('dokumen_mou')) {
-                $dokumen = file_get_contents($request->file('dokumen')->getRealPath());
+                $dokumen = file_get_contents($request->file('dokumen_mou')->getRealPath());
             }
 
             // ✅ Simpan ke database

@@ -109,6 +109,7 @@ Route::middleware(['auth', 'role:hrd,pic,admin'])->group(function(){
     Route::get('/unit/tambah', [UnitController::class, 'viewTambahUnit'])->name('view.tambah.unit');
     Route::get('/unit/tambah-borongan', [UnitController::class, 'viewTambahUnitBorongan'])->name('view.tambah.unit-borongan');
     Route::get('/unit/detail/{id}', [UnitController::class, 'viewDetailUnit'])->name('view.detail.unit');
+    Route::POST('/tambah-unit', [UnitController::class, 'tambahUnit'])->name('tambah.unit.post');
     Route::POST('/tambah-unit-harian', [UnitController::class, 'tambahUnitHarian'])->name('tambah.unit-harian.post');
     Route::POST('/tambah-unit-borongan', [UnitController::class, 'tambahUnitBorongan'])->name('tambah.unit-borongan.post');
     Route::get('/unit/ubah/{id}', [UnitController::class, 'ubahUnit'])->name('view.ubah.unit');
