@@ -75,6 +75,7 @@ function numericFieldHandler(inputClass, fieldName) {
 // Apply untuk masing-masing
 numericFieldHandler('.nik-input', 'NIK');
 numericFieldHandler('.no_kk-input', 'No KK');
+numericFieldHandler('.kpj-input', 'No KK');
 numericFieldHandler('.anak-input', 'Anak')
 numericFieldHandler('.rt-input', 'RT');
 numericFieldHandler('.rw-input', 'RW');
