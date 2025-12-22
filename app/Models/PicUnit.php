@@ -16,4 +16,9 @@ class PicUnit extends Model
         'id_pic',
     ];
 
+    public function staff()
+    {
+    return $this->belongsTo(Staff::class, 'id_pic', 'id');
+    }
+
 }

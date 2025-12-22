@@ -20,12 +20,23 @@ class Unit extends Model
         'nama_unit',
         'persentase_management_fee',
         'sistem_pengajian',
+        'status_aktif'
     ];
 
     protected $casts = [
         'mulai_perjanjian' => 'date',
         'akhir_perjanjian' => 'date',
     ];
+
+    public function namaMitra()
+    {
+        return $this->belongsTo(MitraKerja::class, 'id_mitra_kerja');
+    }
+
+    public function picUnit()
+    {
+        return $this->hasOne(PicUnit::class, 'id_unit', 'id');
+    }
 
 
 }
