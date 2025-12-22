@@ -126,6 +126,7 @@ class AdminUserSeeder extends Seeder
             ['jabatan' => 'admin', 'email' => 'admin@company.com', 'password' => 'admin123'],
             ['jabatan' => 'HRD', 'email' => 'hrd@gmail.com', 'password' => 'hrd123'],
             ['jabatan' => 'PIC', 'email' => 'pic@gmail.com', 'password' => 'pic123'],
+            ['jabatan' => 'PIC', 'email' => 'pic2@gmail.com', 'password' => 'pic123'],
             ['jabatan' => 'Akuntan', 'email' => 'akuntan@gmail.com', 'password' => 'akuntan123'],
         ];
 
