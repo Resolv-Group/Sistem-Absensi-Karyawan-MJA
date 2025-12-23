@@ -87,6 +87,7 @@ Route::middleware(['auth', 'role:hrd,admin'])->group(function(){
 
 Route::middleware(['auth', 'role:hrd,pic,admin'])->group(function(){
 
+    //Pekerja
     Route::get('/daftar-pekerja', [PekerjaController::class, 'viewPekerjaMain'])->name('view.pekerja');
     Route::get('/pekerja/tambah', [PekerjaController::class, 'viewTambahPekerja'])->name('view.tambah.pekerja');
     Route::get('/pekerja/detail/{id}', [PekerjaController::class, 'viewDetailPekerja'])->name('view.detail.pekerja');
@@ -96,7 +97,7 @@ Route::middleware(['auth', 'role:hrd,pic,admin'])->group(function(){
     // Route::get('/pekerja/dokumen/{id}', [PekerjaController::class, 'showDokumen'])->name('pekerja.dokumen.show');
     Route::put('/pekerja/toggle-status/{id}', [PekerjaController::class, 'toggleStatus']);
 
-
+    //Mitra Kerja
     Route::get('/mitra-kerja', [MitraKerjaController::class, 'viewMitraKerjaMain'])->name('view.mitra-kerja');
     Route::get('/mitra-kerja/tambah', [MitraKerjaController::class, 'viewTambahMitraKerja'])->name('view.tambah.mitra-kerja');
     Route::get('/mitra-kerja/detail/{id}', [MitraKerjaController::class, 'viewDetailMitraKerja'])->name('view.detail.mitra-kerja');
@@ -105,19 +106,22 @@ Route::middleware(['auth', 'role:hrd,pic,admin'])->group(function(){
     Route::put('/mitra-kerja/ubah/{id}', [MitraKerjaController::class, 'updateMitraKerja'])->name('update.mitra-kerja');
     Route::put('/mitra-kerja/toggle-status/{id}', [MitraKerjaController::class, 'toggleStatus']);
 
+    //Unit
     Route::get('/unit', [UnitController::class, 'viewUnitMain'])->name('view.unit');
     Route::get('/unit/tambah', [UnitController::class, 'viewTambahUnit'])->name('view.tambah.unit');
-    Route::get('/unit/{id}/tambah-harian', [UnitController::class, 'viewTambahUnitHarian'])->name('view.tambah.unit-harian');
-    Route::get('/unit/tambah-borongan', [UnitController::class, 'viewTambahUnitBorongan'])->name('view.tambah.unit-borongan');
-    Route::get('/unit/detail/{id}', [UnitController::class, 'viewDetailUnit'])->name('view.detail.unit');
     Route::POST('/tambah-unit', [UnitController::class, 'tambahUnit'])->name('tambah.unit.post');
+    Route::get('/unit/detail/{id}', [UnitController::class, 'viewDetailUnit'])->name('view.detail.unit');
+    Route::get('/unit/{id}/tambah-pekerja', [UnitController::class, 'viewTambahUnitHarian'])->name('view.tambah.unit-pekerja');
+    Route::POST('/tambah-unit-pekerja', [UnitController::class, 'tambahPekerjaUnit'])->name('tambah.unit-pekerja.post');
+
+    //Unit belum ada
+    Route::get('/unit/tambah-borongan', [UnitController::class, 'viewTambahUnitBorongan'])->name('view.tambah.unit-borongan');
     Route::POST('/tambah-unit-harian', [UnitController::class, 'tambahUnitHarian'])->name('tambah.unit-harian.post');
     Route::POST('/tambah-unit-borongan', [UnitController::class, 'tambahUnitBorongan'])->name('tambah.unit-borongan.post');
     Route::get('/unit/ubah/{id}', [UnitController::class, 'ubahUnit'])->name('view.ubah.unit');
     Route::put('/unit/ubah/{id}', [UnitController::class, 'updateUnit'])->name('update.unit');
 
     Route::put('/unit/toggle-status/{id}', [UnitController::class, 'toggleStatus']);
-
 
     Route::POST('/tambah-bidang-usaha', [BidangUsahaController::class, 'tambahBidangUsaha'])->name('tambah.bidang-usaha.post');
 });

@@ -9,6 +9,7 @@ use App\Models\Staff;
 use Illuminate\Database\QueryException;
 use App\Models\MitraKerja;
 use App\Models\Pekerja;
+use App\Models\PKWT;
 use Illuminate\Support\Facades\DB;
 
 class UnitController extends Controller
@@ -195,7 +196,78 @@ class UnitController extends Controller
         $pekerjaList = \App\Models\Pekerja::select('id', 'nama', 'nik')->where('status_aktif', 1)->get();
 
 
-        return view('Unit.CRUD.tambah-unit-harian', compact('unitSelected', 'units', 'pekerjaList'));
+        return view('Unit.CRUD.tambah-unit-pekerja', compact('unitSelected', 'units', 'pekerjaList'));
     }
 
+    function tambahPekerjaUnit(Request $request)
+    {
+        // dd($request->all()); // aktifkan hanya untuk debug
+
+        try {
+            DB::beginTransaction();
+
+            // ✅ VALIDASI SESUAI ARRAY
+            $request->validate(
+                [
+                    'id_unit' => 'required|string',
+
+                    'pekerja' => 'required|array|min:1',
+
+                    'pekerja.*.id_pekerja' => 'required|integer|exists:pekerja,id',
+                    'pekerja.*.divisi' => 'required|string',
+                    'pekerja.*.jabatan' => 'required|string',
+
+                    'pekerja.*.tgl_mulai_pkwt' => 'required|date',
+                    'pekerja.*.tgl_akhir_pkwt' => 'required|date|after_or_equal:pekerja.*.tgl_mulai_pkwt',
+
+                    'pekerja.*.gaji_harian' => 'required|integer|min:0',
+
+                    'pekerja.*.dokumen_pkwt' => 'nullable|file|mimes:png,jpg,jpeg,pdf|max:2048',
+                ],
+                [
+                    'id_unit.required' => 'ID Unit wajib diisi',
+                    'pekerja.required' => 'Data pekerja wajib diisi',
+                    'pekerja.*.id_pekerja.required' => 'Pekerja wajib dipilih',
+                    'pekerja.*.gaji_harian.required' => 'Gaji harian wajib diisi',
+                ]
+            );
+
+            // ✅ LOOP PEKERJA
+            foreach ($request->pekerja as $index => $data) {
+
+                // Upload file per pekerja
+                $dokumen = null;
+                if ($request->hasFile("pekerja.$index.dokumen_pkwt")) {
+                    $dokumen = file_get_contents(
+                        $request->file("pekerja.$index.dokumen_pkwt")->getRealPath()
+                    );
+                }
+
+                PKWT::create([
+                    'id_unit' => $request->id_unit,
+                    'id_pekerja' => $data['id_pekerja'],
+                    'divisi' => $data['divisi'],
+                    'jabatan' => $data['jabatan'],
+                    'tgl_mulai_pkwt' => $data['tgl_mulai_pkwt'],
+                    'tgl_akhir_pkwt' => $data['tgl_akhir_pkwt'],
+                    'gaji_harian' => $data['gaji_harian'],
+                    'dokumen_pkwt' => $dokumen,
+                    'status_aktif' => 1,
+                ]);
+            }
+
+            DB::commit();
+
+            return redirect()
+                ->route('view.tambah.unit')
+                ->with('success', 'Pekerja berhasil ditambahkan.');
+
+        } catch (QueryException $e) {
+            DB::rollBack();
+            return back()->withInput()->withErrors(['database' => $e->getMessage()]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->withInput()->withErrors(['general' => $e->getMessage()]);
+        }
+    }
 }

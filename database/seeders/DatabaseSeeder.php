@@ -14,7 +14,9 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(AdminUserSeeder::class);
         $this->call(BidangUsahaSeeder::class);
-        $this->call([MitraKerjaSeeder::class]);
-        $this->call([UnitSeeder::class]);
+        $this->call(MitraKerjaSeeder::class);
+        $this->call(UnitSeeder::class);
+        $this->call(DivisiSeeder::class);
+        $this->call(JabatanPKWTSeeder::class);
     }
 }

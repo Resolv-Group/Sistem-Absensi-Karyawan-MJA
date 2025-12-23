@@ -15,9 +15,9 @@
                 <nav class="flex text-sm font-medium text-gray-500 mb-1">
                     <span class="hover:text-gray-700">Unit</span>
                     <span class="mx-2 text-gray-300">/</span>
-                    <span class="text-blue-600">Tambah Harian</span>
+                    <span class="text-blue-600">Tambah Pekerja Unit</span>
                 </nav>
-                <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Tambah Unit Harian</h1>
+                <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Tambah Pekerja Unit</h1>
             </div>
         </div>
 
@@ -31,7 +31,7 @@
             </div>
         @endif
 
-        <form action="{{ route('tambah.unit-harian.post') }}" method="POST" enctype="multipart/form-data"
+        <form action="{{ route('tambah.unit-pekerja.post') }}" method="POST" enctype="multipart/form-data"
             x-data="workerForm()" class="space-y-6">
             @csrf
 
@@ -60,7 +60,7 @@
                         </label>
 
                         {{-- Hidden Input to ensure ID is submitted --}}
-                        <input type="hidden" name="id" value="{{ $unit->id ?? '' }}">
+                        <input type="hidden" name="id_unit" value="{{ $unitSelected->id ?? '' }}">
 
                         <div
                             class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 flex items-center justify-between">
