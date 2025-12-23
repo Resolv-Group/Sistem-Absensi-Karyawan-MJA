@@ -26,6 +26,7 @@ return new class extends Migration
             $table->binary('dokumen_pkwt');
 
             $table->integer('status_aktif')->default(1);
+            $table->unsignedInteger('gaji_harian')->nullable();
 
             $table->timestamps();
         });

@@ -35,7 +35,7 @@ class Unit extends Model
 
     public function picUnit()
     {
-        return $this->hasOne(PicUnit::class, 'id_unit', 'id');
+        return $this->hasMany(PicUnit::class, 'id_unit', 'id');
     }
 
 

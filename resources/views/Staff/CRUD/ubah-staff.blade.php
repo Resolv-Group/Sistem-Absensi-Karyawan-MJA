@@ -326,7 +326,7 @@
                     <div x-data="{
                         open: false,
                         selected: '{{ old('jabatan', $staff->jabatan ?? '') }}',
-                        list: ['Staff', 'Supervisor', 'Manager', 'Direktur', 'HRD', 'IT', 'Akuntan']
+                        list: ['Staff', 'Supervisor', 'Manager', 'Direktur', 'HRD', 'IT', 'Akuntan', 'PIC']
                     }" class="relative">
 
                         <label class="block text-sm font-bold text-gray-700 mb-1">Jabatan</label>

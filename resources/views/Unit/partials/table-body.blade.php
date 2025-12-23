@@ -17,13 +17,13 @@
 
                 <div class="min-w-0">
                     {{-- Main Text (Mitra Name) --}}
-                    <div class="text-sm font-bold text-gray-900 truncate max-w-[200px]"
-                        title="{{ $u->namaMitra->nama_mitra }}">
-                        {{ $u->namaMitra->nama_mitra }}
+                    <div class="text-sm font-bold text-gray-900 truncate max-w-[200px]" title="{{ $u->nama_unit }}}">
+                        {{ $u->nama_unit }}
                     </div>
                     {{-- Sub Text (Unit Name or ID) --}}
                     <div class="text-xs text-gray-500 mt-0.5 flex items-center gap-1">
-                        <span class="truncate max-w-[150px]">{{ $u->nama_unit ?? 'Unit Umum' }}</span>
+                        <span class="truncate max-w-[150px]"
+                            title="{{ $u->namaMitra->nama_mitra }}">MK: {{ $u->namaMitra->nama_mitra }}</span>
                     </div>
                 </div>
             </div>
@@ -38,18 +38,79 @@
 
         {{-- 4. PIC (Clean look with icon) --}}
         <td class="px-6 py-4 whitespace-nowrap">
-            <div class="flex items-center justify-center gap-2 text-gray-600">
-                @if (optional(optional($u->picUnit)->staff)->nama)
-                    <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                    <span class="text-sm font-medium">{{ optional($u->picUnit->staff)->nama }}</span>
+            <div class="flex items-center justify-center gap-2 text-gray-600 relative">
+                @php
+                    $pics = $u->picUnit ?? collect([]);
+                    $count = $pics->count();
+                @endphp
+
+                @if ($count > 0)
+                    {{-- 1. DISPLAY FIRST PIC --}}
+                    <div class="flex items-center gap-1.5">
+                        <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        <span class="text-sm font-medium truncate max-w-[120px]">
+                            {{ optional($pics->first()->staff)->nama ?? '-' }}
+                        </span>
+                    </div>
+
+                    {{-- 2. DISPLAY "+X MORE" BADGE --}}
+                    @if ($count > 1)
+                        <div class="relative group/badge cursor-pointer ml-1">
+
+                            {{-- The Badge --}}
+                            <span
+                                class="inline-flex items-center justify-center h-5 px-1.5 text-[10px] font-bold text-blue-600 bg-blue-50 border border-blue-100 rounded-full hover:bg-blue-100 transition">
+                                +{{ $count - 1 }}
+                            </span>
+
+                            {{-- Tooltip Container (Positioned to the RIGHT) --}}
+                            <div
+                                class="absolute left-full top-1/2 transform -translate-y-1/2 ml-3 hidden group-hover/badge:block z-50">
+
+                                {{-- Main Content Box --}}
+                                <div
+                                    class="bg-white border border-gray-200 text-sm rounded-xl py-3 px-4 shadow-xl whitespace-nowrap min-w-[140px] relative">
+
+                                    {{-- Arrow pointing LEFT (towards badge) --}}
+                                    {{-- We use border-b and border-l so the bottom-left corner points left when rotated --}}
+                                    <div
+                                        class="absolute top-1/2 -left-1.5 transform -translate-y-1/2 w-3 h-3 bg-white border-b border-l border-gray-200 rotate-45">
+                                    </div>
+
+                                    {{-- Header --}}
+                                    <p
+                                        class="text-[10px] uppercase tracking-wider text-gray-400 font-bold mb-2 pb-2 border-b border-gray-100">
+                                        PIC Lainnya
+                                    </p>
+
+                                    {{-- List --}}
+                                    <div class="space-y-2">
+                                        @foreach ($pics->skip(1) as $p)
+                                            <div class="flex items-center gap-2">
+                                                {{-- Simple Dot Avatar --}}
+                                                <div class="w-1.5 h-1.5 rounded-full bg-blue-400"></div>
+
+                                                {{-- Name --}}
+                                                <span class="text-xs font-medium text-gray-700">
+                                                    {{ optional($p->staff)->nama ?? '-' }}
+                                                </span>
+                                            </div>
+                                        @endforeach
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    @endif
                 @else
                     <span class="text-xs text-gray-400 italic">Belum diset</span>
                 @endif
             </div>
         </td>
+
 
         {{-- 5. PAYMENT SYSTEM --}}
         @php

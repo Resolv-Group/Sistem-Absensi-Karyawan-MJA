@@ -1,0 +1,530 @@
+@extends('layout')
+
+@section('content')
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        {{-- 1. HEADER SECTION (Unchanged) --}}
+        <div class="mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+            <div>
+                <nav class="flex text-sm font-medium text-gray-500 mb-2">
+                    <a href="{{ route('view.unit') }}" class="hover:text-gray-700 transition">Unit</a>
+                    <span class="mx-2 text-gray-400">/</span>
+                    <span class="text-blue-600">Detail</span>
+                </nav>
+                <div class="flex items-center gap-4">
+                    <div class="p-2 rounded-full border border-gray-200 bg-white text-gray-500 shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Detail Unit</h1>
+                        <p class="text-sm text-gray-500 mt-1">Informasi lengkap profil unit, PIC, dan kontrak.</p>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Action Buttons --}}
+            <div class="flex items-center gap-3">
+                <button onclick="confirmToggleStatus({{ $unit->id }}, {{ $unit->status_aktif }})"
+                    class="px-4 py-2 text-sm font-medium border rounded-lg transition shadow-sm flex items-center gap-2
+                    {{ $unit->status_aktif
+                        ? 'text-red-600 bg-red-50 border-red-100 hover:bg-red-100'
+                        : 'text-emerald-600 bg-emerald-50 border-emerald-100 hover:bg-emerald-100' }}">
+                    @if($unit->status_aktif)
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg>
+                        Nonaktifkan
+                    @else
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                        Aktifkan
+                    @endif
+                </button>
+                <a href="{{ route('view.ubah.unit', $unit->id) }}"
+                    class="px-4 py-2 text-sm font-medium text-white bg-black border border-black rounded-lg hover:bg-gray-800 transition shadow-sm flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                    </svg>
+                    Ubah Data
+                </a>
+            </div>
+        </div>
+
+        {{-- 2. TOP SECTION: IDENTITY & CONTRACT (Grid Layout) --}}
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
+
+            {{-- LEFT: Unit Profile --}}
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden h-full flex flex-col">
+                    <div class="h-24 bg-gradient-to-br from-gray-900 to-gray-800 relative">
+                        <div class="absolute inset-0 opacity-20"
+                            style="background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 16px 16px;">
+                        </div>
+                    </div>
+                    <div class="px-6 pb-6 relative text-center flex-1">
+                        <div class="relative -mt-12 inline-block">
+                            <div
+                                class="h-24 w-24 rounded-2xl border-4 border-white shadow-xl bg-white overflow-hidden flex items-center justify-center text-3xl font-black text-gray-800 tracking-tighter">
+                                {{ substr($unit->nama_unit, 0, 2) }}
+                            </div>
+                        </div>
+                        <h2 class="mt-4 text-xl font-bold text-gray-900 leading-tight">{{ $unit->nama_unit }}</h2>
+
+                        <div class="mt-3 flex justify-center gap-2">
+                            <span
+                                class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold {{ $unit->status_aktif ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-red-50 text-red-600 border border-red-100' }}">
+                                <span
+                                    class="w-2 h-2 {{ $unit->status_aktif ? 'bg-emerald-500' : 'bg-red-500' }} rounded-full mr-2"></span>
+                                {{ $unit->status_aktif ? 'Status Aktif' : 'Tidak Aktif' }}
+                            </span>
+                        </div>
+
+                        <div class="mt-8 text-left space-y-4 border-t border-gray-100 pt-6">
+                            <div class="flex justify-between items-center group cursor-default">
+                                <span
+                                    class="text-xs text-gray-400 uppercase font-bold tracking-wide group-hover:text-blue-600 transition">ID
+                                    Unit</span>
+                                <span
+                                    class="font-mono text-xs font-bold text-gray-700 bg-gray-100 px-2.5 py-1 rounded-md group-hover:bg-blue-50 group-hover:text-blue-700 transition">{{ $unit->id }}</span>
+                            </div>
+                            <div class="flex justify-between items-start group">
+                                <span
+                                    class="text-xs text-gray-400 uppercase font-bold tracking-wide group-hover:text-blue-600 transition">Induk
+                                    Mitra</span>
+                                <span
+                                    class="text-sm font-bold text-gray-900 text-right max-w-[60%] leading-snug group-hover:text-blue-700 transition">{{ $unit->namaMitra->nama_mitra ?? '-' }}</span>
+                            </div>
+                            <div class="flex justify-between items-start group">
+                                <span
+                                    class="text-xs text-gray-400 uppercase font-bold tracking-wide group-hover:text-blue-600 transition">Mulai Perjanjian</span>
+                                <span
+                                    class="text-sm font-bold text-gray-900 text-right max-w-[60%] leading-snug group-hover:text-blue-700 transition">{{ formatTanggal($unit->mulai_perjanjian )}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- RIGHT: Contract & PIC --}}
+            <div class="lg:col-span-2 flex flex-col gap-6">
+
+                {{-- A. PIC Section (Interactive) --}}
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+                    <div class="flex items-center justify-between mb-5">
+                        <h3 class="font-bold text-gray-900 flex items-center gap-2">
+                            <div class="p-1.5 bg-blue-50 text-blue-600 rounded-lg">
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                            </div>
+                            Penanggung Jawab (PIC)
+                        </h3>
+                        @if ($unit->picUnit->count() > 0)
+                            <span
+                                class="text-xs font-bold bg-gray-100 text-gray-600 px-2 py-1 rounded-md">{{ $unit->picUnit->count() }}
+                                Orang</span>
+                        @endif
+                    </div>
+
+                    @if ($unit->picUnit->count() > 0)
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            @foreach ($unit->picUnit as $pic)
+                                <div
+                                    class="group flex items-center gap-4 p-4 rounded-xl border border-gray-100 bg-white hover:border-blue-200 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 relative">
+                                    {{-- Avatar --}}
+                                    <div
+                                        class="h-12 w-12 rounded-full bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center text-blue-600 font-bold text-base shadow-sm group-hover:scale-110 transition-transform">
+                                        {{ substr(optional($pic->staff)->nama, 0, 1) }}
+                                    </div>
+
+                                    <div class="min-w-0 flex-1">
+                                        <p
+                                            class="text-sm font-bold text-gray-900 truncate group-hover:text-blue-700 transition">
+                                            {{ optional($pic->staff)->nama ?? 'N/A' }}</p>
+                                        <p class="text-xs text-gray-500 truncate">
+                                            {{ optional($pic->staff)->jabatan ?? 'Staff' }}</p>
+                                    </div>
+
+                                    {{-- Call Action (Appears on Hover) --}}
+                                    @if (optional($pic->staff)->telp)
+                                        <a href="tel:{{ optional($pic->staff)->telp }}"
+                                            class="absolute right-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 p-2 bg-blue-600 text-white rounded-lg shadow-lg hover:bg-blue-700 transition-all duration-200"
+                                            title="Hubungi PIC">
+                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                                            </svg>
+                                        </a>
+                                    @endif
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="text-center py-8 bg-gray-50 rounded-xl border border-dashed border-gray-200">
+                            <p class="text-sm text-gray-500 font-medium">Belum ada PIC yang ditugaskan.</p>
+                        </div>
+                    @endif
+                </div>
+
+                {{-- B. Contract Details (Colorful & Visual) --}}
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 flex-1">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="font-bold text-gray-900 flex items-center gap-2">
+                            <div class="p-1.5 bg-purple-50 text-purple-600 rounded-lg">
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 011.414.586l5.414 5.414a1 1 0 01.586 1.414V19a2 2 0 01-2 2z" />
+                                </svg>
+                            </div>
+                            Detail Kontrak & Legalitas
+                        </h3>
+                        @if ($unit->dokumen)
+                            <a href="{{ asset('storage/' . $unit->dokumen) }}" target="_blank"
+                                class="text-xs font-bold text-blue-600 hover:underline flex items-center gap-1">
+                                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                                Lihat Dokumen
+                            </a>
+                        @endif
+                    </div>
+
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        {{-- 1. Pengajian --}}
+                        <div
+                            class="p-4 rounded-xl bg-gray-50 border border-gray-100 hover:border-purple-200 hover:bg-purple-50/30 transition group">
+                            <div class="flex items-center gap-2 mb-2">
+                                <div class="p-1 rounded bg-white shadow-sm text-gray-500 group-hover:text-purple-600">
+                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
+                                <span class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Sistem</span>
+                            </div>
+                            <p class="font-bold text-gray-900">
+                                {{ $unit->sistem_pengajian == 1 ? 'Harian' : 'Borongan' }}
+                            </p>
+                        </div>
+
+                        {{-- 2. Fee --}}
+                        <div
+                            class="p-4 rounded-xl bg-gray-50 border border-gray-100 hover:border-orange-200 hover:bg-orange-50/30 transition group">
+                            <div class="flex items-center gap-2 mb-2">
+                                <div class="p-1 rounded bg-white shadow-sm text-gray-500 group-hover:text-orange-600">
+                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                                    </svg>
+                                </div>
+                                <span class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Mgmt Fee</span>
+                            </div>
+                            <p class="font-bold text-gray-900">{{ $unit->management_fee }}%</p>
+                        </div>
+
+                        {{-- 3. Expiry Date --}}
+                        <div
+                            class="p-4 rounded-xl bg-gray-50 border border-gray-100 hover:border-emerald-200 hover:bg-emerald-50/30 transition group">
+                            <div class="flex items-center gap-2 mb-2">
+                                <div class="p-1 rounded bg-white shadow-sm text-gray-500 group-hover:text-emerald-600">
+                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                </div>
+                                <span class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Berakhir</span>
+                            </div>
+                            <p class="font-bold text-gray-900">
+                                {{ \Carbon\Carbon::parse($unit->tgl_akhir_mou)->format('d M Y') }}</p>
+
+                            {{-- Days Left Indicator --}}
+                            @php $days = \Carbon\Carbon::now()->diffInDays(\Carbon\Carbon::parse($unit->tgl_akhir_mou), false); @endphp
+                            <div class="mt-2 h-1 w-full bg-gray-200 rounded-full overflow-hidden">
+                                <div class="h-full {{ $days < 30 ? 'bg-red-500' : 'bg-emerald-500' }}"
+                                    style="width: {{ min(100, max(0, ($days / 365) * 100)) }}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- 3. BOTTOM SECTION: WORKER TABLE (Full Width) --}}
+        {{-- 3. BOTTOM SECTION: WORKER TABLE (Updated with Salary & Documents) --}}
+        <div class="flex items-center gap-4 mb-6">
+            <h2 class="text-xl font-bold text-gray-900">Daftar Pekerja Unit</h2>
+            <div class="h-px bg-gray-200 flex-1"></div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+            {{-- Toolbar --}}
+            <div class="px-6 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gray-50/30">
+                <div class="flex items-center gap-2">
+                    <span class="px-2.5 py-0.5 rounded-md bg-white border border-gray-200 text-gray-700 text-xs font-bold shadow-sm">
+                        Total: 5 Orang
+                    </span>
+                </div>
+                <div class="flex items-center gap-3 w-full sm:w-auto">
+                    <div class="relative w-full sm:w-64">
+                        <input type="text" placeholder="Cari pekerja..." class="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition bg-white">
+                        <svg class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                    </div>
+                    <a href="{{ route('view.tambah.unit-harian', $unit->id) }}"
+                    class="px-4 py-2 bg-black text-white text-xs font-bold rounded-lg hover:bg-gray-800 transition flex items-center gap-2 shadow-sm">
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+                        Tambah
+                    </a>
+                </div>
+            </div>
+
+            {{-- Table --}}
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-50 border-b border-gray-100">
+                            <th class="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Nama & NIK</th>
+                            <th class="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Divisi</th>
+                            <th class="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Jabatan</th>
+                            <th class="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Gaji Pokok</th> {{-- NEW --}}
+                            <th class="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Dokumen</th> {{-- NEW --}}
+                            <th class="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider text-center">Bergabung</th>
+                            <th class="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider text-center">Akhir</th>
+                            {{-- <th class="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider text-center">Status</th> --}}
+                            <th class="px-6 py-4 text-right"></th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50">
+                        {{-- DUMMY DATA ROWS --}}
+                        @php
+                            $dummyWorkers = [
+                                [
+                                    'name' => 'Budi Santoso',
+                                    'nik' => '3201123456780001',
+                                    'role' => 'Operator Produksi',
+                                    'salary' => 4500000,
+                                    'doc_type' => 'pdf',
+                                    'doc_name' => 'Kontrak_Budi.pdf',
+                                    'join' => '2023-01-15',
+                                    'status' => 1
+                                ],
+                                [
+                                    'name' => 'Siti Aminah',
+                                    'nik' => '3201123456780002',
+                                    'role' => 'Staff Administrasi',
+                                    'salary' => 5200000,
+                                    'doc_type' => 'img',
+                                    'doc_name' => 'Scan_KTP.jpg',
+                                    'join' => '2023-03-10',
+                                    'status' => 1
+                                ],
+                                [
+                                    'name' => 'Rahmat Hidayat',
+                                    'nik' => '3201123456780003',
+                                    'role' => 'Security',
+                                    'salary' => 3800000,
+                                    'doc_type' => 'pdf',
+                                    'doc_name' => 'PKWT_Rahmat.pdf',
+                                    'join' => '2023-05-22',
+                                    'status' => 1
+                                ],
+                                [
+                                    'name' => 'Dewi Lestari',
+                                    'nik' => '3201123456780004',
+                                    'role' => 'Cleaning Service',
+                                    'salary' => 3500000,
+                                    'doc_type' => null, // No document example
+                                    'doc_name' => null,
+                                    'join' => '2022-11-05',
+                                    'status' => 0
+                                ],
+                                [
+                                    'name' => 'Agus Setiawan',
+                                    'nik' => '3201123456780005',
+                                    'role' => 'Driver',
+                                    'salary' => 4200000,
+                                    'doc_type' => 'pdf',
+                                    'doc_name' => 'Kontrak_Driver.pdf',
+                                    'join' => '2024-01-02',
+                                    'status' => 1
+                                ],
+                            ];
+                        @endphp
+
+                        @foreach($dummyWorkers as $worker)
+                            <tr class="hover:bg-blue-50/30 transition group">
+                                {{-- 1. Name --}}
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        {{-- <div class="h-9 w-9 rounded-full bg-white border border-gray-200 flex items-center justify-center text-xs font-bold text-gray-600 shadow-sm group-hover:border-blue-200 group-hover:text-blue-600 transition">
+                                            {{ substr($worker['name'], 0, 1) }}
+                                        </div> --}}
+                                        <div>
+                                            <p class="text-sm font-bold text-gray-900 group-hover:text-blue-600 transition">{{ $worker['name'] }}</p>
+                                            <p class="text-xs text-gray-400 font-mono">{{ $worker['nik'] }}</p>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                {{-- 2. Jabatan --}}
+                                <td class="px-6 py-4">
+                                    <span class="text-xs font-medium text-gray-600 bg-gray-100 px-2 py-1 rounded border border-gray-200">{{ $worker['role'] }}</span>
+                                </td>
+
+                                <td class="px-6 py-4">
+                                    <span class="text-xs font-medium text-gray-600 bg-gray-100 px-2 py-1 rounded border border-gray-200">{{ $worker['role'] }}</span>
+                                </td>
+
+                                {{-- 3. Salary (NEW) --}}
+                                <td class="px-6 py-4">
+                                    <div class="flex flex-col">
+                                        <span class="text-sm font-bold text-gray-900">
+                                            Rp {{ number_format($worker['salary'], 0, ',', '.') }}
+                                        </span>
+                                        <span class="text-[10px] text-gray-400">/ Hari</span>
+                                    </div>
+                                </td>
+
+                                {{-- 4. Dokumen (NEW) --}}
+                                <td class="px-6 py-4">
+                                    @if($worker['doc_type'] == 'pdf')
+                                        <a href="#" class="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-red-50 text-red-700 border border-red-100 hover:bg-red-100 transition group/doc">
+                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                                            <span class="text-xs font-bold truncate max-w-[80px]">PDF</span>
+                                        </a>
+                                    @elseif($worker['doc_type'] == 'img')
+                                        <a href="#" class="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-blue-50 text-blue-700 border border-blue-100 hover:bg-blue-100 transition group/doc">
+                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                            <span class="text-xs font-bold truncate max-w-[80px]">IMG</span>
+                                        </a>
+                                    @else
+                                        <span class="text-xs text-gray-400 italic flex items-center gap-1">
+                                            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                                            Empty
+                                        </span>
+                                    @endif
+                                </td>
+
+                                {{-- 5. Date --}}
+                                <td class="px-6 py-4 text-center text-xs text-gray-500 font-medium">
+                                    {{ \Carbon\Carbon::parse($worker['join'])->format('d M Y') }}
+                                </td>
+                                <td class="px-6 py-4 text-center text-xs text-gray-500 font-medium">
+                                    {{ \Carbon\Carbon::parse($worker['join'])->format('d M Y') }}
+                                </td>
+
+                                {{-- 6. Status --}}
+                                {{-- <td class="px-6 py-4 text-center">
+                                    @if($worker['status'])
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-100">
+                                            <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full mr-1.5"></span> Aktif
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-gray-100 text-gray-500 border border-gray-200">
+                                            <span class="w-1.5 h-1.5 bg-gray-400 rounded-full mr-1.5"></span> Nonaktif
+                                        </span>
+                                    @endif
+                                </td> --}}
+
+                                {{-- 7. Actions --}}
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <div class="flex justify-end gap-2">
+                                        <!-- Edit -->
+                                        <a href="#"
+                                            class="text-blue-600 hover:text-blue-900 border border-blue-200 hover:bg-blue-50
+                                    rounded-lg p-2 transition"
+                                            title="Edit">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                                                stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M11 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-5M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                            </svg>
+                                        </a>
+
+                                        <!-- Detail -->
+                                        <a href="#"
+                                            class="text-blue-600 hover:text-blue-900 border border-blue-200 hover:bg-blue-50
+                                    rounded-lg p-2 transition"
+                                            title="Detail">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                                                stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z" />
+                                            </svg>
+                                        </a>
+                                    </div>
+
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+
+            {{-- <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 text-center">
+               <button class="text-xs font-bold text-gray-500 hover:text-gray-900 transition">Lihat Selengkapnya &rarr;</button>
+            </div> --}}
+        </div>
+
+    </div>
+@endsection
+
+@push('scripts')
+    <script>
+        function confirmToggleStatus(id, statusAktif) {
+            const isAktif = statusAktif == 1;
+
+            Swal.fire({
+                title: isAktif ? 'Nonaktifkan Unit?' : 'Aktifkan Unit?',
+                text: isAktif ?
+                    'Unit ini tidak akan muncul di daftar aktif.' :
+                    'Unit ini akan kembali aktif.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: isAktif ? '#dc2626' : '#059669',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: isAktif ? 'Ya, Nonaktifkan' : 'Ya, Aktifkan',
+                cancelButtonText: 'Batal',
+                customClass: {
+                    popup: 'rounded-2xl',
+                    confirmButton: 'rounded-lg px-4 py-2',
+                    cancelButton: 'rounded-lg px-4 py-2'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Adjust route to match your defined route name
+                    fetch(`/unit/toggle-status/${id}`, {
+                            method: 'PUT',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Berhasil',
+                                text: data.message,
+                                timer: 1500,
+                                showConfirmButton: false,
+                                customClass: {
+                                    popup: 'rounded-2xl'
+                                }
+                            }).then(() => location.reload());
+                        })
+                        .catch(() => {
+                            Swal.fire('Error', 'Terjadi kesalahan sistem', 'error');
+                        });
+                }
+            });
+        }
+    </script>
+@endpush

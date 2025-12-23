@@ -14,7 +14,7 @@ class PKWT extends Model
     protected $fillable = [
         'id_pekerja','id_unit','divisi','jabatan',
         'tgl_mulai_pkwt','tgl_akhir_pkwt',
-        'dokumen_pkwt','status_aktif'
+        'dokumen_pkwt','status_aktif', 'gaji_harian'
     ];
 
 }

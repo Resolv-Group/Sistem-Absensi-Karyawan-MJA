@@ -18,7 +18,7 @@ class PicUnit extends Model
 
     public function staff()
     {
-    return $this->belongsTo(Staff::class, 'id_pic', 'id');
+        return $this->belongsTo(Staff::class, 'id_pic', 'id');
     }
 
 }
