@@ -38,5 +38,15 @@ class Unit extends Model
         return $this->hasMany(PicUnit::class, 'id_unit', 'id');
     }
 
+    public function pkwtPekerja() {
+        return $this->hasOne(PKWT::class, 'id_unit', 'id_unit');
+    }
+
+    public function pkwt()
+    {
+        return $this->hasMany(PKWT::class, 'id_unit', 'id');
+    }
+
+
 
 }

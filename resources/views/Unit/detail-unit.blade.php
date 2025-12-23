@@ -12,13 +12,15 @@
                     <span class="text-blue-600">Detail</span>
                 </nav>
                 <div class="flex items-center gap-4">
-                    <div class="p-2 rounded-full border border-gray-200 bg-white text-gray-500 shadow-sm">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
+                    <a href="{{ route('view.unit') }}"
+                        class="group p-2 rounded-full border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            class="h-5 w-5 transform group-hover:-translate-x-0.5 transition" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                         </svg>
-                    </div>
+                    </a>
                     <div>
                         <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Detail Unit</h1>
                         <p class="text-sm text-gray-500 mt-1">Informasi lengkap profil unit, PIC, dan kontrak.</p>
@@ -105,6 +107,20 @@
                             </div>
                         </div>
                     </div>
+                    <div class="border-t border-gray-100 grid grid-cols-1 divide-x divide-gray-100">
+                        <a href="{{ route('stream.mou', $unit->id) }}" target="_blank"
+                            class="flex items-center justify-center gap-2 py-4 text-sm font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-50 transition group">
+
+                            <svg class="w-5 h-5 text-gray-400 group-hover:text-blue-500 transition"
+                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M4 6h11a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2z" />
+                            </svg>
+
+                            <span>Lihat MOU</span>
+                        </a>
+
+                    </div>
                 </div>
             </div>
 
@@ -160,6 +176,8 @@
                                             </svg>
                                         </a>
                                     @endif
+
+
                                 </div>
                             @endforeach
                         </div>
@@ -226,7 +244,7 @@
                                 </div>
                                 <span class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Mgmt Fee</span>
                             </div>
-                            <p class="font-bold text-gray-900">{{ $unit->management_fee }}%</p>
+                            <p class="font-bold text-gray-900">{{ $unit->persentase_management_fee }}%</p>
                         </div>
 
                         {{-- 3. Expiry Date --}}
@@ -251,13 +269,17 @@
                                     style="width: {{ min(100, max(0, ($days / 365) * 100)) }}%"></div>
                             </div>
                         </div>
+
+
                     </div>
+
                 </div>
+
             </div>
+
         </div>
 
         {{-- 3. BOTTOM SECTION: WORKER TABLE (Full Width) --}}
-        {{-- 3. BOTTOM SECTION: WORKER TABLE (Updated with Salary & Documents) --}}
         <div class="flex items-center gap-4 mb-6">
             <h2 class="text-xl font-bold text-gray-900">Daftar Pekerja Unit</h2>
             <div class="h-px bg-gray-200 flex-1"></div>
@@ -268,7 +290,7 @@
             <div class="px-6 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gray-50/30">
                 <div class="flex items-center gap-2">
                     <span class="px-2.5 py-0.5 rounded-md bg-white border border-gray-200 text-gray-700 text-xs font-bold shadow-sm">
-                        Total: 5 Orang
+                        Total: {{ $totalPekerja }} Orang
                     </span>
                 </div>
                 <div class="flex items-center gap-3 w-full sm:w-auto">
@@ -293,71 +315,14 @@
                             <th class="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Divisi</th>
                             <th class="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Jabatan</th>
                             <th class="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Gaji Pokok</th> {{-- NEW --}}
-                            <th class="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Dokumen</th> {{-- NEW --}}
+                            <th class="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider">PKWT</th> {{-- NEW --}}
                             <th class="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider text-center">Bergabung</th>
                             <th class="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider text-center">Akhir</th>
-                            {{-- <th class="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider text-center">Status</th> --}}
                             <th class="px-6 py-4 text-right"></th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-50">
-                        {{-- DUMMY DATA ROWS --}}
-                        @php
-                            $dummyWorkers = [
-                                [
-                                    'name' => 'Budi Santoso',
-                                    'nik' => '3201123456780001',
-                                    'role' => 'Operator Produksi',
-                                    'salary' => 4500000,
-                                    'doc_type' => 'pdf',
-                                    'doc_name' => 'Kontrak_Budi.pdf',
-                                    'join' => '2023-01-15',
-                                    'status' => 1
-                                ],
-                                [
-                                    'name' => 'Siti Aminah',
-                                    'nik' => '3201123456780002',
-                                    'role' => 'Staff Administrasi',
-                                    'salary' => 5200000,
-                                    'doc_type' => 'img',
-                                    'doc_name' => 'Scan_KTP.jpg',
-                                    'join' => '2023-03-10',
-                                    'status' => 1
-                                ],
-                                [
-                                    'name' => 'Rahmat Hidayat',
-                                    'nik' => '3201123456780003',
-                                    'role' => 'Security',
-                                    'salary' => 3800000,
-                                    'doc_type' => 'pdf',
-                                    'doc_name' => 'PKWT_Rahmat.pdf',
-                                    'join' => '2023-05-22',
-                                    'status' => 1
-                                ],
-                                [
-                                    'name' => 'Dewi Lestari',
-                                    'nik' => '3201123456780004',
-                                    'role' => 'Cleaning Service',
-                                    'salary' => 3500000,
-                                    'doc_type' => null, // No document example
-                                    'doc_name' => null,
-                                    'join' => '2022-11-05',
-                                    'status' => 0
-                                ],
-                                [
-                                    'name' => 'Agus Setiawan',
-                                    'nik' => '3201123456780005',
-                                    'role' => 'Driver',
-                                    'salary' => 4200000,
-                                    'doc_type' => 'pdf',
-                                    'doc_name' => 'Kontrak_Driver.pdf',
-                                    'join' => '2024-01-02',
-                                    'status' => 1
-                                ],
-                            ];
-                        @endphp
-
-                        @foreach($dummyWorkers as $worker)
+                        @forelse($pkwtPekerja as $pkwt)
                             <tr class="hover:bg-blue-50/30 transition group">
                                 {{-- 1. Name --}}
                                 <td class="px-6 py-4">
@@ -366,40 +331,42 @@
                                             {{ substr($worker['name'], 0, 1) }}
                                         </div> --}}
                                         <div>
-                                            <p class="text-sm font-bold text-gray-900 group-hover:text-blue-600 transition">{{ $worker['name'] }}</p>
-                                            <p class="text-xs text-gray-400 font-mono">{{ $worker['nik'] }}</p>
+                                            <p class="text-sm font-bold text-gray-900 group-hover:text-blue-600 transition">{{ $pkwt->pekerja->nama }}</p>
+                                            <p class="text-xs text-gray-400 font-mono">{{ $pkwt->pekerja->nik }}</p>
                                         </div>
                                     </div>
                                 </td>
 
                                 {{-- 2. Jabatan --}}
                                 <td class="px-6 py-4">
-                                    <span class="text-xs font-medium text-gray-600 bg-gray-100 px-2 py-1 rounded border border-gray-200">{{ $worker['role'] }}</span>
+                                    <span class="text-xs font-medium text-gray-600 bg-gray-100 px-2 py-1 rounded border border-gray-200">{{ $pkwt->jabatan }}</span>
                                 </td>
 
                                 <td class="px-6 py-4">
-                                    <span class="text-xs font-medium text-gray-600 bg-gray-100 px-2 py-1 rounded border border-gray-200">{{ $worker['role'] }}</span>
+                                    <span class="text-xs font-medium text-gray-600 bg-gray-100 px-2 py-1 rounded border border-gray-200">{{ $pkwt->divisi }}</span>
                                 </td>
 
                                 {{-- 3. Salary (NEW) --}}
                                 <td class="px-6 py-4">
                                     <div class="flex flex-col">
                                         <span class="text-sm font-bold text-gray-900">
-                                            Rp {{ number_format($worker['salary'], 0, ',', '.') }}
+                                            Rp {{ number_format($pkwt->gaji_harian, 0, ',', '.') }}
                                         </span>
                                         <span class="text-[10px] text-gray-400">/ Hari</span>
                                     </div>
                                 </td>
 
+                                @php $mime = $pkwt->dokumen_mime; @endphp
+
                                 {{-- 4. Dokumen (NEW) --}}
                                 <td class="px-6 py-4">
-                                    @if($worker['doc_type'] == 'pdf')
-                                        <a href="#" class="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-red-50 text-red-700 border border-red-100 hover:bg-red-100 transition group/doc">
+                                    @if($mime && Str::startsWith($mime, 'application/pdf'))
+                                        <a href="{{ route('stream.pkwt', $pkwt->id) }}"  target="_blank" class="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-red-50 text-red-700 border border-red-100 hover:bg-red-100 transition group/doc">
                                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
                                             <span class="text-xs font-bold truncate max-w-[80px]">PDF</span>
                                         </a>
-                                    @elseif($worker['doc_type'] == 'img')
-                                        <a href="#" class="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-blue-50 text-blue-700 border border-blue-100 hover:bg-blue-100 transition group/doc">
+                                    @elseif($mime && Str::startsWith($mime, 'image/'))
+                                        <a href="{{ route('stream.pkwt', $pkwt->id) }}"  target="_blank"  class="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-blue-50 text-blue-700 border border-blue-100 hover:bg-blue-100 transition group/doc">
                                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                                             <span class="text-xs font-bold truncate max-w-[80px]">IMG</span>
                                         </a>
@@ -413,24 +380,13 @@
 
                                 {{-- 5. Date --}}
                                 <td class="px-6 py-4 text-center text-xs text-gray-500 font-medium">
-                                    {{ \Carbon\Carbon::parse($worker['join'])->format('d M Y') }}
+                                    {{ \Carbon\Carbon::parse($pkwt->tgl_mulai_pkwt)->format('d M Y') }}
                                 </td>
-                                <td class="px-6 py-4 text-center text-xs text-gray-500 font-medium">
-                                    {{ \Carbon\Carbon::parse($worker['join'])->format('d M Y') }}
-                                </td>
+                                <td class="px-6 py-4 text-center text-xs text-gray-500 font-medium
+                                    {{ $pkwt->status_pkwt['color'] === 'red' ? 'text-red-600' : 'text-gray-500' }}">
 
-                                {{-- 6. Status --}}
-                                {{-- <td class="px-6 py-4 text-center">
-                                    @if($worker['status'])
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-100">
-                                            <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full mr-1.5"></span> Aktif
-                                        </span>
-                                    @else
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-gray-100 text-gray-500 border border-gray-200">
-                                            <span class="w-1.5 h-1.5 bg-gray-400 rounded-full mr-1.5"></span> Nonaktif
-                                        </span>
-                                    @endif
-                                </td> --}}
+                                    {{ \Carbon\Carbon::parse($pkwt->tgl_akhir_pkwt)->format('d M Y') }}
+                                </td>
 
                                 {{-- 7. Actions --}}
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -462,7 +418,21 @@
 
                                 </td>
                             </tr>
-                        @endforeach
+                        @empty
+                        <tr>
+                            <td colspan="7" class="px-6 py-10 text-center text-gray-500">
+                                <div class="flex flex-col items-center justify-center">
+                                    <svg class="w-12 h-12 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
+                                        </path>
+                                    </svg>
+                                    <p class="font-medium">Belum ada data pekerja pada unit ini..</p>
+                                    <p class="text-sm mt-1">Silakan daftarkan pekerja.</p>
+                                </div>
+                            </td>
+                        </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>

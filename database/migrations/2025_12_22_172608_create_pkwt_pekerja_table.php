@@ -24,6 +24,7 @@ return new class extends Migration
             $table->date('tgl_akhir_pkwt');
 
             $table->binary('dokumen_pkwt');
+            $table->string('dokumen_mime', 100)->nullable();
 
             $table->integer('status_aktif')->default(1);
             $table->unsignedInteger('gaji_harian')->nullable();
