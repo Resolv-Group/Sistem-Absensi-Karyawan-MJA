@@ -19,17 +19,12 @@ class UnitController extends Controller
         // --- 1. CALCULATE STATS (Top Cards) ---
         $totalUnit = Unit::count(); // total pekerja
         $unitBaru = Unit::where('created_at', '>=', now()->subMonth())->count(); // pekerja baru dari bulan lalu
-        // $mitraMendekati = Unit::where('status_aktif', 1)
-        //     ->whereNotNull('tgl_akhir_mou')
-        //     ->whereBetween('tgl_akhir_mou', [
-        //         now(),
-        //         now()->addDays(30)
-        //     ])
-        //     ->count();
         $tidakAktif = Unit::where('status_aktif', '!=', '1')->count(); // pekerja tidak aktif
 
         // --- 2. BUILD QUERY ---
-        $query = Unit::query()->with(['picUnit.staff', 'namaMitra']);
+        $query = Unit::query()
+            ->with(['picUnit.staff', 'namaMitra'])
+            ->withCount('pkwt');
 
         // A. Filter by Search (Name, NIK, KPJ)
         // We check for 'search' (from new JS) or 'q' (fallback)
@@ -180,10 +175,66 @@ class UnitController extends Controller
         $historiUnit = History::where('foreign_id', $id)->where('nama_tabel', 'unit')->get();
 
         $pekerja = Pekerja::get();
+        $totalPekerja = PKWT::with('pekerja')
+            ->where('id_unit', $id)
+            ->count();
+
+        $pkwtPekerja = PKWT::with('pekerja')
+            ->where('id_unit', $id)
+            ->get();
+
+        // dd($pkwtPekerja);
 
         // dd($mitraKerja);
 
-        return view('Unit.detail-unit', compact('unit', 'historiUnit', 'pekerja'));
+        return view('Unit.detail-unit', compact('unit', 'historiUnit', 'pekerja', 'totalPekerja', 'pkwtPekerja'));
+    }
+
+    public function showDokumenMOU($id, Request $request)
+    {
+        // 1. Find the record
+        $data = Unit::findOrFail($id);
+
+        // 2. Check if blob exists
+        if (!$data->dokumen_mou) {
+            abort(404, 'Dokumen tidak ditemukan.');
+        }
+
+        // 3. Detect the MIME type (PDF, JPG, PNG) from the binary data
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $mimeType = $finfo->buffer($data->dokumen_mou);
+
+        // 4. Determine if it's "View" (inline) or "Download" (attachment)
+        // If URL has ?download=true, we force download.
+        $disposition = $request->has('download') ? 'attachment' : 'inline';
+
+        // Generate a filename
+        $filename = 'dokumen-mitra-' . $id;
+
+        // 5. Return the binary data as a proper HTTP response
+        return response($data->dokumen_mou)
+            ->header('Content-Type', $mimeType)
+            ->header('Content-Disposition', $disposition . '; filename="' . $filename . '"');
+    }
+
+    public function showDokumenPKWT($id, Request $request)
+    {
+        $data = PKWT::findOrFail($id);
+
+        if (!$data->dokumen_pkwt) {
+            abort(404, 'Dokumen tidak ditemukan.');
+        }
+
+        // PAKAI MIME YANG DISIMPAN (LEBIH CEPAT & AMAN)
+        $mimeType = $data->dokumen_mime ?? 'application/octet-stream';
+
+        $disposition = $request->has('download') ? 'attachment' : 'inline';
+
+        $filename = 'dokumen-pkwt-' . $id;
+
+        return response($data->dokumen_pkwt)
+            ->header('Content-Type', $mimeType)
+            ->header('Content-Disposition', $disposition . '; filename="' . $filename . '"');
     }
 
     function viewTambahUnitHarian($id_unit)
@@ -237,10 +288,12 @@ class UnitController extends Controller
 
                 // Upload file per pekerja
                 $dokumen = null;
+                $dokumenMime = null;
                 if ($request->hasFile("pekerja.$index.dokumen_pkwt")) {
-                    $dokumen = file_get_contents(
-                        $request->file("pekerja.$index.dokumen_pkwt")->getRealPath()
-                    );
+                    $file = $request->file("pekerja.$index.dokumen_pkwt");
+
+                    $dokumen = file_get_contents($file->getRealPath());
+                    $dokumenMime = $file->getMimeType();
                 }
 
                 PKWT::create([
@@ -252,6 +305,7 @@ class UnitController extends Controller
                     'tgl_akhir_pkwt' => $data['tgl_akhir_pkwt'],
                     'gaji_harian' => $data['gaji_harian'],
                     'dokumen_pkwt' => $dokumen,
+                    'dokumen_mime' => $dokumenMime,
                     'status_aktif' => 1,
                 ]);
             }

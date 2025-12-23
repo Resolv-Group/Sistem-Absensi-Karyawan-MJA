@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -11,10 +12,44 @@ class PKWT extends Model
 
     protected $table = 'pkwt_pekerja';
 
-    protected $fillable = [
-        'id_pekerja','id_unit','divisi','jabatan',
-        'tgl_mulai_pkwt','tgl_akhir_pkwt',
-        'dokumen_pkwt','status_aktif', 'gaji_harian'
-    ];
+    protected $fillable = ['id_pekerja', 'id_unit', 'divisi', 'jabatan', 'tgl_mulai_pkwt', 'tgl_akhir_pkwt', 'dokumen_pkwt', 'dokumen_mime', 'status_aktif', 'gaji_harian'];
 
+    public function pekerja()
+    {
+        return $this->belongsTo(Pekerja::class, 'id_pekerja', 'id');
+    }
+
+    public function getStatusPkwtAttribute()
+    {
+        if (!$this->tgl_akhir_pkwt) {
+            return [
+                'label' => 'Tanpa PKWT',
+                'color' => 'gray',
+            ];
+        }
+
+        $today = Carbon::today();
+        $end = Carbon::parse($this->tgl_akhir_pkwt);
+
+        $daysLeft = $today->diffInDays($end, false);
+
+        if ($daysLeft < 0) {
+            return [
+                'label' => 'Expired',
+                'color' => 'red',
+            ];
+        }
+
+        if ($daysLeft <= 30) {
+            return [
+                'label' => 'Segera Habis',
+                'color' => 'red',
+            ];
+        }
+
+        return [
+            'label' => 'Aktif',
+            'color' => 'green',
+        ];
+    }
 }

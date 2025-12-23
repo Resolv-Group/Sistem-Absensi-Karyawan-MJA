@@ -124,6 +124,12 @@ Route::middleware(['auth', 'role:hrd,pic,admin'])->group(function(){
     Route::put('/unit/toggle-status/{id}', [UnitController::class, 'toggleStatus']);
 
     Route::POST('/tambah-bidang-usaha', [BidangUsahaController::class, 'tambahBidangUsaha'])->name('tambah.bidang-usaha.post');
+
+    //Show Dokumen
+    Route::get('/unit/{id}/stream/mou', [UnitController::class, 'showDokumenMOU'])
+    ->name('stream.mou');
+    Route::get('/pkwt/{id}/stream/pkwt', [UnitController::class, 'showDokumenPKWT'])
+    ->name('stream.pkwt');
 });
 
 
