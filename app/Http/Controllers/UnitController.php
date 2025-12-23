@@ -2,17 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\History;
 use App\Models\Unit;
 use Illuminate\Http\Request;
 use App\Models\Staff;
 use Illuminate\Database\QueryException;
 use App\Models\MitraKerja;
+use App\Models\Pekerja;
 use Illuminate\Support\Facades\DB;
 
 class UnitController extends Controller
 {
-    function viewUnitMain(Request $request) {
-
+    function viewUnitMain(Request $request)
+    {
         // --- 1. CALCULATE STATS (Top Cards) ---
         $totalUnit = Unit::count(); // total pekerja
         $unitBaru = Unit::where('created_at', '>=', now()->subMonth())->count(); // pekerja baru dari bulan lalu
@@ -26,7 +28,7 @@ class UnitController extends Controller
         $tidakAktif = Unit::where('status_aktif', '!=', '1')->count(); // pekerja tidak aktif
 
         // --- 2. BUILD QUERY ---
-        $query = Unit::query();
+        $query = Unit::query()->with(['picUnit.staff', 'namaMitra']);
 
         // A. Filter by Search (Name, NIK, KPJ)
         // We check for 'search' (from new JS) or 'q' (fallback)
@@ -34,7 +36,7 @@ class UnitController extends Controller
 
         $query->when($search, function ($q) use ($search) {
             $q->where(function ($sub) use ($search) {
-                $sub->where('nama_unit', 'LIKE', "%{$search}%"); // Ensure column name is 'no_kpj' or 'kpj' based on your DB
+                $sub->where('nama_unit', 'LIKE', "%{$search}%");
             });
         });
 
@@ -44,9 +46,13 @@ class UnitController extends Controller
             $q->where('status_aktif', $request->status);
         });
 
+        $query->when($request->filled('pengajian'), function ($q) use ($request) {
+            $q->where('sistem_pengajian', $request->pengajian);
+        });
+
         // C. Filter by Date Range (Tanggal Bergabung)
         $query->when($request->start_date, function ($q) use ($request) {
-            $q->whereDate('akhir_perjanjian', '>=', $request->start_date);
+            $q->whereDate('mulai_perjanjian', '>=', $request->start_date);
         });
 
         $query->when($request->end_date, function ($q) use ($request) {
@@ -54,10 +60,7 @@ class UnitController extends Controller
         });
 
         // --- 3. FETCH DATA ---
-        $unit = $query->orderBy('created_at', 'desc')
-                        ->paginate(10)
-                        ->withQueryString();
-
+        $unit = $query->orderBy('created_at', 'desc')->paginate(10)->withQueryString();
 
         // --- 4. RETURN RESPONSE ---
 
@@ -70,7 +73,7 @@ class UnitController extends Controller
         return view('Unit.main-unit', compact('unit', 'totalUnit', 'unitBaru', 'tidakAktif'));
     }
 
-  public function viewTambahUnit()
+    public function viewTambahUnit()
     {
         $picList = Staff::select('id as val', 'nama as label')->where('jabatan', 'PIC')->get();
 
@@ -96,7 +99,6 @@ class UnitController extends Controller
 
                     'pic_ids' => 'required|array|min:1',
                     'pic_ids.*' => 'exists:staff,id',
-                    
                 ],
                 [
                     'id_unit.required' => 'ID Unit wajib diisi',
@@ -142,12 +144,12 @@ class UnitController extends Controller
                 'status_aktif' => 1,
             ]);
 
-            // dd($unit);  
+            // dd($unit);
             $picIds = $request->pic_ids;
 
             foreach ($picIds as $picId) {
                 DB::table('pic_unit')->insert([
-                    'id_unit' => $request->id_unit, // atau $unit->id_unit
+                    'id_unit' => $unit->id, // atau $unit->id_unit
                     'id_pic' => $picId,
                     'created_at' => now(),
                     'updated_at' => now(),
@@ -169,7 +171,31 @@ class UnitController extends Controller
                 ->withErrors(['general' => $e->getMessage()]);
         }
     }
-  }
+
+    function viewDetailUnit($id)
+    {
+        $unit = Unit::with(['picUnit.staff', 'namaMitra'])->findOrFail($id);
+
+        $historiUnit = History::where('foreign_id', $id)->where('nama_tabel', 'unit')->get();
+
+        $pekerja = Pekerja::get();
+
+        // dd($mitraKerja);
+
+        return view('Unit.detail-unit', compact('unit', 'historiUnit', 'pekerja'));
+    }
+
+    function viewTambahUnitHarian($id_unit)
+    {
+        // Assuming you have Unit and Pekerja models
+        $units = \App\Models\Unit::select('id', 'nama_unit as nama')->get();
+        $unitSelected = Unit::with('namaMitra')
+        ->where('id', $id_unit)
+        ->firstOrFail();
+        $pekerjaList = \App\Models\Pekerja::select('id', 'nama', 'nik')->where('status_aktif', 1)->get();
 
 
+        return view('Unit.CRUD.tambah-unit-harian', compact('unitSelected', 'units', 'pekerjaList'));
+    }
 
+}

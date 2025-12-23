@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('header')
-    <x-header title="Daftar Unit" subtitle="List semua unit" breadcrumbs="Unit Manajemen"/>
+    <x-header title="Daftar Unit" subtitle="Ringkasan statistik dan daftar unit kerja." breadcrumbs="Unit Manajemen" />
 @endsection
 
 @section('content')
@@ -31,31 +31,119 @@
     {{-- ================================
         1. STATS OVERVIEW CARD
     ================================= --}}
-    <div class="bg-white border border-gray-200 rounded-xl p-6 mb-8 shadow-sm">
-        <div class="flex items-center justify-between mb-4">
-            <h2 class="text-sm font-semibold text-gray-800">
-                Periode: <span class="text-gray-500 font-normal">{{ \Carbon\Carbon::now()->translatedFormat('F Y') }}</span>
-            </h2>
-            {{-- <a href="#" class="text-sm text-blue-600 hover:underline flex items-center gap-1">
-                Lihat detail <span>&rarr;</span>
-            </a> --}}
+    {{-- 1. HEADER & DATE INDICATOR --}}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+
+        {{-- CARD 1: TOTAL UNIT --}}
+        <div
+            class="bg-white rounded-2xl p-5 border border-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-lg hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">
+            <div class="flex justify-between items-start z-10 relative">
+                <div>
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Total Unit</p>
+                    <h3 class="text-3xl font-extrabold text-gray-900">{{ $totalUnit }}</h3>
+                </div>
+                <div
+                    class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                </div>
+            </div>
+            {{-- Decorative bottom line --}}
+            <div
+                class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-blue-300 opacity-0 group-hover:opacity-100 transition-opacity">
+            </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-            {{-- Stat Item --}}
-            <div class="border-r border-gray-100 last:border-0">
-                <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Total Mitra Kerja</p>
-                <p class="mt-1 text-2xl font-bold text-gray-900">{{ $totalUnit }}</p>
+        {{-- CARD 2: UNIT BARU --}}
+        <div
+            class="bg-white rounded-2xl p-5 border border-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-lg hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">
+            <div class="flex justify-between items-start z-10 relative">
+                <div>
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Unit Baru</p>
+                    <div class="flex items-baseline gap-2">
+                        <h3 class="text-3xl font-extrabold text-gray-900">{{ $unitBaru }}</h3>
+                        <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-md">Bulan
+                            Ini</span>
+                    </div>
+                </div>
+                <div
+                    class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-50 to-emerald-100 flex items-center justify-center text-emerald-600 group-hover:scale-110 transition-transform">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                </div>
             </div>
-            <div class="border-r border-gray-100 last:border-0">
-                <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Mitra Baru</p>
-                <p class="mt-1 text-2xl font-bold text-gray-900">{{ $unitBaru }}</p>
-            </div>
-            <div class="border-r border-gray-100 last:border-0">
-                <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Tidak Aktif</p>
-                <p class="mt-1 text-2xl font-bold text-gray-900">{{ $tidakAktif }}</p>
+            <div
+                class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 to-emerald-300 opacity-0 group-hover:opacity-100 transition-opacity">
             </div>
         </div>
+
+        {{-- CARD 3: HARIAN --}}
+        <div
+            class="bg-white rounded-2xl p-5 border border-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-lg hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">
+            <div class="flex justify-between items-start z-10 relative">
+                <div>
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Harian</p>
+                    <h3 class="text-3xl font-extrabold text-gray-900">{{ $totalHarian ?? 0 }}</h3>
+                </div>
+                <div
+                    class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-50 to-purple-100 flex items-center justify-center text-purple-600 group-hover:scale-110 transition-transform">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+            </div>
+            <div
+                class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 to-purple-300 opacity-0 group-hover:opacity-100 transition-opacity">
+            </div>
+        </div>
+
+        {{-- CARD 4: BORONGAN --}}
+        <div
+            class="bg-white rounded-2xl p-5 border border-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-lg hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">
+            <div class="flex justify-between items-start z-10 relative">
+                <div>
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Borongan</p>
+                    <h3 class="text-3xl font-extrabold text-gray-900">{{ $totalBorongan ?? 0 }}</h3>
+                </div>
+                <div
+                    class="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-50 to-orange-100 flex items-center justify-center text-orange-600 group-hover:scale-110 transition-transform">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                </div>
+            </div>
+            <div
+                class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-orange-500 to-orange-300 opacity-0 group-hover:opacity-100 transition-opacity">
+            </div>
+        </div>
+
+        {{-- CARD 5: TIDAK AKTIF --}}
+        {{-- On small screens, span full width to fill gap --}}
+        <div
+            class="bg-white rounded-2xl p-5 border border-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-lg hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group sm:col-span-2 lg:col-span-1">
+            <div class="flex justify-between items-start z-10 relative">
+                <div>
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Tidak Aktif</p>
+                    <h3 class="text-3xl font-extrabold text-gray-900">{{ $tidakAktif }}</h3>
+                </div>
+                <div
+                    class="w-10 h-10 rounded-xl bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center text-red-600 group-hover:scale-110 transition-transform">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                    </svg>
+                </div>
+            </div>
+            <div
+                class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-red-500 to-red-300 opacity-0 group-hover:opacity-100 transition-opacity">
+            </div>
+        </div>
+
     </div>
 
     {{-- ================================
@@ -65,14 +153,16 @@
 
         {{-- Left: View Switcher (Visual only) --}}
         <div class="bg-gray-100 p-1 rounded-lg inline-flex self-start sm:self-center">
-            <button
-                class="bg-white shadow-sm px-3 py-1.5 rounded-md text-sm font-medium text-gray-800 flex items-center gap-2">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+            <div
+                class="inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 rounded-full shadow-sm text-sm font-medium text-gray-600">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" viewBox="0 0 20 20"
+                    fill="currentColor">
+                    <path fill-rule="evenodd"
+                        d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+                        clip-rule="evenodd" />
                 </svg>
-                List Daftar
-            </button>
+                <span>{{ \Carbon\Carbon::now()->translatedFormat('F Y') }}</span>
+            </div>
         </div>
 
         {{-- Right: Actions --}}
@@ -96,8 +186,8 @@
             <div class="relative">
                 <button id="filterToggleBtn"
                     class="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                     </svg>
@@ -149,7 +239,87 @@
                             {{-- Trigger Button --}}
                             <div @click="open = !open" @click.outside="open = false"
                                 class="relative block w-full pl-9 pr-3 py-2.5 text-sm bg-gray-50 border border-transparent rounded-xl text-gray-700
-               cursor-pointer hover:bg-gray-100 transition flex justify-between items-center group-focus-within:ring-2 group-focus-within:ring-blue-100 group-focus-within:bg-white">
+                                    cursor-pointer hover:bg-gray-100 transition flex justify-between items-center group-focus-within:ring-2 group-focus-within:ring-blue-100 group-focus-within:bg-white">
+
+                                {{-- Left Icon (User) --}}
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <svg class="h-4 w-4 text-gray-400 group-hover:text-blue-500 transition" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
+
+                                {{-- Selected Text --}}
+                                <span class="truncate font-medium"
+                                    x-text="list.find(x => x.val == selected)?.label || 'Semua Status'">
+                                </span>
+
+                                {{-- Right Chevron --}}
+                                <svg class="w-4 h-4 text-gray-400 transition-transform duration-200"
+                                    :class="{ 'rotate-180': open }" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </div>
+
+                            {{-- Dropdown List --}}
+                            <div x-show="open" x-transition:enter="transition ease-out duration-100"
+                                x-transition:enter-start="transform opacity-0 scale-95"
+                                x-transition:enter-end="transform opacity-100 scale-100"
+                                x-transition:leave="transition ease-in duration-75"
+                                x-transition:leave-start="transform opacity-100 scale-100"
+                                x-transition:leave-end="transform opacity-0 scale-95"
+                                class="absolute w-full mt-1 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden z-[60]">
+
+                                <ul class="max-h-60 overflow-y-auto py-1">
+                                    <template x-for="item in list" :key="item.val">
+                                        <li @click="selected = item.val; open = false"
+                                            class="px-4 py-2.5 text-sm cursor-pointer transition flex items-center gap-2"
+                                            :class="selected == item.val ? 'bg-blue-50 text-blue-700 font-semibold' :
+                                                'text-gray-700 hover:bg-gray-50 hover:text-gray-900'">
+
+                                            {{-- Checkmark Icon (Visible if selected) --}}
+                                            <svg x-show="selected == item.val" class="w-4 h-4 text-blue-600"
+                                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M5 13l4 4L19 7" />
+                                            </svg>
+                                            {{-- Spacer if not selected --}}
+                                            <span x-show="selected != item.val" class="w-4 h-4"></span>
+
+                                            <span x-text="item.label"></span>
+                                        </li>
+                                    </template>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div x-data="{
+                            open: false,
+                            selected: '',
+                            list: [
+                                { val: '', label: 'Semua Tipe Pengajian' },
+                                { val: '1', label: 'Harian' },
+                                { val: '2', label: 'Borongan' }
+                            ]
+                        }" x-init="$watch('selected', value => {
+                            // This bridges Alpine to your existing jQuery Search script
+                            $('#pengajianFilter').val(value).trigger('change');
+                        })" class="relative group">
+
+                            <label class="block text-[10px] uppercase tracking-wider font-bold text-gray-400 mb-1.5">
+                                Tipe Pengajian
+                            </label>
+
+                            {{-- Hidden Input for the jQuery Script to read --}}
+                            <input type="hidden" id="pengajianFilter" :value="selected">
+
+                            {{-- Trigger Button --}}
+                            <div @click="open = !open" @click.outside="open = false"
+                                class="relative block w-full pl-9 pr-3 py-2.5 text-sm bg-gray-50 border border-transparent rounded-xl text-gray-700
+                                    cursor-pointer hover:bg-gray-100 transition flex justify-between items-center group-focus-within:ring-2 group-focus-within:ring-blue-100 group-focus-within:bg-white">
 
                                 {{-- Left Icon (User) --}}
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">

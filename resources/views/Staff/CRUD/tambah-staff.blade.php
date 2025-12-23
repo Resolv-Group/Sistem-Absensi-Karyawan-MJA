@@ -325,7 +325,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
 
                     {{-- 1. Jabatan --}}
-                    <div x-data="{ open: false, selected: '{{ old('jabatan') }}' || '', list: ['Staff', 'Supervisor', 'Manager', 'Direktur', 'HRD', 'IT', 'Akuntan'] }" class="relative">
+                    <div x-data="{ open: false, selected: '{{ old('jabatan') }}' || '', list: ['Staff', 'Supervisor', 'Manager', 'Direktur', 'HRD', 'IT', 'Akuntan', 'PIC'] }" class="relative">
                         <label class="block text-sm font-bold text-gray-700 mb-1">Jabatan</label>
 
                         <input type="hidden" name="jabatan" x-model="selected">
