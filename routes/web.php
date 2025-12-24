@@ -113,11 +113,12 @@ Route::middleware(['auth', 'role:hrd,pic,admin'])->group(function(){
     Route::get('/unit/detail/{id}', [UnitController::class, 'viewDetailUnit'])->name('view.detail.unit');
     Route::get('/unit/{id}/tambah-pekerja', [UnitController::class, 'viewTambahUnitHarian'])->name('view.tambah.unit-pekerja');
     Route::POST('/tambah-unit-pekerja', [UnitController::class, 'tambahPekerjaUnit'])->name('tambah.unit-pekerja.post');
-
+    Route::get('/unit/{id}/tambah-borongan', [UnitController::class, 'viewTambahBorongan'])->name('view.tambah.unit-borongan');
+    Route::POST('/tambah-unit-borongan', [UnitController::class, 'tambahBoronganUnit'])->name('tambah.unit-borongan.post');
+    
     //Unit belum ada
-    Route::get('/unit/tambah-borongan', [UnitController::class, 'viewTambahUnitBorongan'])->name('view.tambah.unit-borongan');
+    Route::get('/unit/tambah-borongan', [UnitController::class, 'viewTambahBorongan'])->name('view.tambah.unit-borongan');
     Route::POST('/tambah-unit-harian', [UnitController::class, 'tambahUnitHarian'])->name('tambah.unit-harian.post');
-    Route::POST('/tambah-unit-borongan', [UnitController::class, 'tambahUnitBorongan'])->name('tambah.unit-borongan.post');
     Route::get('/unit/ubah/{id}', [UnitController::class, 'ubahUnit'])->name('view.ubah.unit');
     Route::put('/unit/ubah/{id}', [UnitController::class, 'updateUnit'])->name('update.unit');
 

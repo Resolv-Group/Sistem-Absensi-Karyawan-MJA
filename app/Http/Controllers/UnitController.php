@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Borongan;
 use App\Models\Divisi;
 use App\Models\History;
 use App\Models\JabatanPKWT;
+use App\Models\Kategori;
 use App\Models\Unit;
 use Illuminate\Http\Request;
 use App\Models\Staff;
@@ -323,6 +325,80 @@ class UnitController extends Controller
             return redirect()
                 ->route('view.tambah.unit')
                 ->with('success', 'Pekerja berhasil ditambahkan.');
+
+        } catch (QueryException $e) {
+            DB::rollBack();
+            return back()->withInput()->withErrors(['database' => $e->getMessage()]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->withInput()->withErrors(['general' => $e->getMessage()]);
+        }
+    }
+
+    function viewTambahBorongan($id_unit)
+    {
+        // Assuming you have Unit and Pekerja models
+        $units = \App\Models\Unit::select('id', 'nama_unit as nama')->get();
+        $unitSelected = Unit::with('namaMitra')
+        ->where('id', $id_unit)
+        ->firstOrFail();
+        $kategoriList = Kategori::select('id', 'nama')->get();
+    
+        return view('Unit.CRUD.tambah-unit-borongan', compact('unitSelected', 'units', 'kategoriList'));
+    }
+
+    function tambahBoronganUnit(Request $request)
+    {
+        // dd($request->all()); // aktifkan hanya untuk debug
+
+        try {
+            DB::beginTransaction();
+
+            // ✅ VALIDASI SESUAI ARRAY
+            $request->validate(
+                [
+                    'id_unit' => 'required|string',
+
+                    'borongan' => 'required|array|min:1',
+
+                    'borongan.*.harga_unit' => 'required|double',
+                    'borongan.*.harga_pekerja' => 'required|double',
+
+                    'borongan.*.kategori' => 'required|integer',
+                    'borongan.*.nama_item' => 'required|string',
+
+                    'borongan.*.satuan' => 'required|string',
+                ],
+                [
+                    'id_unit.required' => 'ID Unit wajib diisi',
+                    'borongan.required' => 'Data borongan wajib diisi',
+                    'borongan.*.harga_unit.required' => 'Harga Unit wajib dipilih',
+                    'borongan.*.harga_pekerja.required' => 'Harga Pekerja wajib dipilih',
+                    'borongan.*.kategori.required' => 'Kategori wajib dipilih',
+                    'borongan.*.nama_item.required' => 'Nama Item wajib diisi',
+                    'borongan.*.satuan.required' => 'Satuan wajib diisi',
+                ]
+            );
+
+            // ✅ LOOP PEKERJA
+            foreach ($request->borongan as $index => $data) {
+
+                $borongan = Borongan::create([
+                    'id_unit' => $request->id_unit,
+                    'harga_unit' => $data['harga_unit'],
+                    'harga_pekerja' => $data['harga_pekerja'],
+                    'kategori' => $data['kategori'],
+                    'nama_item' => $data['nama_item'],
+                    'satuan' => $data['satuan'],
+                    'status_aktif' => 1,
+                ]);
+            }
+
+            DB::commit();
+
+            return redirect()
+                ->route('view.tambah.unit')
+                ->with('success', 'Borongan berhasil ditambahkan.');
 
         } catch (QueryException $e) {
             DB::rollBack();
