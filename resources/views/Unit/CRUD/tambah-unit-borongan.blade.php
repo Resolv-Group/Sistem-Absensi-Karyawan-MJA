@@ -32,89 +32,70 @@
         @endif
 
         <form action="{{ route('tambah.unit-borongan.post') }}" method="POST" enctype="multipart/form-data"
-            x-data="workerForm()" class="space-y-6">
+            x-data="boronganForm()" class="space-y-6">
             @csrf
 
             {{-- CARD 1: INFORMASI UNIT --}}
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-200">
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 relative overflow-hidden group">
+
+                {{-- Hidden Input --}}
+                <input type="hidden" name="id_unit" value="{{ $unitSelected->id ?? '' }}">
+
+                {{-- Background Decoration (Subtle) --}}
                 <div
-                    class="bg-blue-50/50 border-b border-blue-100 p-4 flex flex-col items-center justify-center text-center">
+                    class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-blue-50 rounded-full blur-3xl opacity-50 pointer-events-none">
+                </div>
+
+                <div class="flex items-start sm:items-center gap-5 relative z-10">
+
+                    {{-- 1. Large Icon / Logo --}}
                     <div
-                        class="h-10 w-10 bg-white rounded-full flex items-center justify-center shadow-sm text-blue-600 mb-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        class="flex-shrink-0 h-16 w-16 bg-gradient-to-br from-blue-50 to-white border border-blue-100 rounded-2xl flex items-center justify-center shadow-sm">
+                        <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                                 d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                         </svg>
                     </div>
-                    <h2 class="text-sm font-bold text-gray-900 uppercase tracking-wide">Informasi Penambahan Item (Borongan)
-                    </h2>
-                </div>
 
-                <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {{-- 2. Information Details --}}
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span
+                                class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-100 uppercase tracking-wide">
+                                Unit Terpilih
+                            </span>
+                        </div>
 
-                    {{-- 1. Unit Information (Readonly) --}}
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
-                            Unit Kerja Terpilih
-                        </label>
+                        <h2 class="text-xl font-bold text-gray-900 leading-tight truncate">
+                            {{ $unitSelected->nama_unit ?? 'Nama Unit' }}
+                        </h2>
 
-                        {{-- Hidden Input to ensure ID is submitted --}}
-                        <input type="hidden" name="id_unit" value="{{ $unitSelected->id ?? '' }}">
-
-                        <div
-                            class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 flex items-center justify-between">
-                            <div>
-                                {{-- Nama Unit --}}
-                                <p class="text-sm font-bold text-gray-900">
-                                    {{ $unitSelected->nama_unit ?? 'Nama Unit Belum Dimuat' }}
-                                </p>
-
-                                {{-- Nama Perusahaan & ID --}}
-                                <div class="flex items-center gap-2 mt-1">
-                                    <div class="flex items-center gap-1.5 text-xs text-gray-500 font-medium">
-                                        <svg class="w-3.5 h-3.5 text-gray-400" fill="none" viewBox="0 0 24 24"
-                                            stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                                        </svg>
-                                        {{ $unitSelected->namaMitra->nama_mitra ?? 'Nama Perusahaan' }}
-                                    </div>
-
-                                    <span class="text-gray-300">•</span>
-
-                                    <div
-                                        class="flex items-center gap-1 text-xs text-gray-500 font-mono bg-gray-200/50 px-1.5 py-0.5 rounded">
-                                        #{{ $unitSelected->id ?? 'ID' }}
-                                    </div>
-                                </div>
+                        <div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5 text-sm text-gray-500">
+                            <div class="flex items-center gap-1.5">
+                                <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                </svg>
+                                <span
+                                    class="font-medium text-gray-700">{{ $unitSelected->namaMitra->nama_mitra ?? '-' }}</span>
                             </div>
 
-                            {{-- Lock Icon to indicate Readonly --}}
-                            <div class="p-2 bg-gray-200/50 rounded-lg text-gray-400">
-                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                </svg>
+                            <span class="text-gray-300">|</span>
+
+                            <div class="flex items-center gap-1.5">
+                                <span class="text-gray-400">ID:</span>
+                                <span
+                                    class="font-mono font-bold text-gray-900 bg-gray-100 px-1.5 rounded">{{ $unitSelected->id ?? '-' }}</span>
                             </div>
                         </div>
                     </div>
 
-                    {{-- 2. Status Aktif (Readonly Style) --}}
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
-                            Status Penambahan
-                        </label>
-                        <div
-                            class="w-full py-3.5 px-4 bg-emerald-50 border border-emerald-100 rounded-xl text-emerald-700 text-sm font-bold flex items-center gap-2 h-[66px]">
-                            {{-- Fixed height to match neighbor --}}
-                            <span class="relative flex h-2.5 w-2.5">
-                                <span
-                                    class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-                            </span>
-                            Aktif
-                        </div>
+                    {{-- 3. Lock Icon (Visual indicator that this is fixed) --}}
+                    <div class="hidden sm:flex h-10 w-10 text-gray-300 justify-center items-center">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
                     </div>
                 </div>
             </div>
@@ -133,7 +114,7 @@
                 </div>
 
                 <div class="p-6 space-y-6">
-                    <template x-for="(row, index) in rows" :key="row.id">
+                    <template x-for="(row, index) in borongan" :key="row.id">
                         <div
                             class="bg-white rounded-2xl border border-gray-200 p-5 relative group transition hover:border-blue-300 hover:shadow-lg hover:shadow-blue-500/10">
 
@@ -151,91 +132,71 @@
                                         d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                 </svg>
                             </button>
-                            
+
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
 
                                 {{-- 1. Nama Barang --}}
-                                <div>
-                                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Nama Item
+                                <div class="sm:col-span-2">
+                                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Nama
+                                        Item
                                         <span class="text-red-500">*</span></label>
-                                    <input type="text" name="nama_item" placeholder="Contoh: Besi A"
-                                        class="w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-blue-500 focus:ring-blue-100 transition py-3 px-4 text-sm font-medium placeholder-gray-400"
-                                        value="{{ old('') }}">
+                                    <input type="text" :name="`borongan[${index}][nama_item]`" x-model="row.nama_item"
+                                        placeholder="Contoh: Besi A"
+                                        class="w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-blue-500 py-3 px-4 text-sm" />
                                 </div>
 
                                 {{-- 2. Kategori (Searchable Combobox) --}}
-                                <div
-                                    x-data="idCombobox(row, 'kategoriId', window.kategoriData, k => k.nama)"
-                                    x-init="init()"
-                                    class="relative"
-                                >
+                                <div x-data="idCombobox(row, 'kategoriId', window.kategoriData, k => k.nama)" x-init="init()" class="relative">
                                     <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
                                         Kategori
                                     </label>
 
                                     <div class="relative">
                                         <!-- Visible input (search / display only) -->
-                                        <input
-                                            type="text"
-                                            x-model="search"
-                                            @focus="open = true"
-                                            @click="open = true"
-                                            @click.outside="close()"
-                                            @keydown.escape="open = false"
+                                        <input type="text" x-model="search" @focus="open = true" @click="open = true"
+                                            @click.outside="close()" @keydown.escape="open = false"
                                             placeholder="Pilih kategori..."
                                             class="w-full pl-4 pr-10 py-3 text-sm font-medium text-gray-800 bg-gray-50 rounded-xl focus:bg-white focus:border-blue-500 transition"
-                                            autocomplete="off"
-                                        >
+                                            autocomplete="off">
 
                                         <!-- Chevron -->
                                         <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M19 9l-7 7-7-7"/>
+                                                    d="M19 9l-7 7-7-7" />
                                             </svg>
                                         </div>
                                     </div>
 
                                     <!-- Dropdown -->
-                                    <ul
-                                        x-show="open"
-                                        x-transition.opacity
-                                        class="absolute z-50 w-full mt-1 bg-white border border-gray-100 rounded-xl shadow-xl max-h-48 overflow-y-auto py-1"
-                                    >
+                                    <ul x-show="open" x-transition.opacity
+                                        class="absolute z-50 w-full mt-1 bg-white border border-gray-100 rounded-xl shadow-xl max-h-48 overflow-y-auto py-1">
                                         <template x-for="item in filtered" :key="item.id">
-                                            <li
-                                                @click="select(item)"
-                                                class="px-4 py-2.5 text-sm cursor-pointer hover:bg-blue-50 hover:text-blue-700 font-medium text-gray-700"
-                                            >
+                                            <li @click="select(item)"
+                                                class="px-4 py-2.5 text-sm cursor-pointer hover:bg-blue-50 hover:text-blue-700 font-medium text-gray-700">
                                                 <span x-text="item.nama"></span>
                                             </li>
                                         </template>
 
-                                        <li
-                                            x-show="filtered.length === 0"
-                                            class="px-4 py-2 text-xs text-gray-400 italic"
-                                        >
+                                        <li x-show="filtered.length === 0" class="px-4 py-2 text-xs text-gray-400 italic">
                                             Tidak ada hasil
                                         </li>
                                     </ul>
 
                                     <!-- Hidden input (submitted value) -->
-                                    <input
-                                        type="hidden"
-                                        :name="`pekerja[${index}][kategori_id]`"
-                                        :value="row.kategoriId"
-                                    >
+                                    <input type="hidden" :name="`borongan[${index}][kategori]`" :value="row.kategoriId">
                                 </div>
 
                                 {{-- 3. Gaji Unit --}}
                                 <div>
-                                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Harga Barang Unit</label>
+                                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Harga
+                                        Barang Unit</label>
                                     <div class="relative">
                                         <span
                                             class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-bold">Rp</span>
-                                        <input type="number" :name="`harga_unit`"
-                                            x-model.number="row.harga_unit"
-                                            @input="autoHitung(row)"
+                                        <input type="number" :name="`borongan[${index}][harga_unit]`"
+                                            x-model.number="row.harga_unit" @input="autoHitung(row)"
                                             class="w-full pl-10 rounded-xl border-gray-200 bg-gray-50 text-sm font-bold text-gray-900 focus:bg-white focus:border-blue-500 py-3 px-4"
                                             placeholder="0">
                                     </div>
@@ -243,13 +204,13 @@
 
                                 {{-- 4. Gaji Pekerja --}}
                                 <div>
-                                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Harga Barang Pekerja</label>
+                                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Harga
+                                        Barang Pekerja</label>
                                     <div class="relative">
                                         <span
                                             class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-bold">Rp</span>
-                                        <input type="number" :name="`harga_pekerja`"
-                                            x-model.number="row.harga_pekerja"
-                                            @input="row.manual = true"
+                                        <input type="number" :name="`borongan[${index}][harga_pekerja]`"
+                                            x-model.number="row.harga_pekerja" @input="row.manual = true"
                                             class="w-full pl-10 rounded-xl border-gray-200 bg-gray-50 text-sm font-bold text-gray-900 focus:bg-white focus:border-blue-500 py-3 px-4"
                                             placeholder="0">
                                     </div>
@@ -259,7 +220,8 @@
                                 <div x-data="{ open: false, selected: '{{ old('satuan') }}' || '', list: [{ val: '1', label: 'Rue' }, { val: '2', label: 'M' }, { val: '3', label: 'Biji' }, { val: '4', label: 'Unit' }] }" class="relative">
                                     <label class="block text-sm font-bold text-gray-700 mb-1">Satuan</label>
 
-                                    <input type="hidden" name="satuan" x-model="selected">
+                                    <input type="hidden" :name="`borongan[${index}][satuan]`" x-model="selected" />
+
 
                                     <div @click="open=!open"
                                         class=" bg-gray-50 rounded-lg py-2.5 px-3 cursor-pointer flex justify-between items-center">
@@ -286,24 +248,49 @@
                     </template>
 
                     {{-- Empty State --}}
-                    <div x-show="rows.length === 0" class="text-center py-12 text-gray-400 text-sm italic bg-gray-50/50">
-                        Klik "Tambah Baris" untuk memasukkan data pekerja.
+                    <div x-show="borongan.length === 0"
+                        class="text-center py-12 text-gray-400 text-sm italic bg-gray-50/50">
+                        Klik "Tambah Baris" untuk memasukkan item borongan.
                     </div>
                 </div>
             </div>
 
             {{-- FOOTER / TOTAL --}}
+            {{-- FOOTER ACTION BAR --}}
             <div
-                class="bg-white rounded-2xl shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] border border-gray-200 p-6 flex flex-col sm:flex-row items-center justify-between gap-6 sticky bottom-4 z-10">
-                {{-- <div>
-                    <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Total Alokasi Gaji</p>
-                    <p class="text-3xl font-black text-gray-900" x-text="formatRupiah(totalAllocation)"></p>
-                </div> --}}
+                class="bg-white rounded-2xl shadow-[0_-8px_30px_-10px_rgba(0,0,0,0.1)] border border-gray-200 p-5 flex flex-col sm:flex-row items-center justify-between gap-4 sticky bottom-6 z-20">
 
-                <button type="submit"
-                    class="w-full sm:w-auto px-8 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-200 transition transform hover:-translate-y-0.5">
-                    Simpan Data
-                </button>
+                {{-- Left: Cancel Button & Info --}}
+                <div class="flex items-center gap-4 w-full sm:w-auto order-2 sm:order-1">
+
+                    {{-- Cancel Button --}}
+                    <a href="{{ route('view.detail.unit', $unitSelected->id) }}"
+                        class="px-6 py-3 text-sm font-bold text-gray-600 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 hover:text-gray-900 transition shadow-sm w-full sm:w-auto text-center">
+                        Batalkan
+                    </a>
+                    <div class="h-4 w-px bg-gray-300 hidden sm:block"></div>
+                    {{-- Row Counter (Replaces the empty space) --}}
+                    <div
+                        class="hidden sm:flex items-center gap-2 text-xs font-medium text-gray-400 bg-gray-50 px-3 py-2 rounded-lg border border-gray-100">
+                        <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                        </svg>
+                        <span x-text="borongan.length + ' borongan akan ditambahkan'"></span>
+                    </div>
+                </div>
+
+                {{-- Right: Save Button --}}
+                <div class="w-full sm:w-auto order-1 sm:order-2">
+                    <button type="submit"
+                        class="w-full sm:w-auto px-8 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-200/50 transition transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
+                        <span>Simpan Data</span>
+                        <svg class="w-5 h-5 text-emerald-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                    </button>
+                </div>
+
             </div>
 
         </form>
@@ -413,56 +400,41 @@
         window.workersData = @json($pekerjaList ?? []);
 
         // 2. FORM LOGIC
-        function workerForm() {
+        function boronganForm() {
             return {
-                rows: [{
-                        id: 1,
-                        harga_unit: 0,
-                        harga_pekerja: 0,
-                        workerId: '',
-                        kategoriId: null,
-                    } // Added fieldss
-                ],
+                borongan: [{
+                    id: Date.now(),
+                    kategoriId: null,
+                    nama_item: '',
+                    harga_unit: 0,
+                    harga_pekerja: 0,
+                    satuan: '',
+                    manual: false,
+                }],
 
                 addRow() {
-                    this.rows.push({
+                    this.borongan.push({
                         id: Date.now(),
+                        kategoriId: null,
+                        nama_item: '',
                         harga_unit: 0,
                         harga_pekerja: 0,
-                        workerId: '',
-                        kategoriId: '', 
+                        satuan: '',
+                        manual: false,
                     });
                 },
-                // ... (removeRow, totals, etc remain the same) ...
+
                 removeRow(index) {
-                    this.rows.splice(index, 1);
+                    this.borongan.splice(index, 1);
                 },
 
                 autoHitung(row) {
                     if (row.manual) return;
-
-                    if (!row.harga_unit || row.harga_unit <= 0) {
-                        row.harga_pekerja = 0;
-                        return;
-                    }
-
-                    row.harga_pekerja = Math.round(row.harga_unit * 0.82);
-                },
-
-                get totalAllocation() {
-                    return this.rows.reduce((sum, row) => sum + (parseInt(row.gaji) || 0), 0);
-                },
-                formatRupiah(amount) {
-                    return new Intl.NumberFormat('id-ID', {
-                        style: 'currency',
-                        currency: 'IDR',
-                        minimumFractionDigits: 0
-                    }).format(amount);
+                    row.harga_pekerja = Math.round((row.harga_unit || 0) * 0.82);
                 }
-                
-                
             }
         }
+
 
         // 3. GENERIC STRING COMBOBOX (For Divisi & Jabatan)
         // This allows selecting from list OR typing a new value (Hybrid)
@@ -508,7 +480,6 @@
         // (Combobox logic for Unit remains the same...)
         document.addEventListener('alpine:init', () => {
             Alpine.data('combobox', (listData) => ({
-                // ... existing unit combobox code ...
                 list: listData,
                 search: '',
                 selectedId: '',
