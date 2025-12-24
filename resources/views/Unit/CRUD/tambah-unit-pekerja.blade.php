@@ -202,20 +202,20 @@
                                 </div>
 
                                 {{-- 3. Divisi (Searchable Combobox) --}}
-                                <div x-data="stringCombobox(row.divisi, window.divisiOptions, (val) => row.divisi = val)" x-init="init()" class="relative">
-
-                                    <label
-                                        class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Divisi</label>
+                                <div x-data="idCombobox(row, 'divisiId', window.divisiData, d => d.nama)" x-init="init()" class="relative">
+                                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
+                                        Divisi
+                                    </label>
 
                                     <div class="relative">
-                                        {{-- The Input acts as both search and value --}}
-                                        <input type="text" :name="`pekerja[${index}][divisi]`" x-model="search"
-                                            @focus="open = true" @click="open = true" @click.outside="close()"
-                                            @keydown.escape="open = false" placeholder="Pilih atau ketik..."
-                                            class="w-full pl-4 pr-10 py-3 text-sm font-medium text-gray-800 bg-gray-50 rounded-xl focus:bg-white focus:border-blue-500 transition cursor-pointer"
+                                        <!-- Visible input (search/display only) -->
+                                        <input type="text" x-model="search" @focus="open = true" @click="open = true"
+                                            @click.outside="close()" @keydown.escape="open = false"
+                                            placeholder="Pilih divisi..."
+                                            class="w-full pl-4 pr-10 py-3 text-sm font-medium text-gray-800 bg-gray-50 rounded-xl focus:bg-white focus:border-blue-500 transition"
                                             autocomplete="off">
 
-                                        {{-- Chevron --}}
+                                        <!-- Chevron -->
                                         <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                                             <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
                                                 viewBox="0 0 24 24">
@@ -225,34 +225,41 @@
                                         </div>
                                     </div>
 
-                                    {{-- Dropdown --}}
+                                    <!-- Dropdown -->
                                     <ul x-show="open" x-transition.opacity
                                         class="absolute z-50 w-full mt-1 bg-white border border-gray-100 rounded-xl shadow-xl max-h-48 overflow-y-auto py-1">
-                                        <template x-for="item in filtered" :key="item">
+                                        <template x-for="item in filtered" :key="item.id">
                                             <li @click="select(item)"
                                                 class="px-4 py-2.5 text-sm cursor-pointer hover:bg-blue-50 hover:text-blue-700 font-medium text-gray-700">
-                                                <span x-text="item"></span>
+                                                <span x-text="item.nama"></span>
                                             </li>
                                         </template>
+
                                         <li x-show="filtered.length === 0" class="px-4 py-2 text-xs text-gray-400 italic">
-                                            Tekan enter untuk menggunakan nilai baru
+                                            Tidak ada hasil
                                         </li>
                                     </ul>
+
+                                    <!-- Hidden input (actual submitted value) -->
+                                    <input type="hidden" :name="`pekerja[${index}][divisi_id]`" :value="row.divisiId">
                                 </div>
 
-                                {{-- 4. Jabatan (Searchable Combobox) --}}
-                                <div x-data="stringCombobox(row.jabatan, window.jabatanOptions, (val) => row.jabatan = val)" x-init="init()" class="relative">
 
-                                    <label
-                                        class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Jabatan</label>
+                                {{-- 4. Jabatan (Searchable Combobox) --}}
+                                <div x-data="idCombobox(row, 'jabatanId', window.jabatanData, j => j.nama)" x-init="init()" class="relative">
+                                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
+                                        Jabatan
+                                    </label>
 
                                     <div class="relative">
-                                        <input type="text" :name="`pekerja[${index}][jabatan]`" x-model="search"
-                                            @focus="open = true" @click="open = true" @click.outside="close()"
-                                            @keydown.escape="open = false" placeholder="Pilih atau ketik..."
-                                            class="w-full pl-4 pr-10 py-3 text-sm font-medium text-gray-800 bg-gray-50 rounded-xl focus:bg-white focus:border-blue-500 transition cursor-pointer"
+                                        <!-- Visible input -->
+                                        <input type="text" x-model="search" @focus="open = true" @click="open = true"
+                                            @click.outside="close()" @keydown.escape="open = false"
+                                            placeholder="Pilih jabatan..."
+                                            class="w-full pl-4 pr-10 py-3 text-sm font-medium text-gray-800 bg-gray-50 rounded-xl focus:bg-white focus:border-blue-500 transition"
                                             autocomplete="off">
 
+                                        <!-- Chevron -->
                                         <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                                             <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
                                                 viewBox="0 0 24 24">
@@ -262,18 +269,23 @@
                                         </div>
                                     </div>
 
+                                    <!-- Dropdown -->
                                     <ul x-show="open" x-transition.opacity
                                         class="absolute z-50 w-full mt-1 bg-white border border-gray-100 rounded-xl shadow-xl max-h-48 overflow-y-auto py-1">
-                                        <template x-for="item in filtered" :key="item">
+                                        <template x-for="item in filtered" :key="item.id">
                                             <li @click="select(item)"
                                                 class="px-4 py-2.5 text-sm cursor-pointer hover:bg-blue-50 hover:text-blue-700 font-medium text-gray-700">
-                                                <span x-text="item"></span>
+                                                <span x-text="item.nama"></span>
                                             </li>
                                         </template>
+
                                         <li x-show="filtered.length === 0" class="px-4 py-2 text-xs text-gray-400 italic">
-                                            Tekan enter untuk menggunakan nilai baru
+                                            Tidak ada hasil
                                         </li>
                                     </ul>
+
+                                    <!-- Hidden input (submitted value) -->
+                                    <input type="hidden" :name="`pekerja[${index}][jabatan_id]`" :value="row.jabatanId">
                                 </div>
 
                                 {{-- 5. Dates --}}
@@ -443,8 +455,8 @@
         }
 
         // 1. DATA SOURCES (You can pass these from Controller later)
-        window.divisiOptions = ['Produksi', 'Gudang', 'Logistik', 'Pemasaran', 'Keuangan', 'Umum', 'IT Support'];
-        window.jabatanOptions = ['Staff', 'Supervisor', 'Operator', 'Helper', 'Driver', 'Security', 'Admin'];
+        window.divisiData = @json($divisiList);
+        window.jabatanData = @json($jabatanList);
         window.workersData = @json($pekerjaList ?? []);
 
         // 2. FORM LOGIC
@@ -454,8 +466,8 @@
                         id: 1,
                         gaji: 0,
                         workerId: '',
-                        divisi: '',
-                        jabatan: ''
+                        divisiId: null,
+                        jabatanId: null,
                     } // Added fields
                 ],
 
@@ -464,8 +476,8 @@
                         id: Date.now(),
                         gaji: 0,
                         workerId: '',
-                        divisi: '', // Initialize empty
-                        jabatan: '' // Initialize empty
+                        divisiId: '', // Initialize empty
+                        jabatanId: '' // Initialize empty
                     });
                 },
                 // ... (removeRow, totals, etc remain the same) ...
@@ -487,73 +499,41 @@
 
         // 3. GENERIC STRING COMBOBOX (For Divisi & Jabatan)
         // This allows selecting from list OR typing a new value (Hybrid)
-        function stringCombobox(initialValue, optionsList, updateCallback) {
+        function idCombobox(row, field, dataSource, labelFn) {
             return {
                 open: false,
-                search: initialValue || '',
-                list: optionsList,
+                search: '',
+                selectedId: row[field],
 
                 init() {
-                    // When user types, update the parent row data immediately
-                    this.$watch('search', value => updateCallback(value));
+                    if (this.selectedId) {
+                        const found = dataSource.find(i => i.id == this.selectedId);
+                        if (found) this.search = labelFn(found);
+                    }
                 },
 
                 get filtered() {
-                    if (this.search === '') return this.list;
-                    return this.list.filter(item =>
-                        item.toLowerCase().includes(this.search.toLowerCase())
+                    if (!this.search) return dataSource;
+                    return dataSource.filter(item =>
+                        labelFn(item).toLowerCase().includes(this.search.toLowerCase())
                     );
                 },
 
                 select(item) {
-                    this.search = item;
+                    this.selectedId = item.id;
+                    row[field] = item.id;
+                    this.search = labelFn(item);
                     this.open = false;
-                    // updateCallback is called automatically by $watch
                 },
 
                 close() {
+                    if (this.selectedId) {
+                        const found = dataSource.find(i => i.id == this.selectedId);
+                        if (found) this.search = labelFn(found);
+                    } else {
+                        this.search = '';
+                    }
                     this.open = false;
-                }
-            }
-        }
-
-
-
-
-        // 1. Store Worker Data Globally for Alpine to access
-        window.workersData = @json($pekerjaList ?? []);
-
-        function workerForm() {
-            return {
-                rows: [{
-                        id: 1,
-                        gaji: 0,
-                        workerId: ''
-                    } // Added workerId
-                ],
-
-                addRow() {
-                    this.rows.push({
-                        id: Date.now(),
-                        gaji: 0,
-                        workerId: '' // Added workerId
-                    });
-                },
-
-                removeRow(index) {
-                    this.rows.splice(index, 1);
-                },
-
-                get totalAllocation() {
-                    return this.rows.reduce((sum, row) => sum + (parseInt(row.gaji) || 0), 0);
-                },
-
-                formatRupiah(amount) {
-                    return new Intl.NumberFormat('id-ID', {
-                        style: 'currency',
-                        currency: 'IDR',
-                        minimumFractionDigits: 0
-                    }).format(amount);
                 }
             }
         }

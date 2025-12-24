@@ -35,11 +35,16 @@
                     {{ $unit->status_aktif
                         ? 'text-red-600 bg-red-50 border-red-100 hover:bg-red-100'
                         : 'text-emerald-600 bg-emerald-50 border-emerald-100 hover:bg-emerald-100' }}">
-                    @if($unit->status_aktif)
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg>
+                    @if ($unit->status_aktif)
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                        </svg>
                         Nonaktifkan
                     @else
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
                         Aktifkan
                     @endif
                 </button>
@@ -101,9 +106,10 @@
                             </div>
                             <div class="flex justify-between items-start group">
                                 <span
-                                    class="text-xs text-gray-400 uppercase font-bold tracking-wide group-hover:text-blue-600 transition">Mulai Perjanjian</span>
+                                    class="text-xs text-gray-400 uppercase font-bold tracking-wide group-hover:text-blue-600 transition">Mulai
+                                    Perjanjian</span>
                                 <span
-                                    class="text-sm font-bold text-gray-900 text-right max-w-[60%] leading-snug group-hover:text-blue-700 transition">{{ formatTanggal($unit->mulai_perjanjian )}}</span>
+                                    class="text-sm font-bold text-gray-900 text-right max-w-[60%] leading-snug group-hover:text-blue-700 transition">{{ formatTanggal($unit->mulai_perjanjian) }}</span>
                             </div>
                         </div>
                     </div>
@@ -111,8 +117,8 @@
                         <a href="{{ route('stream.mou', $unit->id) }}" target="_blank"
                             class="flex items-center justify-center gap-2 py-4 text-sm font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-50 transition group">
 
-                            <svg class="w-5 h-5 text-gray-400 group-hover:text-blue-500 transition"
-                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-5 h-5 text-gray-400 group-hover:text-blue-500 transition" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M4 6h11a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2z" />
                             </svg>
@@ -170,7 +176,8 @@
                                         <a href="tel:{{ optional($pic->staff)->telp }}"
                                             class="absolute right-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 p-2 bg-blue-600 text-white rounded-lg shadow-lg hover:bg-blue-700 transition-all duration-200"
                                             title="Hubungi PIC">
-                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                                                stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                                             </svg>
@@ -287,155 +294,167 @@
 
         <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
             {{-- Toolbar --}}
-            <div class="px-6 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gray-50/30">
+            <div
+                class="px-6 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gray-50/30">
                 <div class="flex items-center gap-2">
-                    <span class="px-2.5 py-0.5 rounded-md bg-white border border-gray-200 text-gray-700 text-xs font-bold shadow-sm">
+                    <span
+                        class="px-2.5 py-0.5 rounded-md bg-white border border-gray-200 text-gray-700 text-xs font-bold shadow-sm">
                         Total: {{ $totalPekerja }} Orang
                     </span>
                 </div>
                 <div class="flex items-center gap-3 w-full sm:w-auto">
                     <div class="relative w-full sm:w-64">
-                        <input type="text" placeholder="Cari pekerja..." class="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition bg-white">
-                        <svg class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                        <input type="text" placeholder="Cari pekerja..."
+                            class="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition bg-white">
+                        <svg class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
                     </div>
                     <a href="{{ route('view.tambah.unit-pekerja', $unit->id) }}"
-                    class="px-4 py-2 bg-black text-white text-xs font-bold rounded-lg hover:bg-gray-800 transition flex items-center gap-2 shadow-sm">
-                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+                        class="px-4 py-2 bg-black text-white text-xs font-bold rounded-lg hover:bg-gray-800 transition flex items-center gap-2 shadow-sm">
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
                         Tambah
                     </a>
                 </div>
             </div>
 
             {{-- Table --}}
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-gray-50 border-b border-gray-100">
-                            <th class="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Nama & NIK</th>
-                            <th class="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Divisi</th>
-                            <th class="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Jabatan</th>
-                            <th class="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Gaji Pokok</th> {{-- NEW --}}
-                            <th class="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider">PKWT</th> {{-- NEW --}}
-                            <th class="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider text-center">Bergabung</th>
-                            <th class="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider text-center">Akhir</th>
-                            <th class="px-6 py-4 text-right"></th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-50">
-                        @forelse($pkwtPekerja as $pkwt)
-                            <tr class="hover:bg-blue-50/30 transition group">
-                                {{-- 1. Name --}}
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-3">
-                                        {{-- <div class="h-9 w-9 rounded-full bg-white border border-gray-200 flex items-center justify-center text-xs font-bold text-gray-600 shadow-sm group-hover:border-blue-200 group-hover:text-blue-600 transition">
-                                            {{ substr($worker['name'], 0, 1) }}
-                                        </div> --}}
-                                        <div>
-                                            <p class="text-sm font-bold text-gray-900 group-hover:text-blue-600 transition">{{ $pkwt->pekerja->nama }}</p>
-                                            <p class="text-xs text-gray-400 font-mono">{{ $pkwt->pekerja->nik }}</p>
-                                        </div>
-                                    </div>
-                                </td>
+            <div class="overflow-x-auto rounded-b-2xl">
+    <table class="w-full text-left border-collapse">
+        <thead>
+            <tr class="bg-gray-50/50 border-b border-gray-100">
+                <th class="pl-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider w-[250px]">Nama & NIK</th>
+                <th class="px-4 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Jabatan & Divisi</th>
+                <th class="px-4 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Gaji Pokok & Lembur</th>
+                <th class="px-4 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider text-center">Dokumen</th>
+                <th class="px-4 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider text-center">Periode PKWT</th>
+                <th class="pr-6 py-4 text-right"></th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-50 bg-white">
+            @forelse($pkwtPekerja as $pkwt)
+                <tr class="hover:bg-blue-50/20 transition group">
 
-                                {{-- 2. Jabatan --}}
-                                <td class="px-6 py-4">
-                                    <span class="text-xs font-medium text-gray-600 bg-gray-100 px-2 py-1 rounded border border-gray-200">{{ $pkwt->jabatan }}</span>
-                                </td>
-
-                                <td class="px-6 py-4">
-                                    <span class="text-xs font-medium text-gray-600 bg-gray-100 px-2 py-1 rounded border border-gray-200">{{ $pkwt->divisi }}</span>
-                                </td>
-
-                                {{-- 3. Salary (NEW) --}}
-                                <td class="px-6 py-4">
-                                    <div class="flex flex-col">
-                                        <span class="text-sm font-bold text-gray-900">
-                                            Rp {{ number_format($pkwt->gaji_harian, 0, ',', '.') }}
-                                        </span>
-                                        <span class="text-[10px] text-gray-400">/ Hari</span>
-                                    </div>
-                                </td>
-
-                                @php $mime = $pkwt->dokumen_mime; @endphp
-
-                                {{-- 4. Dokumen (NEW) --}}
-                                <td class="px-6 py-4">
-                                    @if($mime && Str::startsWith($mime, 'application/pdf'))
-                                        <a href="{{ route('stream.pkwt', $pkwt->id) }}"  target="_blank" class="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-red-50 text-red-700 border border-red-100 hover:bg-red-100 transition group/doc">
-                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
-                                            <span class="text-xs font-bold truncate max-w-[80px]">PDF</span>
-                                        </a>
-                                    @elseif($mime && Str::startsWith($mime, 'image/'))
-                                        <a href="{{ route('stream.pkwt', $pkwt->id) }}"  target="_blank"  class="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-blue-50 text-blue-700 border border-blue-100 hover:bg-blue-100 transition group/doc">
-                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                                            <span class="text-xs font-bold truncate max-w-[80px]">IMG</span>
-                                        </a>
-                                    @else
-                                        <span class="text-xs text-gray-400 italic flex items-center gap-1">
-                                            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-                                            Empty
-                                        </span>
-                                    @endif
-                                </td>
-
-                                {{-- 5. Date --}}
-                                <td class="px-6 py-4 text-center text-xs text-gray-500 font-medium">
-                                    {{ \Carbon\Carbon::parse($pkwt->tgl_mulai_pkwt)->format('d M Y') }}
-                                </td>
-                                <td class="px-6 py-4 text-center text-xs text-gray-500 font-medium
-                                    {{ $pkwt->status_pkwt['color'] === 'red' ? 'text-red-600' : 'text-gray-500' }}">
-
-                                    {{ \Carbon\Carbon::parse($pkwt->tgl_akhir_pkwt)->format('d M Y') }}
-                                </td>
-
-                                {{-- 7. Actions --}}
-                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <div class="flex justify-end gap-2">
-                                        <!-- Edit -->
-                                        <a href="#"
-                                            class="text-blue-600 hover:text-blue-900 border border-blue-200 hover:bg-blue-50
-                                    rounded-lg p-2 transition"
-                                            title="Edit">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
-                                                stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M11 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-5M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
-                                            </svg>
-                                        </a>
-
-                                        <!-- Detail -->
-                                        <a href="#"
-                                            class="text-blue-600 hover:text-blue-900 border border-blue-200 hover:bg-blue-50
-                                    rounded-lg p-2 transition"
-                                            title="Detail">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
-                                                stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z" />
-                                            </svg>
-                                        </a>
-                                    </div>
-
-                                </td>
-                            </tr>
-                        @empty
-                        <tr>
-                            <td colspan="7" class="px-6 py-10 text-center text-gray-500">
-                                <div class="flex flex-col items-center justify-center">
-                                    <svg class="w-12 h-12 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
-                                        </path>
-                                    </svg>
-                                    <p class="font-medium">Belum ada data pekerja pada unit ini..</p>
-                                    <p class="text-sm mt-1">Silakan daftarkan pekerja.</p>
+                    {{-- 1. Name & NIK (Wider column) --}}
+                    <td class="pl-6 py-5 align-top">
+                        <div class="flex items-start gap-3">
+                            <div class="min-w-0">
+                                <p class="text-sm font-bold text-gray-900 group-hover:text-blue-600 transition truncate max-w-[180px]" title="{{ $pkwt->pekerja->nama }}">
+                                    {{ $pkwt->pekerja->nama }}
+                                </p>
+                                <div class="flex items-center gap-1 mt-0.5">
+                                    <svg class="w-3 h-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0c0 .884-.956 1.65-2.123 2.155" /></svg>
+                                    <p class="text-xs text-gray-500 font-mono tracking-tight">{{ $pkwt->pekerja->nik }}</p>
                                 </div>
-                            </td>
-                        </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+                            </div>
+                        </div>
+                    </td>
+
+                    {{-- 2. Jabatan & Divisi (Stacked for clarity) --}}
+                    <td class="px-4 py-5 align-top">
+                        <div class="flex flex-col gap-1.5">
+                            <span class="inline-flex items-center text-xs font-semibold text-gray-800 bg-gray-100 px-2.5 py-1 rounded-md border border-gray-200 w-fit max-w-[200px] truncate" title="{{ $pkwt->jabatan->nama  }}">
+                                {{ $pkwt->jabatan->nama }}
+                            </span>
+                            <div class="flex items-center gap-1.5 text-xs text-gray-500 pl-1">
+                                <span class="w-1.5 h-1.5 rounded-full bg-gray-300"></span>
+                                <span class="truncate max-w-[180px]" title="{{ $pkwt->divisi->nama  }}">{{ $pkwt->divisi->nama  }}</span>
+                            </div>
+                        </div>
+                    </td>
+
+                    {{-- 3. Gaji & Lembur (Visual Separation) --}}
+                    <td class="px-4 py-5 align-top">
+                        <div class="space-y-2">
+                            {{-- Gaji Pokok --}}
+                            <div>
+                                {{-- <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-0.5">Pokok</p> --}}
+                                <p class="text-sm font-bold text-gray-900">
+                                    Rp {{ number_format($pkwt->gaji_harian, 0, ',', '.') }}
+                                    <span class="text-[10px] text-gray-400 font-normal">/hr</span>
+                                </p>
+                                <p class="text-sm font-bold text-gray-900">
+                                    Rp {{ number_format($pkwt->gaji_harian, 0, ',', '.') }}
+                                    <span class="text-[10px] text-gray-400 font-normal">/hr</span>
+                                </p>
+                            </div>
+
+                            {{-- Lembur (Assuming variable exists, example logic) --}}
+                            @if(isset($pkwt->gaji_lembur))
+                            <div>
+                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-0.5">Lembur</p>
+                                <p class="text-xs font-medium text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded w-fit">
+                                    Rp {{ number_format($pkwt->gaji_lembur, 0, ',', '.') }}
+                                    <span class="text-emerald-400 font-normal">/jam</span>
+                                </p>
+                            </div>
+                            @endif
+                        </div>
+                    </td>
+
+                    {{-- 4. Dokumen (Clean Button) --}}
+                    @php $mime = $pkwt->dokumen_mime; @endphp
+                    <td class="px-4 py-5 align-middle text-center">
+                        @if ($mime)
+                            <a href="{{ route('stream.pkwt', $pkwt->id) }}" target="_blank"
+                               class="inline-flex flex-col items-center justify-center gap-1 p-2 rounded-lg hover:bg-gray-50 transition group/doc border border-transparent hover:border-gray-200">
+                                @if(Str::startsWith($mime, 'application/pdf'))
+                                    <svg class="w-6 h-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                                    <span class="text-[10px] font-bold text-gray-500 group-hover/doc:text-red-600">PDF</span>
+                                @else
+                                    <svg class="w-6 h-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                    <span class="text-[10px] font-bold text-gray-500 group-hover/doc:text-blue-600">IMG</span>
+                                @endif
+                            </a>
+                        @else
+                            <span class="text-xs text-gray-300 italic">-</span>
+                        @endif
+                    </td>
+
+                    {{-- 5. Periode PKWT (Combined Date) --}}
+                    <td class="px-4 py-5 align-middle text-center">
+                        <div class="flex flex-col items-center gap-1">
+                            <span class="text-xs font-medium text-gray-700 bg-gray-50 px-2 py-1 rounded">
+                                {{ \Carbon\Carbon::parse($pkwt->tgl_mulai_pkwt)->format('d M Y') }}
+                            </span>
+                            <svg class="w-3 h-3 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
+                            <span class="text-xs font-bold {{ $pkwt->status_pkwt['color'] === 'red' ? 'text-red-600 bg-red-50' : 'text-emerald-600 bg-emerald-50' }} px-2 py-1 rounded">
+                                {{ \Carbon\Carbon::parse($pkwt->tgl_akhir_pkwt)->format('d M Y') }}
+                            </span>
+                        </div>
+                    </td>
+
+                    {{-- 6. Actions --}}
+                    <td class="pr-6 py-5 align-middle text-right">
+                        <div class="flex justify-end gap-1 opacity-60 group-hover:opacity-100 transition-opacity">
+                            <a href="#" class="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition" title="Edit">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                            </a>
+                            <a href="#" class="p-2 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition" title="Detail">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="6" class="px-6 py-12 text-center text-gray-500">
+                        <div class="flex flex-col items-center">
+                            <div class="h-12 w-12 bg-gray-50 rounded-full flex items-center justify-center mb-3">
+                                <svg class="w-6 h-6 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                            </div>
+                            <p class="font-medium text-sm">Belum ada pekerja terdaftar.</p>
+                        </div>
+                    </td>
+                </tr>
+            @endforelse
+        </tbody>
+    </table>
+</div>
 
             {{-- <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 text-center">
                <button class="text-xs font-bold text-gray-500 hover:text-gray-900 transition">Lihat Selengkapnya &rarr;</button>
@@ -453,8 +472,7 @@
             Swal.fire({
                 title: isAktif ? 'Nonaktifkan Unit?' : 'Aktifkan Unit?',
                 text: isAktif ?
-                    'Unit ini tidak akan muncul di daftar aktif.' :
-                    'Unit ini akan kembali aktif.',
+                    'Unit ini tidak akan muncul di daftar aktif.' : 'Unit ini akan kembali aktif.',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: isAktif ? '#dc2626' : '#059669',

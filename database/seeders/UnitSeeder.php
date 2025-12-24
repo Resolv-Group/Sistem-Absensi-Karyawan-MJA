@@ -16,7 +16,7 @@ class UnitSeeder extends Seeder
     public function run(): void
     {
         // ==================
-        // ✅ MITRA KERJA DUMMY
+        // ✅ Unit DUMMY
         // ==================
         $faker = Faker::create('id_ID');
 
@@ -44,6 +44,6 @@ class UnitSeeder extends Seeder
             'id_unit' => 1,
             'id_pic' => 9,
         ]);
-        
+
     }
 }

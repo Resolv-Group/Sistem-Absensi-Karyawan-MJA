@@ -12,7 +12,7 @@ class PKWT extends Model
 
     protected $table = 'pkwt_pekerja';
 
-    protected $fillable = ['id_pekerja', 'id_unit', 'divisi', 'jabatan', 'tgl_mulai_pkwt', 'tgl_akhir_pkwt', 'dokumen_pkwt', 'dokumen_mime', 'status_aktif', 'gaji_harian'];
+    protected $fillable = ['id_pekerja', 'id_unit', 'divisi_id', 'jabatan_id', 'tgl_mulai_pkwt', 'tgl_akhir_pkwt', 'dokumen_pkwt', 'dokumen_mime', 'status_aktif', 'gaji_harian'];
 
     public function pekerja()
     {
@@ -51,5 +51,15 @@ class PKWT extends Model
             'label' => 'Aktif',
             'color' => 'green',
         ];
+    }
+
+    public function divisi()
+    {
+        return $this->belongsTo(Divisi::class);
+    }
+
+    public function jabatan()
+    {
+        return $this->belongsTo(JabatanPKWT::class);
     }
 }
