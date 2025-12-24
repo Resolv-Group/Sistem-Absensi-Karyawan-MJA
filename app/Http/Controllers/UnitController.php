@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Borongan;
 use App\Models\Divisi;
 use App\Models\History;
 use App\Models\JabatanPKWT;
@@ -348,7 +349,7 @@ class UnitController extends Controller
 
     function tambahBoronganUnit(Request $request)
     {
-        dd($request->all()); // aktifkan hanya untuk debug
+        // dd($request->all()); // aktifkan hanya untuk debug
 
         try {
             DB::beginTransaction();
@@ -356,69 +357,48 @@ class UnitController extends Controller
             // ✅ VALIDASI SESUAI ARRAY
             $request->validate(
                 [
-                    'harga_unit' => 'required|double',
-                    'harga_pekerja' => 'required|double',
-
                     'id_unit' => 'required|string',
 
-                    'pekerja' => 'required|array|min:1',
+                    'borongan' => 'required|array|min:1',
 
-                    'pekerja.*.id_pekerja' => 'required|integer|exists:pekerja,id',
-                    'pekerja.*.divisi_id' => 'required|string',
-                    'pekerja.*.jabatan_id' => 'required|string',
+                    'borongan.*.harga_unit' => 'required|double',
+                    'borongan.*.harga_pekerja' => 'required|double',
 
-                    'pekerja.*.tgl_mulai_pkwt' => 'required|date',
-                    'pekerja.*.tgl_akhir_pkwt' => 'required|date|after_or_equal:pekerja.*.tgl_mulai_pkwt',
+                    'borongan.*.kategori' => 'required|integer',
+                    'borongan.*.nama_item' => 'required|string',
 
-                    'pekerja.*.gaji_harian' => 'required|integer|min:0',
-
-                    'pekerja.*.dokumen_pkwt' => 'nullable|file|mimes:png,jpg,jpeg,pdf|max:2048',
+                    'borongan.*.satuan' => 'required|string',
                 ],
                 [
                     'id_unit.required' => 'ID Unit wajib diisi',
-                    'pekerja.required' => 'Data pekerja wajib diisi',
-                    'pekerja.*.id_pekerja.required' => 'Pekerja wajib dipilih',
-                    'pekerja.*.divisi_id.required' => 'Divisi wajib dipilih',
-                    'pekerja.*.jabatan_id.required' => 'Jabatan wajib dipilih',
-                    'pekerja.*.gaji_harian.required' => 'Gaji harian wajib diisi',
+                    'borongan.required' => 'Data borongan wajib diisi',
+                    'borongan.*.harga_unit.required' => 'Harga Unit wajib dipilih',
+                    'borongan.*.harga_pekerja.required' => 'Harga Pekerja wajib dipilih',
+                    'borongan.*.kategori.required' => 'Kategori wajib dipilih',
+                    'borongan.*.nama_item.required' => 'Nama Item wajib diisi',
+                    'borongan.*.satuan.required' => 'Satuan wajib diisi',
                 ]
             );
 
             // ✅ LOOP PEKERJA
-            foreach ($request->pekerja as $index => $data) {
+            foreach ($request->borongan as $index => $data) {
 
-                // Upload file per pekerja
-                $dokumen = null;
-                $dokumenMime = null;
-                if ($request->hasFile("pekerja.$index.dokumen_pkwt")) {
-                    $file = $request->file("pekerja.$index.dokumen_pkwt");
-
-                    $dokumen = file_get_contents($file->getRealPath());
-                    $dokumenMime = $file->getMimeType();
-                }
-
-                $pkwt = PKWT::create([
+                $borongan = Borongan::create([
                     'id_unit' => $request->id_unit,
-                    'id_pekerja' => $data['id_pekerja'],
-                    'divisi_id' => $data['divisi_id'],
-                    'jabatan_id' => $data['jabatan_id'],
-                    'tgl_mulai_pkwt' => $data['tgl_mulai_pkwt'],
-                    'tgl_akhir_pkwt' => $data['tgl_akhir_pkwt'],
-                    'gaji_harian' => $data['gaji_harian'],
-                    'dokumen_pkwt' => $dokumen,
-                    'dokumen_mime' => $dokumenMime,
+                    'harga_unit' => $data['harga_unit'],
+                    'harga_pekerja' => $data['harga_pekerja'],
+                    'kategori' => $data['kategori'],
+                    'nama_item' => $data['nama_item'],
+                    'satuan' => $data['satuan'],
                     'status_aktif' => 1,
-
                 ]);
-
-
             }
 
             DB::commit();
 
             return redirect()
                 ->route('view.tambah.unit')
-                ->with('success', 'Pekerja berhasil ditambahkan.');
+                ->with('success', 'Borongan berhasil ditambahkan.');
 
         } catch (QueryException $e) {
             DB::rollBack();
