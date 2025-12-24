@@ -17,13 +17,16 @@ return new class extends Migration
             $table->char('id_pekerja', 20);
             $table->char('id_unit', 20);
 
-            $table->char('divisi', 100);
-            $table->char('jabatan', 100);
+            // $table->char('divisi', 100);
+            // $table->char('jabatan', 100);
+
+            $table->integer('divisi_id');
+            $table->integer('jabatan_id');
 
             $table->date('tgl_mulai_pkwt');
             $table->date('tgl_akhir_pkwt');
 
-            $table->binary('dokumen_pkwt');
+            $table->binary('dokumen_pkwt')->long();
             $table->string('dokumen_mime', 100)->nullable();
 
             $table->integer('status_aktif')->default(1);

@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Divisi;
 use App\Models\History;
+use App\Models\JabatanPKWT;
 use App\Models\Unit;
 use Illuminate\Http\Request;
 use App\Models\Staff;
@@ -240,14 +242,15 @@ class UnitController extends Controller
     function viewTambahUnitHarian($id_unit)
     {
         // Assuming you have Unit and Pekerja models
-        $units = \App\Models\Unit::select('id', 'nama_unit as nama')->get();
+        $units = Unit::select('id', 'nama_unit as nama')->get();
         $unitSelected = Unit::with('namaMitra')
         ->where('id', $id_unit)
         ->firstOrFail();
-        $pekerjaList = \App\Models\Pekerja::select('id', 'nama', 'nik')->where('status_aktif', 1)->get();
+        $pekerjaList = Pekerja::select('id', 'nama', 'nik')->where('status_aktif', 1)->get();
+        $divisiList = Divisi::select('id', 'nama')->get();
+        $jabatanList = JabatanPKWT::select('id', 'nama')->get();
 
-
-        return view('Unit.CRUD.tambah-unit-pekerja', compact('unitSelected', 'units', 'pekerjaList'));
+        return view('Unit.CRUD.tambah-unit-pekerja', compact('unitSelected', 'units', 'pekerjaList', 'divisiList', 'jabatanList'));
     }
 
     function tambahPekerjaUnit(Request $request)
@@ -265,8 +268,8 @@ class UnitController extends Controller
                     'pekerja' => 'required|array|min:1',
 
                     'pekerja.*.id_pekerja' => 'required|integer|exists:pekerja,id',
-                    'pekerja.*.divisi' => 'required|string',
-                    'pekerja.*.jabatan' => 'required|string',
+                    'pekerja.*.divisi_id' => 'required|string',
+                    'pekerja.*.jabatan_id' => 'required|string',
 
                     'pekerja.*.tgl_mulai_pkwt' => 'required|date',
                     'pekerja.*.tgl_akhir_pkwt' => 'required|date|after_or_equal:pekerja.*.tgl_mulai_pkwt',
@@ -279,6 +282,8 @@ class UnitController extends Controller
                     'id_unit.required' => 'ID Unit wajib diisi',
                     'pekerja.required' => 'Data pekerja wajib diisi',
                     'pekerja.*.id_pekerja.required' => 'Pekerja wajib dipilih',
+                    'pekerja.*.divisi_id.required' => 'Divisi wajib dipilih',
+                    'pekerja.*.jabatan_id.required' => 'Jabatan wajib dipilih',
                     'pekerja.*.gaji_harian.required' => 'Gaji harian wajib diisi',
                 ]
             );
@@ -296,18 +301,21 @@ class UnitController extends Controller
                     $dokumenMime = $file->getMimeType();
                 }
 
-                PKWT::create([
+                $pkwt = PKWT::create([
                     'id_unit' => $request->id_unit,
                     'id_pekerja' => $data['id_pekerja'],
-                    'divisi' => $data['divisi'],
-                    'jabatan' => $data['jabatan'],
+                    'divisi_id' => $data['divisi_id'],
+                    'jabatan_id' => $data['jabatan_id'],
                     'tgl_mulai_pkwt' => $data['tgl_mulai_pkwt'],
                     'tgl_akhir_pkwt' => $data['tgl_akhir_pkwt'],
                     'gaji_harian' => $data['gaji_harian'],
                     'dokumen_pkwt' => $dokumen,
                     'dokumen_mime' => $dokumenMime,
                     'status_aktif' => 1,
+
                 ]);
+
+
             }
 
             DB::commit();
