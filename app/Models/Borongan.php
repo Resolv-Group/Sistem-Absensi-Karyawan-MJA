@@ -17,4 +17,8 @@ class Borongan extends Model
         'satuan',
         'status_aktif',
     ];
+
+    public function kategoriRel() {
+        return $this->belongsTo(Kategori::class, 'kategori');
+    }
 }

@@ -13,17 +13,17 @@ return new class extends Migration
     {
         Schema::create('borongan', function (Blueprint $table) {
             $table->id();
-            
+
             $table->double('harga_unit');
             $table->double('harga_pekerja');
             $table->char('id_unit', 20);
 
             $table->integer('kategori');
             $table->char('nama_item');
-            $table->char('satuan');
+            $table->integer('satuan');
 
             $table->boolean('status_aktif')->default(true);
-            
+
             $table->timestamps();
         });
     }

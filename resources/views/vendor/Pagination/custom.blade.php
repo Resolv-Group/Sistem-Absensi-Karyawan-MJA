@@ -1,5 +1,5 @@
 @if ($paginator->hasPages())
-    <div class="bg-gray-50 px-6 py-4 border-t border-gray-200 flex flex-col md:flex-row items-center justify-between gap-4">
+    <div class="bg-gray-50 px-6 py-4 border-gray-200 flex flex-col md:flex-row items-center justify-between gap-4">
 
         {{-- Left Side: Text Info (Indonesian) --}}
         <span class="text-xs text-gray-500">

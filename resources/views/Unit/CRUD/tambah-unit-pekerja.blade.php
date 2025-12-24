@@ -36,85 +36,66 @@
             @csrf
 
             {{-- CARD 1: INFORMASI UNIT --}}
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-200">
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 relative overflow-hidden group">
+
+                {{-- Hidden Input --}}
+                <input type="hidden" name="id_unit" value="{{ $unitSelected->id ?? '' }}">
+
+                {{-- Background Decoration (Subtle) --}}
                 <div
-                    class="bg-blue-50/50 border-b border-blue-100 p-4 flex flex-col items-center justify-center text-center">
+                    class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-blue-50 rounded-full blur-3xl opacity-50 pointer-events-none">
+                </div>
+
+                <div class="flex items-start sm:items-center gap-5 relative z-10">
+
+                    {{-- 1. Large Icon / Logo --}}
                     <div
-                        class="h-10 w-10 bg-white rounded-full flex items-center justify-center shadow-sm text-blue-600 mb-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        class="flex-shrink-0 h-16 w-16 bg-gradient-to-br from-blue-50 to-white border border-blue-100 rounded-2xl flex items-center justify-center shadow-sm">
+                        <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                                 d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                         </svg>
                     </div>
-                    <h2 class="text-sm font-bold text-gray-900 uppercase tracking-wide">Informasi Penambahan Unit (Harian)
-                    </h2>
-                </div>
 
-                <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {{-- 2. Information Details --}}
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span
+                                class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-100 uppercase tracking-wide">
+                                Unit Terpilih
+                            </span>
+                        </div>
 
-                    {{-- 1. Unit Information (Readonly) --}}
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
-                            Unit Kerja Terpilih
-                        </label>
+                        <h2 class="text-xl font-bold text-gray-900 leading-tight truncate">
+                            {{ $unitSelected->nama_unit ?? 'Nama Unit' }}
+                        </h2>
 
-                        {{-- Hidden Input to ensure ID is submitted --}}
-                        <input type="hidden" name="id_unit" value="{{ $unitSelected->id ?? '' }}">
-
-                        <div
-                            class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 flex items-center justify-between">
-                            <div>
-                                {{-- Nama Unit --}}
-                                <p class="text-sm font-bold text-gray-900">
-                                    {{ $unitSelected->nama_unit ?? 'Nama Unit Belum Dimuat' }}
-                                </p>
-
-                                {{-- Nama Perusahaan & ID --}}
-                                <div class="flex items-center gap-2 mt-1">
-                                    <div class="flex items-center gap-1.5 text-xs text-gray-500 font-medium">
-                                        <svg class="w-3.5 h-3.5 text-gray-400" fill="none" viewBox="0 0 24 24"
-                                            stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                                        </svg>
-                                        {{ $unitSelected->namaMitra->nama_mitra ?? 'Nama Perusahaan' }}
-                                    </div>
-
-                                    <span class="text-gray-300">•</span>
-
-                                    <div
-                                        class="flex items-center gap-1 text-xs text-gray-500 font-mono bg-gray-200/50 px-1.5 py-0.5 rounded">
-                                        #{{ $unitSelected->id ?? 'ID' }}
-                                    </div>
-                                </div>
+                        <div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5 text-sm text-gray-500">
+                            <div class="flex items-center gap-1.5">
+                                <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                </svg>
+                                <span
+                                    class="font-medium text-gray-700">{{ $unitSelected->namaMitra->nama_mitra ?? '-' }}</span>
                             </div>
 
-                            {{-- Lock Icon to indicate Readonly --}}
-                            <div class="p-2 bg-gray-200/50 rounded-lg text-gray-400">
-                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                </svg>
+                            <span class="text-gray-300">|</span>
+
+                            <div class="flex items-center gap-1.5">
+                                <span class="text-gray-400">ID:</span>
+                                <span
+                                    class="font-mono font-bold text-gray-900 bg-gray-100 px-1.5 rounded">{{ $unitSelected->id ?? '-' }}</span>
                             </div>
                         </div>
                     </div>
 
-                    {{-- 2. Status Aktif (Readonly Style) --}}
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
-                            Status Penambahan
-                        </label>
-                        <div
-                            class="w-full py-3.5 px-4 bg-emerald-50 border border-emerald-100 rounded-xl text-emerald-700 text-sm font-bold flex items-center gap-2 h-[66px]">
-                            {{-- Fixed height to match neighbor --}}
-                            <span class="relative flex h-2.5 w-2.5">
-                                <span
-                                    class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-                            </span>
-                            Aktif
-                        </div>
+                    {{-- 3. Lock Icon (Visual indicator that this is fixed) --}}
+                    <div class="hidden sm:flex h-10 w-10 text-gray-300 justify-center items-center">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
                     </div>
                 </div>
             </div>
@@ -243,7 +224,7 @@
                                     <!-- Hidden input (actual submitted value) -->
                                     <input type="hidden" :name="`pekerja[${index}][divisi_id]`" :value="row.divisiId">
                                 </div>
-                                
+
 
                                 {{-- 4. Jabatan (Searchable Combobox) --}}
                                 <div x-data="idCombobox(row, 'jabatanId', window.jabatanData, j => j.nama)" x-init="init()" class="relative">
@@ -292,7 +273,7 @@
                                 <div>
                                     <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Mulai
                                         PKWT</label>
-                                    <input type="date" :name="`pekerja[${index}][tgl_mulai_pkwt]`"
+                                    <input type="date" :name="`pekerja[${index}][tgl_mulai_pkwt]`" value="{{ now()->toDateString() }}"
                                         class="w-full rounded-xl border-gray-200 bg-gray-50 text-sm py-3 px-4 text-gray-600 focus:bg-white focus:border-blue-500">
                                 </div>
 
@@ -338,18 +319,57 @@
                 </div>
             </div>
 
-            {{-- FOOTER / TOTAL --}}
-            <div
-                class="bg-white rounded-2xl shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] border border-gray-200 p-6 flex flex-col sm:flex-row items-center justify-between gap-6 sticky bottom-4 z-10">
-                <div>
-                    <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Total Alokasi Gaji</p>
-                    <p class="text-3xl font-black text-gray-900" x-text="formatRupiah(totalAllocation)"></p>
-                </div>
+            {{-- FOOTER / TOTAL --}}<div
+                class="bg-white rounded-2xl shadow-[0_-8px_30px_-15px_rgba(0,0,0,0.1)] border border-gray-200 p-5 sticky bottom-6 z-30">
 
-                <button type="submit"
-                    class="w-full sm:w-auto px-8 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-200 transition transform hover:-translate-y-0.5">
-                    Simpan Data
-                </button>
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+
+                    {{-- LEFT: Meta Info & Cancel --}}
+                    <div
+                        class="flex items-center gap-4 w-full sm:w-auto order-2 sm:order-1 justify-center sm:justify-start">
+                        <a href="{{ route('view.detail.unit', $unitSelected->id) }}"
+                            class="px-6 py-3 text-sm font-bold text-gray-600 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 hover:text-gray-900 transition shadow-sm w-full sm:w-auto text-center">
+                            Batalkan
+                        </a>
+
+                        <div class="h-4 w-px bg-gray-300 hidden sm:block"></div>
+
+                        {{-- Row Counter Badge --}}
+                        <div class="flex items-center gap-2 px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg">
+
+                            <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                            <span class="text-xs font-medium text-gray-400">
+                                <span x-text="rows.length + ' pekerja akan ditambahkan'"></span>
+                            </span>
+                        </div>
+                    </div>
+
+                    {{-- RIGHT: Total Price & Save --}}
+                    <div class="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto order-1 sm:order-2">
+
+                        {{-- Total Label --}}
+                        <div class="text-center sm:text-right">
+                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Total Estimasi</p>
+                            <p class="text-2xl font-black text-gray-900 leading-none mt-0.5"
+                                x-text="formatRupiah(totalAllocation)"></p>
+                        </div>
+
+                        {{-- Save Button --}}
+                        <button type="submit"
+                            class="w-full sm:w-auto px-8 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-200/50 transition transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
+                            <span>Simpan</span>
+                            <svg class="w-5 h-5 text-emerald-100" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7" />
+                            </svg>
+                        </button>
+                    </div>
+
+                </div>
             </div>
 
         </form>

@@ -182,16 +182,20 @@ class UnitController extends Controller
         $totalPekerja = PKWT::with('pekerja')
             ->where('id_unit', $id)
             ->count();
+        $totalBorongan = Borongan::where('id_unit', $id)
+            ->count();
 
         $pkwtPekerja = PKWT::with('pekerja')
             ->where('id_unit', $id)
-            ->get();
+            ->paginate(15);
+
+        $borongan = Borongan::with('kategoriRel')->where('id_unit', $id)->paginate(15);
 
         // dd($pkwtPekerja);
 
         // dd($mitraKerja);
 
-        return view('Unit.detail-unit', compact('unit', 'historiUnit', 'pekerja', 'totalPekerja', 'pkwtPekerja'));
+        return view('Unit.detail-unit', compact('unit', 'historiUnit', 'pekerja', 'totalPekerja', 'pkwtPekerja', 'borongan', 'totalBorongan'));
     }
 
     public function showDokumenMOU($id, Request $request)
@@ -323,9 +327,8 @@ class UnitController extends Controller
             DB::commit();
 
             return redirect()
-                ->route('view.tambah.unit')
-                ->with('success', 'Pekerja berhasil ditambahkan.');
-
+                ->route('view.detail.unit', $request->id_unit)
+                ->with('success', 'Pekerja berhasil ditambahkan ke unit.');
         } catch (QueryException $e) {
             DB::rollBack();
             return back()->withInput()->withErrors(['database' => $e->getMessage()]);
@@ -343,7 +346,7 @@ class UnitController extends Controller
         ->where('id', $id_unit)
         ->firstOrFail();
         $kategoriList = Kategori::select('id', 'nama')->get();
-    
+
         return view('Unit.CRUD.tambah-unit-borongan', compact('unitSelected', 'units', 'kategoriList'));
     }
 
@@ -361,13 +364,13 @@ class UnitController extends Controller
 
                     'borongan' => 'required|array|min:1',
 
-                    'borongan.*.harga_unit' => 'required|double',
-                    'borongan.*.harga_pekerja' => 'required|double',
+                    'borongan.*.harga_unit' => 'required|integer',
+                    'borongan.*.harga_pekerja' => 'required|integer',
 
                     'borongan.*.kategori' => 'required|integer',
                     'borongan.*.nama_item' => 'required|string',
 
-                    'borongan.*.satuan' => 'required|string',
+                    'borongan.*.satuan' => 'required|integer',
                 ],
                 [
                     'id_unit.required' => 'ID Unit wajib diisi',
@@ -383,7 +386,7 @@ class UnitController extends Controller
             // ✅ LOOP PEKERJA
             foreach ($request->borongan as $index => $data) {
 
-                $borongan = Borongan::create([
+                Borongan::create([
                     'id_unit' => $request->id_unit,
                     'harga_unit' => $data['harga_unit'],
                     'harga_pekerja' => $data['harga_pekerja'],
@@ -397,8 +400,8 @@ class UnitController extends Controller
             DB::commit();
 
             return redirect()
-                ->route('view.tambah.unit')
-                ->with('success', 'Borongan berhasil ditambahkan.');
+                ->route('view.detail.unit', $request->id_unit)
+                ->with('success', 'Borongan berhasil ditambahkan ke unit.');
 
         } catch (QueryException $e) {
             DB::rollBack();
