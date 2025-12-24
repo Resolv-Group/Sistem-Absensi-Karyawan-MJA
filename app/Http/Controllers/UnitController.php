@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Divisi;
 use App\Models\History;
 use App\Models\JabatanPKWT;
+use App\Models\Kategori;
 use App\Models\Unit;
 use Illuminate\Http\Request;
 use App\Models\Staff;
@@ -263,6 +264,101 @@ class UnitController extends Controller
             // ✅ VALIDASI SESUAI ARRAY
             $request->validate(
                 [
+                    'id_unit' => 'required|string',
+
+                    'pekerja' => 'required|array|min:1',
+
+                    'pekerja.*.id_pekerja' => 'required|integer|exists:pekerja,id',
+                    'pekerja.*.divisi_id' => 'required|string',
+                    'pekerja.*.jabatan_id' => 'required|string',
+
+                    'pekerja.*.tgl_mulai_pkwt' => 'required|date',
+                    'pekerja.*.tgl_akhir_pkwt' => 'required|date|after_or_equal:pekerja.*.tgl_mulai_pkwt',
+
+                    'pekerja.*.gaji_harian' => 'required|integer|min:0',
+
+                    'pekerja.*.dokumen_pkwt' => 'nullable|file|mimes:png,jpg,jpeg,pdf|max:2048',
+                ],
+                [
+                    'id_unit.required' => 'ID Unit wajib diisi',
+                    'pekerja.required' => 'Data pekerja wajib diisi',
+                    'pekerja.*.id_pekerja.required' => 'Pekerja wajib dipilih',
+                    'pekerja.*.divisi_id.required' => 'Divisi wajib dipilih',
+                    'pekerja.*.jabatan_id.required' => 'Jabatan wajib dipilih',
+                    'pekerja.*.gaji_harian.required' => 'Gaji harian wajib diisi',
+                ]
+            );
+
+            // ✅ LOOP PEKERJA
+            foreach ($request->pekerja as $index => $data) {
+
+                // Upload file per pekerja
+                $dokumen = null;
+                $dokumenMime = null;
+                if ($request->hasFile("pekerja.$index.dokumen_pkwt")) {
+                    $file = $request->file("pekerja.$index.dokumen_pkwt");
+
+                    $dokumen = file_get_contents($file->getRealPath());
+                    $dokumenMime = $file->getMimeType();
+                }
+
+                $pkwt = PKWT::create([
+                    'id_unit' => $request->id_unit,
+                    'id_pekerja' => $data['id_pekerja'],
+                    'divisi_id' => $data['divisi_id'],
+                    'jabatan_id' => $data['jabatan_id'],
+                    'tgl_mulai_pkwt' => $data['tgl_mulai_pkwt'],
+                    'tgl_akhir_pkwt' => $data['tgl_akhir_pkwt'],
+                    'gaji_harian' => $data['gaji_harian'],
+                    'dokumen_pkwt' => $dokumen,
+                    'dokumen_mime' => $dokumenMime,
+                    'status_aktif' => 1,
+
+                ]);
+
+
+            }
+
+            DB::commit();
+
+            return redirect()
+                ->route('view.tambah.unit')
+                ->with('success', 'Pekerja berhasil ditambahkan.');
+
+        } catch (QueryException $e) {
+            DB::rollBack();
+            return back()->withInput()->withErrors(['database' => $e->getMessage()]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->withInput()->withErrors(['general' => $e->getMessage()]);
+        }
+    }
+
+    function viewTambahBorongan($id_unit)
+    {
+        // Assuming you have Unit and Pekerja models
+        $units = \App\Models\Unit::select('id', 'nama_unit as nama')->get();
+        $unitSelected = Unit::with('namaMitra')
+        ->where('id', $id_unit)
+        ->firstOrFail();
+        $kategoriList = Kategori::select('id', 'nama')->get();
+    
+        return view('Unit.CRUD.tambah-unit-borongan', compact('unitSelected', 'units', 'kategoriList'));
+    }
+
+    function tambahBoronganUnit(Request $request)
+    {
+        dd($request->all()); // aktifkan hanya untuk debug
+
+        try {
+            DB::beginTransaction();
+
+            // ✅ VALIDASI SESUAI ARRAY
+            $request->validate(
+                [
+                    'harga_unit' => 'required|double',
+                    'harga_pekerja' => 'required|double',
+
                     'id_unit' => 'required|string',
 
                     'pekerja' => 'required|array|min:1',
