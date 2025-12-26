@@ -4,17 +4,15 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\BidangUsahaController;
+use App\Http\Controllers\BoronganController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MitraKerjaController;
 use App\Http\Controllers\PekerjaController;
+use App\Http\Controllers\PKWTController;
 use App\Http\Controllers\ProfilController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\UnitController;
 use Illuminate\Support\Facades\Route;
-
-// Route::get('/', function () {
-//     return view('login');
-// });
 
 // LOGIN
 Route::get('/', [LoginController::class, 'showLoginForm'])->name('login');
@@ -106,24 +104,32 @@ Route::middleware(['auth', 'role:hrd,pic,admin'])->group(function(){
     Route::put('/mitra-kerja/ubah/{id}', [MitraKerjaController::class, 'updateMitraKerja'])->name('update.mitra-kerja');
     Route::put('/mitra-kerja/toggle-status/{id}', [MitraKerjaController::class, 'toggleStatus']);
 
-    //Unit
+    //Unit -> Main - Detail
     Route::get('/unit', [UnitController::class, 'viewUnitMain'])->name('view.unit');
     Route::get('/unit/tambah', [UnitController::class, 'viewTambahUnit'])->name('view.tambah.unit');
     Route::POST('/tambah-unit', [UnitController::class, 'tambahUnit'])->name('tambah.unit.post');
     Route::get('/unit/detail/{id}', [UnitController::class, 'viewDetailUnit'])->name('view.detail.unit');
-    Route::get('/unit/{id}/tambah-pekerja', [UnitController::class, 'viewTambahUnitHarian'])->name('view.tambah.unit-pekerja');
-    Route::POST('/tambah-unit-pekerja', [UnitController::class, 'tambahPekerjaUnit'])->name('tambah.unit-pekerja.post');
-    Route::get('/unit/{id}/tambah-borongan', [UnitController::class, 'viewTambahBorongan'])->name('view.tambah.unit-borongan');
-    Route::POST('/tambah-unit-borongan', [UnitController::class, 'tambahBoronganUnit'])->name('tambah.unit-borongan.post');
-    
-    //Unit belum ada
-    Route::get('/unit/tambah-borongan', [UnitController::class, 'viewTambahBorongan'])->name('view.tambah.unit-borongan');
-    Route::POST('/tambah-unit-harian', [UnitController::class, 'tambahUnitHarian'])->name('tambah.unit-harian.post');
     Route::get('/unit/ubah/{id}', [UnitController::class, 'ubahUnit'])->name('view.ubah.unit');
     Route::put('/unit/ubah/{id}', [UnitController::class, 'updateUnit'])->name('update.unit');
 
+    //Unit -> Status
     Route::put('/unit/toggle-status/{id}', [UnitController::class, 'toggleStatus']);
 
+    //Unit -> PKWT
+    Route::get('/unit/{id}/tambah-pekerja', [PKWTController::class, 'viewTambahUnitHarian'])->name('view.tambah.unit-pekerja');
+    Route::POST('/tambah-unit-pekerja', [PKWTController::class, 'tambahPekerjaUnit'])->name('tambah.unit-pekerja.post');
+    Route::get('/unit/{unitId}/pekerja/{pekerjaId}/ubah', [PKWTController::class, 'ubahUnitPekerja'])->name('view.ubah.unit-pekerja');
+    Route::put('/unit/{unitId}/pekerja/{pekerjaId}/ubah', [PKWTController::class, 'updateUnitPekerja'])->name('update.unit-pekerja');
+
+    // Route::put('/unit/{unitId}/pekerja/{pekerjaId]/toggle-status/', [UnitController::class, 'toggleStatusPKWT']);
+
+    //Unit -> Borongan
+    Route::get('/unit/{id}/tambah-borongan', [BoronganController::class, 'viewTambahBorongan'])->name('view.tambah.unit-borongan');
+    Route::POST('/tambah-unit-borongan', [BoronganController::class, 'tambahBoronganUnit'])->name('tambah.unit-borongan.post');
+    Route::get('/unit/{unitId}/borongan/{boronganId}/ubah', [BoronganController::class, 'ubahUnitBorongan'])->name('view.ubah.unit-borongan');
+    Route::put('/unit/{unitId}/borongan/{boronganId}/ubah', [BoronganController::class, 'updateUnitBorongan'])->name('update.unit-borongan');
+
+    //Tambah Bidang Usaha
     Route::POST('/tambah-bidang-usaha', [BidangUsahaController::class, 'tambahBidangUsaha'])->name('tambah.bidang-usaha.post');
 
     //Show Dokumen

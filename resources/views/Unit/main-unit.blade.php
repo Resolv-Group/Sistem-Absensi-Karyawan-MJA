@@ -377,15 +377,14 @@
                         </div>
 
                         {{-- Date Range (Visual Grouping) --}}
-                        <div>
+                        {{-- <div>
                             <label
                                 class="block text-[10px] uppercase tracking-wider font-bold text-gray-400 mb-1.5">Tanggal
                                 Masa Berakhir</label>
 
                             <div class="flex items-center gap-2">
 
-                                {{-- Start Date --}}
-                                <div class="relative flex-1 min-w-0 group"> {{-- Added min-w-0 here --}}
+                                <div class="relative flex-1 min-w-0 group">
                                     <div
                                         class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none z-10">
                                         <svg class="h-4 w-4 text-gray-400 group-focus-within:text-blue-500 transition"
@@ -401,7 +400,6 @@
 
                                 <span class="text-gray-300">-</span>
 
-                                {{-- End Date --}}
                                 <div class="relative flex-1 min-w-0 group">
                                     <div
                                         class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none z-10">
@@ -416,7 +414,7 @@
                        focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 hover:bg-gray-100 transition placeholder-gray-400 relative z-0">
                                 </div>
                             </div>
-                        </div>
+                        </div> --}}
 
                     </div>
 

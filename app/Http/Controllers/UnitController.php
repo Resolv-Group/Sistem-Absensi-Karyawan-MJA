@@ -13,6 +13,7 @@ use App\Models\Staff;
 use Illuminate\Database\QueryException;
 use App\Models\MitraKerja;
 use App\Models\Pekerja;
+use App\Models\PicUnit;
 use App\Models\PKWT;
 use Illuminate\Support\Facades\DB;
 
@@ -24,6 +25,8 @@ class UnitController extends Controller
         $totalUnit = Unit::count(); // total pekerja
         $unitBaru = Unit::where('created_at', '>=', now()->subMonth())->count(); // pekerja baru dari bulan lalu
         $tidakAktif = Unit::where('status_aktif', '!=', '1')->count(); // pekerja tidak aktif
+        $totalHarian = Unit::where('sistem_pengajian', 1)->count();
+        $totalBorongan = Unit::where('sistem_pengajian', 2)->count();
 
         // --- 2. BUILD QUERY ---
         $query = Unit::query()
@@ -70,7 +73,7 @@ class UnitController extends Controller
         }
 
         // Otherwise return the full page
-        return view('Unit.main-unit', compact('unit', 'totalUnit', 'unitBaru', 'tidakAktif'));
+        return view('Unit.main-unit', compact('unit', 'totalUnit', 'unitBaru', 'totalHarian', 'totalBorongan', 'tidakAktif'));
     }
 
     public function viewTambahUnit()
@@ -179,15 +182,10 @@ class UnitController extends Controller
         $historiUnit = History::where('foreign_id', $id)->where('nama_tabel', 'unit')->get();
 
         $pekerja = Pekerja::get();
-        $totalPekerja = PKWT::with('pekerja')
-            ->where('id_unit', $id)
-            ->count();
-        $totalBorongan = Borongan::where('id_unit', $id)
-            ->count();
+        $totalPekerja = PKWT::with('pekerja')->where('id_unit', $id)->count();
+        $totalBorongan = Borongan::where('id_unit', $id)->count();
 
-        $pkwtPekerja = PKWT::with('pekerja')
-            ->where('id_unit', $id)
-            ->paginate(15);
+        $pkwtPekerja = PKWT::with('pekerja')->where('id_unit', $id)->paginate(15);
 
         $borongan = Borongan::with('kategoriRel')->where('id_unit', $id)->paginate(15);
 
@@ -245,170 +243,123 @@ class UnitController extends Controller
             ->header('Content-Disposition', $disposition . '; filename="' . $filename . '"');
     }
 
-    function viewTambahUnitHarian($id_unit)
+    function ubahUnit(Request $request, $id)
     {
-        // Assuming you have Unit and Pekerja models
-        $units = Unit::select('id', 'nama_unit as nama')->get();
-        $unitSelected = Unit::with('namaMitra')
-        ->where('id', $id_unit)
-        ->firstOrFail();
-        $pekerjaList = Pekerja::select('id', 'nama', 'nik')->where('status_aktif', 1)->get();
-        $divisiList = Divisi::select('id', 'nama')->get();
-        $jabatanList = JabatanPKWT::select('id', 'nama')->get();
+        $unit = Unit::findOrFail($id);
 
-        return view('Unit.CRUD.tambah-unit-pekerja', compact('unitSelected', 'units', 'pekerjaList', 'divisiList', 'jabatanList'));
+        $mitraKerjaList = MitraKerja::select('id as val', 'nama_mitra as label')->get();
+
+        $selectedPicIds = $unit->picUnit?->pluck('id_pic')->toArray() ?? [];
+
+        $picList = Staff::select('id as val', 'nama as label')->where('jabatan', 'PIC')->get();
+
+        return view('Unit.CRUD.ubah-unit', compact('unit', 'mitraKerjaList', 'selectedPicIds', 'picList'));
     }
 
-    function tambahPekerjaUnit(Request $request)
+    function updateUnit(Request $request, $id)
     {
-        // dd($request->all()); // aktifkan hanya untuk debug
-
+        // dd($request->all());
         try {
             DB::beginTransaction();
 
-            // ✅ VALIDASI SESUAI ARRAY
-            $request->validate(
+            // ===============================
+            // VALIDATION
+            // ===============================
+            $validated = $request->validate(
                 [
-                    'id_unit' => 'required|string',
+                    'id_mitra_kerja' => 'required|exists:mitra_kerja,id',
+                    'nama_unit' => 'required|string|max:255',
+                    'sistem_pengajian' => 'required|in:1,2',
+                    'persentase_management_fee' => 'required|numeric|min:0|max:100',
 
-                    'pekerja' => 'required|array|min:1',
+                    'mulai_perjanjian' => 'required|date',
+                    'akhir_perjanjian' => 'required|date|after_or_equal:mulai_perjanjian',
 
-                    'pekerja.*.id_pekerja' => 'required|integer|exists:pekerja,id',
-                    'pekerja.*.divisi_id' => 'required|string',
-                    'pekerja.*.jabatan_id' => 'required|string',
+                    'pic_ids' => 'required|array|min:1',
+                    'pic_ids.*' => 'exists:staff,id',
 
-                    'pekerja.*.tgl_mulai_pkwt' => 'required|date',
-                    'pekerja.*.tgl_akhir_pkwt' => 'required|date|after_or_equal:pekerja.*.tgl_mulai_pkwt',
-
-                    'pekerja.*.gaji_harian' => 'required|integer|min:0',
-
-                    'pekerja.*.dokumen_pkwt' => 'nullable|file|mimes:png,jpg,jpeg,pdf|max:2048',
+                    // FILE OPTIONAL
+                    'dokumen_mou' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
                 ],
                 [
-                    'id_unit.required' => 'ID Unit wajib diisi',
-                    'pekerja.required' => 'Data pekerja wajib diisi',
-                    'pekerja.*.id_pekerja.required' => 'Pekerja wajib dipilih',
-                    'pekerja.*.divisi_id.required' => 'Divisi wajib dipilih',
-                    'pekerja.*.jabatan_id.required' => 'Jabatan wajib dipilih',
-                    'pekerja.*.gaji_harian.required' => 'Gaji harian wajib diisi',
-                ]
-            );
-
-            // ✅ LOOP PEKERJA
-            foreach ($request->pekerja as $index => $data) {
-
-                // Upload file per pekerja
-                $dokumen = null;
-                $dokumenMime = null;
-                if ($request->hasFile("pekerja.$index.dokumen_pkwt")) {
-                    $file = $request->file("pekerja.$index.dokumen_pkwt");
-
-                    $dokumen = file_get_contents($file->getRealPath());
-                    $dokumenMime = $file->getMimeType();
-                }
-
-                $pkwt = PKWT::create([
-                    'id_unit' => $request->id_unit,
-                    'id_pekerja' => $data['id_pekerja'],
-                    'divisi_id' => $data['divisi_id'],
-                    'jabatan_id' => $data['jabatan_id'],
-                    'tgl_mulai_pkwt' => $data['tgl_mulai_pkwt'],
-                    'tgl_akhir_pkwt' => $data['tgl_akhir_pkwt'],
-                    'gaji_harian' => $data['gaji_harian'],
-                    'dokumen_pkwt' => $dokumen,
-                    'dokumen_mime' => $dokumenMime,
-                    'status_aktif' => 1,
-
-                ]);
-
-
-            }
-
-            DB::commit();
-
-            return redirect()
-                ->route('view.detail.unit', $request->id_unit)
-                ->with('success', 'Pekerja berhasil ditambahkan ke unit.');
-        } catch (QueryException $e) {
-            DB::rollBack();
-            return back()->withInput()->withErrors(['database' => $e->getMessage()]);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return back()->withInput()->withErrors(['general' => $e->getMessage()]);
-        }
-    }
-
-    function viewTambahBorongan($id_unit)
-    {
-        // Assuming you have Unit and Pekerja models
-        $units = \App\Models\Unit::select('id', 'nama_unit as nama')->get();
-        $unitSelected = Unit::with('namaMitra')
-        ->where('id', $id_unit)
-        ->firstOrFail();
-        $kategoriList = Kategori::select('id', 'nama')->get();
-
-        return view('Unit.CRUD.tambah-unit-borongan', compact('unitSelected', 'units', 'kategoriList'));
-    }
-
-    function tambahBoronganUnit(Request $request)
-    {
-        // dd($request->all()); // aktifkan hanya untuk debug
-
-        try {
-            DB::beginTransaction();
-
-            // ✅ VALIDASI SESUAI ARRAY
-            $request->validate(
-                [
-                    'id_unit' => 'required|string',
-
-                    'borongan' => 'required|array|min:1',
-
-                    'borongan.*.harga_unit' => 'required|integer',
-                    'borongan.*.harga_pekerja' => 'required|integer',
-
-                    'borongan.*.kategori' => 'required|integer',
-                    'borongan.*.nama_item' => 'required|string',
-
-                    'borongan.*.satuan' => 'required|integer',
+                    'id_mitra_kerja.required' => 'Mitra kerja wajib dipilih.',
+                    'nama_unit.required' => 'Nama unit wajib diisi.',
+                    'pic_ids.required' => 'Minimal 1 PIC harus dipilih.',
+                    'dokumen_mou.mimes' => 'Dokumen harus PDF / JPG / PNG.',
+                    'dokumen_mou.max' => 'Ukuran dokumen maksimal 5MB.',
                 ],
-                [
-                    'id_unit.required' => 'ID Unit wajib diisi',
-                    'borongan.required' => 'Data borongan wajib diisi',
-                    'borongan.*.harga_unit.required' => 'Harga Unit wajib dipilih',
-                    'borongan.*.harga_pekerja.required' => 'Harga Pekerja wajib dipilih',
-                    'borongan.*.kategori.required' => 'Kategori wajib dipilih',
-                    'borongan.*.nama_item.required' => 'Nama Item wajib diisi',
-                    'borongan.*.satuan.required' => 'Satuan wajib diisi',
-                ]
             );
 
-            // ✅ LOOP PEKERJA
-            foreach ($request->borongan as $index => $data) {
+            // ===============================
+            // FIND UNIT
+            // ===============================
+            $unit = Unit::findOrFail($id);
 
-                Borongan::create([
-                    'id_unit' => $request->id_unit,
-                    'harga_unit' => $data['harga_unit'],
-                    'harga_pekerja' => $data['harga_pekerja'],
-                    'kategori' => $data['kategori'],
-                    'nama_item' => $data['nama_item'],
-                    'satuan' => $data['satuan'],
-                    'status_aktif' => 1,
+            // ===============================
+            // HANDLE FILE (OPTIONAL)
+            // ===============================
+            if ($request->hasFile('dokumen_mou')) {
+                $unit->update([
+                    'dokumen_mou' => file_get_contents($request->file('dokumen_mou')->getRealPath()),
                 ]);
             }
 
+            // ===============================
+            // UPDATE UNIT DATA
+            // ===============================
+            $unit->update([
+                'id_mitra_kerja' => $validated['id_mitra_kerja'],
+                'nama_unit' => $validated['nama_unit'],
+                'sistem_pengajian' => $validated['sistem_pengajian'],
+                'persentase_management_fee' => $validated['persentase_management_fee'],
+                'mulai_perjanjian' => $validated['mulai_perjanjian'],
+                'akhir_perjanjian' => $validated['akhir_perjanjian'],
+            ]);
+
+            // ===============================
+            // SYNC PIC
+            // ===============================
+            // Hapus PIC lama
+            PicUnit::where('id_unit', $unit->id)->delete();
+
+            // Insert PIC baru
+            foreach ($validated['pic_ids'] as $picId) {
+                PicUnit::create([
+                    'id_unit' => $unit->id,
+                    'id_pic' => $picId,
+                ]);
+            }
+
+            // dd($unit);
             DB::commit();
 
-            return redirect()
-                ->route('view.detail.unit', $request->id_unit)
-                ->with('success', 'Borongan berhasil ditambahkan ke unit.');
-
+            return redirect()->route('view.unit')->with('success', 'Data unit berhasil diperbarui.');
         } catch (QueryException $e) {
             DB::rollBack();
-            return back()->withInput()->withErrors(['database' => $e->getMessage()]);
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'database' => 'Terjadi kesalahan database: ' . $e->getMessage(),
+                ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->withInput()->withErrors(['general' => $e->getMessage()]);
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'general' => 'Terjadi kesalahan sistem: ' . $e->getMessage(),
+                ]);
         }
+    }
+
+    public function toggleStatus($id)
+    {
+        $unit = Unit::findOrFail($id);
+
+        $unit->status_aktif = !$unit->status_aktif;
+        $unit->save();
+
+        return response()->json([
+            'message' => $unit->status_aktif ? 'Unit berhasil diaktifkan' : 'Unit berhasil dinonaktifkan',
+        ]);
     }
 }
