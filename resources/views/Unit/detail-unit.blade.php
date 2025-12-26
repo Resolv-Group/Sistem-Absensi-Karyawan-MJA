@@ -354,7 +354,7 @@
     </div>
 @endsection
 
-@push('scripts')
+@section('scripts')
     <script>
         function confirmToggleStatus(id, statusAktif) {
             const isAktif = statusAktif == 1;
@@ -405,4 +405,4 @@
             });
         }
     </script>
-@endpush
+@endsection

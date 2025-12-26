@@ -418,7 +418,7 @@
                         {{-- No Telepon --}}
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-1">Nomor Telepon</label>
-                            <input type="text" name="telp" maxlength="16" autocomplete="off"
+                            <input type="text" name="telp" maxlength="13" autocomplete="off"
                                 value="{{ old('telp', $pekerja->telp) }}"
                                 class="telp-input w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition">
                         </div>
@@ -496,7 +496,7 @@
                         {{-- No Kontak --}}
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-1">Nomor Telepon</label>
-                            <input type="text" name="telp_emergency" maxlength="16" autocomplete="off"
+                            <input type="text" name="telp_emergency" maxlength="13" autocomplete="off"
                                 value="{{ old('telp_emergency', $pekerja->telp_emergency) }}"
                                 class="telp_emergency-input w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition">
                         </div>
