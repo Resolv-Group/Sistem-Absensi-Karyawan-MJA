@@ -110,11 +110,11 @@
                 <div class="p-6 space-y-6">
                     <template x-for="(row, index) in borongan" :key="row.id">
                         <div
-                            class="bg-white rounded-2xl border border-gray-200 p-5 relative group transition hover:border-blue-300 hover:shadow-lg hover:shadow-blue-500/10">
+                            class="bg-white rounded-2xl border border-gray-200 p-5 relative group transition hover:border-orange-300 hover:shadow-lg hover:shadow-orange-500/10">
 
                             {{-- Row Number Badge --}}
                             <div
-                                class="absolute -top-2 -left-2 h-6 w-6 bg-blue-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-md">
+                                class="absolute -top-2 -left-2 h-6 w-6 bg-orange-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-md">
                                 <span x-text="index + 1"></span>
                             </div>
 

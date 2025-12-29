@@ -120,6 +120,9 @@ Route::middleware(['auth', 'role:hrd,pic,admin'])->group(function(){
     Route::POST('/tambah-unit-pekerja', [PKWTController::class, 'tambahPekerjaUnit'])->name('tambah.unit-pekerja.post');
     Route::get('/unit/{unitId}/pekerja/{pekerjaId}/ubah', [PKWTController::class, 'ubahUnitPekerja'])->name('view.ubah.unit-pekerja');
     Route::put('/unit/{unitId}/pekerja/{pekerjaId}/ubah', [PKWTController::class, 'updateUnitPekerja'])->name('update.unit-pekerja');
+    Route::put('/unit/pekerja/bulk-update-status', [PKWTController::class, 'bulkUpdateStatus'])->name('bulk.update.pekerja');
+    Route::put('/unit/pekerja/bulk-update-divisi', [PKWTController::class, 'bulkUpdateDivisi'])->name('bulk.update.divisi');
+    Route::put('/unit/pekerja/bulk-update-jabatan', [PKWTController::class, 'bulkUpdateJabatan'])->name('bulk.update.jabatan');
 
     // Route::put('/unit/{unitId}/pekerja/{pekerjaId]/toggle-status/', [UnitController::class, 'toggleStatusPKWT']);
 
@@ -128,6 +131,7 @@ Route::middleware(['auth', 'role:hrd,pic,admin'])->group(function(){
     Route::POST('/tambah-unit-borongan', [BoronganController::class, 'tambahBoronganUnit'])->name('tambah.unit-borongan.post');
     Route::get('/unit/{unitId}/borongan/{boronganId}/ubah', [BoronganController::class, 'ubahUnitBorongan'])->name('view.ubah.unit-borongan');
     Route::put('/unit/{unitId}/borongan/{boronganId}/ubah', [BoronganController::class, 'updateUnitBorongan'])->name('update.unit-borongan');
+    Route::put('/unit/borongan/bulk-update', [BoronganController::class, 'bulkUpdateBorongan'])->name('bulk.update.borongan');
 
     //Tambah Bidang Usaha
     Route::POST('/tambah-bidang-usaha', [BidangUsahaController::class, 'tambahBidangUsaha'])->name('tambah.bidang-usaha.post');

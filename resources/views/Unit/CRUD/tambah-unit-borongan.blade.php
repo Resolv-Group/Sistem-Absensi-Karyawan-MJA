@@ -120,7 +120,7 @@
 
                             {{-- Row Number Badge --}}
                             <div
-                                class="absolute -top-2 -left-2 h-6 w-6 bg-blue-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-md">
+                                class="absolute -top-2 -left-2 h-6 w-6 bg-orange-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-md">
                                 <span x-text="index + 1"></span>
                             </div>
 
