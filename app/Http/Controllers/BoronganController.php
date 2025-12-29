@@ -104,11 +104,11 @@ class BoronganController extends Controller
             // 1. VALIDASI
             // ========================
             $validated = $request->validate([
-                'borongan.0.nama_item'     => 'required|string|max:255',
-                'borongan.0.kategori'      => 'required|exists:kategori,id',
-                'borongan.0.harga_unit'    => 'required|numeric|min:0',
+                'borongan.0.nama_item' => 'required|string|max:255',
+                'borongan.0.kategori' => 'required|exists:kategori,id',
+                'borongan.0.harga_unit' => 'required|numeric|min:0',
                 'borongan.0.harga_pekerja' => 'required|numeric|min:0',
-                'borongan.0.satuan'        => 'required|string|max:10',
+                'borongan.0.satuan' => 'required|string|max:10',
             ]);
 
             $data = $validated['borongan'][0];
@@ -120,12 +120,12 @@ class BoronganController extends Controller
                 ->where('id', $boronganId)
                 ->where('id_unit', $unitId) // 🔐 safety
                 ->update([
-                    'nama_item'     => $data['nama_item'],
-                    'kategori'      => $data['kategori'],
-                    'harga_unit'    => $data['harga_unit'],
+                    'nama_item' => $data['nama_item'],
+                    'kategori' => $data['kategori'],
+                    'harga_unit' => $data['harga_unit'],
                     'harga_pekerja' => $data['harga_pekerja'],
-                    'satuan'        => $data['satuan'],
-                    'updated_at'    => now(),
+                    'satuan' => $data['satuan'],
+                    'updated_at' => now(),
                 ]);
 
             if ($updated === 0) {
@@ -134,10 +134,7 @@ class BoronganController extends Controller
 
             DB::commit();
 
-            return redirect()
-                ->route('view.detail.unit', $unitId)
-                ->with('success', 'Borongan berhasil diperbarui');
-
+            return redirect()->route('view.detail.unit', $unitId)->with('success', 'Borongan berhasil diperbarui');
         } catch (\Throwable $e) {
             DB::rollBack();
 
@@ -147,9 +144,58 @@ class BoronganController extends Controller
                 'error' => $e->getMessage(),
             ]);
 
+            return back()->withInput()->with('error', 'Terjadi kesalahan saat memperbarui borongan');
+        }
+    }
+
+    public function bulkUpdateBorongan(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+
+            $ids = json_decode($request->ids, true);
+            $action = $request->action;
+
+            if (!is_array($ids) || count($ids) === 0) {
+                throw new \Exception('Tidak ada data borongan yang dipilih.');
+            }
+
+            switch ($action) {
+                case 'update_category':
+                    if (!$request->kategori_id) {
+                        throw new \Exception('Kategori wajib dipilih.');
+                    }
+
+                    Borongan::whereIn('id', $ids)->update(['kategori' => $request->kategori_id]);
+                    break;
+
+                case 'update_status':
+                    if (!isset($request->status)) {
+                        throw new \Exception('Status wajib dipilih.');
+                    }
+
+                    Borongan::whereIn('id', $ids)->update(['status_aktif' => $request->status]);
+                    break;
+
+                case 'delete':
+                    Borongan::whereIn('id', $ids)->delete();
+                    break;
+
+                default:
+                    throw new \Exception('Aksi tidak valid.');
+            }
+
+            DB::commit();
+
+            return back()->with('success', 'Data borongan berhasil diperbarui.');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
             return back()
                 ->withInput()
-                ->with('error', 'Terjadi kesalahan saat memperbarui borongan');
+                ->withErrors([
+                    'error' => $e->getMessage(),
+                ]);
         }
     }
 }

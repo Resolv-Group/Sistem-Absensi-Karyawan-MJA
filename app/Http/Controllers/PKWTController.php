@@ -174,4 +174,81 @@ class PKWTController extends Controller
                 ]);
         }
     }
+
+    function bulkUpdateStatus(Request $request)
+    {
+        // 1. Validasi input
+        $request->validate([
+            'ids' => 'required', // String JSON dari Alpine.js
+            'action' => 'required|string',
+            'status' => 'required_if:action,update_status|in:0,1',
+            'reason' => 'nullable|string|max:500',
+        ]);
+
+        // 2. Decode IDs dari string JSON menjadi array PHP
+        $ids = json_decode($request->ids);
+
+        if (empty($ids)) {
+            return back()->with('error', 'Tidak ada pekerja yang dipilih.');
+        }
+
+        // 3. Eksekusi berdasarkan Action
+        try {
+            DB::beginTransaction();
+
+            if ($request->action === 'update_status') {
+                $statusLabel = $request->status == '1' ? 'Aktif' : 'Nonaktif';
+
+                // Update massal menggunakan whereIn
+                PKWT::whereIn('id', $ids)->update([
+                    'status_aktif' => $request->status,
+                    // Jika Anda punya kolom 'keterangan' atau 'log_perubahan'
+                    'updated_at' => now(),
+                ]);
+
+                $message = "Berhasil mengubah " . count($ids) . " pekerja menjadi $statusLabel.";
+
+            } elseif ($request->action === 'delete') {
+                PKWT::whereIn('id', $ids)->delete();
+                $message = "Berhasil menghapus " . count($ids) . " data pekerja.";
+            }
+
+            DB::commit();
+            return back()->with('success', $message);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Terjadi kesalahan saat memperbarui data: ' . $e->getMessage());
+        }
+    }
+
+    public function bulkUpdateDivisi(Request $request)
+    {
+        $ids = json_decode($request->ids);
+        $divisiId = $request->divisi_id;
+
+        // Validate that IDs and Divisi exist
+        PKWT::whereIn('id', $ids)->update([
+            'divisi_id' => $divisiId,
+            // You can handle 'apply_immediately' logic here if needed
+        ]);
+
+        return back()->with('success', count($ids) . ' workers moved to new division.');
+    }
+
+    public function bulkUpdateJabatan(Request $request)
+    {
+        $ids = json_decode($request->ids);
+        $jabatanId = $request->jabatan_id;
+
+        // Validate that IDs and Divisi exist
+        PKWT::whereIn('id', $ids)->update([
+            'jabatan_id' => $jabatanId,
+            // You can handle 'apply_immediately' logic here if needed
+        ]);
+
+        return back()->with('success', count($ids) . ' workers moved to new jabatan.');
+    }
+
+
 }

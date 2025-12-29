@@ -189,11 +189,12 @@ class UnitController extends Controller
 
         $borongan = Borongan::with('kategoriRel')->where('id_unit', $id)->paginate(15);
 
-        // dd($pkwtPekerja);
+        //get checkbox list
+        $divisions = Divisi::get();
+        $boronganKategori = Kategori::get();
+        $jabatan = JabatanPKWT::get();
 
-        // dd($mitraKerja);
-
-        return view('Unit.detail-unit', compact('unit', 'historiUnit', 'pekerja', 'totalPekerja', 'pkwtPekerja', 'borongan', 'totalBorongan'));
+        return view('Unit.detail-unit', compact('unit', 'historiUnit', 'pekerja', 'totalPekerja', 'pkwtPekerja', 'borongan', 'totalBorongan', 'divisions', 'boronganKategori', 'jabatan'));
     }
 
     public function showDokumenMOU($id, Request $request)
