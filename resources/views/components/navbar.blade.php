@@ -49,12 +49,42 @@
             </a>
         </li>
 
-        <li class="relative pb-2 cursor-pointer">
+        {{-- <li class="relative pb-2 cursor-pointer">
             <a href="/absensi"
                 class="text-gray-700 hover:text-black {{ Request::is('absensi') || Request::is('absensi') || Request::is('absensi/*') ? 'border-b-2 border-red-500 pb-2 text-black' : '' }}">
                 Absensi
             </a>
+        </li> --}}
+
+        @if(Auth::user()->role === 'pic' && Auth::user()->units->count())
+        <li class="relative group">
+
+            <button
+                class="flex items-center gap-1 text-gray-700 hover:text-black pb-2
+                {{ Request::is('absensi*') ? 'border-b-2 border-red-500 text-black' : '' }}">
+                Absensi
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 9l-7 7-7-7" />
+                </svg>
+            </button>
+
+            <div class="absolute top-full left-0 mt-0 pt-2
+                    w-48 bg-white rounded-xl shadow-lg border
+                    opacity-0 invisible group-hover:opacity-100 group-hover:visible">
+
+
+                @foreach(Auth::user()->units as $unit)
+                    <a href="{{ route('view.detail.unit', $unit->id) }}"
+                    class="block px-4 py-2 text-sm hover:bg-gray-50">
+                        {{ $unit->nama_unit }}
+                    </a>
+                @endforeach
+
+            </div>
         </li>
+        @endif
+
     </ul>
 
 

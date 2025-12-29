@@ -83,6 +83,11 @@ Route::middleware(['auth', 'role:hrd,admin'])->group(function(){
 
 });
 
+Route::middleware(['auth', 'role:pic,admin'])->group(function(){
+
+    Route::get('/unit/detail/{id}', [UnitController::class, 'viewDetailUnit'])->name('view.detail.unit');
+});
+
 Route::middleware(['auth', 'role:hrd,pic,admin'])->group(function(){
 
     //Pekerja
