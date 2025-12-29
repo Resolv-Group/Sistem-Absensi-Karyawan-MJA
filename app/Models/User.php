@@ -54,4 +54,14 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Staff::class);
     }
+
+    public function units()
+    {
+        return $this->belongsToMany(
+            Unit::class,
+            'pic_unit',
+            'id_pic',
+            'id_unit'
+        );
+    }
 }

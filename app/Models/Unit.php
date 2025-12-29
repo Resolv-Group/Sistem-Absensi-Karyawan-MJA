@@ -47,6 +47,14 @@ class Unit extends Model
         return $this->hasMany(PKWT::class, 'id_unit', 'id');
     }
 
-
-
+    public function pics()
+    {
+        return $this->belongsToMany(
+            User::class,
+            'pic_unit',
+            'id_unit',
+            'id_pic'
+        );
+    }
+    
 }
