@@ -13,6 +13,34 @@ use Illuminate\Support\Facades\DB;
 
 class PKWTController extends Controller
 {
+    public function viewPKWTMain(Request $request, $id_unit)
+    {
+        $unit = Unit::findOrFail($id_unit);
+        $query = PKWT::with(['pekerja', 'jabatan', 'divisi'])->where('id_unit', $id_unit);
+
+        // Filter Pencarian
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->whereHas('pekerja', function ($q) use ($search) {
+                $q->where('nama', 'like', "%{$search}%")->orWhere('nik', 'like', "%{$search}%");
+            });
+        }
+        if ($request->filled('divisi')) $query->where('divisi_id', $request->divisi);
+        if ($request->filled('jabatan')) $query->where('jabatan_pkwt_id', $request->jabatan);
+        if ($request->filled('status')) $query->where('status_aktif', $request->status);
+
+        $pkwtPekerja = $query->latest()->paginate(20);
+
+        // Data untuk Filter Dropdown
+        $divisions = Divisi::all();
+        $jabatan = JabatanPKWT::all();
+
+        if ($request->ajax()) {
+            return view('Unit.partials.main-harian-table', compact('pkwtPekerja', 'unit'))->render();
+        }
+
+        return view('Unit.Pengajian.main-harian', compact('pkwtPekerja', 'unit', 'divisions', 'jabatan'));
+    }
     function viewTambahUnitHarian($id_unit)
     {
         // Assuming you have Unit and Pekerja models
@@ -233,7 +261,7 @@ class PKWTController extends Controller
             // You can handle 'apply_immediately' logic here if needed
         ]);
 
-        return back()->with('success', count($ids) . ' workers moved to new division.');
+        return back()->with('success', count($ids) . ' pekerja berhasil mendapatkan divisi baru.');
     }
 
     public function bulkUpdateJabatan(Request $request)
@@ -247,7 +275,7 @@ class PKWTController extends Controller
             // You can handle 'apply_immediately' logic here if needed
         ]);
 
-        return back()->with('success', count($ids) . ' workers moved to new jabatan.');
+        return back()->with('success', count($ids) . ' pekerja berhasil mendapatkan jabatan baru.');
     }
 
 

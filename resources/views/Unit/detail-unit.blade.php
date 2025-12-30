@@ -288,10 +288,10 @@
 
         {{-- WRAPPER FOR TABS LOGIC --}}
         <div x-data="{ activeTab: 'pekerja' }"
-            class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden flex flex-col h-full">
+            class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-visible flex flex-col h-full">
 
             {{-- 1. TAB HEADER --}}
-            <div class="px-6 border-b border-gray-200 bg-white">
+            <div class="px-6 border-b border-gray-200 bg-white rounded-tl-2xl rounded-tr-2xl">
                 <nav class="-mb-px flex space-x-8" aria-label="Tabs">
                     {{-- Tab 1: Pekerja --}}
                     <button @click="activeTab = 'pekerja'"
@@ -330,7 +330,7 @@
                             <span class="ml-2 py-0.5 px-2.5 rounded-full text-xs font-medium md:inline-block hidden"
                                 :class="activeTab === 'borongan' ? 'bg-orange-100 text-orange-600' :
                                     'bg-gray-100 text-gray-900'">
-                                {{ $totalBorongan }}
+                                {{ $borongan->count() }}
                             </span>
                         </button>
                     @endif

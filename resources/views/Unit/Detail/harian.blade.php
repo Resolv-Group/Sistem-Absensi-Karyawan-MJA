@@ -4,32 +4,302 @@
     showJabatanModal: false,
     showDivisionModal: false,
     showStatusModal: false,
+    showFilterDropdown: false,
     statusValue: '1',
+
+    // Search & Filter States
+    searchQuery: '',
+    filterDivisi: '',
+    filterJabatan: '',
+    filterStatus: '',
+
     allIds: {{ $pkwtPekerja->pluck('id') }},
+
     toggleAll() {
         if (this.selectedItems.length === this.allIds.length) {
             this.selectedItems = [];
         } else {
             this.selectedItems = [...this.allIds];
         }
+    },
+
+    async updateTable() {
+        const url = new URL(window.location.href);
+        url.searchParams.set('target', 'harian');
+        url.searchParams.set('search', this.searchQuery);
+        url.searchParams.set('divisi', this.filterDivisi);
+        url.searchParams.set('jabatan', this.filterJabatan);
+        url.searchParams.set('status', this.filterStatus);
+
+        try {
+            const response = await fetch(url, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            const html = await response.text();
+            document.getElementById('harian-table-body').innerHTML = html;
+
+            const idProvider = document.getElementById('new-ids-provider');
+            if (idProvider) { this.allIds = JSON.parse(idProvider.dataset.ids); }
+        } catch (error) {
+            console.error('Error loading table:', error);
+        }
+    },
+
+    resetFilters() {
+        this.searchQuery = '';
+        this.filterDivisi = '';
+        this.filterJabatan = '';
+        this.filterStatus = '';
+        this.updateTable();
     }
-}" class="relative">
+}" x-init="$watch('searchQuery', () => updateTable());
+$watch('filterDivisi', () => updateTable());
+$watch('filterJabatan', () => updateTable());
+$watch('filterStatus', () => updateTable());" class="relative">
 
     <div
         class="px-6 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gray-50/30">
         <div class="flex items-center gap-2">
-            <p class="text-sm text-gray-500">Menampilkan daftar pekerja harian/kontrak.</p>
+            <p class="text-sm text-gray-500">Menampilkan daftar pekerja harian/kontrak <span class="text-blue-500 font-medium">5 terbaru. </span></p>
         </div>
+
         <div class="flex items-center gap-3 w-full sm:w-auto">
-            <div class="relative w-full sm:w-64">
-                <input type="text" placeholder="Cari pekerja..."
-                    class="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition bg-white">
+            {{-- SEARCH INPUT --}}
+            <div class="relative w-full sm:w-64" x-data="{ showSearchTooltip: false }">
+                {{-- Left Search Icon --}}
                 <svg class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none"
                     viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
+
+                {{-- The Input (Added pr-10 for right icon space) --}}
+                <input type="text" x-model.debounce.500ms="searchQuery" placeholder="Cari Nama atau NIK..." title="Cari (Preview 5 data)"
+                    class="w-full pl-9 pr-10 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition bg-white">
+
+                {{-- Right Info Icon --}}
+                <div class="absolute right-3 top-1/2 -translate-y-1/2 cursor-help text-gray-300 hover:text-blue-500 transition-colors"
+                    @mouseenter="showSearchTooltip = true" @mouseleave="showSearchTooltip = false">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+
+                {{-- Floating Tooltip --}}
+                <div x-show="showSearchTooltip" x-transition:enter="transition ease-out duration-200"
+                    x-transition:enter-start="opacity-0 translate-y-1"
+                    x-transition:enter-end="opacity-100 translate-y-0" x-cloak
+                    class="absolute right-0 top-full mt-2 w-64 p-3 bg-white border border-blue-100 rounded-xl shadow-xl z-[100] pointer-events-none">
+                    <div class="flex gap-2">
+                        <svg class="w-4 h-4 text-blue-500 flex-shrink-0" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <p class="text-[10px] text-blue-700 leading-relaxed">
+                            <span class="font-bold">Mode Preview:</span> Pencarian terbatas pada <span
+                                class="font-bold">5 data terbaru</span>. Gunakan halaman PKWT untuk pencarian
+                            menyeluruh.
+                        </p>
+                    </div>
+                    {{-- Tooltip Arrow --}}
+                    <div class="absolute -top-1 right-4 w-2 h-2 bg-white border-t border-l border-blue-100 rotate-45">
+                    </div>
+                </div>
             </div>
+
+            {{-- FILTER BUTTON --}}
+            <div class="relative"> {{-- Increased wrapper z-index --}}
+                <button @click="showFilterDropdown = !showFilterDropdown"
+                    class="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                    </svg>
+                    Filter
+                    <span x-show="filterDivisi || filterJabatan || filterStatus" class="flex h-2 w-2 relative">
+                        <span
+                            class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                    </span>
+                </button>
+
+
+                {{-- FILTER DROPDOWN POPUP --}}
+                <div x-show="showFilterDropdown" x-transition:enter="transition ease-out duration-200"
+                    x-transition:enter-start="opacity-0 scale-95 translate-y-2"
+                    x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                    x-transition:leave="transition ease-in duration-150"
+                    x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                    x-transition:leave-end="opacity-0 scale-95 translate-y-2"
+                    @click.outside="showFilterDropdown = false" x-cloak
+                    class="absolute right-0 mt-3 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 z-[70] p-5 origin-top-right">
+
+                    {{-- Header --}}
+                    <div class="flex justify-between items-center mb-5">
+                        <h3 class="text-sm font-bold text-gray-800">Filter Data</h3>
+                        <button @click="resetFilters()"
+                            class="text-xs font-medium text-gray-400 hover:text-red-500 hover:bg-red-50 px-2 py-1 rounded transition">
+                            Reset Filter
+                        </button>
+                    </div>
+
+                    <div class="space-y-5">
+
+                        {{-- STATUS FILTER --}}
+                        <div x-data="{ open: false, list: [{ val: '', label: 'Semua Status' }, { val: '1', label: 'Aktif' }, { val: '0', label: 'Nonaktif' }] }" class="relative">
+                            <label
+                                class="block text-[10px] uppercase tracking-wider font-bold text-gray-400 mb-1.5">Status
+                                Keaktifan</label>
+                            <div @click="open = !open"
+                                class="relative block w-full pl-9 pr-3 py-2.5 text-sm bg-gray-50 border border-transparent rounded-xl text-gray-700 cursor-pointer hover:bg-gray-100 transition flex justify-between items-center">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24"
+                                        stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
+                                <span class="truncate font-medium"
+                                    x-text="list.find(x => x.val == filterStatus)?.label || 'Semua Status'"></span>
+                                <svg class="w-4 h-4 text-gray-400 transition-transform duration-200"
+                                    :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </div>
+
+                            {{-- Inner List Dropdown --}}
+                            <div x-show="open" @click.outside="open = false"
+                                class="absolute w-full mt-1 bg-white rounded-xl shadow-xl border border-gray-100 z-[80] overflow-hidden">
+                                <ul class="max-h-60 overflow-y-auto py-1">
+                                    <template x-for="item in list" :key="item.val">
+                                        <li @click="filterStatus = item.val; open = false"
+                                            class="px-4 py-2.5 text-sm cursor-pointer transition flex items-center gap-2"
+                                            :class="filterStatus == item.val ? 'bg-blue-50 text-blue-700 font-semibold' :
+                                                'text-gray-700 hover:bg-gray-50'">
+                                            <svg x-show="filterStatus == item.val" class="w-4 h-4 text-blue-600"
+                                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M5 13l4 4L19 7" />
+                                            </svg>
+                                            <span x-show="filterStatus != item.val" class="w-4 h-4"></span>
+                                            <span x-text="item.label"></span>
+                                        </li>
+                                    </template>
+                                </ul>
+                            </div>
+                        </div>
+
+                        {{-- DIVISI FILTER --}}
+                        <div x-data="{ open: false, list: [{ val: '', label: 'Semua Divisi' }, @foreach ($divisions as $d) { val: '{{ $d->id }}', label: '{{ $d->nama }}' }, @endforeach] }" class="relative">
+                            <label
+                                class="block text-[10px] uppercase tracking-wider font-bold text-gray-400 mb-1.5">Divisi</label>
+                            <div @click="open = !open"
+                                class="relative block w-full pl-9 pr-3 py-2.5 text-sm bg-gray-50 border border-transparent rounded-xl text-gray-700 cursor-pointer hover:bg-gray-100 transition flex justify-between items-center">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24"
+                                        stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                    </svg>
+                                </div>
+                                <span class="truncate font-medium"
+                                    x-text="list.find(x => x.val == filterDivisi)?.label || 'Semua Divisi'"></span>
+                                <svg class="w-4 h-4 text-gray-400 transition-transform duration-200"
+                                    :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </div>
+                            <div x-show="open" @click.outside="open = false"
+                                class="absolute w-full mt-1 bg-white rounded-xl shadow-xl border border-gray-100 z-[80] overflow-hidden">
+                                <ul class="max-h-60 overflow-y-auto py-1">
+                                    <template x-for="item in list" :key="item.val">
+                                        <li @click="filterDivisi = item.val; open = false"
+                                            class="px-4 py-2.5 text-sm cursor-pointer transition flex items-center gap-2"
+                                            :class="filterDivisi == item.val ? 'bg-blue-50 text-blue-700 font-semibold' :
+                                                'text-gray-700 hover:bg-gray-50'">
+                                            <svg x-show="filterDivisi == item.val" class="w-4 h-4 text-blue-600"
+                                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M5 13l4 4L19 7" />
+                                            </svg>
+                                            <span x-show="filterDivisi != item.val" class="w-4 h-4"></span>
+                                            <span x-text="item.label"></span>
+                                        </li>
+                                    </template>
+                                </ul>
+                            </div>
+                        </div>
+
+                        {{-- JABATAN FILTER --}}
+                        <div x-data="{ open: false, list: [{ val: '', label: 'Semua Jabatan' }, @foreach ($jabatan as $j) { val: '{{ $j->id }}', label: '{{ $j->nama }}' }, @endforeach] }" class="relative">
+                            <label
+                                class="block text-[10px] uppercase tracking-wider font-bold text-gray-400 mb-1.5">Jabatan</label>
+                            <div @click="open = !open"
+                                class="relative block w-full pl-9 pr-3 py-2.5 text-sm bg-gray-50 border border-transparent rounded-xl text-gray-700 cursor-pointer hover:bg-gray-100 transition flex justify-between items-center">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24"
+                                        stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M21 13.255A2.396 2.396 0 0019.5 13H17c-1.105 0-2 .895-2 2s.895 2 2 2h2.5c.39 0 .753-.105 1.055-.255A5.002 5.002 0 1121 13.255zM11 13.255A2.396 2.396 0 009.5 13H7c-1.105 0-2 .895-2 2s.895 2 2 2h2.5c.39 0 .753-.105 1.055-.255A5.002 5.002 0 1111 13.255z" />
+                                    </svg>
+                                </div>
+                                <span class="truncate font-medium"
+                                    x-text="list.find(x => x.val == filterJabatan)?.label || 'Semua Jabatan'"></span>
+                                <svg class="w-4 h-4 text-gray-400 transition-transform duration-200"
+                                    :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </div>
+                            <div x-show="open" @click.outside="open = false"
+                                class="absolute w-full mt-1 bg-white rounded-xl shadow-xl border border-gray-100 z-[80] overflow-hidden">
+                                <ul class="max-h-60 overflow-y-auto py-1">
+                                    <template x-for="item in list" :key="item.val">
+                                        <li @click="filterJabatan = item.val; open = false"
+                                            class="px-4 py-2.5 text-sm cursor-pointer transition flex items-center gap-2"
+                                            :class="filterJabatan == item.val ? 'bg-blue-50 text-blue-700 font-semibold' :
+                                                'text-gray-700 hover:bg-gray-50'">
+                                            <svg x-show="filterJabatan == item.val" class="w-4 h-4 text-blue-600"
+                                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M5 13l4 4L19 7" />
+                                            </svg>
+                                            <span x-show="filterJabatan != item.val" class="w-4 h-4"></span>
+                                            <span x-text="item.label"></span>
+                                        </li>
+                                    </template>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Info Helper for Preview Limitation --}}
+                    <div class="mt-4 p-3 bg-orange-50 rounded-xl border border-orange-100 flex gap-3">
+                        <svg class="w-5 h-5 text-orange-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <p class="text-[10px] text-orange-700 leading-relaxed">
+                            <span class="font-bold">Mode Preview:</span> Pencarian ini hanya memindai <span
+                                class="font-bold">5 data terbaru</span>. Jika tidak ditemukan, silakan cek di halaman
+                            <span class="italic font-bold">Master Borongan</span>.
+                        </p>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-gray-50 text-center">
+                        <p class="text-[10px] text-gray-400">Filter akan diterapkan otomatis</p>
+                    </div>
+                </div>
+            </div>
+
             <a href="{{ route('view.tambah.unit-pekerja', $unit->id) }}"
                 class="px-4 py-2 bg-blue-600 text-white text-xs font-bold rounded-lg hover:bg-blue-700 transition flex items-center gap-2 shadow-sm">
                 <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -40,7 +310,6 @@
         </div>
     </div>
 
-    {{-- Table Pekerja --}}
     <div class="overflow-x-auto rounded-b-2xl">
         <table class="w-full text-left border-collapse">
             <thead>
@@ -50,7 +319,8 @@
                             :checked="selectedItems.length === allIds.length && allIds.length > 0"
                             class="rounded border-gray-300 text-blue-600 shadow-sm focus:ring-blue-200 cursor-pointer">
                     </th>
-                    <th class="px-2 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider w-10 text-center">
+                    <th
+                        class="px-2 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider w-10 text-center">
                         #</th>
                     <th class="px-4 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider w-[250px]">Nama &
                         NIK</th>
@@ -65,137 +335,44 @@
                     <th class="pr-6 py-4 text-right"></th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-50 bg-white">
-                @forelse($pkwtPekerja as $pkwt)
-                    <tr {{-- Row Click Logic --}}
-                        @click="selectedItems.includes({{ $pkwt->id }}) ? selectedItems = selectedItems.filter(id => id !== {{ $pkwt->id }}) : selectedItems.push({{ $pkwt->id }})"
-                        {{-- Conditional Background --}}
-                        :class="selectedItems.includes({{ $pkwt->id }}) ? 'bg-blue-50/50' : 'hover:bg-gray-50/80'"
-                        class="transition-colors cursor-pointer group">
-
-                        <td class="pl-6 py-5 align-top">
-                            <input type="checkbox" value="{{ $pkwt->id }}" x-model.number="selectedItems"
-                                @click.stop {{-- Prevents double toggle when clicking the checkbox itself --}}
-                                class="rounded border-gray-300 text-blue-600 shadow-sm focus:ring-blue-200 cursor-pointer mt-1">
-                        </td>
-
-                        <td class="px-2 py-5 align-top text-center">
-                            <span class="text-xs font-bold text-gray-400 font-mono">{{ $loop->iteration }}</span>
-                        </td>
-
-                        <td class="px-4 py-5 align-top">
-                            <div class="flex flex-col gap-0.5">
-                                <span
-                                    class="text-sm font-bold text-gray-900 group-hover:text-blue-600 transition truncate max-w-[200px]"
-                                    title="{{ $pkwt->pekerja->nama }}">
-                                    {{ $pkwt->pekerja->nama }}
-                                </span>
-                                <div class="flex items-center gap-1.5 text-xs text-gray-500">
-                                    <span class="font-mono tracking-tight">{{ $pkwt->pekerja->nik }}</span>
-                                </div>
-                            </div>
-                        </td>
-
-                        <td class="px-4 py-5 align-top">
-                            <div class="flex flex-col gap-2">
-                                <span
-                                    class="inline-flex items-center text-xs font-semibold text-gray-800 bg-gray-100 px-2.5 py-1 rounded-md border border-gray-200 w-fit max-w-[180px] truncate">
-                                    {{ $pkwt->jabatan->nama }}
-                                </span>
-                                <span
-                                    class="text-xs text-gray-500 pl-1 truncate max-w-[180px]">{{ $pkwt->divisi->nama }}</span>
-                            </div>
-                        </td>
-
-                        {{-- PKWT Document --}}
-                        <td class="px-4 py-5 align-top text-center">
-                            @if ($pkwt->dokumen_mime)
-                                <a href="{{ route('stream.pkwt', $pkwt->id) }}" target="_blank" @click.stop
-                                    class="inline-flex flex-col items-center justify-center gap-1.5 p-2 rounded-lg
-                   hover:bg-white transition border border-transparent hover:border-gray-200">
-
-                                    @if (Str::startsWith($pkwt->dokumen_mime, 'application/pdf'))
-                                        {{-- PDF --}}
-                                        <svg class="w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24"
-                                            stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                                d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                                        </svg>
-                                        <span class="text-[9px] font-bold tracking-wide text-gray-500">
-                                            PDF
-                                        </span>
-                                    @else
-                                        {{-- IMAGE --}}
-                                        <svg class="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24"
-                                            stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                        </svg>
-                                        <span class="text-[9px] font-bold tracking-wide text-gray-500">
-                                            IMG
-                                        </span>
-                                    @endif
-
-                                </a>
-                            @else
-                                <span class="text-xs text-gray-300 italic">-</span>
-                            @endif
-                        </td>
-
-
-                        <td class="px-4 py-5 align-top text-center">
-                            <div class="flex flex-col items-center gap-1">
-                                <span
-                                    class="text-[10px] text-gray-400">{{ \Carbon\Carbon::parse($pkwt->tgl_mulai_pkwt)->format('d/m/y') }}</span>
-                                <div class="h-3 w-px bg-gray-200"></div>
-                                <span
-                                    class="text-xs font-bold {{ $pkwt->status_pkwt['color'] === 'red' ? 'text-red-600' : 'text-emerald-600' }}">
-                                    {{ \Carbon\Carbon::parse($pkwt->tgl_akhir_pkwt)->format('d M Y') }}
-                                </span>
-                            </div>
-                        </td>
-
-                        <td class="px-4 py-5 align-top text-center">
-                            @if ($pkwt->status_aktif == 1)
-                                <span
-                                    class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-100">
-                                    Aktif
-                                </span>
-                            @else
-                                <span
-                                    class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-100 text-gray-500 border border-gray-200">
-                                    Nonaktif
-                                </span>
-                            @endif
-                        </td>
-
-                        <td class="pr-6 py-5 align-top text-right">
-                            <div class="flex justify-end gap-1">
-                                <a href="{{ route('view.ubah.unit-pekerja', ['unitId' => $unit->id, 'pekerjaId' => $pkwt->id]) }}"
-                                    @click.stop
-                                    class="p-2 text-gray-400 hover:text-blue-600 hover:bg-white rounded-lg transition">
-                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                    </svg>
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="8" class="px-6 py-12 text-center text-gray-500">Belum ada pekerja terdaftar.
-                        </td>
-                    </tr>
-                @endforelse
+            <tbody id="harian-table-body" class="divide-y divide-gray-50 bg-white">
+                @include('Unit.partials.harian-table')
             </tbody>
         </table>
 
-        @if ($pkwtPekerja->hasPages())
-            <div id="search-pagination" class="border-t border-gray-200 bg-gray-50 px-4 py-3 sm:px-6">
-                {{ $pkwtPekerja->links('vendor.pagination.custom') }}
+        {{-- DEDICATED PAGE NAVIGATION FOOTER --}}
+        <div
+            class="px-6 py-4 bg-gray-50/50 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+
+            <div class="flex items-center gap-3">
+                <div class="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
+                    {{-- USERS ICON --}}
+                    <svg class="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17 20h5v-2a4 4 0 00-4-4h-1m-4 6H2v-2a4 4 0 014-4h1m6-4a4 4 0 11-8 0 4 4 0 018 0zm6 4a3 3 0 10-6 0" />
+                    </svg>
+                </div>
+
+                <div>
+                    <h4 class="text-xs font-bold text-gray-900 leading-tight">
+                        Lihat Semua Pekerja
+                    </h4>
+                    <p class="text-[10px] text-gray-500 mt-0.5">
+                        Buka halaman lengkap untuk melihat dan mengelola seluruh pekerja pada unit ini.
+                    </p>
+                </div>
             </div>
-        @endif
+
+            <a href="{{ route('view.pkwt', $unit->id) }}"
+                class="group inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-blue-600 text-xs font-bold rounded-xl hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all shadow-sm active:scale-95">
+                Lihat Semua Pekerja
+                <svg class="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+            </a>
+        </div>
     </div>
 
     {{-- Floating Bulk Action Bar --}}
@@ -203,7 +380,7 @@
         x-transition:enter-start="opacity-0 translate-y-10" x-transition:enter-end="opacity-100 translate-y-0"
         x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0"
         x-transition:leave-end="opacity-0 translate-y-10"
-        class="fixed bottom-8 left-1/2 -translate-x-1/2 z-40 w-[95%] max-w-3xl">
+        class="fixed bottom-8 left-1/2 -translate-x-1/2 z-40 w-[95%] max-w-3xl"x-cloak>
 
         <div
             class="bg-white/80 backdrop-blur-md border border-blue-100 shadow-[0_8px_30px_rgb(0,0,0,0.12)] rounded-2xl px-5 py-3 flex items-center justify-between">
@@ -262,7 +439,7 @@
     </div>
 
     {{-- MODAL: Change Division --}}
-    <div x-show="showDivisionModal" class="fixed inset-0 z-[60] flex items-center justify-center p-4 sm:p-6" x-cloak>
+    <div x-show="showDivisionModal" class="fixed inset-0 z-[30] flex items-center justify-center p-4 sm:p-6" x-cloak>
 
         {{-- Backdrop --}}
         <div x-show="showDivisionModal" x-transition:enter="ease-out duration-300"
@@ -323,7 +500,8 @@
                             {{-- Dropdown Trigger --}}
                             <div @click="open = !open"
                                 class="bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-4 cursor-pointer flex justify-between items-center hover:border-blue-300 transition-all focus:ring-2 focus:ring-blue-100">
-                                <span class="text-sm" :class="selected ? 'text-gray-900 font-medium' : 'text-gray-400'"
+                                <span class="text-sm"
+                                    :class="selected ? 'text-gray-900 font-medium' : 'text-gray-400'"
                                     x-text="list.find(x => x.val == selected)?.label || 'Pilih Divisi...'">
                                 </span>
                                 <svg class="w-4 h-4 text-gray-400 transition-transform duration-200"
@@ -387,7 +565,7 @@
         </div>
     </div>
 
-    <div x-show="showJabatanModal" class="fixed inset-0 z-[60] flex items-center justify-center p-4 sm:p-6" x-cloak>
+    <div x-show="showJabatanModal" class="fixed inset-0 z-[30] flex items-center justify-center p-4 sm:p-6" x-cloak>
 
         {{-- Backdrop --}}
         <div x-show="showJabatanModal" x-transition:enter="ease-out duration-300"
@@ -448,7 +626,8 @@
                             {{-- Dropdown Trigger --}}
                             <div @click="open = !open"
                                 class="bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-4 cursor-pointer flex justify-between items-center hover:border-blue-300 transition-all focus:ring-2 focus:ring-blue-100">
-                                <span class="text-sm" :class="selected ? 'text-gray-900 font-medium' : 'text-gray-400'"
+                                <span class="text-sm"
+                                    :class="selected ? 'text-gray-900 font-medium' : 'text-gray-400'"
                                     x-text="list.find(x => x.val == selected)?.label || 'Pilih Jabatan...'">
                                 </span>
                                 <svg class="w-4 h-4 text-gray-400 transition-transform duration-200"
@@ -513,7 +692,7 @@
     </div>
 
     {{-- MODAL: Change Status --}}
-    <div x-show="showStatusModal" class="fixed inset-0 z-[60] flex items-center justify-center p-4 sm:p-6" x-cloak>
+    <div x-show="showStatusModal" class="fixed inset-0 z-[30] flex items-center justify-center p-4 sm:p-6" x-cloak>
         {{-- Backdrop --}}
         <div x-show="showStatusModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0"
             x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200"

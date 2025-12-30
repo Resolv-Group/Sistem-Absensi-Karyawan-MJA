@@ -121,6 +121,7 @@ Route::middleware(['auth', 'role:hrd,pic,admin'])->group(function(){
     Route::put('/unit/toggle-status/{id}', [UnitController::class, 'toggleStatus']);
 
     //Unit -> PKWT
+    Route::get('/unit/{id}/daftar-pkwt', [PKWTController::class, 'viewPKWTMain'])->name('view.pkwt');
     Route::get('/unit/{id}/tambah-pekerja', [PKWTController::class, 'viewTambahUnitHarian'])->name('view.tambah.unit-pekerja');
     Route::POST('/tambah-unit-pekerja', [PKWTController::class, 'tambahPekerjaUnit'])->name('tambah.unit-pekerja.post');
     Route::get('/unit/{unitId}/pekerja/{pekerjaId}/ubah', [PKWTController::class, 'ubahUnitPekerja'])->name('view.ubah.unit-pekerja');
@@ -132,11 +133,14 @@ Route::middleware(['auth', 'role:hrd,pic,admin'])->group(function(){
     // Route::put('/unit/{unitId}/pekerja/{pekerjaId]/toggle-status/', [UnitController::class, 'toggleStatusPKWT']);
 
     //Unit -> Borongan
+    Route::get('/unit/{id}/daftar-borongan', [BoronganController::class, 'viewBoronganMain'])->name('view.borongan');
     Route::get('/unit/{id}/tambah-borongan', [BoronganController::class, 'viewTambahBorongan'])->name('view.tambah.unit-borongan');
     Route::POST('/tambah-unit-borongan', [BoronganController::class, 'tambahBoronganUnit'])->name('tambah.unit-borongan.post');
     Route::get('/unit/{unitId}/borongan/{boronganId}/ubah', [BoronganController::class, 'ubahUnitBorongan'])->name('view.ubah.unit-borongan');
     Route::put('/unit/{unitId}/borongan/{boronganId}/ubah', [BoronganController::class, 'updateUnitBorongan'])->name('update.unit-borongan');
     Route::put('/unit/borongan/bulk-update', [BoronganController::class, 'bulkUpdateBorongan'])->name('bulk.update.borongan');
+    Route::put('/unit/borongan/bulk-update-kategori', [BoronganController::class, 'bulkUpdateKategori'])->name('bulk.update.kategori');
+    Route::put('/unit/borongan/bulk-update-status', [BoronganController::class, 'bulkUpdateStatus'])->name('bulk.update.borongan');
 
     //Tambah Bidang Usaha
     Route::POST('/tambah-bidang-usaha', [BidangUsahaController::class, 'tambahBidangUsaha'])->name('tambah.bidang-usaha.post');
