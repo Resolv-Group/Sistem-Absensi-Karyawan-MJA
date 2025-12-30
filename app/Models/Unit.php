@@ -56,5 +56,11 @@ class Unit extends Model
             'id_pic'
         );
     }
-    
+
+    public function borongan()
+    {
+        // 'id_unit' is the foreign key on the borongan table
+        return $this->hasMany(Borongan::class, 'id_unit');
+    }
+
 }

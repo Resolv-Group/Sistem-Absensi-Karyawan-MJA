@@ -23,6 +23,9 @@
         body {
             font-family: 'Poppins', sans-serif;
         }
+        [x-cloak] {
+            display: none !important;
+        }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen">
@@ -40,7 +43,7 @@
     @yield('scripts')
 
     <!-- Loading Screen -->
-    <div id="loading-screen" class="fixed inset-0 bg-gray-100 flex items-center justify-center z-50 hidden">
+    <div id="loading-screen" class="fixed inset-0 bg-gray-100 flex items-center justify-center z-[100] hidden">
         <div class="text-center">
             <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mb-4 animate-spin"></div>
             <p class="text-sm text-gray-500">Loading...</p>

@@ -12,6 +12,36 @@ use Illuminate\Support\Facades\Log;
 
 class BoronganController extends Controller
 {
+
+    public function viewBoronganMain(Request $request, $id_unit)
+    {
+        $unit = Unit::findOrFail($id_unit);
+
+        // Base Query
+        $query = Borongan::with('kategoriRel')->where('id_unit', $id_unit);
+
+        // Live Search & Filter Logic
+        if ($request->filled('search')) {
+            $query->where('nama_item', 'like', "%{$request->search}%");
+        }
+        if ($request->filled('kategori')) {
+            $query->where('kategori', $request->kategori);
+        }
+        if ($request->filled('status')) {
+            $query->where('status_aktif', $request->status);
+        }
+
+        $borongan = $query->latest()->paginate(3)->withQueryString();
+        $boronganKategori = Kategori::all();
+
+        // Jika Request AJAX (Live Update)
+        if ($request->ajax()) {
+            return view('Unit.partials.main-borongan-table', compact('borongan', 'unit'))->render();
+        }
+
+        return view('Unit.Pengajian.main-borongan', compact('borongan', 'unit', 'boronganKategori'));
+    }
+
     function viewTambahBorongan($id_unit)
     {
         // Assuming you have Unit and Pekerja models
@@ -196,6 +226,66 @@ class BoronganController extends Controller
                 ->withErrors([
                     'error' => $e->getMessage(),
                 ]);
+        }
+    }
+
+    function bulkUpdateKategori(Request $request) {
+        $ids = json_decode($request->ids);
+        $kategoriId = $request->kategori;
+
+        // Validate that IDs and Divisi exist
+        Borongan::whereIn('id', $ids)->update([
+            'kategori' => $kategoriId,
+            // You can handle 'apply_immediately' logic here if needed
+        ]);
+
+        return back()->with('success', count($ids) . ' kategori berhasil diperbarui');
+    }
+
+    function bulkUpdateStatus(Request $request)
+    {
+        // 1. Validasi input
+        $request->validate([
+            'ids' => 'required', // String JSON dari Alpine.js
+            'action' => 'required|string',
+            'status' => 'required_if:action,update_status|in:0,1',
+            'reason' => 'nullable|string|max:500',
+        ]);
+
+        // 2. Decode IDs dari string JSON menjadi array PHP
+        $ids = json_decode($request->ids);
+
+        if (empty($ids)) {
+            return back()->with('error', 'Tidak ada item yang dipilih.');
+        }
+
+        // 3. Eksekusi berdasarkan Action
+        try {
+            DB::beginTransaction();
+
+            if ($request->action === 'update_status') {
+                $statusLabel = $request->status == '1' ? 'Aktif' : 'Nonaktif';
+
+                // Update massal menggunakan whereIn
+                Borongan::whereIn('id', $ids)->update([
+                    'status_aktif' => $request->status,
+                    // Jika Anda punya kolom 'keterangan' atau 'log_perubahan'
+                    'updated_at' => now(),
+                ]);
+
+                $message = "Berhasil mengubah " . count($ids) . " item menjadi $statusLabel.";
+
+            } elseif ($request->action === 'delete') {
+                Borongan::whereIn('id', $ids)->delete();
+                $message = "Berhasil menghapus " . count($ids) . " data borongan.";
+            }
+
+            DB::commit();
+            return back()->with('success', $message);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Terjadi kesalahan saat memperbarui data: ' . $e->getMessage());
         }
     }
 }
