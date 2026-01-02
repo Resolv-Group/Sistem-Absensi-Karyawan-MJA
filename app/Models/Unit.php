@@ -63,4 +63,8 @@ class Unit extends Model
         return $this->hasMany(Borongan::class, 'id_unit');
     }
 
+    public function detilHarian()
+    {
+        return $this->hasMany(Detil_Harian::class, 'unit_id');
+    }
 }

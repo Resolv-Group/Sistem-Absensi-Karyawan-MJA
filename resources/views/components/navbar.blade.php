@@ -14,7 +14,7 @@
             </a>
         </li>
 
-        @if (in_array(Auth::user()->role, ['admin', 'hrd', 'pic']))
+        @if (in_array(Auth::user()->role, ['admin', 'hrd']))
             <li class="relative pb-2 cursor-pointer">
                 <a href="{{ route('view.pekerja') }}"
                     class="text-gray-700 hover:text-black {{ Request::is('daftar-pekerja') || Request::is('pekerja*') ? 'border-b-2 border-red-500 pb-2 text-black' : '' }}">
@@ -33,36 +33,31 @@
             </li>
         @endif
 
+        @if (in_array(Auth::user()->role, ['admin', 'hrd']))
+            <li class="relative pb-2 cursor-pointer">
+                <a href="/mitra-kerja"
+                    class="text-gray-700 hover:text-black {{ Request::is('mitra-kerja') || Request::is('mitra-kerja') || Request::is('mitra-kerja/*') ? 'border-b-2 border-red-500 pb-2 text-black' : '' }}">
+                    Mitra Kerja
+                </a>
+            </li>
+        @endif
 
-
-        <li class="relative pb-2 cursor-pointer">
-            <a href="/mitra-kerja"
-                class="text-gray-700 hover:text-black {{ Request::is('mitra-kerja') || Request::is('mitra-kerja') || Request::is('mitra-kerja/*') ? 'border-b-2 border-red-500 pb-2 text-black' : '' }}">
-                Mitra Kerja
-            </a>
-        </li>
-
-        <li class="relative pb-2 cursor-pointer">
-            <a href="/unit"
-                class="text-gray-700 hover:text-black {{ Request::is('unit') || Request::is('unit') || Request::is('unit/*') ? 'border-b-2 border-red-500 pb-2 text-black' : '' }}">
-                Unit
-            </a>
-        </li>
-
-        {{-- <li class="relative pb-2 cursor-pointer">
-            <a href="/absensi"
-                class="text-gray-700 hover:text-black {{ Request::is('absensi') || Request::is('absensi') || Request::is('absensi/*') ? 'border-b-2 border-red-500 pb-2 text-black' : '' }}">
-                Absensi
-            </a>
-        </li> --}}
+        @if (in_array(Auth::user()->role, haystack: ['admin', 'hrd']))
+            <li class="relative pb-2 cursor-pointer">
+                <a href="/unit"
+                    class="text-gray-700 hover:text-black {{ Request::is('unit') || Request::is('unit') || Request::is('unit/*') ? 'border-b-2 border-red-500 pb-2 text-black' : '' }}">
+                    Unit
+                </a>
+            </li>
+        @endif
 
         @if(Auth::user()->role === 'pic' && Auth::user()->units->count())
         <li class="relative group">
 
             <button
                 class="flex items-center gap-1 text-gray-700 hover:text-black pb-2
-                {{ Request::is('absensi*') ? 'border-b-2 border-red-500 text-black' : '' }}">
-                Absensi
+                {{ Request::is('unit*') ? 'border-b-2 border-red-500 text-black' : '' }}">
+                Unit
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M19 9l-7 7-7-7" />
@@ -85,7 +80,18 @@
         </li>
         @endif
 
+        @if (in_array(Auth::user()->role, haystack: ['admin', 'pic']))
+            <li class="relative pb-2 cursor-pointer">
+                <a href="/absensi"
+                    class="text-gray-700 hover:text-black {{ Request::is('absensi') || Request::is('absensi') || Request::is('absensi/*') ? 'border-b-2 border-red-500 pb-2 text-black' : '' }}">
+                    Absensi
+                </a>
+            </li>
+        @endif
+
     </ul>
+
+    
 
 
     {{-- <li class="relative pb-2 cursor-pointer flex items-center gap-1">

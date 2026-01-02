@@ -47,4 +47,10 @@ class Staff extends Model
         // Return null if no photo exists
         return null;
     }
+
+    public function picUnits()
+    {
+        return $this->hasMany(PicUnit::class, 'id_pic', 'id');
+    }
+
 }

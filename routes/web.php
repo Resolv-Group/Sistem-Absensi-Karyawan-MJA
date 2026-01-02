@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AbsensiController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
@@ -86,6 +87,10 @@ Route::middleware(['auth', 'role:hrd,admin'])->group(function(){
 Route::middleware(['auth', 'role:pic,admin'])->group(function(){
 
     Route::get('/unit/detail/{id}', [UnitController::class, 'viewDetailUnit'])->name('view.detail.unit');
+
+    //Absensi
+    Route::get('/absensi', [AbsensiController::class, 'viewAbsensiMain'])->name('view.absensi');
+    
 });
 
 Route::middleware(['auth', 'role:hrd,pic,admin'])->group(function(){
