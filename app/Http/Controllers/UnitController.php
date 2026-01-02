@@ -175,83 +175,6 @@ class UnitController extends Controller
         }
     }
 
-    // function viewDetailUnit($id)
-    // {
-    //     $unit = Unit::with(['picUnit.staff', 'namaMitra'])->findOrFail($id);
-
-    //     $historiUnit = History::where('foreign_id', $id)->where('nama_tabel', 'unit')->get();
-
-    //     $pekerja = Pekerja::get();
-    //     $totalPekerja = PKWT::with('pekerja')->where('id_unit', $id)->count();
-    //     $totalBorongan = Borongan::where('id_unit', $id)->count();
-
-    //     $pkwtPekerja = PKWT::with('pekerja')->where('id_unit', $id)->paginate(15);
-
-    //     $borongan = Borongan::with('kategoriRel')->where('id_unit', $id)->paginate(15);
-
-    //     //get checkbox list
-    //     $divisions = Divisi::get();
-    //     $boronganKategori = Kategori::get();
-    //     $jabatan = JabatanPKWT::get();
-
-    //     return view('Unit.detail-unit', compact('unit', 'historiUnit', 'pekerja', 'totalPekerja', 'pkwtPekerja', 'borongan', 'totalBorongan', 'divisions', 'boronganKategori', 'jabatan'));
-    // }
-
-    // function viewDetailUnit(Request $request, $id)
-    // {
-    //     $unit = Unit::with(['picUnit.staff', 'namaMitra'])->findOrFail($id);
-
-    //     // Base query for PKWT (Harian)
-    //     $query = PKWT::with(['pekerja', 'jabatan', 'divisi'])
-    //         ->where('id_unit', $id);
-
-    //     // LIVE SEARCH & FILTERS
-    //     if ($request->filled('search')) {
-    //         $search = $request->search;
-    //         $query->whereHas('pekerja', function($q) use ($search) {
-    //             $q->where('nama', 'like', "%{$search}%")
-    //             ->orWhere('nik', 'like', "%{$search}%");
-    //         });
-    //     }
-
-    //     if ($request->filled('divisi')) {
-    //         $query->where('divisi_id', $request->divisi);
-    //     }
-
-    //     if ($request->filled('jabatan')) {
-    //         $query->where('jabatan_pkwt_id', $request->jabatan);
-    //     }
-
-    //     if ($request->filled('status')) {
-    //         $query->where('status_aktif', $request->status);
-    //     }
-
-    //     $pkwtPekerja = $query->paginate(15)->withQueryString();
-
-    //     // Data for dropdowns
-    //     $divisions = Divisi::all();
-    //     $jabatan = JabatanPKWT::all();
-    //     $boronganKategori = Kategori::all();
-
-    //     // Other data
-    //     $historiUnit = History::where('foreign_id', $id)->where('nama_tabel', 'unit')->get();
-    //     $pekerja = Pekerja::get();
-    //     $totalPekerja = PKWT::where('id_unit', $id)->count();
-    //     $totalBorongan = Borongan::where('id_unit', $id)->count();
-    //     $borongan = Borongan::with('kategoriRel')->where('id_unit', $id)->paginate(15);
-
-    //     // Check if request is AJAX (for live search)
-    //     if ($request->ajax()) {
-    //         return view('Unit.partials.harian-table', compact('pkwtPekerja', 'unit'))->render();
-    //     }
-
-    //     return view('Unit.detail-unit', compact(
-    //         'unit', 'historiUnit', 'pekerja', 'totalPekerja',
-    //         'pkwtPekerja', 'borongan', 'totalBorongan',
-    //         'divisions', 'boronganKategori', 'jabatan'
-    //     ));
-    // }
-
     public function viewDetailUnit(Request $request, $id)
     {
         $unit = Unit::with(['picUnit.staff', 'namaMitra'])->findOrFail($id);
@@ -270,7 +193,7 @@ class UnitController extends Controller
                     $query->where('nama_item', 'like', "%{$request->search}%");
                 }
                 if ($request->filled('kategori')) {
-                    $query->where('kategori_id', $request->kategori);
+                    $query->where('kategori', $request->kategori);
                 }
                 if ($request->filled('status')) {
                     $query->where('status_aktif', $request->status);
