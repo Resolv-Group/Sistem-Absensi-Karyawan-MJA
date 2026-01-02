@@ -42,4 +42,9 @@ class Pekerja extends Model
         // Return null if no photo exists
         return null;
     }
+
+    public function absensi()
+    {
+        return $this->belongsTo(Absensi::class, 'id_pic', 'id');
+    }
 }

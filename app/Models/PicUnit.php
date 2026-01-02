@@ -21,6 +21,9 @@ class PicUnit extends Model
         return $this->belongsTo(Staff::class, 'id_pic', 'id');
     }
 
-    
+    public function absensi()
+    {
+        return $this->belongsTo(Absensi::class, 'id_pic', 'id');
+    }
 
 }

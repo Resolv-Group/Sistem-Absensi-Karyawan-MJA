@@ -57,7 +57,7 @@ class MitraKerjaController extends Controller
                         ->paginate(10)
                         ->withQueryString();
 
-
+        
         // --- 4. RETURN RESPONSE ---
 
         // If AJAX request (from the search/filter script), return ONLY the table partial

@@ -29,7 +29,7 @@ class PKWTController extends Controller
         if ($request->filled('jabatan')) $query->where('jabatan_pkwt_id', $request->jabatan);
         if ($request->filled('status')) $query->where('status_aktif', $request->status);
 
-        $pkwtPekerja = $query->latest()->paginate(20);
+        $pkwtPekerja = $query->latest()->paginate(2);
 
         // Data untuk Filter Dropdown
         $divisions = Divisi::all();

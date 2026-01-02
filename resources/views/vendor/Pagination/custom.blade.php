@@ -28,33 +28,63 @@
             @endif
 
             {{-- Pagination Elements (The Numbers) --}}
-            @foreach ($elements as $element)
+            @php
+                $current = $paginator->currentPage();
+                $last = $paginator->lastPage();
+                $start = max(2, $current - 1);
+                $end = min($last - 1, $current + 1);
+            @endphp
 
-                {{-- "Three Dots" Separator --}}
-                @if (is_string($element))
-                    <span class="px-3 py-1 border border-gray-300 bg-white rounded-md text-xs font-medium text-gray-500">
-                        {{ $element }}
+            {{-- Page 1 --}}
+            @if ($current == 1)
+                <span class="px-3 py-1 border border-blue-600 bg-blue-50 text-blue-600 rounded-md text-xs font-medium">
+                    1
+                </span>
+            @else
+                <a href="{{ $paginator->url(1) }}"
+                class="px-3 py-1 border border-gray-300 bg-white rounded-md text-xs font-medium hover:bg-gray-50">
+                    1
+                </a>
+            @endif
+
+            {{-- Left Dots --}}
+            @if ($start > 2)
+                <span class="px-3 py-1 text-gray-400 text-xs">…</span>
+            @endif
+
+            {{-- Middle Pages --}}
+            @for ($page = $start; $page <= $end; $page++)
+                @if ($page == $current)
+                    <span class="px-3 py-1 border border-blue-600 bg-blue-50 text-blue-600 rounded-md text-xs font-medium">
+                        {{ $page }}
                     </span>
+                @else
+                    <a href="{{ $paginator->url($page) }}"
+                    class="px-3 py-1 border border-gray-300 bg-white rounded-md text-xs font-medium hover:bg-gray-50">
+                        {{ $page }}
+                    </a>
                 @endif
+            @endfor
 
-                {{-- Array Of Links --}}
-                @if (is_array($element))
-                    @foreach ($element as $page => $url)
-                        @if ($page == $paginator->currentPage())
-                            {{-- Active Page (Highlighted) --}}
-                            <span class="px-3 py-1 border border-blue-600 bg-blue-50 text-blue-600 rounded-md text-xs font-medium">
-                                {{ $page }}
-                            </span>
-                        @else
-                            {{-- Normal Page --}}
-                            <a href="{{ $url }}"
-                               class="px-3 py-1 border border-gray-300 bg-white rounded-md text-xs font-medium text-gray-700 hover:bg-gray-50 transition">
-                                {{ $page }}
-                            </a>
-                        @endif
-                    @endforeach
+            {{-- Right Dots --}}
+            @if ($end < $last - 1)
+                <span class="px-3 py-1 text-gray-400 text-xs">…</span>
+            @endif
+
+            {{-- Last Page --}}
+            @if ($last > 1)
+                @if ($current == $last)
+                    <span class="px-3 py-1 border border-blue-600 bg-blue-50 text-blue-600 rounded-md text-xs font-medium">
+                        {{ $last }}
+                    </span>
+                @else
+                    <a href="{{ $paginator->url($last) }}"
+                    class="px-3 py-1 border border-gray-300 bg-white rounded-md text-xs font-medium hover:bg-gray-50">
+                        {{ $last }}
+                    </a>
                 @endif
-            @endforeach
+            @endif
+
 
             {{-- Next Button --}}
             @if ($paginator->hasMorePages())
