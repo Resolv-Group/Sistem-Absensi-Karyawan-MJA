@@ -21,4 +21,9 @@ class Borongan extends Model
     public function kategoriRel() {
         return $this->belongsTo(Kategori::class, 'kategori');
     }
+
+    public function unit()
+    {
+        return $this->belongsTo(Unit::class, 'id_unit', 'id');
+    }
 }
