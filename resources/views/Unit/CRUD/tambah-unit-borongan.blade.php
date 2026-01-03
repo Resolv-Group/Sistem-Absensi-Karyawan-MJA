@@ -195,10 +195,17 @@
                                     <div class="relative">
                                         <span
                                             class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-bold">Rp</span>
-                                        <input type="number" :name="`borongan[${index}][harga_unit]`"
-                                            x-model.number="row.harga_unit" @input="autoHitung(row)"
-                                            class="w-full pl-10 rounded-xl border-gray-200 bg-gray-50 text-sm font-bold text-gray-900 focus:bg-white focus:border-blue-500 py-3 px-4"
-                                            placeholder="0">
+                                        <input
+                                            type="number"
+                                            step="0.01"
+                                            :name="`borongan[${index}][harga_unit]`"
+                                            x-model.number="row.harga_unit"
+                                            @input="autoHitung(row)"
+                                            @blur="row.harga_unit = Number(row.harga_unit || 0).toFixed(2)"
+                                            class="w-full pl-10 rounded-xl border-gray-200 bg-gray-50 text-sm font-bold text-gray-900
+                                                focus:bg-white focus:border-blue-500 py-3 px-4"
+                                            placeholder="0.00">
+
                                     </div>
                                 </div>
 
@@ -209,10 +216,17 @@
                                     <div class="relative">
                                         <span
                                             class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-bold">Rp</span>
-                                        <input type="number" :name="`borongan[${index}][harga_pekerja]`"
-                                            x-model.number="row.harga_pekerja" @input="row.manual = true"
-                                            class="w-full pl-10 rounded-xl border-gray-200 bg-gray-50 text-sm font-bold text-gray-900 focus:bg-white focus:border-blue-500 py-3 px-4"
-                                            placeholder="0">
+                                        <input
+                                            type="number"
+                                            step="0.01"
+                                            :name="`borongan[${index}][harga_pekerja]`"
+                                            x-model.number="row.harga_pekerja"
+                                            @input="row.manual = true"
+                                            @blur="row.harga_pekerja = Number(row.harga_pekerja || 0).toFixed(2)"
+                                            class="w-full pl-10 rounded-xl border-gray-200 bg-gray-50 text-sm font-bold text-gray-900
+                                                focus:bg-white focus:border-blue-500 py-3 px-4"
+                                            placeholder="0.00">
+
                                     </div>
                                 </div>
 
@@ -429,9 +443,17 @@
                 },
 
                 autoHitung(row) {
-                    if (row.manual) return;
-                    row.harga_pekerja = Math.round((row.harga_unit || 0) * 0.82);
-                }
+                if (row.manual) return;
+
+                const unit = Number(row.harga_unit || 0);
+
+                // Hitung 82%
+                const hasil = unit * 0.82;
+
+                // Simpan 2 angka di belakang koma
+                row.harga_pekerja = Number(hasil.toFixed(2));
+            }
+
             }
         }
 

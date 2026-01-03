@@ -8,8 +8,8 @@
             <div class="flex items-start">
 
                 <div class="ml-4 min-w-0">
-                    <div class="text-sm font-bold text-gray-900 truncate max-w-xs" title="{{ $un->namaMitra->nama_mitra ?? '-' }}">
-                        {{ $un->namaMitra->nama_mitra ?? '-' }}
+                    <div class="text-sm font-bold text-gray-900 truncate max-w-xs" title="{{ $un->nama_unit ?? '-' }}">
+                        {{ $un->nama_unit ?? '-' }}
                     </div>
                     {{-- <div class="text-xs text-gray-500">Sidoarjo, Jawa Timur</div> --}}
                 </div>
@@ -18,10 +18,29 @@
 
         <td class="px-6 py-4 whitespace-nowrap text-center align-top">
             <span class="inline-flex items-center px-2.5 py-1 rounded-md text-sm font-bold bg-gray-100 text-gray-800">
-                100
+                {{ $un->pkwt_pekerja_count ?? '-' }}
             </span>
             <div class="text-[10px] text-gray-400 mt-1 uppercase tracking-wider">Orang</div>
         </td>
+
+        @php
+            $sistemPengajian = [1 => 'Harian', 2 => 'Borongan'];
+            $colors = [
+                1 => 'text-purple-600 bg-purple-50',
+                2 => 'text-orange-600 bg-orange-50'
+            ];
+
+            $value = $un->sistem_pengajian;
+        @endphp
+
+        <td class="px-6 py-4 whitespace-nowrap text-center align-top">
+            <span
+                class="inline-flex items-center px-2.5 py-1 rounded-md text-sm font-bold
+                    {{ $colors[$value] ?? 'text-gray-600 bg-gray-100' }}">
+                {{ $sistemPengajian[$value] ?? '-' }}
+            </span>
+        </td>
+
 
         <td class="px-6 py-4 whitespace-nowrap text-center align-top">
             <span
@@ -42,16 +61,20 @@
         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
             <div class="flex justify-end gap-2">
                 <!-- Detail -->
-                {{-- <a href="{{ route('view.detail.mitra-kerja', $mk->id) }}"
+                <a href="{{ 
+                        $un->sistem_pengajian == 1 
+                            ? route('view.harian', $un->id) 
+                            : route('view.borongan', $un->id) 
+                    }}"
                     class="text-blue-600 hover:text-blue-900 border border-blue-200 hover:bg-blue-50
-               rounded-lg p-2 transition"
+                        rounded-lg p-2 transition"
                     title="Detail">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z" />
                     </svg>
-                </a> --}}
+                </a>
             </div>
 
         </td>

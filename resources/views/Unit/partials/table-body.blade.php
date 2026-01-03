@@ -127,7 +127,7 @@
         {{-- 6. STAT (Total Workers) --}}
         <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-600 font-medium">
         {{ $u->pkwt_count }}
-
+            
 
         </td>
 

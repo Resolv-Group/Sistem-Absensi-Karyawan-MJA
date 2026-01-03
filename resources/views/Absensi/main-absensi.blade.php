@@ -34,12 +34,12 @@
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
 
-        {{-- CARD 1: TOTAL UNIT --}}
+        {{-- CARD 1: TOTAL Unit --}}
         <div
             class="bg-white rounded-2xl p-5 border border-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-lg hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">
             <div class="flex justify-between items-start z-10 relative">
                 <div>
-                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Total Absensi</p>
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Total Unit</p>
                     <h3 class="text-3xl font-extrabold text-gray-900">{{ $totalAbsensi }}</h3>
                 </div>
                 <div
@@ -56,7 +56,7 @@
             </div>
         </div>
 
-        {{-- CARD 2: UNIT BARU --}}
+        {{-- CARD 2: TOTAL HADIR PEKERJA --}}
         <div
             class="bg-white rounded-2xl p-5 border border-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-lg hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">
             <div class="flex justify-between items-start z-10 relative">
@@ -64,7 +64,7 @@
                     <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Total Hadir Pekerja</p>
                     <div class="flex items-baseline gap-2">
                         <h3 class="text-3xl font-extrabold text-gray-900">{{ $totalHadir }}</h3>
-                        <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-md">Bulan
+                        <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-md">Hari
                             Ini</span>
                     </div>
                 </div>
@@ -80,7 +80,7 @@
             </div>
         </div>
 
-        {{-- CARD 3: HARIAN --}}
+        {{-- CARD 3: TOTAL ABSEN PEKERJA --}}
         <div
             class="bg-white rounded-2xl p-5 border border-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-lg hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">
             <div class="flex justify-between items-start z-10 relative">
@@ -101,7 +101,7 @@
             </div>
         </div>
 
-        {{-- CARD 5: TIDAK AKTIF --}}
+        {{-- CARD 4: TOTAL PEKERJA DEKAT PENILAIAN --}}
         {{-- On small screens, span full width to fill gap --}}
         <div
             class="bg-white rounded-2xl p-5 border border-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-lg hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group sm:col-span-2 lg:col-span-1">
@@ -127,11 +127,9 @@
 
     {{-- ================================
     3. TOOLBAR & FILTERS
-================================= --}}
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 relative">
-
-        {{-- Left: View Switcher (Visual only) --}}
-        <div class="bg-gray-100 p-1 rounded-lg inline-flex self-start sm:self-center">
+    ================================= --}}
+    {{-- Left: View Switcher (Visual only) --}}
+        {{-- <div class="bg-gray-100 p-1 rounded-lg inline-flex self-start sm:self-center">
             <div
                 class="inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 rounded-full shadow-sm text-sm font-medium text-gray-600">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" viewBox="0 0 20 20"
@@ -142,10 +140,31 @@
                 </svg>
                 <span>{{ \Carbon\Carbon::now()->translatedFormat('F Y') }}</span>
             </div>
+        </div> --}}
+    <div 
+        x-data="{
+            date: '{{ request('date') ?? now()->toDateString() }}',
+            go() {
+                window.location.href = '{{ route('view.absensi') }}?date=' + this.date
+            }
+        }"
+        class="mb-6 relative inline-flex items-center"
+    >
+        <div class="inline-flex items-center gap-2 px-3 py-2 bg-white border rounded-lg shadow-sm text-sm">
+            <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1z"/>
+            </svg>
+            <span x-text="new Date(date).toLocaleDateString('id-ID', { day:'2-digit', month:'long', year:'numeric' })"></span>
         </div>
 
-        
+        <input
+            type="date"
+            x-model="date"
+            @change="go()"
+            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+        >
     </div>
+
 
     {{-- ================================
         4. MAIN TABLE

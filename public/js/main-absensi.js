@@ -141,5 +141,10 @@ function debounce(fn, delay = 300) {
     };
 }
 
+
+
 // Initial attachment
-attachPaginationEvents();
+attachPaginationEvents();   
+
+
+
