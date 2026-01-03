@@ -12,9 +12,11 @@
                     <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
                         Nama Unit
                     </th>
-                    {{-- RESTORED COLUMN --}}
-                    <th class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">
+                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
                         Total Pekerja 
+                    </th>
+                    <th class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">
+                        Jenis Unit
                     </th>
                     <th class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">
                         Total Belum Absen

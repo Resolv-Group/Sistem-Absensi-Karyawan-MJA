@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Log;
 
 class BoronganController extends Controller
 {
-
     public function viewBoronganMain(Request $request, $id_unit)
     {
         $unit = Unit::findOrFail($id_unit);

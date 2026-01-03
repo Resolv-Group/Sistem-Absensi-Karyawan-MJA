@@ -301,30 +301,37 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
                         {{-- Sistem Pengajian --}}
-                        <div x-data="{ open: false, selected: '{{ old('sistem_pengajian', $unit->sistem_pengajian) }}' || '', list: [{ val: '1', label: 'Harian' }, { val: '2', label: 'Borongan' }] }" class="relative">
-                            <label class="block text-sm font-bold text-gray-700 mb-1">Sistem Pengajian</label>
+                        <div
+                            x-data="{
+                                selected: '{{ old('sistem_pengajian', $unit->sistem_pengajian) }}',
+                                list: [
+                                    { val: '1', label: 'Harian' },
+                                    { val: '2', label: 'Borongan' }
+                                ]
+                            }"
+                            class="relative"
+                        >
+                            <label class="block text-sm font-bold text-gray-700 mb-1">
+                                Sistem Pengajian
+                            </label>
 
+                            <!-- nilai tetap dikirim -->
                             <input type="hidden" name="sistem_pengajian" x-model="selected">
 
-                            <div @click="open=!open"
-                                class=" bg-gray-50 rounded-lg py-2.5 px-3 cursor-pointer flex justify-between items-center">
-                                <span x-text="list.find(x=>x.val==selected)?.label || 'Pilih Tipe Pengajian'"></span>
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <!-- tampilan read-only -->
+                            <div
+                                class="bg-gray-100 rounded-lg py-2.5 px-3 flex justify-between items-center
+                                    cursor-not-allowed text-gray-500"
+                            >
+                                <span x-text="list.find(x => x.val == selected)?.label || '-'"></span>
+
+                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M19 9l-7 7-7-7" />
                                 </svg>
                             </div>
-
-                            <ul x-show="open" @click.outside="open=false"
-                                class="absolute w-full mt-1 border border-gray-300 bg-white rounded-lg shadow-md overflow-y-auto max-h-40 z-50">
-                                <template x-for="item in list" :key="item.val">
-                                    <li @click="selected=item.val; open=false"
-                                        class="px-3 py-2 hover:bg-blue-600 hover:text-white cursor-pointer transition"
-                                        x-text="item.label">
-                                    </li>
-                                </template>
-                            </ul>
                         </div>
+
 
                         {{-- Management Fee --}}
                         <div>
