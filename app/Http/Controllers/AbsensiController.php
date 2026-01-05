@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Absensi;
 use App\Models\Detil_Harian;
 use App\Models\Divisi;
 use App\Models\JabatanPKWT;
@@ -32,7 +33,7 @@ class AbsensiController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(10)
             ->withQueryString();
-
+        
         // 🔥 3. TOTAL ABSENSI (jumlah unit PIC)
         $totalAbsensi = $units->total();
 
@@ -81,61 +82,60 @@ class AbsensiController extends Controller
         ));
     }
 
-    function ViewHarian(Request $request, $id_unit)
+    function ViewHarian(Request $request, $id_unit, $date)
     {
-        $unit = Unit::findOrFail($id_unit);
-        $query = PKWT::with(['pekerja', 'jabatan', 'divisi'])->where('id_unit', $id_unit);
+        $picId = Auth::user()->staff->id;
 
-        // Filter Pencarian
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->whereHas('pekerja', function ($q) use ($search) {
-                $q->where('nama', 'like', "%{$search}%")->orWhere('nik', 'like', "%{$search}%");
-            });
+        // ambil unit + pekerjanya
+        $unit = Unit::with('pkwt.pekerja')->findOrFail($id_unit);
+
+        foreach ($unit->pkwt as $pkwt) {
+
+            $sudahAda = Absensi::where('id_pekerja', $pkwt->id_pekerja)
+                ->where('tgl_absensi', $date)
+                ->exists();
+
+            if ($sudahAda) {
+                continue;
+            }
+
+            Absensi::create([
+                'id_pekerja' => $pkwt->id_pekerja,
+                'id_pic'     => $picId,
+                'id_unit'    => $unit->id,
+                'tgl_absensi'=> $date,
+                'tipe'       => $unit->sistem_pengajian,
+                'verifikasi' => 0,
+            ]);
         }
-        if ($request->filled('divisi')) $query->where('divisi_id', $request->divisi);
-        if ($request->filled('jabatan')) $query->where('jabatan_pkwt_id', $request->jabatan);
-        if ($request->filled('status')) $query->where('status_aktif', $request->status);
-
-        $pkwtPekerja = $query->latest()->paginate(2);
-
-        // Data untuk Filter Dropdown
-        $divisions = Divisi::all();
-        $jabatan = JabatanPKWT::all();
-
-        if ($request->ajax()) {
-            return view('Unit.partials.main-harian-table', compact('pkwtPekerja', 'unit'))->render();
-        }
-
-        return view('Unit.Pengajian.main-harian', compact('pkwtPekerja', 'unit', 'divisions', 'jabatan'));
     }
 
-        function ViewBorongan(Request $request, $id_unit)
+    function ViewBorongan(Request $request, $id_unit, $date)
     {
-        $unit = Unit::findOrFail($id_unit);
-        $query = PKWT::with(['pekerja', 'jabatan', 'divisi'])->where('id_unit', $id_unit);
+        $picId = Auth::user()->staff->id;
 
-        // Filter Pencarian
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->whereHas('pekerja', function ($q) use ($search) {
-                $q->where('nama', 'like', "%{$search}%")->orWhere('nik', 'like', "%{$search}%");
-            });
+        // ambil unit + pekerjanya
+        $unit = Unit::with('pkwt.pekerja')->findOrFail($id_unit);
+
+        foreach ($unit->pkwt as $pkwt) {
+
+            $sudahAda = Absensi::where('id_pekerja', $pkwt->id_pekerja)
+                ->where('id_unit', $id_unit)
+                ->where('tgl_absensi', $date)
+                ->exists();
+
+            if ($sudahAda) {
+                continue;
+            }
+
+            Absensi::create([
+                'id_pekerja' => $pkwt->id_pekerja,
+                'id_pic'     => $picId,
+                'id_unit'    => $unit->id,
+                'tgl_absensi'=> $date,
+                'tipe'       => $unit->sistem_pengajian,
+                'verifikasi' => 0,
+            ]);
         }
-        if ($request->filled('divisi')) $query->where('divisi_id', $request->divisi);
-        if ($request->filled('jabatan')) $query->where('jabatan_pkwt_id', $request->jabatan);
-        if ($request->filled('status')) $query->where('status_aktif', $request->status);
-
-        $pkwtPekerja = $query->latest()->paginate(2);
-
-        // Data untuk Filter Dropdown
-        $divisions = Divisi::all();
-        $jabatan = JabatanPKWT::all();
-
-        if ($request->ajax()) {
-            return view('Unit.partials.main-harian-table', compact('pkwtPekerja', 'unit'))->render();
-        }
-
-        return view('Unit.Pengajian.main-harian', compact('pkwtPekerja', 'unit', 'divisions', 'jabatan'));
     }
 }

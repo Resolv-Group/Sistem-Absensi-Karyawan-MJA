@@ -65,8 +65,8 @@ class BoronganController extends Controller
 
                     'borongan' => 'required|array|min:1',
 
-                    'borongan.*.harga_unit' => 'required|integer',
-                    'borongan.*.harga_pekerja' => 'required|integer',
+                    'borongan.*.harga_unit' => 'required',
+                    'borongan.*.harga_pekerja' => 'required',
 
                     'borongan.*.kategori' => 'required|integer',
                     'borongan.*.nama_item' => 'required|string',
