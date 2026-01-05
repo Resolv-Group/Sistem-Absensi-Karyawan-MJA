@@ -90,8 +90,8 @@ Route::middleware(['auth', 'role:pic,admin'])->group(function(){
 
     //Absensi
     Route::get('/absensi', [AbsensiController::class, 'viewAbsensiMain'])->name('view.absensi');
-    Route::get('/absensi/{id}/daftar-harian', [AbsensiController::class, 'ViewHarian'])->name('view.harian');
-    Route::get('/absensi/{id}/daftar-borongan', [AbsensiController::class, 'ViewBorongan'])->name('view.borongan');
+    Route::get('/absensi/{id_unit}/harian/{date}', [AbsensiController::class, 'ViewHarian'])->name('view.absensiharian');
+    Route::get('/absensi/{id_unit}/borongan/{date}', [AbsensiController::class, 'ViewBorongan'])->name('view.absensiborongan');
 });
 
 Route::middleware(['auth', 'role:hrd,pic,admin'])->group(function(){

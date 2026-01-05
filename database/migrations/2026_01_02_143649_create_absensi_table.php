@@ -16,6 +16,7 @@ return new class extends Migration
 
             $table->integer('id_pekerja');
             $table->integer('id_pic');
+            $table->integer('id_unit');
 
             $table->date('tgl_absensi');
 

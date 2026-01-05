@@ -12,6 +12,7 @@ class Absensi extends Model
         'id_pekerja',
         'id_pic',
         'tgl_absensi',
+        'id_unit',
         'tipe',
         'verifikasi'
     ];

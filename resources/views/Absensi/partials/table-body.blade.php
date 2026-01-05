@@ -63,8 +63,8 @@
                 <!-- Detail -->
                 <a href="{{ 
                         $un->sistem_pengajian == 1 
-                            ? route('view.harian', $un->id) 
-                            : route('view.borongan', $un->id) 
+                            ? route('view.absensiharian', [$un->id, request('date') ?? now()->toDateString()])
+                            : route('view.absensiborongan', [$un->id, request('date') ?? now()->toDateString()])
                     }}"
                     class="text-blue-600 hover:text-blue-900 border border-blue-200 hover:bg-blue-50
                         rounded-lg p-2 transition"
