@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Detil_Harian;
+use App\Models\Divisi;
+use App\Models\JabatanPKWT;
 use App\Models\MitraKerja;
 use App\Models\Pekerja;
+use App\Models\PKWT;
 use App\Models\Unit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
