@@ -82,7 +82,7 @@
 
             this.selectedItems.forEach(id => {
                 // Set default ke '1' (Hadir) jika datanya belum ada
-                if (!newStatus[id]) newStatus[id] = '0';
+                if (!newStatus[id]) newStatus[id] = '2';
                 if (!newCatatan[id]) newCatatan[id] = '';
             });
 
@@ -174,7 +174,7 @@
                 <div class="relative z-10">
                     {{-- Top Row: Breadcrumb & Date Capsule --}}
                     <div class="flex flex-wrap items-center justify-between gap-4 mb-8">
-                        <a href="{{ url()->previous() }}"
+                        <a href="{{ route('view.absensi') }}"
                             class="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 hover:text-blue-600 transition group">
                             <svg class="w-3.5 h-3.5 transform group-hover:-translate-x-1 transition" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor">
@@ -329,10 +329,7 @@
                                         open: false,
                                         list: [{ val: '', label: 'Semua Status' },
                                             { val: '1', label: 'Hadir' },
-                                            { val: '2', label: 'Sakit' },
-                                            { val: '3', label: 'Izin' },
-                                            { val: '4', label: 'Cuti' },
-                                            { val: '0', label: 'Alpha / Absen' }
+                                            { val: '2', label: 'Cuti' },
                                         ]
                                     }" class="relative">
                                         <label
@@ -431,7 +428,8 @@
                                                             <path stroke-linecap="round" stroke-linejoin="round"
                                                                 stroke-width="2" d="M5 13l4 4L19 7" />
                                                         </svg>
-                                                        <span x-show="filterVerifikasi != item.val" class="w-4 h-4"></span>
+                                                        <span x-show="filterVerifikasi != item.val"
+                                                            class="w-4 h-4"></span>
                                                         <span x-text="item.label"></span>
                                                     </li>
                                                 </template>
@@ -498,6 +496,7 @@
                             </div>
 
                             <!-- MODAL: INPUT JAM KERJA -->
+                            <!-- MODAL: INPUT JAM KERJA -->
                             <div x-show="showAbsenModal"
                                 class="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6" x-cloak>
                                 {{-- Glass Backdrop --}}
@@ -506,11 +505,11 @@
                                     x-transition:leave="ease-in duration-200" @click="showAbsenModal = false"
                                     class="fixed inset-0 bg-gray-900/60 backdrop-blur-md"></div>
 
-                                {{-- Modal Content --}}
+                                {{-- Modal Content - Increased max-width to 4xl to accommodate the note field --}}
                                 <div x-show="showAbsenModal" x-transition:enter="ease-out duration-300"
                                     x-transition:enter-start="opacity-0 scale-95 translate-y-8"
                                     x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-                                    class="relative bg-white rounded-[2.5rem] shadow-[0_30px_100px_rgba(0,0,0,0.25)] w-full max-w-3xl overflow-hidden flex flex-col max-h-[85vh] border border-white/20">
+                                    class="relative bg-white rounded-[2.5rem] shadow-[0_30px_100px_rgba(0,0,0,0.25)] w-full max-w-4xl overflow-hidden flex flex-col max-h-[85vh] border border-white/20">
 
                                     {{-- Header Section --}}
                                     <div
@@ -540,7 +539,7 @@
 
                                         {{-- OCD Feature: Quick Apply Row --}}
                                         <div
-                                            class="mt-6 p-4 bg-blue-50/50 rounded-2xl border border-blue-100 flex items-center justify-between">
+                                            class="mt-6 p-4 bg-blue-50/50 rounded-2xl border border-blue-100 flex flex-wrap items-center justify-between gap-4">
                                             <div class="flex items-center gap-3">
                                                 <div class="p-2 bg-blue-600 rounded-xl shadow-lg shadow-blue-200">
                                                     <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24"
@@ -556,10 +555,10 @@
                                             <div class="flex items-center gap-4">
                                                 <div class="flex items-center gap-2">
                                                     <input type="time" x-model="globalMasuk"
-                                                        class="bg-white border-blue-200 rounded-xl text-sm font-bold focus:ring-blue-500">
+                                                        class="bg-white border-blue-200 p-1 rounded-md text-sm font-bold focus:ring-blue-500 shadow-sm">
                                                     <span class="text-blue-300 font-black">-</span>
                                                     <input type="time" x-model="globalKeluar"
-                                                        class="bg-white border-blue-200 rounded-xl text-sm font-bold focus:ring-blue-500">
+                                                        class="bg-white border-blue-200 p-1 rounded-md text-sm font-bold focus:ring-blue-500 shadow-sm">
                                                 </div>
                                                 <button type="button" @click="applyGlobalTime()"
                                                     class="px-4 py-2 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-blue-700 transition shadow-md shadow-blue-100">Terapkan</button>
@@ -573,42 +572,76 @@
                                         method="POST" class="flex-1 overflow-y-auto custom-scrollbar bg-white">
                                         @csrf
                                         @method('PUT')
-
                                         <input type="hidden" name="date" value="{{ $date }}">
-                                        <div class="p-10 space-y-3">
+
+                                        <div class="p-10 space-y-4">
                                             <template x-for="id in selectedItems" :key="id">
                                                 <div
-                                                    class="group flex items-center justify-between p-5 bg-gray-50/50 hover:bg-white rounded-[1.5rem] border border-transparent hover:border-blue-100 hover:shadow-xl hover:shadow-blue-900/5 transition-all duration-300">
-                                                    <div class="flex items-center gap-4">
-                                                        {{-- Avatar Circle --}}
+                                                    class="group flex flex-col lg:flex-row lg:items-center justify-between p-6 bg-gray-50/50 hover:bg-white rounded-[2rem] border border-transparent hover:border-blue-100 hover:shadow-xl hover:shadow-blue-900/5 transition-all duration-300 gap-6">
+
+                                                    {{-- Left: Identity Section --}}
+                                                    <div
+                                                        class="flex items-center gap-4 min-w-0 flex-1 lg:flex-none lg:w-64">
+                                                        {{-- Avatar Circle (Keep as is) --}}
                                                         <div
-                                                            class="w-12 h-12 rounded-2xl bg-white shadow-sm border border-gray-100 flex items-center justify-center text-blue-600 text-xs font-black group-hover:bg-blue-600 group-hover:text-white transition-all duration-500">
+                                                            class="flex-shrink-0 w-12 h-12 rounded-2xl bg-white shadow-sm border border-gray-100 flex items-center justify-center text-blue-600 text-xs font-black group-hover:bg-blue-600 group-hover:text-white transition-all duration-500">
                                                             <span x-text="workerMap[id]?.initials"></span>
                                                         </div>
-                                                        <div>
-                                                            <p class="text-sm font-black text-gray-900 leading-tight"
-                                                                x-text="workerMap[id]?.nama"></p>
-                                                            <p class="text-[10px] font-bold text-gray-400 mt-0.5 tracking-widest"
-                                                                x-text="workerMap[id]?.nik"></p>
+
+                                                        {{-- Name & NIK Container --}}
+                                                        <div class="min-w-0"> {{-- This allows the children to truncate --}}
+                                                            <p class="text-sm font-black text-gray-900 leading-tight truncate"
+                                                                x-text="workerMap[id]?.nama" :title="workerMap[id]?.nama">
+                                                                {{-- Added :title so full name shows on hover --}}
+                                                            </p>
+                                                            <p class="text-[10px] font-bold text-gray-400 mt-0.5 tracking-widest truncate"
+                                                                x-text="workerMap[id]?.nik">
+                                                            </p>
                                                         </div>
                                                     </div>
 
-                                                    {{-- Input Grid --}}
-                                                    <div class="flex items-center gap-6">
-                                                        <div class="flex flex-col gap-1">
+                                                    {{-- Right: Inputs Grid --}}
+                                                    <div class="flex flex-1 flex-wrap items-end gap-6">
+                                                        {{-- Jam Masuk --}}
+                                                        <div class="flex flex-col gap-1.5 min-w-[200px]">
                                                             <label
-                                                                class="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Masuk</label>
+                                                                class="text-[9px] font-black text-gray-400 uppercase tracking-[0.15em] ml-1">Masuk</label>
                                                             <input type="time" :id="'masuk-' + id"
                                                                 :name="'data[' + id + '][masuk]'" value="08:00"
-                                                                class="bg-white border-gray-200 rounded-xl text-sm font-bold text-gray-700 focus:ring-4 focus:ring-blue-50 focus:border-blue-500 transition-all">
+                                                                class="bg-white border-gray-200 p-1 rounded-md text-sm font-bold text-gray-700 focus:ring-4 focus:ring-blue-50 focus:border-blue-500 transition-all shadow-sm">
                                                         </div>
-                                                        <div class="h-8 w-px bg-gray-200 mt-4"></div>
-                                                        <div class="flex flex-col gap-1">
+
+                                                        {{-- Divider --}}
+                                                        <div class="hidden lg:block h-10 w-px bg-gray-200 mb-1"></div>
+
+                                                        {{-- Jam Keluar --}}
+                                                        <div class="flex flex-col gap-1.5 min-w-[200px]">
                                                             <label
-                                                                class="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Keluar</label>
+                                                                class="text-[9px] font-black text-gray-400 uppercase tracking-[0.15em] ml-1">Keluar</label>
                                                             <input type="time" :id="'keluar-' + id"
                                                                 :name="'data[' + id + '][keluar]'" value="17:00"
-                                                                class="bg-white border-gray-200 rounded-xl text-sm font-bold text-gray-700 focus:ring-4 focus:ring-blue-50 focus:border-blue-500 transition-all">
+                                                                class="bg-white border-gray-200 p-1 rounded-md text-sm font-bold text-gray-700 focus:ring-4 focus:ring-blue-50 focus:border-blue-500 transition-all shadow-sm">
+                                                        </div>
+
+                                                        {{-- Catatan / Keterangan --}}
+                                                        <div class="flex flex-col gap-1.5 flex-1 min-w-[200px]">
+                                                            <label
+                                                                class="text-[9px] font-black text-gray-400 uppercase tracking-[0.15em] ml-1">Catatan
+                                                                (Opsional)</label>
+                                                            <div class="relative group/input">
+                                                                <input type="text" :name="'data[' + id + '][catatan]'"
+                                                                    placeholder="Tambahkan catatan..."
+                                                                    class="w-full bg-white border-gray-200 rounded-xl px-5 py-3.5 text-sm font-semibold text-gray-700 focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all placeholder:text-gray-400 placeholder:font-normal outline-none shadow-sm">
+                                                                <div
+                                                                    class="absolute right-3 top-1/2 -translate-y-1/2 opacity-0 group-focus-within/input:opacity-100 transition-opacity">
+                                                                    <svg class="w-4 h-4 text-blue-400" fill="none"
+                                                                        viewBox="0 0 24 24" stroke="currentColor">
+                                                                        <path stroke-linecap="round"
+                                                                            stroke-linejoin="round" stroke-width="2"
+                                                                            d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                                                    </svg>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -693,30 +726,35 @@
                                                         {{-- Side Label: Pekerja --}}
                                                         <td
                                                             class="py-4 pl-6 bg-gray-50/50 rounded-l-2xl border-y border-l border-gray-100">
-                                                            <div class="flex items-center gap-4">
+                                                            {{-- Left: Identity Section --}}
+                                                            <div
+                                                                class="flex items-center gap-4 min-w-0 flex-1 lg:flex-none lg:w-64">
+                                                                {{-- Avatar Circle (Keep as is) --}}
                                                                 <div
-                                                                    class="w-10 h-10 rounded-xl bg-white shadow-sm border border-gray-100 flex items-center justify-center text-[10px] font-black text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
+                                                                    class="flex-shrink-0 w-12 h-12 rounded-2xl bg-white shadow-sm border border-gray-100 flex items-center justify-center text-blue-600 text-xs font-black group-hover:bg-blue-600 group-hover:text-white transition-all duration-500">
                                                                     <span x-text="workerMap[id]?.initials"></span>
                                                                 </div>
-                                                                <div class="flex flex-col">
-                                                                    <span
-                                                                        class="text-sm font-black text-gray-900 leading-none"
-                                                                        x-text="workerMap[id]?.nama"></span>
-                                                                    <span class="text-[10px] font-bold text-gray-400 mt-1"
-                                                                        x-text="workerMap[id]?.nik"></span>
+
+                                                                {{-- Name & NIK Container --}}
+                                                                <div class="min-w-0"> {{-- This allows the children to truncate --}}
+                                                                    <p class="text-sm font-black text-gray-900 leading-tight truncate"
+                                                                        x-text="workerMap[id]?.nama"
+                                                                        :title="workerMap[id]?.nama">
+                                                                        {{-- Added :title so full name shows on hover --}}
+                                                                    </p>
+                                                                    <p class="text-[10px] font-bold text-gray-400 mt-0.5 tracking-widest truncate"
+                                                                        x-text="workerMap[id]?.nik">
+                                                                    </p>
                                                                 </div>
                                                             </div>
                                                         </td>
 
                                                         {{-- Alpine Dropdown (Balanced Height) --}}
-                                                        <td class="py-4 px-4 bg-gray-50/50 border-y border-gray-100">
+                                                        <td class="py-4 pl-0 pr-10 bg-gray-50/50 border-y border-gray-100 ">
                                                             <div x-data="{
                                                                 open: false,
                                                                 list: [
-                                                                    { val: '2', label: 'Sakit' },
-                                                                    { val: '3', label: 'Izin' },
-                                                                    { val: '4', label: 'Cuti' },
-                                                                    { val: '0', label: 'Alpha / Absen' }
+                                                                    { val: '2', label: 'Cuti' }
                                                                 ]
                                                             }" class="relative">
 
@@ -786,14 +824,6 @@
                             </div>
                         </div>
                     </div>
-
-                    {{-- <a href="#"
-                        class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white font-bold rounded-2xl hover:bg-blue-700 shadow-lg shadow-blue-100 transition active:scale-95">
-                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                        </svg>
-                        Lihat Absensi
-                    </a> --}}
                 </div>
 
                 {{-- TABLE --}}
@@ -813,11 +843,11 @@
                                 <th
                                     class="px-4 py-4 text-[11px] font-black text-gray-400 uppercase tracking-widest text-center">
                                     Status Absen</th>
-                                <th class="px-4 py-4 text-[11px] font-black text-gray-400 uppercase tracking-widest">
-                                    Catatan</th>
                                 <th
                                     class="px-4 py-4 text-[11px] font-black text-center text-gray-400 uppercase tracking-widest">
                                     Status Verifikasi</th>
+                                <th class="px-4 py-4 text-[11px] font-black text-gray-400 uppercase tracking-widest">
+                                Catatan</th>
                             </tr>
                         </thead>
                         <tbody id="main-table-body" class="divide-y divide-gray-50">

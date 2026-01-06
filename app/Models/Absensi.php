@@ -21,10 +21,16 @@ class Absensi extends Model
         return $this->hasOne(Detil_Harian::class, 'id_absensi', 'id');
     }
 
+    public function detilBorongan() {
+        return $this->hasMany(Detil_Borongan::class, 'id_absensi', 'id');
+    }
+
     public function pekerja()
     {
         return $this->belongsTo(Pekerja::class, 'id_pekerja', 'id');
     }
+
+
 
 
 }

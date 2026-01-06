@@ -45,7 +45,7 @@
                     </span>
                 </div>
             @else
-                <span class="text-[10px] font-bold text-gray-200 tracking-widest">-- : --</span>
+                <span class="text-[12px] font-bold text-gray-200 tracking-widest">-- : --</span>
             @endif
         </td>
 
@@ -55,40 +55,20 @@
                 @switch($detil->status_kehadiran)
                     @case(1)
                         <span
-                            class="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-sm border border-emerald-200">Hadir</span>
+                            class="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-[12px] font-black uppercase tracking-widest shadow-sm border border-emerald-200">Hadir</span>
                     @break
 
                     @case(2)
                         <span
-                            class="px-3 py-1 bg-amber-100 text-amber-700 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-sm border border-amber-200">Sakit</span>
-                    @break
-
-                    @case(3)
-                        <span
-                            class="px-3 py-1 bg-blue-100 text-blue-700 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-sm border border-blue-200">Izin</span>
-                    @break
-
-                    @case(4)
-                        <span
-                            class="px-3 py-1 bg-purple-100 text-purple-700 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-sm border border-purple-200">Cuti</span>
-                    @break
-
-                    @case(5)
-                        <span
-                            class="px-3 py-1 bg-red-100 text-red-700 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-sm border border-red-200">Alpha</span>
+                            class="px-3 py-1 bg-purple-100 text-purple-700 rounded-lg text-[12px] font-black uppercase tracking-widest shadow-sm border border-purple-200">Cuti</span>
                     @break
 
                     @default
-                        <span class="text-[10px] font-bold text-gray-300 italic">Status Unknown</span>
+                        <span class="text-[12px] font-bold text-gray-300 italic">Status Unknown</span>
                 @endswitch
             @else
-                <span class="text-[10px] font-bold text-gray-300 italic uppercase tracking-widest">Belum Absen</span>
+                <span class="text-[12px] font-bold text-gray-300 italic uppercase tracking-widest">Belum Absen</span>
             @endif
-        </td>
-        <td class="px-4 py-5">
-            <p class="text-[11px] font-medium text-gray-500 italic truncate max-w-[180px]" title="{{ $detil->catatan ?? '' }}">
-                {{ $detil->catatan ?? '-' }}
-            </p>
         </td>
 
         <td class="px-4 py-5 text-center">
@@ -96,20 +76,45 @@
                 @switch($absensi->verifikasi)
                     @case(1)
                         <span
-                            class="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-sm border border-emerald-200">Disetujui</span>
+                            class="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-[12px] font-black uppercase tracking-widest shadow-sm border border-emerald-200">Disetujui</span>
                     @break
 
                     @case(0)
                         <span
-                            class="px-3 py-1 bg-amber-100 text-amber-700 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-sm border border-amber-200">Menunggu Persetujuan</span>
+                            class="px-3 py-1 bg-amber-100 text-amber-700 rounded-lg text-[12px] font-black uppercase tracking-widest shadow-sm border border-amber-200">Menunggu
+                            Persetujuan</span>
                     @break
 
                     @default
-                        <span class="text-[10px] font-bold text-gray-300 italic">Status Unknown</span>
+                        <span class="text-[12px] font-bold text-gray-300 italic">Status Diketahui</span>
                 @endswitch
             @else
-                <span class="text-[10px] font-bold text-gray-300 italic uppercase tracking-widest">Belum Terverifikasi</span>
+                <span class="text-[12px] font-bold text-gray-300 italic uppercase tracking-widest">Belum
+                    Terverifikasi</span>
             @endif
+        </td>
+
+        <td class="px-4 py-5 align-top">
+            <div class="mt-1">
+                @if ($detil && $detil->catatan)
+                    {{-- Wrapper dengan aksen garis vertikal orange --}}
+                    <div class="flex flex-col min-w-0 border-l-2 border-orange-200 pl-3 py-0.5">
+                        {{-- Label Header Kecil --}}
+                        <span class="text-[9px] font-black text-slate-400 uppercase tracking-tighter">
+                            Keterangan
+                        </span>
+
+                        {{-- Isi Catatan --}}
+                        <p class="text-[11px] font-semibold text-slate-600 italic leading-tight break-words max-w-[180px]"
+                            title="{{ $detil->catatan }}">
+                            {{ $detil->catatan }}
+                        </p>
+                    </div>
+                @else
+                    {{-- Tampilan jika kosong --}}
+                    <span class="text-[12px] font-bold text-slate-200 italic uppercase tracking-widest">-</span>
+                @endif
+            </div>
         </td>
     </tr>
     @empty
@@ -119,7 +124,7 @@
                     x-transition:enter-start="opacity-0 translate-y-8" x-transition:enter-end="opacity-100 translate-y-0"
                     class="flex flex-col items-center justify-center">
 
-                    @if (request()->anyFilled(['search', 'status']))
+                    @if (request()->anyFilled(['search', 'status', 'statusVerif']))
                         {{-- SKENARIO A: FILTER AKTIF TAPI TIDAK ADA HASIL --}}
                         <div class="relative mb-10">
                             {{-- Blue Glow --}}

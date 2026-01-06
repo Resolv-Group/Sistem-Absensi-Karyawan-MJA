@@ -24,7 +24,9 @@
                     <th class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">
                         Total Perlu Penilaian
                     </th>
-                    <th class="relative px-6 py-3"><span class="sr-only">Actions</span></th>
+                    @if (Auth::user()->staff?->jabatan === 'PIC')
+                        <th class="relative px-6 py-3"><span class="sr-only">Actions</span></th>
+                    @endif
                 </tr>
             </thead>
 

@@ -15,7 +15,7 @@
         <div class="flex flex-col leading-none">
             <span class="font-black text-gray-900 tracking-tighter text-sm lg:text-base uppercase">Mitra Jua
                 Abadi</span>
-            <span class="text-[9px] font-bold text-red-500 tracking-[0.2em] uppercase mt-0.5">Sistem Terpadu</span>
+            <span class="text-[10px] font-bold text-red-500 tracking-[0.2em] uppercase mt-0.5">Sistem Terpadu</span>
         </div>
     </a>
 
@@ -140,12 +140,12 @@
             </div>
             <div class="flex flex-col">
                 <div class="flex items-center gap-1.5">
-                    <span class="text-[12px] font-black text-gray-900 uppercase tracking-tight"
+                    <span class="text-[13px] font-black text-gray-900 uppercase tracking-tight"
                         x-text="greetingText"></span>
                     <span class="w-1 h-1 bg-red-400 rounded-full animate-pulse"></span>
                 </div>
                 <div class="h-3 overflow-hidden">
-                    <p class="text-[10px] font-bold text-gray-400 italic" x-text="currentQuote"></p>
+                    <p class="text-[11px] font-bold text-gray-400 italic" x-text="currentQuote"></p>
                 </div>
             </div>
         </div>
@@ -239,16 +239,16 @@
             updateGreeting() {
                 const hour = new Date().getHours();
                 if (hour < 11) {
-                    this.greetingText = 'Pagi';
+                    this.greetingText = 'Selamat Pagi';
                     this.greetingIcon = '☀️';
                 } else if (hour < 15) {
-                    this.greetingText = 'Siang';
+                    this.greetingText = 'Selamat Siang';
                     this.greetingIcon = '🌤️';
                 } else if (hour < 19) {
-                    this.greetingText = 'Sore';
+                    this.greetingText = 'Selamat Sore';
                     this.greetingIcon = '🌅';
                 } else {
-                    this.greetingText = 'Malam';
+                    this.greetingText = 'Selamat Malam';
                     this.greetingIcon = '🌙';
                 }
             }

@@ -26,8 +26,8 @@
         @php
             $sistemPengajian = [1 => 'Harian', 2 => 'Borongan'];
             $colors = [
-                1 => 'text-purple-600 bg-purple-50',
-                2 => 'text-orange-600 bg-orange-50'
+                1 => 'text-blue-600 bg-blue-50',
+                2 => 'text-orange-600 bg-orange-50',
             ];
 
             $value = $un->sistem_pengajian;
@@ -58,26 +58,25 @@
             <div class="text-[10px] text-gray-400 mt-1 uppercase tracking-wider">Orang</div>
         </td>
 
-        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-            <div class="flex justify-end gap-2">
-                <!-- Detail -->
-                <a href="{{
-                        $un->sistem_pengajian == 1
-                            ? route('view.absensiharian', [$un->id, request('date') ?? now()->toDateString()])
-                            : route('view.absensiborongan', [$un->id, request('date') ?? now()->toDateString()])
-                    }}"
-                    class="text-blue-600 hover:text-blue-900 border border-blue-200 hover:bg-blue-50
-                        rounded-lg p-2 transition"
-                    title="Detail">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z" />
-                    </svg>
-                </a>
-            </div>
-
-        </td>
+        @if (Auth::user()->staff?->jabatan === 'PIC')
+            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <div class="flex justify-end gap-2">
+                    <!-- Detail -->
+                    <a href="{{ $un->sistem_pengajian == 1
+                        ? route('view.absensi.harian', [$un->id, request('date') ?? now()->toDateString()])
+                        : route('view.absensi.borongan', [$un->id, request('date') ?? now()->toDateString()]) }}"
+                        class="text-blue-600 hover:text-blue-900 border border-blue-200 hover:bg-blue-50
+                            rounded-lg p-2 transition"
+                        title="Detail">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z" />
+                        </svg>
+                    </a>
+                </div>
+            </td>
+        @endif
     </tr>
 @empty
     <tr>
@@ -94,4 +93,3 @@
         </td>
     </tr>
 @endforelse
-
