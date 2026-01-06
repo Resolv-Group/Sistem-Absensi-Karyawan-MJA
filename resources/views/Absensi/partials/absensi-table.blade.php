@@ -13,7 +13,7 @@
                         Nama Unit
                     </th>
                     <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
-                        Total Pekerja 
+                        Total Pekerja
                     </th>
                     <th class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">
                         Jenis Unit
@@ -30,15 +30,15 @@
 
             <tbody id="table-company-body" class="bg-white divide-y divide-gray-200">
 
-                @include('Absensi.partials.table-body', ['mitraKerja' => $mitraKerja])
+                @include('Absensi.partials.table-body', ['units' => $units])
             </tbody>
         </table>
     </div>
 
-    @if ($mitraKerja->hasPages())
+    @if ($units->hasPages())
         <!-- Ensure this ID matches the JS selector -->
         <div id="search-pagination" class="border-t border-gray-200 bg-gray-50 px-4 py-3 sm:px-6">
-            {{ $mitraKerja->links('vendor.pagination.custom') }}
+            {{ $units->links('vendor.pagination.custom') }}
         </div>
     @endif
 </div>

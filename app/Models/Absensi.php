@@ -17,5 +17,14 @@ class Absensi extends Model
         'verifikasi'
     ];
 
-    
+    public function detilHarian() {
+        return $this->hasOne(Detil_Harian::class, 'id_absensi', 'id');
+    }
+
+    public function pekerja()
+    {
+        return $this->belongsTo(Pekerja::class, 'id_pekerja', 'id');
+    }
+
+
 }

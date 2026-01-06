@@ -47,4 +47,14 @@ class Pekerja extends Model
     {
         return $this->belongsTo(Absensi::class, 'id_pic', 'id');
     }
+
+    function absensiPekerja(){
+        return $this->hasMany(Absensi::class, 'id_pekerja');
+    }
+
+    public function absensiMany()
+    {
+        return $this->hasMany(Absensi::class, 'id_pekerja', 'id');
+    }
+
 }
