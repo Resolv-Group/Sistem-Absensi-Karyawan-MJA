@@ -17,18 +17,19 @@ return new class extends Migration
             $table->char('id_absensi');
             $table->integer('id_barang');
             $table->integer('status_kehadiran')->default(0);
-            
-            $table->integer('act.rej');
-            $table->integer('rej.mc');
-            $table->integer('totalQTY');
-            $table->integer('bayaranItem');
+
             $table->integer('FD');
+            $table->integer('act_rej');
+            $table->integer('good_mc');
 
-            $table->binary('buktiSuratJalan');
+            $table->integer('bayaranPerusahaan');
+            $table->integer('bayaranItem');
 
-            $table->char('catatan');
+            $table->binary('buktiSuratJalan')->nullable();
 
-            $table->int('updated_by');
+            $table->char('catatan')->nullable();
+
+            $table->integer('updated_by');
 
             $table->timestamps();
         });

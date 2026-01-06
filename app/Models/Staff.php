@@ -53,4 +53,9 @@ class Staff extends Model
         return $this->hasMany(PicUnit::class, 'id_pic', 'id');
     }
 
+    public function isAdmin()
+    {
+        return $this->jabatan === 'admin';
+    }
+
 }

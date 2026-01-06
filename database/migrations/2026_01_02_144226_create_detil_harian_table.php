@@ -22,7 +22,7 @@ return new class extends Migration
 
             $table->char('catatan')->nullable();
 
-            $table->int('updated_by');
+            $table->integer('updated_by');
 
             $table->timestamps();
         });
