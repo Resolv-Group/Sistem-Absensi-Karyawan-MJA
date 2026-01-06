@@ -51,6 +51,7 @@
         showAbsenStatusModal: false,
         searchQuery: '',
         filterStatus: '',
+        filterVerifikasi: '',
         statusValue: '1',
         workerMap: @js($workerMap),
 
@@ -107,7 +108,7 @@
                 // If called from Pagination Link
                 url = new URL(targetUrl);
                 // If no search is active, save this as our current 'base' page
-                if (!this.searchQuery && !this.filterDivisi && !this.filterJabatan && !this.filterStatus) {
+                if (!this.searchQuery && !this.filterVerifikasi && !this.filterStatus) {
                     this.currentPage = url.searchParams.get('page') || 1;
                 }
             } else {
@@ -116,7 +117,7 @@
 
                 // Logic: If user is typing, we force page 1 to find results.
                 // If user cleared everything, we restore the saved currentPage.
-                if (!this.searchQuery && !this.filterDivisi && !this.filterJabatan && !this.filterStatus) {
+                if (!this.searchQuery && !this.filterVerifikasi && !this.filterStatus) {
                     url.searchParams.set('page', this.currentPage);
                 } else {
                     url.searchParams.set('page', '1');
@@ -126,6 +127,7 @@
             // Apply all filters to the URL
             url.searchParams.set('search', this.searchQuery);
             url.searchParams.set('status', this.filterStatus);
+            url.searchParams.set('statusVerif', this.filterVerifikasi);
 
             try {
                 const response = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
@@ -149,107 +151,127 @@
         resetFilters() {
             this.searchQuery = '';
             this.filterStatus = '';
+            this.filterVerifikasi = '';
             // This will trigger the $watch which calls updateTable()
             // Our logic inside updateTable will see filters are empty and restore Page 2
         },
 
     }" x-init="$watch('searchQuery', () => updateTable());
-    $watch('filterStatus', () => updateTable());">
+    $watch('filterStatus', () => updateTable());
+    $watch('filterVerifikasi', () => updateTable());">
 
         {{-- HEADER SECTION --}}
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
-    <div class="bg-white rounded-[2.5rem] p-8 md:p-10 shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-gray-100 relative overflow-hidden">
+            <div
+                class="bg-white rounded-[2.5rem] p-8 md:p-10 shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-gray-100 relative overflow-hidden">
 
-        {{-- Surprise Element: Background Pattern Decoration --}}
-        <div class="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-blue-50 rounded-full blur-3xl opacity-40"></div>
-        <div class="absolute bottom-0 left-0 -ml-16 -mb-16 w-64 h-64 bg-emerald-50 rounded-full blur-3xl opacity-40"></div>
-
-        <div class="relative z-10">
-            {{-- Top Row: Breadcrumb & Date Capsule --}}
-            <div class="flex flex-wrap items-center justify-between gap-4 mb-8">
-                <a href="{{ url()->previous() }}"
-                    class="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 hover:text-blue-600 transition group">
-                    <svg class="w-3.5 h-3.5 transform group-hover:-translate-x-1 transition" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
-                    </svg>
-                    Kembali ke Unit
-                </a>
-
-                {{-- DYNAMIC DATE PILL (OCD Friendly) --}}
-                <div class="flex items-center gap-3 bg-gray-50 px-4 py-1.5 rounded-full border border-gray-100 shadow-inner">
-                    <svg class="w-3.5 h-3.5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    <span class="text-[10px] font-black text-gray-600 uppercase tracking-widest">
-                        Periode: {{ \Carbon\Carbon::parse($date)->translatedFormat('d F Y') }}
-                    </span>
-                    @if(\Carbon\Carbon::parse($date)->isToday())
-                        <span class="flex h-2 w-2 relative">
-                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                        </span>
-                    @endif
+                {{-- Surprise Element: Background Pattern Decoration --}}
+                <div class="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-blue-50 rounded-full blur-3xl opacity-40">
                 </div>
-            </div>
-
-            <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
-                {{-- Left Side: Identity & Branding --}}
-                <div class="space-y-4">
-                    <div class="flex items-center gap-5">
-                        <div class="h-16 w-2 bg-blue-600 rounded-full shadow-[0_0_20px_rgba(37,99,235,0.4)]"></div>
-                        <div>
-                            <div class="flex items-center gap-3 mb-1">
-                                <h1 class="text-5xl font-black text-gray-900 tracking-tight leading-none">Pengelolaan
-                                    Absensi<span class="text-blue-600">.</span>
-                                </h1>
-                            </div>
-
-                            <div class="flex items-center gap-3 mt-4">
-                                <div class="px-3 py-1 bg-gray-900 text-white text-[10px] font-black uppercase tracking-widest rounded-lg shadow-sm">
-                                    {{ $unit->namaMitra->nama_mitra ?? 'Mitra Perusahaan' }}
-                                </div>
-                                <div class="px-3 py-1 bg-blue-50 text-blue-700 text-[10px] font-black uppercase tracking-widest rounded-lg border border-blue-100 italic">
-                                    Sistem {{ $unit->sistem_pengajian == 1 ? 'Harian' : 'Borongan' }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <p class="text-base text-gray-500 flex items-center gap-2 ml-7">
-                        Unit Kerja:
-                        <span class="font-bold text-gray-800 italic underline decoration-blue-200 underline-offset-8 decoration-2">
-                            {{ $unit->nama_unit }}
-                        </span>
-                    </p>
+                <div class="absolute bottom-0 left-0 -ml-16 -mb-16 w-64 h-64 bg-emerald-50 rounded-full blur-3xl opacity-40">
                 </div>
 
-                {{-- Right Side: Grid Stats Cards --}}
-                <div class="grid grid-cols-2 gap-3">
-                    {{-- Total Card --}}
-                    <div class="bg-gray-50/50 border border-gray-100 rounded-3xl p-5 min-w-[140px] hover:bg-white hover:shadow-xl hover:shadow-blue-900/5 transition-all duration-300 group">
-                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Total</p>
-                        <div class="flex items-end gap-1">
-                            <span class="text-3xl font-black text-gray-900 leading-none">{{ $pkwtPekerja->total() }}</span>
-                            <span class="text-[10px] font-bold text-gray-400 mb-1">Pekerja</span>
-                        </div>
-                    </div>
-
-                    {{-- Active Card --}}
-                    <div class="bg-gray-50/50 border border-gray-100 rounded-3xl p-5 min-w-[140px] hover:bg-white hover:shadow-xl hover:shadow-emerald-900/5 transition-all duration-300 group">
-                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 text-emerald-500">Total Hadir</p>
-                        <div class="flex items-end gap-1">
-                            <span class="text-3xl font-black text-emerald-600 leading-none">{{ $totalHadir }}</span>
-                            <svg class="w-4 h-4 text-emerald-400 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                <div class="relative z-10">
+                    {{-- Top Row: Breadcrumb & Date Capsule --}}
+                    <div class="flex flex-wrap items-center justify-between gap-4 mb-8">
+                        <a href="{{ url()->previous() }}"
+                            class="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 hover:text-blue-600 transition group">
+                            <svg class="w-3.5 h-3.5 transform group-hover:-translate-x-1 transition" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
                             </svg>
+                            Kembali ke Unit
+                        </a>
+
+                        {{-- DYNAMIC DATE PILL --}}
+                        <div
+                            class="flex items-center gap-3 bg-gray-50 px-4 py-1.5 rounded-full border border-gray-100 shadow-inner">
+                            <svg class="w-3.5 h-3.5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            <span class="text-[11px] font-black text-gray-600 uppercase tracking-widest">
+                                Periode: {{ \Carbon\Carbon::parse($date)->translatedFormat('d F Y') }}
+                            </span>
+                            @if (\Carbon\Carbon::parse($date)->isToday())
+                                <span class="flex h-2 w-2 relative">
+                                    <span
+                                        class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                    <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                                </span>
+                            @endif
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
+                        {{-- Left Side: Identity & Branding --}}
+                        <div class="space-y-4">
+                            <div class="flex items-center gap-5">
+                                <div class="h-16 w-2 bg-blue-600 rounded-full shadow-[0_0_20px_rgba(37,99,235,0.4)]"></div>
+                                <div>
+                                    <div class="flex items-center gap-3 mb-1">
+                                        <h1 class="text-5xl font-black text-gray-900 tracking-tight leading-none">
+                                            Pengelolaan
+                                            Absensi<span class="text-blue-600">.</span>
+                                        </h1>
+                                    </div>
+
+                                    <div class="flex items-center gap-3 mt-4">
+                                        <div
+                                            class="px-3 py-1 bg-gray-900 text-white text-[10px] font-black uppercase tracking-widest rounded-lg shadow-sm">
+                                            {{ $unit->namaMitra->nama_mitra ?? 'Mitra Perusahaan' }}
+                                        </div>
+                                        <div
+                                            class="px-3 py-1 bg-blue-50 text-blue-700 text-[10px] font-black uppercase tracking-widest rounded-lg border border-blue-100 italic">
+                                            Sistem {{ $unit->sistem_pengajian == 1 ? 'Harian' : 'Borongan' }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <p class="text-base text-gray-500 flex items-center gap-2 ml-7">
+                                Unit Kerja:
+                                <span
+                                    class="font-bold text-gray-800 italic underline decoration-blue-200 underline-offset-8 decoration-2">
+                                    {{ $unit->nama_unit }}
+                                </span>
+                            </p>
+                        </div>
+
+                        {{-- Right Side: Grid Stats Cards --}}
+                        <div class="grid grid-cols-2 gap-3">
+                            {{-- Total Card --}}
+                            <div
+                                class="bg-gray-50/50 border border-gray-100 rounded-3xl p-5 min-w-[140px] hover:bg-white hover:shadow-xl hover:shadow-blue-900/5 transition-all duration-300 group">
+                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Total</p>
+                                <div class="flex items-end gap-1">
+                                    <span
+                                        class="text-3xl font-black text-gray-900 leading-none">{{ $pkwtPekerja->total() }}</span>
+                                    <span class="text-[10px] font-bold text-gray-400 mb-1">Pekerja</span>
+                                </div>
+                            </div>
+
+                            {{-- Active Card --}}
+                            <div
+                                class="bg-gray-50/50 border border-gray-100 rounded-3xl p-5 min-w-[140px] hover:bg-white hover:shadow-xl hover:shadow-emerald-900/5 transition-all duration-300 group">
+                                <p
+                                    class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 text-emerald-500">
+                                    Total Hadir</p>
+                                <div class="flex items-end gap-1">
+                                    <span
+                                        class="text-3xl font-black text-emerald-600 leading-none">{{ $totalHadir }}</span>
+                                    <svg class="w-4 h-4 text-emerald-400 mb-1" fill="none" viewBox="0 0 24 24"
+                                        stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                            d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
 
         {{-- MAIN CONTENT --}}
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 ">
@@ -279,6 +301,7 @@
                                 </svg>
                                 Filter
                                 <span x-show="filterStatus" class="w-2 h-2 bg-blue-500 rounded-full"></span>
+                                <span x-show="filterVerifikasi" class="w-2 h-2 bg-blue-500 rounded-full"></span>
                             </button>
 
                             <div x-show="showFilterDropdown" x-transition:enter="transition ease-out duration-200"
@@ -302,12 +325,16 @@
                                 <div class="space-y-5">
 
                                     {{-- STATUS FILTER --}}
-                                    <div x-data="{ open: false, list: [{ val: '', label: 'Semua Status' },
-                                                                    { val: '1', label: 'Hadir' },
-                                                                    { val: '2', label: 'Sakit' },
-                                                                    { val: '3', label: 'Izin' },
-                                                                    { val: '4', label: 'Cuti' },
-                                                                    { val: '0', label: 'Alpha / Absen' }] }" class="relative">
+                                    <div x-data="{
+                                        open: false,
+                                        list: [{ val: '', label: 'Semua Status' },
+                                            { val: '1', label: 'Hadir' },
+                                            { val: '2', label: 'Sakit' },
+                                            { val: '3', label: 'Izin' },
+                                            { val: '4', label: 'Cuti' },
+                                            { val: '0', label: 'Alpha / Absen' }
+                                        ]
+                                    }" class="relative">
                                         <label
                                             class="block text-[10px] uppercase tracking-wider font-bold text-gray-400 mb-1.5">Status
                                             Absen</label>
@@ -355,21 +382,65 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="space-y-5 mt-7">
+
+                                    {{-- STATUS FILTER --}}
+                                    <div x-data="{
+                                        open: false,
+                                        list: [{ val: '', label: 'Semua Status' },
+                                            { val: '1', label: 'Disetujui' },
+                                            { val: '0', label: 'Menunggu Persetujuan' }
+                                        ]
+                                    }" class="relative mb-2">
+                                        <label
+                                            class="block text-[10px] uppercase tracking-wider font-bold text-gray-400 mb-1.5">Status
+                                            Verifikasi Absen</label>
+                                        <div @click="open = !open"
+                                            class="relative block w-full pl-9 pr-3 py-2.5 text-sm bg-gray-50 border border-transparent rounded-xl text-gray-700 cursor-pointer hover:bg-gray-100 transition flex justify-between items-center">
+                                            <div
+                                                class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24"
+                                                    stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                            </div>
+                                            <span class="truncate font-medium"
+                                                x-text="list.find(x => x.val == filterVerifikasi)?.label || 'Semua Status'"></span>
+                                            <svg class="w-4 h-4 text-gray-400 transition-transform duration-200"
+                                                :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M19 9l-7 7-7-7" />
+                                            </svg>
+                                        </div>
+
+                                        {{-- Inner List Dropdown --}}
+                                        <div x-show="open" @click.outside="open = false"
+                                            class="absolute w-full mt-1 bg-white rounded-xl shadow-xl border border-gray-100 z-[80] overflow-hidden">
+                                            <ul class="max-h-60 overflow-y-auto py-1">
+                                                <template x-for="item in list" :key="item.val">
+                                                    <li @click="filterVerifikasi = item.val; open = false"
+                                                        class="px-4 py-2.5 text-sm cursor-pointer transition flex items-center gap-2"
+                                                        :class="filterVerifikasi == item.val ?
+                                                            'bg-blue-50 text-blue-700 font-semibold' :
+                                                            'text-gray-700 hover:bg-gray-50'">
+                                                        <svg x-show="filterVerifikasi == item.val"
+                                                            class="w-4 h-4 text-blue-600" fill="none"
+                                                            viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2" d="M5 13l4 4L19 7" />
+                                                        </svg>
+                                                        <span x-show="filterVerifikasi != item.val" class="w-4 h-4"></span>
+                                                        <span x-text="item.label"></span>
+                                                    </li>
+                                                </template>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
 
                                 {{-- Info Helper for Preview Limitation --}}
-                                <div class="mt-4 p-3 bg-orange-50 rounded-xl border border-orange-100 flex gap-3">
-                                    <svg class="w-5 h-5 text-orange-500 flex-shrink-0 mt-0.5" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    <p class="text-[10px] text-orange-700 leading-relaxed">
-                                        <span class="font-bold">Mode Preview:</span> Pencarian ini hanya memindai <span
-                                            class="font-bold">5 data terbaru</span>. Jika tidak ditemukan, silakan cek di
-                                        halaman
-                                        <span class="italic font-bold">Master Borongan</span>.
-                                    </p>
-                                </div>
                                 <div class="mt-6 pt-4 border-t border-gray-50 text-center">
                                     <p class="text-[10px] text-gray-400">Filter akan diterapkan otomatis</p>
                                 </div>
@@ -744,7 +815,8 @@
                                     Status Absen</th>
                                 <th class="px-4 py-4 text-[11px] font-black text-gray-400 uppercase tracking-widest">
                                     Catatan</th>
-                                <th class="px-4 py-4 text-[11px] font-black text-center text-gray-400 uppercase tracking-widest">
+                                <th
+                                    class="px-4 py-4 text-[11px] font-black text-center text-gray-400 uppercase tracking-widest">
                                     Status Verifikasi</th>
                             </tr>
                         </thead>

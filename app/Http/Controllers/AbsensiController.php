@@ -27,7 +27,7 @@ class AbsensiController extends Controller
 
         // 🔥 2. Unit yang dipegang PIC
         $units = Unit::with(['namaMitra'])
-            ->withCount('pkwtPekerja')
+            ->withCount('pkwt')
             ->whereHas('picUnit', function ($q) use ($staff) {
                 $q->where('id_pic', $staff->id);
             })
@@ -52,60 +52,14 @@ class AbsensiController extends Controller
             ->where('status_kehadiran', 0)
             ->count();
 
-        // 🔥 6. Mitra Kerja (search tetap jalan)
-        $query = MitraKerja::query();
-
-        $search = $request->input('search') ?? $request->input('q');
-
-        $query->when($search, function ($q) use ($search) {
-            $q->where('nama_mitra', 'LIKE', "%{$search}%");
-        });
-
-        $mitraKerja = $query->orderBy('created_at', 'desc')->paginate(10)->withQueryString();
-
         // 🔥 7. AJAX support
         if ($request->ajax()) {
-            return view('Absensi.partials.absensi-table', compact('mitraKerja'))->render();
+            return view('Absensi.partials.absensi-table', compact('units'))->render();
         }
 
         // 🔥 8. Return view
-        return view('Absensi.main-absensi', compact('mitraKerja', 'totalAbsensi', 'totalHadir', 'totalAbsen', 'units', 'date'));
+        return view('Absensi.main-absensi', compact('totalAbsensi', 'totalHadir', 'totalAbsen', 'units', 'date'));
     }
-
-    // function ViewHarian(Request $request, $id_unit, $date)
-    // {
-    //     $picId = Auth::user()->staff->id;
-
-    //     // ambil unit + pekerjanya
-    //     $unit = Unit::with('pkwt.pekerja')->findOrFail($id_unit);
-
-    //     foreach ($unit->pkwt as $pkwt) {
-
-    //         $sudahAda = Absensi::where('id_pekerja', $pkwt->id_pekerja)
-    //             ->where('tgl_absensi', $date)
-    //             ->exists();
-
-    //         if ($sudahAda) {
-    //             continue;
-    //         }
-
-    //         Absensi::create([
-    //             'id_pekerja' => $pkwt->id_pekerja,
-    //             'id_pic'     => $picId,
-    //             'id_unit'    => $unit->id,
-    //             'tgl_absensi'=> $date,
-    //             'tipe'       => $unit->sistem_pengajian,
-    //             'verifikasi' => 0,
-    //         ]);
-    //     }
-
-    //     // Create a simple map for Alpine: { id: "Nama Pekerja" }
-    //     $workerMap = $unit->pkwt->mapWithKeys(function ($item) {
-    //         return [$item->id => $item->pekerja->nama];
-    //     });
-
-    //     return view('Absensi.detail.main-harian', compact('unit', 'date', 'workerMap'));
-    // }
 
     public function ViewHarian(Request $request, $id_unit, $date)
     {
@@ -156,7 +110,16 @@ class AbsensiController extends Controller
                 });
         }
 
-        $pkwtPekerja = $pkwtQuery->paginate(15);
+        if ($request->filled('statusVerif')) {
+            $status = $request->statusVerif;
+                $pkwtQuery->whereHas('pekerja.absensiMany', function ($q) use ($status, $date, $id_unit) {
+                    $q->where('tgl_absensi', $date)
+                    ->where('id_unit', $id_unit)
+                    ->where('verifikasi', $status);
+                });
+        }
+
+        $pkwtPekerja = $pkwtQuery->paginate(25);
 
         // 4. Handle AJAX Response
         if ($request->ajax()) {
@@ -238,6 +201,8 @@ class AbsensiController extends Controller
                     // Tentukan Status (Hadir=1, Sakit=2, Izin=3, Cuti=4, Alpha=5)
                     $status = isset($values['status']) ? (int) $values['status'] : 1;
 
+                    $oldDetil = $absensi->detilHarian; // relasi hasOne
+
                     /**
                      * LOGIKA PEMBATASAN WAKTU (Karena DB tidak boleh NULL)
                      * Jika status Hadir (1), ambil input jam atau set 00:00:00 jika kosong.
@@ -245,6 +210,8 @@ class AbsensiController extends Controller
                      */
                     $waktuMasuk = $status === 1 ? $values['masuk'] ?? '00:00:00' : '00:00:00';
                     $waktuKeluar = $status === 1 ? $values['keluar'] ?? '00:00:00' : '00:00:00';
+
+                    $statusChanged = $oldDetil && $oldDetil->status_kehadiran != $status;
 
                     // Simpan atau Update ke tabel detil_harian
                     Detil_Harian::updateOrCreate(
@@ -256,6 +223,13 @@ class AbsensiController extends Controller
                             'catatan' => $values['catatan'] ?? null,
                         ],
                     );
+
+                     // 🔁 RESET VERIFIKASI JIKA STATUS BERUBAH
+                    if ($statusChanged) {
+                        $absensi->update([
+                            'verifikasi' => 0
+                        ]);
+                    }
                 }
             }
 

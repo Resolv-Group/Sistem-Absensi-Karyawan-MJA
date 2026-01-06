@@ -18,7 +18,7 @@
 
         <td class="px-6 py-4 whitespace-nowrap text-center align-top">
             <span class="inline-flex items-center px-2.5 py-1 rounded-md text-sm font-bold bg-gray-100 text-gray-800">
-                {{ $un->pkwt_pekerja_count ?? '-' }}
+                {{ $un->pkwt_count ?? '-' }}
             </span>
             <div class="text-[10px] text-gray-400 mt-1 uppercase tracking-wider">Orang</div>
         </td>
@@ -45,7 +45,7 @@
         <td class="px-6 py-4 whitespace-nowrap text-center align-top">
             <span
                 class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100">
-                {{ $un->namaMitra->nama_mitra ?? '-' }}
+                {{ $un->pkwt_count ?? '-' }}
             </span>
             <div class="text-[10px] text-gray-400 mt-1 uppercase tracking-wider">Orang</div>
         </td>
@@ -61,8 +61,8 @@
         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
             <div class="flex justify-end gap-2">
                 <!-- Detail -->
-                <a href="{{ 
-                        $un->sistem_pengajian == 1 
+                <a href="{{
+                        $un->sistem_pengajian == 1
                             ? route('view.absensiharian', [$un->id, request('date') ?? now()->toDateString()])
                             : route('view.absensiborongan', [$un->id, request('date') ?? now()->toDateString()])
                     }}"
@@ -89,7 +89,7 @@
                     </path>
                 </svg>
                 <p class="font-medium">Belum ada absen.</p>
-                <p class="text-sm mt-1">Silakan tambah mitra kerja baru.</p>
+                {{-- <p class="text-sm mt-1">Silakan tambah mitra kerja baru.</p> --}}
             </div>
         </td>
     </tr>

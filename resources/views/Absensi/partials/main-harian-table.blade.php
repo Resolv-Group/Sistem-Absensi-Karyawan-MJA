@@ -93,7 +93,6 @@
 
         <td class="px-4 py-5 text-center">
             @if ($absensi)
-                {{-- PERBAIKAN: Switch pada properti status_kehadiran --}}
                 @switch($absensi->verifikasi)
                     @case(1)
                         <span
@@ -163,37 +162,6 @@
                                 </svg>
                                 Reset Semua Filter
                             </button>
-                        </div>
-                    @else
-                        {{-- SKENARIO B: DATABASE BENAR-BENAR KOSONG --}}
-                        <div class="relative mb-10">
-                            <div class="absolute inset-0 bg-gray-200 rounded-full blur-[50px] opacity-30"></div>
-
-                            <div
-                                class="relative w-32 h-32 bg-gray-50 rounded-[2.5rem] border-2 border-dashed border-gray-200 flex items-center justify-center group hover:border-blue-400 transition-colors duration-500">
-                                <svg class="w-16 h-16 text-gray-300 group-hover:text-blue-200 transition-colors"
-                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                        d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                                </svg>
-                            </div>
-                        </div>
-
-                        <h3 class="text-2xl font-black text-gray-400 tracking-tight">Belum Ada Data Pekerja</h3>
-                        <p class="text-sm text-gray-400 max-w-[350px] mx-auto mt-3 leading-relaxed">
-                            Daftar pekerja harian (PKWT) untuk unit ini masih kosong. Daftarkan pekerja pertama Anda
-                            sekarang.
-                        </p>
-
-                        <div class="mt-10">
-                            <a href="{{ route('view.tambah.unit-pekerja', $unit->id) }}"
-                                class="inline-flex items-center gap-3 px-10 py-4 bg-blue-600 text-white text-sm font-black rounded-2xl hover:bg-blue-700 shadow-xl shadow-blue-200 transition-all hover:-translate-y-1 active:scale-95">
-                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 4v16m8-8H4" />
-                                </svg>
-                                Daftarkan Pekerja Baru
-                            </a>
                         </div>
                     @endif
                 </div>
