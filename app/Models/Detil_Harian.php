@@ -13,7 +13,8 @@ class Detil_Harian extends Model
         'status_kehadiran',
         'waktu_masuk',
         'waktu_keluar',
-        'catatan'
+        'catatan',
+        'updated_by'
     ];
 
     public function unit()

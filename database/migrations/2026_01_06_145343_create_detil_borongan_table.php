@@ -11,16 +11,22 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('detil_harian', function (Blueprint $table) {
+        Schema::create('detil_borongan', function (Blueprint $table) {
             $table->id();
 
-            $table->integer('id_absensi');
+            $table->char('id_absensi');
+            $table->integer('id_barang');
             $table->integer('status_kehadiran')->default(0);
+            
+            $table->integer('act.rej');
+            $table->integer('rej.mc');
+            $table->integer('totalQTY');
+            $table->integer('bayaranItem');
+            $table->integer('FD');
 
-            $table->time('waktu_masuk')->default('00:00:00');
-            $table->time('waktu_keluar')->default('00:00:00');
+            $table->binary('buktiSuratJalan');
 
-            $table->char('catatan')->nullable();
+            $table->char('catatan');
 
             $table->int('updated_by');
 
@@ -33,6 +39,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('detil_harian');
+        Schema::dropIfExists('detil_borongan');
     }
 };

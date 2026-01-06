@@ -21,7 +21,7 @@ class AbsensiController extends Controller
     {
         $user = Auth::user();
         $staff = $user->staff;
-
+        
         // 🔥 1. Ambil tanggal (default: hari ini)
         $date = $request->date ?? now()->toDateString();
 
