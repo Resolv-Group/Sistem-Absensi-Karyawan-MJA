@@ -57,4 +57,16 @@ class Pekerja extends Model
         return $this->hasMany(Absensi::class, 'id_pekerja', 'id');
     }
 
+    public function pkwt()
+    {
+        return $this->hasMany(PKWT::class, 'id_pekerja');
+    }
+
+    // 🔥 PKWT yang AKTIF (hanya 1 seharusnya)
+    public function pkwtAktif()
+    {
+        return $this->hasOne(PKWT::class, 'id_pekerja')
+            ->where('status_aktif', 1);
+    }
+
 }

@@ -32,7 +32,8 @@
                         title="{{ $u->pekerja->nama }}">
                         {{ $u->pekerja->nama }}
                     </p>
-                    <p class="text-[12px] font-medium text-slate-400 uppercase tracking-tighter">NIK: {{ $u->pekerja->nik }}
+                    <p class="text-[12px] font-medium text-slate-400 uppercase tracking-tighter">NIK:
+                        {{ $u->pekerja->nik }}
                     </p>
                 </div>
             </div>
@@ -205,6 +206,7 @@
                             <span
                                 class="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-[12px] font-black uppercase tracking-widest border border-emerald-200 shadow-sm">Hadir</span>
                         @break
+
                         @case(2)
                             <span
                                 class="px-3 py-1 bg-purple-100 text-purple-700 rounded-lg text-[12px] font-black uppercase tracking-widest border border-purple-200 shadow-sm">Cuti</span>
@@ -377,6 +379,28 @@
                                 Reset Semua Filter
                             </button>
                         </div>
+                    @else
+                        {{-- SKENARIO A: FILTER AKTIF TAPI TIDAK ADA HASIL --}}
+                        {{-- STATE: DATABASE KOSONG (Sekarang sudah Animasi & Konsisten) --}}
+                        <div class="relative mb-8">
+                            {{-- Pulse Glow Abu-abu --}}
+                            <div class="absolute inset-0 bg-gray-200 rounded-full blur-3xl opacity-50 animate-pulse"></div>
+
+                            {{-- Floating Card Abu-abu --}}
+                            <div
+                                class="relative w-24 h-24 bg-gradient-to-br from-gray-50 to-white rounded-3xl flex items-center justify-center border border-gray-100 shadow-xl animate-float-harian">
+                                <svg class="w-12 h-12 text-gray-300" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                        d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                                </svg>
+                            </div>
+                        </div>
+
+                        <h3 class="text-xl font-black text-gray-400 tracking-tight">Belum Ada Pekerja</h3>
+                        <p class="text-sm text-gray-400 max-w-[280px] mx-auto mt-3 leading-relaxed">
+                            Unit ini belum memiliki daftar pekerja yang terdaftar di sistem.
+                        </p>
                     @endif
                 </div>
             </td>
