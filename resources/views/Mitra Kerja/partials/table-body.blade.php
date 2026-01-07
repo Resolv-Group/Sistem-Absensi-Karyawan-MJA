@@ -27,7 +27,7 @@
 
         <td class="px-6 py-4 whitespace-nowrap text-center align-top">
             <span class="inline-flex items-center px-2.5 py-1 rounded-md text-sm font-bold bg-gray-100 text-gray-800">
-                100
+                {{ $mk->units_count}}
             </span>
             <div class="text-[10px] text-gray-400 mt-1 uppercase tracking-wider">Orang</div>
         </td>

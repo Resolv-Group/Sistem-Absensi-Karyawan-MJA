@@ -14,7 +14,7 @@
                     </th>
                     {{-- RESTORED COLUMN --}}
                     <th class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">
-                        Total Pekerja
+                        Total Unit
                     </th>
                     <th class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">
                         Bidang Usaha

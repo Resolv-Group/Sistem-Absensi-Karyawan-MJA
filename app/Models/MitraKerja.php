@@ -133,4 +133,12 @@ class MitraKerja extends Model
             ->map(fn ($line) => trim($line))
             ->implode('<br>');
     }
+    public function units()
+    {
+        return $this->hasMany(Unit::class, 'id_mitra_kerja', 'id');
+    }
+    public function getTotalUnitAttribute()
+    {
+        return $this->unit()->count();
+    }
 }
