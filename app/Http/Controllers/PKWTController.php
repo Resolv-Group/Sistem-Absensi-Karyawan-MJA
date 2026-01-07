@@ -25,9 +25,15 @@ class PKWTController extends Controller
                 $q->where('nama', 'like', "%{$search}%")->orWhere('nik', 'like', "%{$search}%");
             });
         }
-        if ($request->filled('divisi')) $query->where('divisi_id', $request->divisi);
-        if ($request->filled('jabatan')) $query->where('jabatan_pkwt_id', $request->jabatan);
-        if ($request->filled('status')) $query->where('status_aktif', $request->status);
+        if ($request->filled('divisi')) {
+            $query->where('divisi_id', $request->divisi);
+        }
+        if ($request->filled('jabatan')) {
+            $query->where('jabatan_pkwt_id', $request->jabatan);
+        }
+        if ($request->filled('status')) {
+            $query->where('status_aktif', $request->status);
+        }
 
         $pkwtPekerja = $query->latest()->paginate(2);
 
@@ -41,17 +47,35 @@ class PKWTController extends Controller
 
         return view('Unit.Pengajian.main-harian', compact('pkwtPekerja', 'unit', 'divisions', 'jabatan'));
     }
-    function viewTambahUnitHarian($id_unit)
+    public function viewTambahUnitHarian($id_unit)
     {
-        // Assuming you have Unit and Pekerja models
+        // 1. Get current unit info
         $units = Unit::select('id', 'nama_unit as nama')->get();
         $unitSelected = Unit::with('namaMitra')->where('id', $id_unit)->firstOrFail();
-        $pekerjaList = Pekerja::select('id', 'nama', 'nik')->where('status_aktif', 1)->get();
+
+        // 2. Get IDs of workers who ALREADY have an active contract (in any unit)
+        $assignedWorkerIds = PKWT::where('status_aktif', 1)->pluck('id_pekerja')->toArray();
+
+        // 3. Get workers who are active but NOT in the assigned list
+        // This handles the requirement: "cannot add worker if already in this or other unit"
+        $pekerjaList = Pekerja::select('id', 'nama', 'nik')->where('status_aktif', 1)->whereNotIn('id', $assignedWorkerIds)->get();
+
         $divisiList = Divisi::select('id', 'nama')->get();
         $jabatanList = JabatanPKWT::select('id', 'nama')->get();
 
         return view('Unit.CRUD.tambah-unit-pekerja', compact('unitSelected', 'units', 'pekerjaList', 'divisiList', 'jabatanList'));
     }
+    // function viewTambahUnitHarian($id_unit)
+    // {
+    //     // Assuming you have Unit and Pekerja models
+    //     $units = Unit::select('id', 'nama_unit as nama')->get();
+    //     $unitSelected = Unit::with('namaMitra')->where('id', $id_unit)->firstOrFail();
+    //     $pekerjaList = Pekerja::select('id', 'nama', 'nik')->where('status_aktif', 1)->get();
+    //     $divisiList = Divisi::select('id', 'nama')->get();
+    //     $jabatanList = JabatanPKWT::select('id', 'nama')->get();
+
+    //     return view('Unit.CRUD.tambah-unit-pekerja', compact('unitSelected', 'units', 'pekerjaList', 'divisiList', 'jabatanList'));
+    // }
 
     function tambahPekerjaUnit(Request $request)
     {
@@ -205,48 +229,58 @@ class PKWTController extends Controller
 
     function bulkUpdateStatus(Request $request)
     {
-        // 1. Validasi input
         $request->validate([
-            'ids' => 'required', // String JSON dari Alpine.js
+            'ids' => 'required',
             'action' => 'required|string',
             'status' => 'required_if:action,update_status|in:0,1',
             'reason' => 'nullable|string|max:500',
         ]);
 
-        // 2. Decode IDs dari string JSON menjadi array PHP
-        $ids = json_decode($request->ids);
+        $ids = json_decode($request->ids, true);
 
         if (empty($ids)) {
             return back()->with('error', 'Tidak ada pekerja yang dipilih.');
         }
 
-        // 3. Eksekusi berdasarkan Action
         try {
             DB::beginTransaction();
 
             if ($request->action === 'update_status') {
-                $statusLabel = $request->status == '1' ? 'Aktif' : 'Nonaktif';
+                // 🔥 JIKA MAU AKTIFKAN
+                if ((int) $request->status === 1) {
+                    // 1️⃣ Ambil daftar pekerja dari PKWT yang dipilih
+                    $pekerjaIds = PKWT::whereIn('id', $ids)->pluck('id_pekerja')->unique();
 
-                // Update massal menggunakan whereIn
+                    // 2️⃣ Cek apakah masih ada PKWT aktif lain
+                    $conflict = PKWT::whereIn('id_pekerja', $pekerjaIds)
+                        ->where('status_aktif', 1)
+                        ->whereNotIn('id', $ids) // ⬅️ selain yang sedang dipilih
+                        ->exists();
+
+                    if ($conflict) {
+                        DB::rollBack();
+                        return back()->with('error', 'Gagal mengaktifkan. Pastikan pekerja tidak memiliki PKWT aktif di unit lain.');
+                    }
+                }
+
+                // 3️⃣ UPDATE AMAN
                 PKWT::whereIn('id', $ids)->update([
                     'status_aktif' => $request->status,
-                    // Jika Anda punya kolom 'keterangan' atau 'log_perubahan'
                     'updated_at' => now(),
                 ]);
 
-                $message = "Berhasil mengubah " . count($ids) . " pekerja menjadi $statusLabel.";
-
+                $statusLabel = $request->status == 1 ? 'Aktif' : 'Nonaktif';
+                $message = 'Berhasil mengubah ' . count($ids) . " pekerja menjadi $statusLabel.";
             } elseif ($request->action === 'delete') {
                 PKWT::whereIn('id', $ids)->delete();
-                $message = "Berhasil menghapus " . count($ids) . " data pekerja.";
+                $message = 'Berhasil menghapus ' . count($ids) . ' data pekerja.';
             }
 
             DB::commit();
             return back()->with('success', $message);
-
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Terjadi kesalahan saat memperbarui data: ' . $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
 
@@ -277,6 +311,4 @@ class PKWTController extends Controller
 
         return back()->with('success', count($ids) . ' pekerja berhasil mendapatkan jabatan baru.');
     }
-
-
 }

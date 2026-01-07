@@ -273,7 +273,8 @@
                                 <div>
                                     <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Mulai
                                         PKWT</label>
-                                    <input type="date" :name="`pekerja[${index}][tgl_mulai_pkwt]`" value="{{ now()->toDateString() }}"
+                                    <input type="date" :name="`pekerja[${index}][tgl_mulai_pkwt]`"
+                                        value="{{ now()->toDateString() }}"
                                         class="w-full rounded-xl border-gray-200 bg-gray-50 text-sm py-3 px-4 text-gray-600 focus:bg-white focus:border-blue-500">
                                 </div>
 
@@ -435,34 +436,40 @@
                 selectedId: row.workerId || null,
 
                 init() {
-                    // If an ID is already set (e.g., from old() data), populate search field
                     if (this.selectedId) {
                         const p = window.workersData.find(w => w.id == this.selectedId);
-                        if (p) {
-                            this.search = `${p.nama} (${p.nik})`;
-                        }
+                        if (p) this.search = `${p.nama} (${p.nik})`;
                     }
                 },
 
                 get filtered() {
-                    if (!this.search) {
-                        return window.workersData;
-                    }
-                    return window.workersData.filter(p =>
-                        p.nama.toLowerCase().includes(this.search.toLowerCase()) ||
-                        p.nik.includes(this.search)
-                    );
+                    // 1. Get IDs selected in other rows (to hide them)
+                    // We use $data to access the parent 'workerForm' scope
+                    const allSelected = this.$data.getSelectedWorkerIds();
+
+                    // 2. Filter the master list
+                    return window.workersData.filter(p => {
+                        // Must match search term
+                        const matchesSearch = !this.search ||
+                            p.nama.toLowerCase().includes(this.search.toLowerCase()) ||
+                            p.nik.includes(this.search);
+
+                        // IMPORTANT: Show if it's the one currently selected in THIS row,
+                        // OR if it's not selected in ANY row.
+                        const isAvailable = !allSelected.includes(p.id) || p.id == row.workerId;
+
+                        return matchesSearch && isAvailable;
+                    });
                 },
 
                 select(p) {
                     this.selectedId = p.id;
-                    row.workerId = p.id;
+                    row.workerId = p.id; // Update the row data
                     this.search = `${p.nama} (${p.nik})`;
                     this.open = false;
                 },
 
                 close() {
-                    // UX: If user clicks away without selecting, revert text to match ID or clear it
                     if (this.selectedId) {
                         const p = window.workersData.find(w => w.id == this.selectedId);
                         if (p) this.search = `${p.nama} (${p.nik})`;
@@ -490,6 +497,10 @@
                         jabatanId: null,
                     } // Added fields
                 ],
+
+                getSelectedWorkerIds() {
+                    return this.rows.map(row => row.workerId).filter(id => id !== '');
+                },
 
                 addRow() {
                     this.rows.push({
