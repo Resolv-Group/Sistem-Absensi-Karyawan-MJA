@@ -56,12 +56,29 @@
         statusValue: '1',
         workerMap: @js($workerMap),
         rowItems: [],
+        barangLookup: @js($barangLookup),
 
         currentIndex: 0,
         // Computed property to get current worker ID
         get currentWorkerId() {
             return this.selectedItems[this.currentIndex];
         },
+
+        updatePrices(workerId, rIdx) {
+            const row = this.rowItems[workerId][rIdx];
+            const item = this.barangLookup[row.id_barang];
+
+            if (item) {
+                // Map harga_unit -> bayaranPerusahaan
+                row.bayaranPerusahaan = item.harga_unit;
+                // Map harga_pekerja -> bayaranItem
+                row.bayaranItem = item.harga_pekerja;
+            } else {
+                row.bayaranPerusahaan = 0;
+                row.bayaranItem = 0;
+            }
+        },
+
         // Function to add a new row for a worker
         addBoronganRow(workerId) {
             if (!this.rowItems) this.rowItems = {};
@@ -565,8 +582,8 @@
                                                     <h1 class="text-base font-black text-slate-800 tracking-tight">Presensi
                                                         Borongan</h1>
                                                     <span
-                                                        class="px-2 py-0.5 bg-orange-100 text-orange-700 text-[12px] font-black uppercase tracking-widest rounded-md">System
-                                                        Active</span>
+                                                        class="px-2 py-0.5 bg-orange-100 text-orange-700 text-[12px] font-black uppercase tracking-widest rounded-md">Sistem Aktif
+                                                    </span>
                                                 </div>
                                                 <p
                                                     class="text-[12px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">
@@ -800,7 +817,13 @@
                                                                                         :key="item.id">
                                                                                         <li>
                                                                                             <button type="button"
-                                                                                                @click="row.id_barang = item.id; open = false; search = ''"
+                                                                                                @click="
+                                                                                                    row.id_barang = item.id;
+                                                                                                    row.bayaranPerusahaan = item.harga_unit; {{-- Direct mapping --}}
+                                                                                                    row.bayaranItem = item.harga_pekerja;   {{-- Direct mapping --}}
+                                                                                                    open = false;
+                                                                                                    search = ''
+                                                                                                "
                                                                                                 class="w-full text-left px-4 py-3 text-xs font-semibold transition-colors flex items-center justify-between group"
                                                                                                 :class="row.id_barang == item
                                                                                                     .id ?
@@ -876,39 +899,42 @@
 
                                                                     {{-- Baris Bawah: 3 Kolom (Reject MC & Hasil Akhir) --}}
                                                                     <div class="grid grid-cols-2 gap-3">
-                                                                        {{-- <div class="flex flex-col gap-1.5">
-                                                                            <label
-                                                                                class="text-[12px] font-black text-slate-400 uppercase tracking-widest">Rej
-                                                                                MC</label>
-                                                                            <input type="number"
-                                                                                :name="'data[' + workerId + '][' + rIdx +
-                                                                                    '][rej_mc]'"
-                                                                                x-model="row.rej_mc"
-                                                                                class="bg-slate-50 border-transparent rounded-xl px-3 py-2 text-xs font-bold focus:bg-white focus:ring-2 focus:ring-orange-100 outline-none transition-all">
-                                                                        </div> --}}
-
-                                                                        {{-- FIELD: TOTAL QTY (HASIL PRODUKSI) --}}
+                                                                        {{-- FIELD: BAYARAN PERUSAHAAN --}}
                                                                         <div class="flex flex-col gap-1.5">
                                                                             <label
-                                                                                class="text-[12px] font-black text-slate-500 uppercase tracking-widest">Bayaran Perusahaan
+                                                                                class="text-[12px] font-black text-slate-500 uppercase tracking-widest">
+                                                                                Bayaran Perusahaan
                                                                             </label>
-                                                                            <input type="number" readonly
-                                                                                :name="'data[' + workerId + '][' + rIdx +
-                                                                                    '][bayaranPerusahaan]'"
-                                                                                x-model="row.bayaranPerusahaan"
-                                                                                class="bg-slate-100 border-transparent rounded-xl px-3 py-2 text-xs font-black text-slate-700 focus:bg-white focus:ring-2 focus:ring-slate-200 outline-none transition-all">
+                                                                            <div class="relative flex items-center">
+                                                                                <!-- Currency Prefix -->
+                                                                                <span
+                                                                                    class="absolute left-3 text-[10px] font-black text-slate-400">Rp.</span>
+
+                                                                                <input type="number" readonly
+                                                                                    :name="'data[' + workerId + '][' + rIdx +
+                                                                                        '][bayaranPerusahaan]'"
+                                                                                    x-model="row.bayaranPerusahaan"
+                                                                                    class="w-full bg-slate-100 border-transparent rounded-xl pl-10 pr-3 py-2 text-xs font-black text-slate-700 focus:bg-white focus:ring-2 focus:ring-slate-200 outline-none transition-all">
+                                                                            </div>
                                                                         </div>
 
                                                                         {{-- FIELD: BAYARAN ITEM (BASIS GAJI) --}}
                                                                         <div class="flex flex-col gap-1.5">
                                                                             <label
-                                                                                class="text-[12px] font-black text-orange-600 uppercase tracking-widest">Bayaran
-                                                                                Item</label>
-                                                                            <input type="number" readonly
-                                                                                :name="'data[' + workerId + '][' + rIdx +
-                                                                                    '][bayaranItem]'"
-                                                                                x-model="row.bayaranItem"
-                                                                                class="bg-orange-50 border border-orange-100 rounded-xl px-3 py-2 text-xs font-black text-orange-700 focus:bg-white focus:ring-2 focus:ring-orange-100 outline-none transition-all">
+                                                                                class="text-[12px] font-black text-orange-600 uppercase tracking-widest">
+                                                                                Bayaran Item
+                                                                            </label>
+                                                                            <div class="relative flex items-center">
+                                                                                <!-- Currency Prefix -->
+                                                                                <span
+                                                                                    class="absolute left-3 text-[10px] font-black text-orange-300">Rp.</span>
+
+                                                                                <input type="number" readonly
+                                                                                    :name="'data[' + workerId + '][' + rIdx +
+                                                                                        '][bayaranItem]'"
+                                                                                    x-model="row.bayaranItem"
+                                                                                    class="w-full bg-orange-50 border border-orange-100 rounded-xl pl-10 pr-3 py-2 text-xs font-black text-orange-700 focus:bg-white focus:ring-2 focus:ring-orange-100 outline-none transition-all">
+                                                                            </div>
                                                                         </div>
                                                                     </div>
                                                                 </div>

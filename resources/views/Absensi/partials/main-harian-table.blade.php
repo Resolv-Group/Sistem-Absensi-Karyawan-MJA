@@ -1,6 +1,10 @@
 @forelse($pkwtPekerja as $u)
     @php
-        $absensi = $u->pekerja->absensiPekerja->firstWhere('tgl_absensi', $date);
+        $absensi = $u->pekerja->absensiPekerja
+        ->where('tgl_absensi', $date)
+        ->where('id_unit', $u->id_unit)
+        ->first();
+
         $detil = $absensi?->detilHarian;
     @endphp
 

@@ -89,12 +89,12 @@ class AbsensiController extends Controller
             );
         }
 
-        // 2. Query Utama: Ambil PKWT + Pekerja + Absensi (pada tgl tsb) + DetilHarian
+        // 2. Query Utama: Ambil PKWT + Pekerja + Absensi (pada tgl tsb) + DetilHarian + status aktif PKWT
         $pkwtQuery = PKWT::with([
             'pekerja.absensi' => function ($q) use ($date, $id_unit) {
                 $q->where('tgl_absensi', $date)->where('id_unit', $id_unit)->with('detilHarian');
             },
-        ])->where('id_unit', $id_unit);
+        ])->where('id_unit', $id_unit)->where('status_aktif', 1);
 
         // 3. Filter Pencarian (Nama/NIK)
         if ($request->filled('search')) {
@@ -174,13 +174,14 @@ class AbsensiController extends Controller
         }
 
         $barangs = Borongan::where('id_unit', $id_unit)->orderBy('nama_item', 'asc')->get();
+        $barangLookup = $barangs->keyBy('id');
 
         // 2. Query Utama: Ambil PKWT + Pekerja + Absensi (pada tgl tsb) + detilBorongan
         $pkwtQuery = PKWT::with([
             'pekerja.absensi' => function ($q) use ($date, $id_unit) {
                 $q->where('tgl_absensi', $date)->where('id_unit', $id_unit)->with('detilBorongan');
             },
-        ])->where('id_unit', $id_unit);
+        ])->where('id_unit', $id_unit)->where('status_aktif', 1);
 
         // 3. Filter Pencarian (Nama/NIK)
         if ($request->filled('search')) {
@@ -213,7 +214,7 @@ class AbsensiController extends Controller
 
         // 4. Handle AJAX Response
         if ($request->ajax()) {
-            return view('Absensi.partials.main-borongan-table', compact('pkwtPekerja', 'unit', 'date', 'barangs'))->render();
+            return view('Absensi.partials.main-borongan-table', compact('pkwtPekerja', 'unit', 'date', 'barangs', 'barangLookup'))->render();
         }
 
         // 5. Worker Map untuk Modal
@@ -234,7 +235,7 @@ class AbsensiController extends Controller
             })
             ->count();
 
-        return view('Absensi.detail.main-borongan', compact('unit', 'date', 'workerMap', 'pkwtPekerja', 'totalHadir', 'barangs'));
+        return view('Absensi.detail.main-borongan', compact('unit', 'date', 'workerMap', 'pkwtPekerja', 'totalHadir', 'barangs', 'barangLookup'));
     }
 
     // public function bulkAbsensiUpdate(Request $request)
