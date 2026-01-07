@@ -40,7 +40,7 @@
             <div class="flex justify-between items-start z-10 relative">
                 <div>
                     <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Total Unit</p>
-                    <h3 class="text-3xl font-extrabold text-gray-900">{{ $totalAbsensi }}</h3>
+                    <h3 class="text-3xl font-extrabold text-gray-900">{{ $totalUnit }}</h3>
                 </div>
                 <div
                     class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform">
@@ -86,7 +86,7 @@
             <div class="flex justify-between items-start z-10 relative">
                 <div>
                     <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Total Absen Pekerja</p>
-                    <h3 class="text-3xl font-extrabold text-gray-900">{{ $totalAbsensi ?? 0 }}</h3>
+                    <h3 class="text-3xl font-extrabold text-gray-900">{{ $totalAbsen ?? 0 }}</h3>
                 </div>
                 <div
                     class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-50 to-purple-100 flex items-center justify-center text-purple-600 group-hover:scale-110 transition-transform">
@@ -108,7 +108,7 @@
             <div class="flex justify-between items-start z-10 relative">
                 <div>
                     <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Perkerja dekat penilaian</p>
-                    <h3 class="text-3xl font-extrabold text-gray-900">{{ $totalAbsensi }}</h3>
+                    <h3 class="text-3xl font-extrabold text-gray-900">{{ $totalPenilaian }}</h3>
                 </div>
                 <div
                     class="w-10 h-10 rounded-xl bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center text-red-600 group-hover:scale-110 transition-transform">

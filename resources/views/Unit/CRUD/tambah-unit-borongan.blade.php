@@ -211,8 +211,9 @@
 
                                 {{-- 4. Gaji Pekerja --}}
                                 <div>
-                                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Harga
-                                        Barang Pekerja</label>
+                                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
+                                        Harga Barang Pekerja (Potongan {{ $unitSelected->persentase_management_fee ?? 0 }}%)
+                                    </label>
                                     <div class="relative">
                                         <span
                                             class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-bold">Rp</span>
@@ -229,7 +230,7 @@
 
                                     </div>
                                 </div>
-
+                                
                                 {{-- 4. Satuan  --}}
                                 <div x-data="{ open: false, selected: '{{ old('satuan') }}' || '', list: [{ val: '1', label: 'Rue' }, { val: '2', label: 'M' }, { val: '3', label: 'Biji' }, { val: '4', label: 'Unit' }] }" class="relative">
                                     <label class="block text-sm font-bold text-gray-700 mb-1">Satuan</label>
@@ -313,6 +314,7 @@
 
 @section('scripts')
     <script>
+        
         function unitCombobox() {
             return {
                 list: @json($units ?? []),
@@ -413,6 +415,8 @@
         window.kategoriData = @json($kategoriList);
         window.workersData = @json($pekerjaList ?? []);
 
+        const managementFee = {{ $unitSelected->persentase_management_fee ?? 0 }} / 100;
+
         // 2. FORM LOGIC
         function boronganForm() {
             return {
@@ -442,20 +446,22 @@
                     this.borongan.splice(index, 1);
                 },
 
+                
+
                 autoHitung(row) {
                 if (row.manual) return;
 
                 const unit = Number(row.harga_unit || 0);
 
                 // Hitung 82%
-                const hasil = unit * 0.82;
+                const hasil = unit * (1 - managementFee);
 
                 // Simpan 2 angka di belakang koma
                 row.harga_pekerja = Number(hasil.toFixed(2));
             }
 
-            }
         }
+    }
 
 
         // 3. GENERIC STRING COMBOBOX (For Divisi & Jabatan)

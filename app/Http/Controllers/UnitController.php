@@ -27,7 +27,7 @@ class UnitController extends Controller
         $tidakAktif = Unit::where('status_aktif', '!=', '1')->count(); // pekerja tidak aktif
         $totalHarian = Unit::where('sistem_pengajian', 1)->count();
         $totalBorongan = Unit::where('sistem_pengajian', 2)->count();
-
+        
         // --- 2. BUILD QUERY ---
         $query = Unit::query()
             ->with(['picUnit.staff', 'namaMitra'])

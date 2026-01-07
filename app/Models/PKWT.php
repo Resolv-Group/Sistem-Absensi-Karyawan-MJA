@@ -19,6 +19,11 @@ class PKWT extends Model
         return $this->belongsTo(Pekerja::class, 'id_pekerja', 'id');
     }
 
+    public function unit()
+    {
+        return $this->belongsTo(Unit::class, 'id_unit');
+    }
+
     public function getStatusPkwtAttribute()
     {
         if (!$this->tgl_akhir_pkwt) {
