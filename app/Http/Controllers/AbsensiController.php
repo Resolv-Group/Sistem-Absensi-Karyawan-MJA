@@ -23,6 +23,8 @@ class AbsensiController extends Controller
     {
         $user = Auth::user();
         $staff = $user->staff;
+        $today = Carbon::today();
+        $limit = Carbon::today()->addDays(7);
 
         // 🔥 1. Ambil tanggal (default: hari ini)
         $date = $request->date ?? now()->toDateString();
@@ -39,24 +41,51 @@ class AbsensiController extends Controller
             });
         }
 
-        $units = $unitsQuery->paginate(10)->withQueryString();
+        // $units = $unitsQuery->paginate(10)->withQueryString();
 
-        // 🔥 3. TOTAL ABSENSI (jumlah unit PIC)
-        $totalAbsensi = $units->total();
+        $units = Unit::with(['namaMitra'])
+            ->whereHas('picUnit', fn ($q) =>
+                $q->where('id_pic', Auth::user()->staff->id)
+            )
+            ->paginate(10)
+            ->withQueryString();
+
+
+        // 🔥 3. TOTAL Unit (jumlah unit PIC)
+        $totalUnit = $units->total();
 
         // 🔥 4. TOTAL HADIR (detil_harian dari absensi PIC + tanggal)
-        $totalHadir = Detil_Harian::whereHas('absensi', function ($q) use ($staff, $date) {
-            $q->where('id_pic', $staff->id)->whereDate('tgl_absensi', $date);
-        })
+        $filterAbsensi = function ($q) use ($staff, $date) {
+            $q->where('id_pic', $staff->id)
+            ->whereDate('tgl_absensi', $date);
+        };
+
+        $totalHadir =
+        Detil_Harian::whereHas('absensi', $filterAbsensi)
             ->where('status_kehadiran', 1)
+            ->count()
+        +
+        Detil_Borongan::whereHas('absensi', $filterAbsensi)
+            ->where('status_kehadiran', 1)
+            ->distinct('id_absensi')
             ->count();
 
+                
+
         // 🔥 5. TOTAL ABSEN
-        $totalAbsen = Detil_Harian::whereHas('absensi', function ($q) use ($staff, $date) {
-            $q->where('id_pic', $staff->id)->whereDate('tgl_absensi', $date);
-        })
-            ->where('status_kehadiran', 0)
+        $totalPekerja = PKWT::whereHas('unit.picUnit', function ($q) use ($staff) {
+                $q->where('id_pic', $staff->id);
+            })
             ->count();
+        
+        $totalAbsen = max(0, $totalPekerja - $totalHadir);
+
+        $totalPenilaian = PKWT::whereBetween('tgl_akhir_pkwt', [$today, $limit])
+            ->whereHas('unit.picUnit', function ($q) use ($staff) {
+                $q->where('id_pic', $staff->id);
+            })
+            ->count();
+
 
         // 🔥 7. AJAX support
         if ($request->ajax()) {
@@ -64,7 +93,7 @@ class AbsensiController extends Controller
         }
 
         // 🔥 8. Return view
-        return view('Absensi.main-absensi', compact('totalAbsensi', 'totalHadir', 'totalAbsen', 'units', 'date'));
+        return view('Absensi.main-absensi', compact('totalUnit', 'totalHadir', 'totalAbsen', 'totalPenilaian', 'units', 'date'));
     }
 
     public function ViewHarian(Request $request, $id_unit, $date)
@@ -96,6 +125,8 @@ class AbsensiController extends Controller
             },
         ])->where('id_unit', $id_unit)->where('status_aktif', 1);
 
+
+
         // 3. Filter Pencarian (Nama/NIK)
         if ($request->filled('search')) {
             $search = $request->search;
@@ -123,6 +154,7 @@ class AbsensiController extends Controller
             });
         }
 
+
         $pkwtPekerja = $pkwtQuery->paginate(25);
 
         // 4. Handle AJAX Response
@@ -147,6 +179,8 @@ class AbsensiController extends Controller
                 $q->where('status_kehadiran', 1);
             })
             ->count();
+        
+
 
         return view('Absensi.detail.main-harian', compact('unit', 'date', 'workerMap', 'pkwtPekerja', 'totalHadir'));
     }
@@ -314,6 +348,7 @@ class AbsensiController extends Controller
     //     }
     // }
 
+    
     public function bulkAbsensiUpdate(Request $request)
     {
         $request->validate([

@@ -6,8 +6,7 @@
 
         <td class="px-6 py-4 whitespace-nowrap align-top max-w-[450px]">
             <div class="flex items-start">
-
-                <div class="ml-4 min-w-0">
+                <div class="min-w-0">
                     <div class="text-sm font-bold text-gray-900 truncate max-w-xs" title="{{ $un->nama_unit ?? '-' }}">
                         {{ $un->nama_unit ?? '-' }}
                     </div>
@@ -18,7 +17,7 @@
 
         <td class="px-6 py-4 whitespace-nowrap text-center align-top">
             <span class="inline-flex items-center px-2.5 py-1 rounded-md text-sm font-bold bg-gray-100 text-gray-800">
-                {{ $un->pkwt_count ?? '-' }}
+                {{ $un->total_pekerja ?? '-' }}
             </span>
             <div class="text-[10px] text-gray-400 mt-1 uppercase tracking-wider">Orang</div>
         </td>
@@ -45,15 +44,15 @@
         <td class="px-6 py-4 whitespace-nowrap text-center align-top">
             <span
                 class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100">
-                {{ $un->pkwt_count ?? '-' }}
+                {{ $un->total_belum_absen ?? '-' }}
             </span>
             <div class="text-[10px] text-gray-400 mt-1 uppercase tracking-wider">Orang</div>
         </td>
 
         <td class="px-6 py-4 whitespace-nowrap text-center align-top">
             <span
-                class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100">
-                {{ $un->namaMitra->nama_mitra ?? '-' }}
+                class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-blue-50 text-red-700 border border-blue-100">
+                {{ $un->total_penilaian ?? '-' }}
             </span>
             <div class="text-[10px] text-gray-400 mt-1 uppercase tracking-wider">Orang</div>
         </td>

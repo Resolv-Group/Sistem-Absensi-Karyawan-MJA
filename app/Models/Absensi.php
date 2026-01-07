@@ -30,7 +30,9 @@ class Absensi extends Model
         return $this->belongsTo(Pekerja::class, 'id_pekerja', 'id');
     }
 
-
-
+    public function unit()
+    {
+        return $this->belongsTo(Unit::class, 'id_unit');
+    }
 
 }

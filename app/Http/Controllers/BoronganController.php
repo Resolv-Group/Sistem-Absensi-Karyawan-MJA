@@ -48,6 +48,7 @@ class BoronganController extends Controller
         $unitSelected = Unit::with('namaMitra')->where('id', $id_unit)->firstOrFail();
         $kategoriList = Kategori::select('id', 'nama')->get();
 
+
         return view('Unit.CRUD.tambah-unit-borongan', compact('unitSelected', 'units', 'kategoriList'));
     }
 
