@@ -90,7 +90,7 @@
             </div>
         </td>
 
-        <td class="px-6 py-4 whitespace-nowrap text-center">
+        {{-- <td class="px-6 py-4 whitespace-nowrap text-center">
             @if ($s->status_aktif == 1)
                 <span
                     class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
@@ -104,7 +104,7 @@
                     Non-Aktif
                 </span>
             @endif
-        </td>
+        </td> --}}
 
         <td class="px-6 py-4 whitespace-nowrap text-center">
             @if ($s->status_aktif == 1)

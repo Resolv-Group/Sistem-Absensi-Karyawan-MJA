@@ -36,10 +36,10 @@
                         </th>
 
                         {{-- COLUMN 4: STATUS  --}}
-                        <th scope="col"
+                        {{-- <th scope="col"
                             class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">
                             Status PKWT
-                        </th>
+                        </th> --}}
 
                         <th scope="col"
                             class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">

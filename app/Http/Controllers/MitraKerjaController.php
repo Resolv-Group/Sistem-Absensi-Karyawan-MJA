@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\BidangUsaha;
 use App\Models\History;
 use App\Models\MitraKerja;
+use App\Models\PKWT;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class MitraKerjaController extends Controller
 {
@@ -53,11 +55,11 @@ class MitraKerjaController extends Controller
         });
 
         // --- 3. FETCH DATA ---
-        $mitraKerja = $query->orderBy('created_at', 'desc')
+        $mitraKerja = $query->withCount('units')
+        ->orderBy('created_at', 'desc')
                         ->paginate(10)
                         ->withQueryString();
 
-        
         // --- 4. RETURN RESPONSE ---
 
         // If AJAX request (from the search/filter script), return ONLY the table partial
