@@ -60,7 +60,7 @@ class PekerjaController extends Controller
 
 
         // --- 2. BUILD QUERY ---
-        $query = Pekerja::query();
+        $query = Pekerja::with(['pkwtAktif']);
 
         // A. Filter by Search (Name, NIK, KPJ)
         // We check for 'search' (from new JS) or 'q' (fallback)

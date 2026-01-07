@@ -73,12 +73,21 @@
         </td>
 
         <td class="px-6 py-4 whitespace-nowrap text-center">
-            <span
-                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 border border-red-200">
-                <span class="w-1.5 h-1.5 bg-red-500 rounded-full mr-1.5"></span>
-                Non-Aktif
-            </span>
-        </td>
+    @if ($p->pkwtAktif)
+        <span
+            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 border border-emerald-200">
+            <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full mr-1.5"></span>
+            Aktif
+        </span>
+    @else
+        <span
+            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 border border-red-200">
+            <span class="w-1.5 h-1.5 bg-red-500 rounded-full mr-1.5"></span>
+            Non-Aktif
+        </span>
+    @endif
+</td>
+
 
         <td class="px-6 py-4 whitespace-nowrap text-center">
             @if ($p->status_aktif)

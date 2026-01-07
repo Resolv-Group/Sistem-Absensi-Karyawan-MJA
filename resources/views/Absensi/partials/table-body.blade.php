@@ -77,6 +77,8 @@
             </td>
         @endif
     </tr>
+
+
 @empty
     <tr>
         <td colspan="7" class="px-6 py-10 text-center text-gray-500">
@@ -87,7 +89,6 @@
                     </path>
                 </svg>
                 <p class="font-medium">Belum ada absen.</p>
-                {{-- <p class="text-sm mt-1">Silakan tambah mitra kerja baru.</p> --}}
             </div>
         </td>
     </tr>
