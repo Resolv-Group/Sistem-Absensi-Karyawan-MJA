@@ -55,7 +55,7 @@
         filterVerifikasi: '',
         statusValue: '1',
         workerMap: @js($workerMap),
-        rowItems: [],
+        rowItems: @js($existingBorongan),
         barangLookup: @js($barangLookup),
 
         currentIndex: 0,
@@ -812,7 +812,7 @@
                                                                                     <template
                                                                                         x-for="item in options.filter(b =>
                                                                                             b.nama_item.toLowerCase().includes(search.toLowerCase()) &&
-                                                                                            !rowItems[workerId].some(r => r.id_barang == b.id && r !== row)
+                                                                                            !rowItems[workerId]?.some(r => r.id_barang == b.id)
                                                                                         )"
                                                                                         :key="item.id">
                                                                                         <li>
