@@ -70,14 +70,14 @@ class AbsensiController extends Controller
             ->distinct('id_absensi')
             ->count();
 
-                
+
 
         // 🔥 5. TOTAL ABSEN
         $totalPekerja = PKWT::whereHas('unit.picUnit', function ($q) use ($staff) {
                 $q->where('id_pic', $staff->id);
             })
             ->count();
-        
+
         $totalAbsen = max(0, $totalPekerja - $totalHadir);
 
         $totalPenilaian = PKWT::whereBetween('tgl_akhir_pkwt', [$today, $limit])
@@ -179,7 +179,7 @@ class AbsensiController extends Controller
                 $q->where('status_kehadiran', 1);
             })
             ->count();
-        
+
 
 
         return view('Absensi.detail.main-harian', compact('unit', 'date', 'workerMap', 'pkwtPekerja', 'totalHadir'));
@@ -211,11 +211,15 @@ class AbsensiController extends Controller
         $barangLookup = $barangs->keyBy('id');
 
         // 2. Query Utama: Ambil PKWT + Pekerja + Absensi (pada tgl tsb) + detilBorongan
+
         $pkwtQuery = PKWT::with([
             'pekerja.absensi' => function ($q) use ($date, $id_unit) {
-                $q->where('tgl_absensi', $date)->where('id_unit', $id_unit)->with('detilBorongan');
+                $q->where('tgl_absensi', $date)
+                ->where('id_unit', $id_unit)
+                ->with('detilBorongan');
             },
-        ])->where('id_unit', $id_unit)->where('status_aktif', 1);
+        ])->where('id_unit', $id_unit)
+        ->where('status_aktif', 1);
 
         // 3. Filter Pencarian (Nama/NIK)
         if ($request->filled('search')) {
@@ -244,11 +248,34 @@ class AbsensiController extends Controller
             });
         }
 
-        $pkwtPekerja = $pkwtQuery->paginate(25);
+        $pkwtPekerja = $pkwtQuery->paginate(25)->withQueryString();;
+
+        $existingBorongan = [];
+
+        foreach ($pkwtPekerja as $pkwt) {
+            $absensi = Absensi::where('id_pekerja', $pkwt->pekerja->id)
+                ->whereDate('tgl_absensi', $date)
+                ->where('id_unit', $pkwt->id_unit)
+                ->first();
+            if ($absensi && $absensi->detilBorongan->isNotEmpty()) {
+                $existingBorongan[$pkwt->id] = $absensi->detilBorongan->map(function ($d) {
+                    return [
+                        'id_barang' => $d->id_barang,
+                        'FD' => $d->FD,
+                        'act_rej' => $d->act_rej,
+                        'good_mc' => $d->good_mc,
+                        'bayaranPerusahaan' => $d->bayaran_perusahaan,
+                        'bayaranItem' => $d->bayaran_item,
+                        'catatan' => $d->catatan,
+                        'fileName' => null,
+                    ];
+                })->values();
+            }
+        }
 
         // 4. Handle AJAX Response
         if ($request->ajax()) {
-            return view('Absensi.partials.main-borongan-table', compact('pkwtPekerja', 'unit', 'date', 'barangs', 'barangLookup'))->render();
+            return view('Absensi.partials.main-borongan-table', compact('pkwtPekerja', 'unit', 'date', 'barangs', 'barangLookup', 'existingBorongan'))->render();
         }
 
         // 5. Worker Map untuk Modal
@@ -269,7 +296,7 @@ class AbsensiController extends Controller
             })
             ->count();
 
-        return view('Absensi.detail.main-borongan', compact('unit', 'date', 'workerMap', 'pkwtPekerja', 'totalHadir', 'barangs', 'barangLookup'));
+        return view('Absensi.detail.main-borongan', compact('unit', 'date', 'workerMap', 'pkwtPekerja', 'totalHadir', 'barangs', 'barangLookup', 'existingBorongan'));
     }
 
     // public function bulkAbsensiUpdate(Request $request)
@@ -348,7 +375,7 @@ class AbsensiController extends Controller
     //     }
     // }
 
-    
+
     public function bulkAbsensiUpdate(Request $request)
     {
         $request->validate([
