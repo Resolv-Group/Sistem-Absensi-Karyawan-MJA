@@ -903,7 +903,7 @@
                                                                         <div class="flex flex-col gap-1.5">
                                                                             <label
                                                                                 class="text-[12px] font-black text-slate-500 uppercase tracking-widest">
-                                                                                Bayaran Perusahaan
+                                                                                Tagihan Perusahaan
                                                                             </label>
                                                                             <div class="relative flex items-center">
                                                                                 <!-- Currency Prefix -->
@@ -922,7 +922,7 @@
                                                                         <div class="flex flex-col gap-1.5">
                                                                             <label
                                                                                 class="text-[12px] font-black text-orange-600 uppercase tracking-widest">
-                                                                                Bayaran Item
+                                                                                Bayaran Pekerja
                                                                             </label>
                                                                             <div class="relative flex items-center">
                                                                                 <!-- Currency Prefix -->
