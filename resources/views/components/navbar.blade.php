@@ -25,51 +25,48 @@
         <li>
             <a href="{{ route('view.dashboard') }}"
                 class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all duration-300
-                {{ Request::is('dashboard') ? 'bg-white text-red-600 shadow-sm ring-1 ring-black/5' : 'text-gray-500 hover:text-gray-900 hover:bg-white/50' }}">
-                <svg class="w-4 h-4 {{ Request::is('dashboard') ? 'text-red-500' : '' }}" fill="none"
-                    viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                {{ request()->routeIs('view.dashboard') ? 'bg-white text-red-600 shadow-sm ring-1 ring-black/5' : 'text-gray-500 hover:text-gray-900 hover:bg-white/50' }}">
+                <svg class="w-4 h-4 {{ request()->routeIs('view.dashboard') ? 'text-red-500' : '' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                 </svg>
                 <span>Dashboard</span>
             </a>
         </li>
 
-        {{-- Role Based Menus --}}
-        @foreach ([
-        ['role' => ['admin', 'hrd'], 'route' => 'view.pekerja', 'label' => 'Pekerja', 'pattern' => 'pekerja*', 'icon' => 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z'],
-        // ['role' => ['admin', 'hrd', 'akuntan'], 'url' => '/payroll', 'label' => 'Payroll', 'pattern' => 'payroll*', 'icon' => 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.407 2.646 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.407-2.646-1M12 16a6.002 6.002 0 006-4m-12 0a6.002 6.002 0 006 4m6-4V7a1 1 0 00-1-1H7a1 1 0 00-1 1v10a1 1 0 001 1h10a1 1 0 001-1v-4'],
-        ['role' => ['admin', 'hrd', 'akuntan'], 'route' => 'view.staff', 'label' => 'Staff', 'pattern' => 'staff*', 'icon' => 'M21 13.255A2.396 2.396 0 0019.5 13H17c-1.105 0-2 .895-2 2s.895 2 2 2h2.5c.39 0 .753-.105 1.055-.255A5.002 5.002 0 1121 13.255zM11 13.255A2.396 2.396 0 009.5 13H7c-1.105 0-2 .895-2 2s.895 2 2 2h2.5c.39 0 .753-.105 1.055-.255A5.002 5.002 0 1111 13.255z'],
+    {{-- Role Based Menus --}}
+    @foreach ([
+        ['role' => ['admin', 'hrd'], 'route' => 'view.pekerja', 'label' => 'Pekerja', 'pattern' => 'view.pekerja*', 'icon' => 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z'],
+        ['role' => ['admin', 'hrd', 'akuntan'], 'url' => '/payroll', 'label' => 'Payroll', 'pattern' => 'payroll*', 'icon' => 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.407 2.646 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.407-2.646-1M12 16a6.002 6.002 0 006-4m-12 0a6.002 6.002 0 006 4m6-4V7a1 1 0 00-1-1H7a1 1 0 00-1 1v10a1 1 0 001 1h10a1 1 0 001-1v-4'],
+        ['role' => ['admin', 'hrd', 'akuntan'], 'route' => 'view.staff', 'label' => 'Staff', 'pattern' => 'view.staff*', 'icon' => 'M21 13.255A2.396 2.396 0 0019.5 13H17c-1.105 0-2 .895-2 2s.895 2 2 2h2.5c.39 0 .753-.105 1.055-.255A5.002 5.002 0 1121 13.255zM11 13.255A2.396 2.396 0 009.5 13H7c-1.105 0-2 .895-2 2s.895 2 2 2h2.5c.39 0 .753-.105 1.055-.255A5.002 5.002 0 1111 13.255z'],
         ['role' => ['admin', 'hrd'], 'url' => '/mitra-kerja', 'label' => 'Mitra', 'pattern' => 'mitra-kerja*', 'icon' => 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4'],
     ] as $item)
-            @if (in_array(Auth::user()->role, $item['role']))
-                <li>
-                    {{-- Jika ada route, maka gunakan fungsi route() bawaan Laravel.
-                        Jika tidak ada (seperti pada menu Mitra), maka gunakan alamat url mentah. --}}
-                    <a href="{{ isset($item['route']) ? route($item['route']) : $item['url'] }}"
-                        class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all duration-300
-                        {{ Request::is($item['pattern']) ? 'bg-white text-red-600 shadow-sm ring-1 ring-black/5' : 'text-gray-500 hover:text-gray-900 hover:bg-white/50' }}">
-                        <svg class="w-4 h-4 {{ Request::is($item['pattern']) ? 'text-red-500' : '' }}" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="{{ $item['icon'] }}" />
-                        </svg>
-                        <span>{{ $item['label'] }}</span>
-                    </a>
-                </li>
-            @endif
-        @endforeach
+        @php
+            // Logic to check active state: works for both Route names and URL patterns
+            $isActive = isset($item['route']) ? request()->routeIs($item['pattern']) : Request::is($item['pattern']);
+        @endphp
+
+        @if (in_array(Auth::user()->role, $item['role']))
+            <li>
+                <a href="{{ isset($item['route']) ? route($item['route']) : $item['url'] }}"
+                    class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all duration-300
+                    {{ $isActive ? 'bg-white text-red-600 shadow-sm ring-1 ring-black/5' : 'text-gray-500 hover:text-gray-900 hover:bg-white/50' }}">
+                    <svg class="w-4 h-4 {{ $isActive ? 'text-red-500' : '' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $item['icon'] }}" />
+                    </svg>
+                    <span>{{ $item['label'] }}</span>
+                </a>
+            </li>
+        @endif
+    @endforeach
 
         {{-- Unit Logic --}}
         @if (in_array(Auth::user()->role, ['admin', 'hrd']))
             <li>
                 <a href="/unit"
                     class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all duration-300
-                    {{ Request::is('unit*') ? 'bg-white text-red-600 shadow-sm ring-1 ring-black/5' : 'text-gray-500 hover:text-gray-900 hover:bg-white/50' }}">
-                    <svg class="w-4 h-4 {{ Request::is('unit*') ? 'text-red-500' : '' }}" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                    {{ Request::is('unit*') || request()->routeIs('view.detail.unit*') ? 'bg-white text-red-600 shadow-sm ring-1 ring-black/5' : 'text-gray-500 hover:text-gray-900 hover:bg-white/50' }}">
+                    <svg class="w-4 h-4 {{ Request::is('unit*') ? 'text-red-500' : '' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                     </svg>
                     <span>Unit</span>
                 </a>
@@ -117,10 +114,8 @@
                 <a href="/absensi"
                     class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all duration-300
                     {{ Request::is('absensi*') ? 'bg-white text-red-600 shadow-sm ring-1 ring-black/5' : 'text-gray-500 hover:text-gray-900 hover:bg-white/50' }}">
-                    <svg class="w-4 h-4 {{ Request::is('absensi*') ? 'text-red-500' : '' }}" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                    <svg class="w-4 h-4 {{ Request::is('absensi*') ? 'text-red-500' : '' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
                     </svg>
                     <span>Absensi</span>
                 </a>

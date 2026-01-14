@@ -64,19 +64,46 @@
             return this.selectedItems[this.currentIndex];
         },
 
+        formatRibuan(number) {
+            if (!number) return '0';
+            return new Intl.NumberFormat('id-ID').format(number);
+        },
+
         updatePrices(workerId, rIdx) {
             const row = this.rowItems[workerId][rIdx];
             const item = this.barangLookup[row.id_barang];
 
-            if (item) {
-                // Map harga_unit -> bayaranPerusahaan
-                row.bayaranPerusahaan = item.harga_unit;
-                // Map harga_pekerja -> bayaranItem
-                row.bayaranItem = item.harga_pekerja;
+            // 1. Calculate the current Total QTY
+            const totalQTY = (parseInt(row.FD) || 0) +
+                            (parseInt(row.act_rej) || 0) +
+                            (parseInt(row.good_mc) || 0);
+
+            // 2. Update the row object so the UI knows the total
+            row.totalQTY = totalQTY;
+
+            if (item && totalQTY > 0) {
+                // rumus: totalQTY * harga_unit
+                row.bayaranPerusahaan = totalQTY * item.harga_unit;
+
+                // rumus: totalQTY * harga_pekerja
+                row.bayaranItem = totalQTY * item.harga_pekerja;
             } else {
+                // Reset to 0 if no item selected or QTY is 0
                 row.bayaranPerusahaan = 0;
                 row.bayaranItem = 0;
             }
+        },
+
+        calculateAllExistingPrices() {
+            if (!this.rowItems) return;
+
+            // Loop through every worker in the existing data
+            Object.keys(this.rowItems).forEach(workerId => {
+                // Loop through every row for that worker
+                this.rowItems[workerId].forEach((row, rIdx) => {
+                    this.updatePrices(workerId, rIdx);
+                });
+            });
         },
 
         // Function to add a new row for a worker
@@ -209,7 +236,9 @@
             // Our logic inside updateTable will see filters are empty and restore Page 2
         },
 
-    }" x-init="$watch('searchQuery', () => updateTable());
+    }" x-init="
+    calculateAllExistingPrices();
+    $watch('searchQuery', () => updateTable());
     $watch('filterStatus', () => updateTable());
     $watch('filterVerifikasi', () => updateTable());">
 
@@ -869,7 +898,8 @@
                                                                             <input type="number"
                                                                                 :name="'data[' + workerId + '][' + rIdx +
                                                                                     '][FD]'"
-                                                                                x-model="row.FD"
+                                                                                x-model.number="row.FD"
+                                                                                @input="updatePrices(workerId, rIdx)"
                                                                                 class="bg-slate-50 border-transparent rounded-xl px-3 py-2 text-xs font-bold focus:bg-white focus:ring-2 focus:ring-orange-100 outline-none transition-all">
                                                                         </div>
 
@@ -880,7 +910,8 @@
                                                                             <input type="number"
                                                                                 :name="'data[' + workerId + '][' + rIdx +
                                                                                     '][act_rej]'"
-                                                                                x-model="row.act_rej"
+                                                                                    x-model.number="row.act_rej"
+                                                                                    @input="updatePrices(workerId, rIdx)"
                                                                                 class="bg-slate-50 border-transparent rounded-xl px-3 py-2 text-xs font-bold focus:bg-white focus:ring-2 focus:ring-orange-100 outline-none transition-all">
                                                                         </div>
 
@@ -892,48 +923,73 @@
                                                                             <input type="number"
                                                                                 :name="'data[' + workerId + '][' + rIdx +
                                                                                     '][good_mc]'"
-                                                                                x-model="row.good_mc"
+                                                                                    x-model.number="row.good_mc"
+                                                                                    @input="updatePrices(workerId, rIdx)"
                                                                                 class="bg-slate-50 border-transparent rounded-xl px-3 py-2 text-xs font-bold focus:bg-white focus:ring-2 focus:ring-emerald-50 outline-none transition-all">
                                                                         </div>
                                                                     </div>
 
-                                                                    {{-- Baris Bawah: 3 Kolom (Reject MC & Hasil Akhir) --}}
-                                                                    <div class="grid grid-cols-2 gap-3">
-                                                                        {{-- FIELD: BAYARAN PERUSAHAAN --}}
-                                                                        <div class="flex flex-col gap-1.5">
-                                                                            <label
-                                                                                class="text-[12px] font-black text-slate-500 uppercase tracking-widest">
-                                                                                Bayaran Perusahaan
-                                                                            </label>
-                                                                            <div class="relative flex items-center">
-                                                                                <!-- Currency Prefix -->
-                                                                                <span
-                                                                                    class="absolute left-3 text-[10px] font-black text-slate-400">Rp.</span>
-
-                                                                                <input type="number" readonly
-                                                                                    :name="'data[' + workerId + '][' + rIdx +
-                                                                                        '][bayaranPerusahaan]'"
-                                                                                    x-model="row.bayaranPerusahaan"
-                                                                                    class="w-full bg-slate-100 border-transparent rounded-xl pl-10 pr-3 py-2 text-xs font-black text-slate-700 focus:bg-white focus:ring-2 focus:ring-slate-200 outline-none transition-all">
+                                                                    {{-- 2. TOTAL QUANTITY DISPLAY (Matches the UI Vibe) --}}
+                                                                    <div class="mt-4 p-4 rounded-2xl border-2 border-dashed border-orange-100 bg-orange-50/30 flex items-center justify-between">
+                                                                        <div class="flex items-center gap-3">
+                                                                            <div class="p-2 bg-orange-100 rounded-lg">
+                                                                                <svg class="w-4 h-4 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                                                                </svg>
+                                                                            </div>
+                                                                            <div>
+                                                                                <p class="text-[10px] font-black text-orange-400 uppercase tracking-widest leading-none">Total Produksi</p>
+                                                                                <p class="text-[11px] font-bold text-slate-500 mt-1">Akumulasi QTY Terinput</p>
                                                                             </div>
                                                                         </div>
 
-                                                                        {{-- FIELD: BAYARAN ITEM (BASIS GAJI) --}}
-                                                                        <div class="flex flex-col gap-1.5">
-                                                                            <label
-                                                                                class="text-[12px] font-black text-orange-600 uppercase tracking-widest">
-                                                                                Bayaran Item
-                                                                            </label>
-                                                                            <div class="relative flex items-center">
-                                                                                <!-- Currency Prefix -->
-                                                                                <span
-                                                                                    class="absolute left-3 text-[10px] font-black text-orange-300">Rp.</span>
+                                                                        <div class="flex items-baseline gap-1">
+                                                                            <span class="text-3xl font-black text-orange-600 tracking-tighter"
+                                                                                x-text="(parseInt(row.FD) || 0) + (parseInt(row.act_rej) || 0) + (parseInt(row.good_mc) || 0)">
+                                                                            </span>
+                                                                            <span class="text-[10px] font-black text-orange-400 uppercase">Pcs</span>
+                                                                        </div>
 
-                                                                                <input type="number" readonly
-                                                                                    :name="'data[' + workerId + '][' + rIdx +
-                                                                                        '][bayaranItem]'"
-                                                                                    x-model="row.bayaranItem"
-                                                                                    class="w-full bg-orange-50 border border-orange-100 rounded-xl pl-10 pr-3 py-2 text-xs font-black text-orange-700 focus:bg-white focus:ring-2 focus:ring-orange-100 outline-none transition-all">
+                                                                        {{-- Hidden input for form submission --}}
+                                                                        <input type="hidden" :name="'data[' + workerId + '][' + rIdx + '][totalQTY]'"
+                                                                            :value="(parseInt(row.FD) || 0) + (parseInt(row.act_rej) || 0) + (parseInt(row.good_mc) || 0)">
+                                                                    </div>
+
+                                                                    {{-- Baris Bawah: 3 Kolom (Reject MC & Hasil Akhir) --}}
+                                                                    <div class="grid grid-cols-2 gap-3 mt-4">
+                                                                        {{-- FIELD: TAGIHAN PERUSAHAAN --}}
+                                                                        <div class="flex flex-col gap-1.5">
+                                                                            <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Tagihan Perusahaan</label>
+                                                                            <div class="relative flex items-center">
+                                                                                <span class="absolute left-3 text-[10px] font-black text-slate-400">Rp.</span>
+
+                                                                                {{-- Display Only Input (With Dots) --}}
+                                                                                <input type="text" readonly
+                                                                                    :value="formatRibuan(row.bayaranPerusahaan)"
+                                                                                    class="w-full bg-slate-100 border-transparent rounded-xl pl-10 pr-3 py-2 text-xs font-black text-slate-700 outline-none">
+
+                                                                                {{-- Actual Data Input (Sent to Database) --}}
+                                                                                <input type="hidden"
+                                                                                    :name="'data[' + workerId + '][' + rIdx + '][bayaranPerusahaan]'"
+                                                                                    x-model="row.bayaranPerusahaan">
+                                                                            </div>
+                                                                        </div>
+
+                                                                        {{-- FIELD: BAYARAN PEKERJA --}}
+                                                                        <div class="flex flex-col gap-1.5">
+                                                                            <label class="text-[11px] font-black text-orange-600 uppercase tracking-widest ml-1">Bayaran Pekerja</label>
+                                                                            <div class="relative flex items-center">
+                                                                                <span class="absolute left-3 text-[10px] font-black text-orange-300">Rp.</span>
+
+                                                                                {{-- Display Only Input (With Dots) --}}
+                                                                                <input type="text" readonly
+                                                                                    :value="formatRibuan(row.bayaranItem)"
+                                                                                    class="w-full bg-orange-50 border border-orange-100 rounded-xl pl-10 pr-3 py-2 text-xs font-black text-orange-700 outline-none">
+
+                                                                                {{-- Actual Data Input (Sent to Database) --}}
+                                                                                <input type="hidden"
+                                                                                    :name="'data[' + workerId + '][' + rIdx + '][bayaranItem]'"
+                                                                                    x-model="row.bayaranItem">
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -1011,6 +1067,7 @@
                                                                         <label
                                                                             class="text-[12px] font-black text-slate-400 uppercase tracking-widest ml-1">Catatan</label>
                                                                         <textarea :name="'data[' + workerId + '][' + rIdx + '][catatan]'" rows="1"
+                                                                            x-model="row.catatan"
                                                                             placeholder="Tambahkan keterangan tambahan..."
                                                                             class="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-2.5 text-xs font-semibold text-slate-700 focus:bg-white focus:ring-2 focus:ring-orange-100 focus:border-orange-400 outline-none transition-all resize-none shadow-sm placeholder:text-slate-300"></textarea>
                                                                     </div>

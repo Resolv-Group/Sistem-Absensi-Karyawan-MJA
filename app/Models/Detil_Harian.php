@@ -10,6 +10,7 @@ class Detil_Harian extends Model
 
     protected $fillable = [
         'id_absensi',
+        'id_shift',
         'status_kehadiran',
         'waktu_masuk',
         'waktu_keluar',
@@ -25,5 +26,12 @@ class Detil_Harian extends Model
     public function absensi()
     {
         return $this->belongsTo(Absensi::class, 'id_absensi', 'id');
+    }
+
+    public function shiftAbsen()
+    {
+        // Parameter 1: Model tujuan
+        // Parameter 2: Foreign key di tabel detil_harian
+        return $this->belongsTo(Shift_Absen::class, 'id_shift');
     }
 }
