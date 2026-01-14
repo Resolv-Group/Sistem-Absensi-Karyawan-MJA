@@ -19,5 +19,6 @@ class DatabaseSeeder extends Seeder
         $this->call(DivisiSeeder::class);
         $this->call(JabatanPKWTSeeder::class);
         $this->call(KategoriSeeder::class);
+        $this->call(ShiftSeeder::class);
     }
 }

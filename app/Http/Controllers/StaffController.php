@@ -102,7 +102,21 @@ class StaffController extends Controller
 
     function viewTambahStaff()
     {
-        return view('Staff.CRUD.tambah-staff');
+        $lastStaffId = Staff::max('id'); // asumsi primary key = id
+
+        // Jika belum ada data
+        $nextNumber = ($lastStaffId ?? 0) + 1;
+
+        // Format 3 digit (001, 002, dst)
+        $numberFormatted = str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+
+        // Format tanggal: DDMMYY
+        $dateFormatted = Carbon::now()->format('dmy');
+
+        // Gabungkan
+        $defaultIdStaff = "{$numberFormatted}-{$dateFormatted}";
+        
+        return view('Staff.CRUD.tambah-staff', compact('defaultIdStaff'));
     }
 
     function viewDetailStaff($id)

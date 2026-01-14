@@ -58,7 +58,7 @@ class PKWTController extends Controller
 
         // 3. Get workers who are active but NOT in the assigned list
         // This handles the requirement: "cannot add worker if already in this or other unit"
-        $pekerjaList = Pekerja::select('id', 'nama', 'nik')->where('status_aktif', 1)->whereNotIn('id', $assignedWorkerIds)->get();
+        $pekerjaList = Pekerja::select('id', 'nama', 'nik')->where('status_aktif', 1)->get();
 
         $divisiList = Divisi::select('id', 'nama')->get();
         $jabatanList = JabatanPKWT::select('id', 'nama')->get();

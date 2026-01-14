@@ -1,7 +1,12 @@
 @extends('layout')
 
 @section('content')
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <div 
+    x-data="{
+        showTambahShift: false
+    }"
+    class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
         {{-- 1. HEADER SECTION (Unchanged) --}}
         <div class="mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
@@ -48,6 +53,153 @@
                         Aktifkan
                     @endif
                 </button>
+                <button
+                    type="button"
+                    @click="showTambahShift = true"
+                    class="group flex items-center gap-2.5 px-6 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-all shadow-lg shadow-blue-200 active:scale-95"
+                >
+                    {{-- Icon Pensil/Edit --}}
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-blue-100 group-hover:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2.5 2.5 0 113.536 3.536L12 14.207l-4 1 1-4 9.414-9.414z" />
+                    </svg>
+                    
+                    <span>Update Shift</span>
+                </button>
+
+    {{-- MODAL: Update Shift --}}
+    <div x-show="showTambahShift" 
+        x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100"
+        x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0"
+        x-data="{
+            shifts: {{ $shifts->map(fn($s) => [
+                'id' => $s->id,
+                'nama' => $s->nama,
+                'waktu_masuk' => $s->waktu_masuk,
+                'waktu_keluar' => $s->waktu_keluar,
+            ])->toJson() }},
+            addShift() {
+                this.shifts.push({ id: null, nama: '', waktu_masuk: '', waktu_keluar: '' })
+            },
+            removeShift(index) {
+                this.shifts.splice(index, 1)
+            }
+        }"
+        class="fixed inset-0 z-[50] flex items-center justify-center p-4"
+        x-cloak>
+
+        {{-- Backdrop dengan Blur Halus --}}
+        <div @click="showTambahShift = false" class="fixed inset-0 bg-slate-900/20 backdrop-blur-md"></div>
+
+        {{-- Modal Content --}}
+        <div x-show="showTambahShift"
+            x-transition:enter="transition ease-out duration-300 transform"
+            x-transition:enter-start="opacity-0 scale-95"
+            x-transition:enter-end="opacity-100 scale-100"
+            class="relative bg-white w-full max-w-2xl rounded-3xl shadow-xl overflow-hidden border border-gray-100">
+            
+            {{-- Header: Minimalist --}}
+            <div class="px-8 pt-8 pb-4 flex justify-between items-center">
+                <div>
+                    <h3 class="text-xl font-semibold text-gray-800 tracking-tight">Pengaturan Shift</h3>
+                    <p class="text-sm text-gray-400">Kelola jam operasional unit Anda</p>
+                </div>
+                <button @click="showTambahShift = false" class="p-2 text-gray-400 hover:text-gray-600 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <form action="{{ route('unit.shifts.update', $unit->id) }}" method="POST">
+                @csrf
+                @method('PUT')
+
+                <div class="px-8 py-4 max-h-[60vh] overflow-y-auto space-y-4 custom-scrollbar">
+                    
+                    {{-- SHIFT ROWS --}}
+                    <div class="space-y-3">
+                        <template x-for="(shift, index) in shifts" :key="index">
+                            <div class="group flex items-center gap-4 p-2 transition-all border-b border-gray-50 hover:border-gray-100">
+                                
+                                {{-- Input Nama --}}
+                                <div class="flex-[2]">
+                                    <label class="text-[10px] uppercase tracking-widest text-gray-400 font-semibold mb-1 block">Nama Shift</label>
+                                    <input type="text"
+                                        :name="`shifts[${index}][nama]`"
+                                        x-model="shift.nama"
+                                        placeholder="Contoh: Pagi"
+                                        class="w-full border-none bg-transparent p-0 text-sm font-medium focus:ring-0 placeholder-gray-300">
+                                </div>
+
+                                {{-- Input Masuk --}}
+                                <div class="flex-1">
+                                    <label class="text-[10px] uppercase tracking-widest text-gray-400 font-semibold mb-1 block">Masuk</label>
+                                    <input type="time"
+                                        :name="`shifts[${index}][waktu_masuk]`"
+                                        x-model="shift.waktu_masuk"
+                                        class="w-full border-none bg-transparent p-0 text-sm focus:ring-0 text-gray-600">
+                                </div>
+
+                                {{-- Input Keluar --}}
+                                <div class="flex-1">
+                                    <label class="text-[10px] uppercase tracking-widest text-gray-400 font-semibold mb-1 block">Keluar</label>
+                                    <input type="time"
+                                        :name="`shifts[${index}][waktu_keluar]`"
+                                        x-model="shift.waktu_keluar"
+                                        class="w-full border-none bg-transparent p-0 text-sm focus:ring-0 text-gray-600">
+                                </div>
+
+                                {{-- Remove Button --}}
+                                <div class="pt-4">
+                                    <button type="button" @click="removeShift(index)" 
+                                        class="p-2 text-gray-300 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                    </button>
+                                </div>
+
+                                <input type="hidden" :name="`shifts[${index}][id]`" x-model="shift.id">
+                            </div>
+                        </template>
+                    </div>
+
+                    {{-- Add Shift Button: Ultra Minimalist --}}
+                    <button type="button" @click="addShift()"
+                        class="group flex items-center gap-2 py-3 text-sm font-medium text-gray-400 hover:text-blue-500 transition-colors">
+                        <span class="flex items-center justify-center w-5 h-5 rounded-full border border-gray-200 group-hover:border-blue-500 transition-colors text-xs">+</span>
+                        Tambah shift baru
+                    </button>
+                </div>
+
+                {{-- Footer: Clean & Floating --}}
+                <div class="px-8 py-6 flex justify-end items-center gap-6">
+                    <button type="button" @click="showTambahShift = false"
+                        class="text-sm font-medium text-gray-400 hover:text-gray-600 transition-colors">
+                        Abaikan
+                    </button>
+                    <button type="submit"
+                        class="px-8 py-2.5 bg-gray-900 text-white text-sm font-medium rounded-full hover:bg-black shadow-lg shadow-gray-200 transition-all active:scale-95">
+                        Simpan Perubahan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+<style>
+    /* Menyembunyikan scrollbar tapi tetap bisa scroll */
+    .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #f1f1f1; border-radius: 10px; }
+    .custom-scrollbar:hover::-webkit-scrollbar-thumb { background: #e2e8f0; }
+</style>
+
+
                 <a href="{{ route('view.ubah.unit', $unit->id) }}"
                     class="px-4 py-2 text-sm font-medium text-white bg-black border border-black rounded-lg hover:bg-gray-800 transition shadow-sm flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
@@ -352,6 +504,9 @@
         </div>
 
     </div>
+
+
+
 @endsection
 
 @section('scripts')
