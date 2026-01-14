@@ -1,6 +1,6 @@
 @forelse($pkwtPekerja as $u)
     @php
-        $absensi = $u->pekerja->absensiPekerja->firstWhere('tgl_absensi', $date);
+        $absensi = $u->pekerja->absensiByUnitTanggal($u->id_unit, $date)->first();
 
         $detil = $absensi?->detilBorongan;
 
@@ -58,6 +58,7 @@
                                 <span class="text-[12px] font-black text-slate-300 uppercase tracking-[0.2em]">Belum Ada
                                     Output</span>
                             </div>
+
                         @else
                             <div
                                 class="flex items-center justify-between p-3 bg-white border border-slate-100 rounded-2xl shadow-sm hover:border-orange-200 transition-all group/item">

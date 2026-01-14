@@ -54,6 +54,12 @@
         filterVerifikasi: '',
         statusValue: '1',
         workerMap: @js($workerMap),
+        shifts: @js($shiftList),
+        globalShift: '',
+        openShift: false,
+        rowShift: {},
+        rowMasuk: {},
+        rowKeluar: {},
 
         // Track the current page number
         currentPage: {{ $pkwtPekerja->currentPage() }},
@@ -66,12 +72,32 @@
         rowStatus: {},
         rowCatatan: {},
 
+        selectGlobalShift(s) {
+            this.globalShift = s.id;
+            // Otomatis isi jam global berdasarkan data shift yang dipilih
+            this.globalMasuk = s.waktu_masuk; // Pastikan nama kolom sesuai di DB
+            this.globalKeluar = s.waktu_keluar;
+        },
+
+        selectRowShift(workerId, s) {
+            this.rowShift[workerId] = s.id;
+            this.rowMasuk[workerId] = s.waktu_masuk;
+            this.rowKeluar[workerId] = s.waktu_keluar;
+        },
+
         applyGlobalTime() {
             this.selectedItems.forEach(id => {
+                // 1. Apply Times to DOM inputs
                 const rowMasuk = document.getElementById('masuk-' + id);
                 const rowKeluar = document.getElementById('keluar-' + id);
                 if (rowMasuk) rowMasuk.value = this.globalMasuk;
                 if (rowKeluar) rowKeluar.value = this.globalKeluar;
+
+                // 2. Apply Shift and Status to Alpine State
+                this.rowShift[id] = this.globalShift;
+                this.rowMasuk[id] = this.globalMasuk;
+                this.rowKeluar[id] = this.globalKeluar;
+                this.rowStatus[id] = this.globalStatus;
             });
         },
 
@@ -497,7 +523,7 @@
 
                             <!-- MODAL: INPUT JAM KERJA -->
                             <div x-show="showAbsenModal"
-                                class="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6" x-cloak>
+                                class="fixed inset-0 z-[100] flex items-center justify-center p-6 sm:p-6" x-cloak>
                                 {{-- Glass Backdrop --}}
                                 <div x-show="showAbsenModal" x-transition:enter="ease-out duration-300"
                                     x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
@@ -508,7 +534,7 @@
                                 <div x-show="showAbsenModal" x-transition:enter="ease-out duration-300"
                                     x-transition:enter-start="opacity-0 scale-95 translate-y-8"
                                     x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-                                    class="relative bg-white rounded-[2.5rem] shadow-[0_30px_100px_rgba(0,0,0,0.25)] w-full max-w-4xl overflow-hidden flex flex-col max-h-[85vh] border border-white/20">
+                                    class="relative bg-white rounded-[2.5rem] shadow-[0_30px_100px_rgba(0,0,0,0.25)] w-full max-w-6xl overflow-hidden flex flex-col max-h-[85vh] border border-white/20">
 
                                     {{-- Header Section --}}
                                     <div
@@ -536,7 +562,7 @@
                                             </button>
                                         </div>
 
-                                        {{-- OCD Feature: Quick Apply Row --}}
+                                        {{-- Quick Apply Row --}}
                                         <div
                                             class="mt-6 p-4 bg-blue-50/50 rounded-2xl border border-blue-100 flex flex-wrap items-center justify-between gap-4">
                                             <div class="flex items-center gap-3">
@@ -551,16 +577,102 @@
                                                     class="text-[11px] font-black text-blue-800 uppercase tracking-wider">Terapkan
                                                     ke semua</span>
                                             </div>
+
                                             <div class="flex items-center gap-4">
-                                                <div class="flex items-center gap-2">
-                                                    <input type="time" x-model="globalMasuk"
-                                                        class="bg-white border-blue-200 p-1 rounded-md text-sm font-bold focus:ring-blue-500 shadow-sm">
-                                                    <span class="text-blue-300 font-black">-</span>
-                                                    <input type="time" x-model="globalKeluar"
-                                                        class="bg-white border-blue-200 p-1 rounded-md text-sm font-bold focus:ring-blue-500 shadow-sm">
+                                                {{-- DYNAMIC SHIFT DROPDOWN --}}
+                                                <div class="relative">
+                                                    <button type="button" @click="openShift = !openShift"
+                                                        class="flex items-center gap-3 px-4 py-2 bg-white border border-blue-200 rounded-xl text-xs font-bold text-blue-700 shadow-sm hover:border-blue-400 transition-all outline-none">
+                                                        <div class="flex flex-col items-start leading-none">
+                                                            <span class="text-[10px] uppercase font-black"
+                                                                x-text="shifts.find(s => s.id == globalShift)?.nama || 'Pilih Shift'"></span>
+                                                            <template x-if="globalShift">
+                                                                <span class="text-[9px] text-blue-400 font-bold mt-0.5"
+                                                                    x-text="shifts.find(s => s.id == globalShift).waktu_masuk + ' - ' + shifts.find(s => s.id == globalShift).waktu_keluar"></span>
+                                                            </template>
+                                                        </div>
+                                                        <svg class="w-3.5 h-3.5 text-blue-400 transition-transform"
+                                                            :class="openShift ? 'rotate-180' : ''" fill="none"
+                                                            stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path d="M19 9l-7 7-7-7" stroke-width="3"
+                                                                stroke-linecap="round" stroke-linejoin="round" />
+                                                        </svg>
+                                                    </button>
+
+                                                    {{-- DROPDOWN LIST: Ubah ke top-full agar muncul di bawah --}}
+                                                    <div x-show="openShift" @click.outside="openShift = false"
+                                                        {{-- Perubahan di sini: top-full mt-2 dan z-index sangat tinggi --}}
+                                                        class="absolute top-full mt-2 left-0 w-52 bg-white rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.1)] border border-blue-50 overflow-hidden z-[150]"
+                                                        x-transition:enter="transition ease-out duration-200"
+                                                        x-transition:enter-start="opacity-0 -translate-y-2"
+                                                        x-transition:enter-end="opacity-100 translate-y-0" x-cloak>
+
+                                                        <div class="p-2 bg-blue-50/50 border-b border-blue-50">
+                                                            <p
+                                                                class="text-[9px] font-black text-blue-400 uppercase tracking-widest px-2">
+                                                                Opsi Shift</p>
+                                                        </div>
+
+                                                        <div class="max-h-60 overflow-y-auto custom-scrollbar">
+                                                            <template x-for="s in shifts" :key="s.id">
+                                                                <div @click="selectGlobalShift(s); openShift = false"
+                                                                    class="px-4 py-3 cursor-pointer transition-all flex items-center justify-between group border-b border-gray-50 last:border-none"
+                                                                    :class="globalShift == s.id ? 'bg-blue-600' :
+                                                                        'hover:bg-blue-50'">
+
+                                                                    <div class="flex flex-col gap-0.5">
+                                                                        {{-- Nama Shift --}}
+                                                                        <span
+                                                                            class="text-[11px] font-black uppercase tracking-tight"
+                                                                            :class="globalShift == s.id ? 'text-white' :
+                                                                                'text-slate-700 group-hover:text-blue-700'"
+                                                                            x-text="s.nama"></span>
+
+                                                                        {{-- Detail Waktu --}}
+                                                                        <div class="flex items-center gap-1.5">
+                                                                            <svg class="w-3 h-3"
+                                                                                :class="globalShift == s.id ? 'text-blue-200' :
+                                                                                    'text-slate-400'"
+                                                                                fill="none" viewBox="0 0 24 24"
+                                                                                stroke="currentColor">
+                                                                                <path stroke-linecap="round"
+                                                                                    stroke-linejoin="round"
+                                                                                    stroke-width="2"
+                                                                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                            </svg>
+                                                                            <span class="text-[10px] font-bold"
+                                                                                :class="globalShift == s.id ? 'text-blue-100' :
+                                                                                    'text-slate-400'"
+                                                                                x-text="s.waktu_masuk + ' - ' + s.waktu_keluar"></span>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    {{-- Checkmark Icon --}}
+                                                                    <div x-show="globalShift == s.id"
+                                                                        class="flex-shrink-0">
+                                                                        <svg class="w-4 h-4 text-white" fill="none"
+                                                                            viewBox="0 0 24 24" stroke="currentColor">
+                                                                            <path stroke-linecap="round"
+                                                                                stroke-linejoin="round" stroke-width="3"
+                                                                                d="M5 13l4 4L19 7" />
+                                                                        </svg>
+                                                                    </div>
+                                                                </div>
+                                                            </template>
+                                                        </div>
+
+                                                        <template x-if="!shifts || shifts.length === 0">
+                                                            <div
+                                                                class="px-4 py-4 text-center text-[10px] font-bold text-slate-400 italic">
+                                                                Tidak ada data shift
+                                                            </div>
+                                                        </template>
+                                                    </div>
                                                 </div>
                                                 <button type="button" @click="applyGlobalTime()"
-                                                    class="px-4 py-2 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-blue-700 transition shadow-md shadow-blue-100">Terapkan</button>
+                                                    class="px-6 py-2.5 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-blue-700 transition shadow-lg shadow-blue-200 active:scale-95">
+                                                    Terapkan
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
@@ -573,89 +685,119 @@
                                         @method('PUT')
                                         <input type="hidden" name="date" value="{{ $date }}">
 
-                                        <div class="p-10 space-y-4">
+                                        {{-- Header Row (Optional for clarity) --}}
+                                        <div
+                                            class="px-10 py-3 bg-gray-50/50 border-b border-gray-100 hidden lg:flex items-center text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">
+                                            <div class="w-64">Informasi Pekerja</div>
+                                            <div class="w-48 px-4 text-center">Shift Kerja</div>
+                                            <div class="w-72 px-4 text-center">Waktu (Masuk - Keluar)</div>
+                                            <div class="flex-1 px-4">Keterangan / Catatan</div>
+                                        </div>
+
+                                        <div class="divide-y divide-gray-100">
                                             <template x-for="id in selectedItems" :key="id">
                                                 <div
-                                                    class="group flex flex-col lg:flex-row lg:items-center justify-between p-6 bg-gray-50/50 hover:bg-white rounded-[2rem] border border-transparent hover:border-blue-100 hover:shadow-xl hover:shadow-blue-900/5 transition-all duration-300 gap-6">
+                                                    class="group flex flex-col lg:flex-row lg:items-center px-10 py-4 hover:bg-blue-50/30 transition-all duration-300 gap-y-4 lg:gap-y-0">
 
-                                                    {{-- Left: Identity Section --}}
-                                                    <div
-                                                        class="flex items-center gap-4 min-w-0 flex-1 lg:flex-none lg:w-64">
-                                                        {{-- Avatar Circle (Keep as is) --}}
+                                                    {{-- 1. Identity (Slim & Compact) --}}
+                                                    <div class="flex items-center gap-3 w-64 flex-shrink-0">
                                                         <div
-                                                            class="flex-shrink-0 w-12 h-12 rounded-2xl bg-white shadow-sm border border-gray-100 flex items-center justify-center text-blue-600 text-xs font-black group-hover:bg-blue-600 group-hover:text-white transition-all duration-500">
+                                                            class="w-9 h-9 rounded-xl bg-white shadow-sm border border-gray-100 flex items-center justify-center text-blue-600 text-[10px] font-black group-hover:bg-blue-600 group-hover:text-white transition-all">
                                                             <span x-text="workerMap[id]?.initials"></span>
                                                         </div>
-
-                                                        {{-- Name & NIK Container --}}
-                                                        <div class="min-w-0"> {{-- This allows the children to truncate --}}
-                                                            <p class="text-sm font-black text-gray-900 leading-tight truncate"
-                                                                x-text="workerMap[id]?.nama" :title="workerMap[id]?.nama">
-                                                                {{-- Added :title so full name shows on hover --}}
-                                                            </p>
-                                                            <p class="text-[10px] font-bold text-gray-400 mt-0.5 tracking-widest truncate"
-                                                                x-text="workerMap[id]?.nik">
-                                                            </p>
+                                                        <div class="min-w-0">
+                                                            <p class="text-xs font-bold text-gray-800 truncate"
+                                                                x-text="workerMap[id]?.nama"></p>
+                                                            <p class="text-[9px] font-medium text-gray-400 tracking-tighter"
+                                                                x-text="workerMap[id]?.nik"></p>
                                                         </div>
                                                     </div>
 
-                                                    {{-- Right: Inputs Grid --}}
-                                                    <div class="flex flex-1 flex-wrap items-end gap-6">
-                                                        {{-- Jam Masuk --}}
-                                                        <div class="flex flex-col gap-1.5 min-w-[200px]">
-                                                            <label
-                                                                class="text-[9px] font-black text-gray-400 uppercase tracking-[0.15em] ml-1">Masuk</label>
-                                                            <input type="time" :id="'masuk-' + id"
-                                                                :name="'data[' + id + '][masuk]'" value="08:00"
-                                                                class="bg-white border-gray-200 p-1 rounded-md text-sm font-bold text-gray-700 focus:ring-4 focus:ring-blue-50 focus:border-blue-500 transition-all shadow-sm">
-                                                        </div>
+                                                    {{-- 2. Shift Dropdown (Subtle Pill Style) --}}
+                                                    <div class="w-full lg:w-48 px-0 lg:px-4" x-data="{ open: false }">
+                                                        <input type="hidden" :name="'data[' + id + '][id_shift]'"
+                                                            x-model="rowShift[id]">
+                                                        <div class="relative">
+                                                            <button type="button" @click="open = !open"
+                                                                class="w-full h-9 flex items-center justify-between px-3 bg-gray-50 border border-transparent hover:border-blue-200 hover:bg-white rounded-lg transition-all text-[11px] font-bold text-gray-600 focus:ring-2 focus:ring-blue-100">
+                                                                <span
+                                                                    x-text="shifts.find(s => s.id == rowShift[id])?.nama || 'Pilih Shift'"></span>
+                                                                <svg class="w-3 h-3 text-gray-400"
+                                                                    :class="open ? 'rotate-180' : ''" fill="none"
+                                                                    stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path d="M19 9l-7 7-7-7" stroke-width="3"
+                                                                        stroke-linecap="round" stroke-linejoin="round" />
+                                                                </svg>
+                                                            </button>
 
-                                                        {{-- Divider --}}
-                                                        <div class="hidden lg:block h-10 w-px bg-gray-200 mb-1"></div>
-
-                                                        {{-- Jam Keluar --}}
-                                                        <div class="flex flex-col gap-1.5 min-w-[200px]">
-                                                            <label
-                                                                class="text-[9px] font-black text-gray-400 uppercase tracking-[0.15em] ml-1">Keluar</label>
-                                                            <input type="time" :id="'keluar-' + id"
-                                                                :name="'data[' + id + '][keluar]'" value="17:00"
-                                                                class="bg-white border-gray-200 p-1 rounded-md text-sm font-bold text-gray-700 focus:ring-4 focus:ring-blue-50 focus:border-blue-500 transition-all shadow-sm">
-                                                        </div>
-
-                                                        {{-- Catatan / Keterangan --}}
-                                                        <div class="flex flex-col gap-1.5 flex-1 min-w-[200px]">
-                                                            <label
-                                                                class="text-[9px] font-black text-gray-400 uppercase tracking-[0.15em] ml-1">Catatan
-                                                                (Opsional)</label>
-                                                            <div class="relative group/input">
-                                                                <input type="text" :name="'data[' + id + '][catatan]'"
-                                                                    placeholder="Tambahkan catatan..."
-                                                                    class="w-full bg-white border-gray-200 rounded-xl px-5 py-3.5 text-sm font-semibold text-gray-700 focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all placeholder:text-gray-400 placeholder:font-normal outline-none shadow-sm">
-                                                                <div
-                                                                    class="absolute right-3 top-1/2 -translate-y-1/2 opacity-0 group-focus-within/input:opacity-100 transition-opacity">
-                                                                    <svg class="w-4 h-4 text-blue-400" fill="none"
-                                                                        viewBox="0 0 24 24" stroke="currentColor">
-                                                                        <path stroke-linecap="round"
-                                                                            stroke-linejoin="round" stroke-width="2"
-                                                                            d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                                                    </svg>
-                                                                </div>
+                                                            <div x-show="open" @click.outside="open = false"
+                                                                class="absolute top-full mt-1 left-0 w-full bg-white rounded-xl shadow-2xl border border-gray-100 z-[120] overflow-hidden"
+                                                                x-cloak>
+                                                                <template x-for="s in shifts" :key="s.id">
+                                                                    <div @click="selectRowShift(id, s); open = false"
+                                                                        class="px-3 py-2 text-[10px] font-bold cursor-pointer hover:bg-blue-50 flex justify-between items-center"
+                                                                        :class="rowShift[id] == s.id ?
+                                                                            'text-blue-600 bg-blue-50/50' :
+                                                                            'text-gray-600'">
+                                                                        <span x-text="s.nama"></span>
+                                                                        <span class="text-[8px] opacity-40"
+                                                                            x-text="s.waktu_masuk"></span>
+                                                                    </div>
+                                                                </template>
                                                             </div>
                                                         </div>
+                                                    </div>
+
+                                                    {{-- 3. Time Capsule (Expanded to fit time pickers) --}}
+                                                    <div class="w-full lg:w-72 px-0 lg:px-4 flex-shrink-0">
+                                                        <div
+                                                            class="flex items-center justify-between bg-white border border-gray-200 rounded-lg h-9 px-3 gap-2 focus-within:border-blue-400 transition-all shadow-sm">
+                                                            {{-- Masuk --}}
+                                                            <div class="flex items-center gap-2">
+                                                                <svg class="w-3 h-3 text-gray-300" fill="none"
+                                                                    stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path d="M12 8v4l3 3" stroke-width="2.5"
+                                                                        stroke-linecap="round" stroke-linejoin="round" />
+                                                                </svg>
+                                                                <input type="time" :name="'data[' + id + '][masuk]'"
+                                                                    x-model="rowMasuk[id]"
+                                                                    class="bg-transparent border-none p-0 text-[11px] font-bold text-gray-700 focus:ring-0 outline-none w-[85px]">
+                                                            </div>
+
+                                                            <span class="text-gray-200 font-black text-[10px]">TO</span>
+
+                                                            {{-- Keluar --}}
+                                                            <div class="flex items-center gap-2">
+                                                                <input type="time" :name="'data[' + id + '][keluar]'"
+                                                                    x-model="rowKeluar[id]"
+                                                                    class="bg-transparent border-none p-0 text-[11px] font-bold text-gray-700 focus:ring-0 outline-none w-[85px] text-right">
+                                                                <svg class="w-3 h-3 text-gray-300" fill="none"
+                                                                    stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path d="M12 8v4l3 3" stroke-width="2.5"
+                                                                        stroke-linecap="round" stroke-linejoin="round" />
+                                                                </svg>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    {{-- 4. Catatan (Fills remaining space, less priority) --}}
+                                                    <div class="flex-1 px-0 lg:px-4 min-w-[150px]">
+                                                        <input type="text" :name="'data[' + id + '][catatan]'"
+                                                            x-model="rowCatatan[id]" placeholder="Keterangan..."
+                                                            class="w-full h-9 bg-transparent border-b border-transparent hover:border-gray-100 focus:border-blue-300 focus:bg-gray-50/30 rounded-md px-3 text-[11px] font-medium text-gray-600 transition-all outline-none italic placeholder:text-gray-300">
                                                     </div>
                                                 </div>
                                             </template>
                                         </div>
 
-                                        {{-- Sticky Footer --}}
+                                        {{-- STICKY FOOTER --}}
                                         <div
-                                            class="sticky bottom-0 px-10 py-6 bg-gray-50/80 backdrop-blur-md border-t border-gray-100 flex items-center justify-end gap-4">
+                                            class="sticky bottom-0 px-10 py-5 bg-white/95 backdrop-blur-md border-t border-gray-100 flex items-center justify-end gap-4">
                                             <button type="button" @click="showAbsenModal = false"
-                                                class="px-6 py-3 text-xs font-black text-gray-400 uppercase tracking-widest hover:text-gray-600 transition">Batal</button>
+                                                class="px-6 py-2.5 text-[10px] font-black text-gray-400 uppercase tracking-widest hover:text-gray-600 transition">Batal</button>
                                             <button type="submit"
-                                                class="px-10 py-4 bg-blue-600 text-white text-xs font-black uppercase tracking-[0.2em] rounded-2xl hover:bg-blue-700 shadow-2xl shadow-blue-200 transition-all active:scale-95">
-                                                Simpan Presensi
-                                            </button>
+                                                class="px-8 py-3 bg-blue-600 text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-xl hover:bg-blue-700 shadow-xl shadow-blue-200 transition-all active:scale-95">Simpan
+                                                Semua</button>
                                         </div>
                                     </form>
                                 </div>
@@ -749,7 +891,8 @@
                                                         </td>
 
                                                         {{-- Alpine Dropdown (Balanced Height) --}}
-                                                        <td class="py-4 pl-0 pr-10 bg-gray-50/50 border-y border-gray-100 ">
+                                                        <td
+                                                            class="py-4 pl-0 pr-10 bg-gray-50/50 border-y border-gray-100 ">
                                                             <div x-data="{
                                                                 open: false,
                                                                 list: [
@@ -846,7 +989,7 @@
                                     class="px-4 py-4 text-[11px] font-black text-center text-gray-400 uppercase tracking-widest">
                                     Status Verifikasi</th>
                                 <th class="px-4 py-4 text-[11px] font-black text-gray-400 uppercase tracking-widest">
-                                Catatan</th>
+                                    Catatan</th>
                             </tr>
                         </thead>
                         <tbody id="main-table-body" class="divide-y divide-gray-50">

@@ -29,24 +29,37 @@
             </div>
         </td>
 
-        {{-- STATUS ABSENSI --}}
-
+        {{-- Ganti bagian <td> Jam Masuk & Keluar dengan ini --}}
         <td class="px-4 py-5 text-left">
-            {{-- Tampilkan jam hanya jika statusnya Hadir (1) --}}
-            @if ($detil && $detil->status_kehadiran == 1 && $detil->waktu_masuk)
-                <div class="flex items-center gap-2">
-                    <span
-                        class="text-xs font-black text-gray-700 bg-gray-50 px-2 py-1 rounded-md border border-gray-100">
-                        {{ \Carbon\Carbon::parse($detil->waktu_masuk)->format('H:i') }}
-                    </span>
-                    <span class="text-gray-300">—</span>
-                    <span
-                        class="text-xs font-black text-gray-700 bg-gray-50 px-2 py-1 rounded-md border border-gray-100">
-                        {{ \Carbon\Carbon::parse($detil->waktu_keluar)->format('H:i') }}
-                    </span>
+            @if ($detil && $detil->status_kehadiran == 1)
+                <div class="flex items-center gap-4">
+
+                    {{-- Shift Info --}}
+                    <div>
+                        <p class="text-sm font-black text-gray-900 uppercase tracking-tight">
+                            {{ $detil->shiftAbsen->nama ?? 'Shift Tetap' }}
+                        </p>
+                        <p class="text-sm font-mono font-bold text-blue-500/80">
+                            {{ \Carbon\Carbon::parse($detil->waktu_masuk)->format('H:i') }}
+                            <span class="text-gray-300 mx-1">—</span>
+                            {{ \Carbon\Carbon::parse($detil->waktu_keluar)->format('H:i') }}
+                        </p>
+                    </div>
                 </div>
             @else
-                <span class="text-[12px] font-bold text-gray-200 tracking-widest">-- : --</span>
+                {{-- Consistent Empty State --}}
+                <div class="flex items-center gap-4 opacity-30">
+                    <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636" />
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-sm font-bold text-gray-400">OFF</p>
+                        <p class="text-[10px] font-black text-gray-300 uppercase tracking-widest">Tidak Hadir</p>
+                    </div>
+                </div>
             @endif
         </td>
 

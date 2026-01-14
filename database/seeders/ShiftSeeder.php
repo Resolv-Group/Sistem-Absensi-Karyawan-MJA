@@ -15,24 +15,50 @@ class ShiftSeeder extends Seeder
     {
         DB::table('shift_absen')->insert([
             [
-                'id_unit' => 1,
-                'nama' => 'pagi',
+                'id_unit'      => 6,
+                'nama'         => 'pagi',
                 'waktu_masuk'  => '07:00:00',
                 'waktu_keluar' => '15:00:00',
                 'created_at'   => now(),
                 'updated_at'   => now(),
             ],
             [
-                'id_unit' => 1,
-                'nama' => 'siang',
+                'id_unit'      => 6,
+                'nama'         => 'siang',
                 'waktu_masuk'  => '15:00:00',
                 'waktu_keluar' => '23:00:00',
                 'created_at'   => now(),
                 'updated_at'   => now(),
             ],
             [
-                'id_unit' => 1,
-                'nama' => 'malam',
+                'id_unit'      => 6,
+                'nama'         => 'malam',
+                'waktu_masuk'  => '23:00:00',
+                'waktu_keluar' => '07:00:00',
+                'created_at'   => now(),
+                'updated_at'   => now(),
+            ],
+        ]);
+        DB::table('shift_absen')->insert([
+            [
+                'id_unit'      => 7,
+                'nama'         => 'pagi',
+                'waktu_masuk'  => '07:00:00',
+                'waktu_keluar' => '15:00:00',
+                'created_at'   => now(),
+                'updated_at'   => now(),
+            ],
+            [
+                'id_unit'      => 7,
+                'nama'         => 'siang',
+                'waktu_masuk'  => '15:00:00',
+                'waktu_keluar' => '23:00:00',
+                'created_at'   => now(),
+                'updated_at'   => now(),
+            ],
+            [
+                'id_unit'      => 7,
+                'nama'         => 'malam',
                 'waktu_masuk'  => '23:00:00',
                 'waktu_keluar' => '07:00:00',
                 'created_at'   => now(),

@@ -11,6 +11,7 @@ use App\Models\JabatanPKWT;
 use App\Models\MitraKerja;
 use App\Models\Pekerja;
 use App\Models\PKWT;
+use App\Models\Shift_Absen;
 use App\Models\Unit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -101,6 +102,8 @@ class AbsensiController extends Controller
         $picId = Auth::user()->staff->id;
         $unit = Unit::with(['namaMitra'])->findOrFail($id_unit);
 
+        $shiftList = Shift_Absen::where('id_unit', $id_unit)->get();
+
         // 1. Sync Attendance Records (Tetap pertahankan ini agar record absensi utama tercipta)
         $allPkwt = PKWT::with('pekerja')->where('id_unit', $id_unit)->get();
         foreach ($allPkwt as $pkwt) {
@@ -124,8 +127,6 @@ class AbsensiController extends Controller
                 $q->where('tgl_absensi', $date)->where('id_unit', $id_unit)->with('detilHarian');
             },
         ])->where('id_unit', $id_unit)->where('status_aktif', 1);
-
-
 
         // 3. Filter Pencarian (Nama/NIK)
         if ($request->filled('search')) {
@@ -154,7 +155,6 @@ class AbsensiController extends Controller
             });
         }
 
-
         $pkwtPekerja = $pkwtQuery->paginate(25);
 
         // 4. Handle AJAX Response
@@ -180,9 +180,7 @@ class AbsensiController extends Controller
             })
             ->count();
 
-
-
-        return view('Absensi.detail.main-harian', compact('unit', 'date', 'workerMap', 'pkwtPekerja', 'totalHadir'));
+        return view('Absensi.detail.main-harian', compact('unit', 'date', 'workerMap', 'pkwtPekerja', 'totalHadir', 'shiftList'));
     }
 
     function ViewBorongan(Request $request, $id_unit, $date)
@@ -273,8 +271,6 @@ class AbsensiController extends Controller
             }
         }
 
-        // dd($existingBorongan);
-
         // 4. Handle AJAX Response
         if ($request->ajax()) {
             return view('Absensi.partials.main-borongan-table', compact('pkwtPekerja', 'unit', 'date', 'barangs', 'barangLookup', 'existingBorongan'))->render();
@@ -301,83 +297,6 @@ class AbsensiController extends Controller
         return view('Absensi.detail.main-borongan', compact('unit', 'date', 'workerMap', 'pkwtPekerja', 'totalHadir', 'barangs', 'barangLookup', 'existingBorongan'));
     }
 
-    // public function bulkAbsensiUpdate(Request $request)
-    // {
-    //     // 1. Validasi Input
-    //     $request->validate([
-    //         'date' => 'required|date',
-    //         'data' => 'required|array',
-    //     ]);
-
-    //     $date = $request->date;
-    //     $inputData = $request->data;
-
-    //     // 2. Mulai Transaksi Database
-    //     DB::beginTransaction();
-
-    //     try {
-    //         foreach ($inputData as $pkwtId => $values) {
-    //             // Cari data PKWT
-    //             $pkwt = PKWT::find($pkwtId);
-    //             if (!$pkwt) {
-    //                 continue;
-    //             }
-
-    //             // Cari record Absensi utama (yang dibuat di ViewHarian)
-    //             $absensi = Absensi::where('id_pekerja', $pkwt->id_pekerja)->where('tgl_absensi', $date)->first();
-
-    //             if ($absensi) {
-    //                 // Tentukan Status (Hadir=1, Cuti=2)
-    //                 $status = isset($values['status']) ? (int) $values['status'] : 1;
-
-    //                 $oldDetil = $absensi->detilHarian; // relasi hasOne
-
-    //                 /**
-    //                  * LOGIKA PEMBATASAN WAKTU (Karena DB tidak boleh NULL)
-    //                  * Jika status Hadir (1), ambil input jam atau set 00:00:00 jika kosong.
-    //                  * Jika status BUKAN Hadir (2-5), paksa jam jadi 00:00:00 agar DB tidak error.
-    //                  */
-    //                 $waktuMasuk = $status === 1 ? $values['masuk'] ?? '00:00:00' : '00:00:00';
-    //                 $waktuKeluar = $status === 1 ? $values['keluar'] ?? '00:00:00' : '00:00:00';
-
-    //                 $statusChanged = $oldDetil && $oldDetil->status_kehadiran != $status;
-
-    //                 // Simpan atau Update ke tabel detil_harian
-    //                 Detil_Harian::updateOrCreate(
-    //                     ['id_absensi' => $absensi->id], // Kunci pencarian (mencegah duplikat)
-    //                     [
-    //                         'status_kehadiran' => $status,
-    //                         'waktu_masuk' => $waktuMasuk,
-    //                         'waktu_keluar' => $waktuKeluar,
-    //                         'catatan' => $values['catatan'] ?? null,
-    //                         'updated_by' => Auth::id(),
-    //                     ],
-    //                 );
-
-    //                 // 🔁 RESET VERIFIKASI JIKA STATUS BERUBAH
-    //                 if ($statusChanged) {
-    //                     $absensi->update([
-    //                         'verifikasi' => 0,
-    //                     ]);
-    //                 }
-    //             }
-    //         }
-
-    //         // 3. Simpan perubahan permanen jika semua loop sukses
-    //         DB::commit();
-
-    //         return redirect()->back()->with('success', 'Data presensi pekerja berhasil diperbarui.');
-    //     } catch (\Exception $e) {
-    //         // 4. Batalkan semua perubahan jika ada satu saja yang error
-    //         DB::rollBack();
-
-    //         return redirect()
-    //             ->back()
-    //             ->with('error', 'Gagal menyimpan presensi: ' . $e->getMessage());
-    //     }
-    // }
-
-
     public function bulkAbsensiUpdate(Request $request)
     {
         $request->validate([
@@ -387,6 +306,7 @@ class AbsensiController extends Controller
 
         $date = $request->date;
         $inputData = $request->data;
+
 
         DB::beginTransaction();
 
@@ -427,6 +347,7 @@ class AbsensiController extends Controller
                 Detil_Harian::updateOrCreate(
                     ['id_absensi' => $absensi->id],
                     [
+                        'id_shift' => $values['id_shift'],
                         'status_kehadiran' => $status,
                         'waktu_masuk' => $waktuMasuk,
                         'waktu_keluar' => $waktuKeluar,

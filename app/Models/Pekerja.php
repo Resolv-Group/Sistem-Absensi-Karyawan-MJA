@@ -69,4 +69,11 @@ class Pekerja extends Model
             ->where('status_aktif', 1);
     }
 
+    public function absensiByUnitTanggal($unitId, $date)
+    {
+        return $this->hasOne(Absensi::class, 'id_pekerja')
+            ->where('id_unit', $unitId)
+            ->whereDate('tgl_absensi', $date);
+    }
+
 }
