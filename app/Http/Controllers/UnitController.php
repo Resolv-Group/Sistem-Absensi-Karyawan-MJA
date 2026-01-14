@@ -15,6 +15,7 @@ use App\Models\MitraKerja;
 use App\Models\Pekerja;
 use App\Models\PicUnit;
 use App\Models\PKWT;
+use App\Models\Shift_Absen;
 use Illuminate\Support\Facades\DB;
 
 class UnitController extends Controller
@@ -178,6 +179,7 @@ class UnitController extends Controller
     public function viewDetailUnit(Request $request, $id)
     {
         $unit = Unit::with(['picUnit.staff', 'namaMitra'])->findOrFail($id);
+        $shifts = Shift_Absen::select('id', 'nama', 'waktu_masuk', 'waktu_keluar')->where('id_unit', $id)->get();
 
         if ($request->ajax()) {
             // --- HANDLE BORONGAN AJAX ---
@@ -251,7 +253,7 @@ class UnitController extends Controller
         $boronganKategori = Kategori::all();
         $jabatan = JabatanPKWT::all();
 
-        return view('Unit.detail-unit', compact('unit', 'historiUnit', 'pekerja', 'pkwtPekerja', 'borongan', 'divisions', 'boronganKategori', 'jabatan'));
+        return view('Unit.detail-unit', compact('unit', 'historiUnit', 'pekerja', 'pkwtPekerja', 'borongan', 'divisions', 'boronganKategori', 'jabatan', 'shifts'));
     }
 
     public function showDokumenMOU($id, Request $request)
@@ -420,4 +422,5 @@ class UnitController extends Controller
             'message' => $unit->status_aktif ? 'Unit berhasil diaktifkan' : 'Unit berhasil dinonaktifkan',
         ]);
     }
+
 }

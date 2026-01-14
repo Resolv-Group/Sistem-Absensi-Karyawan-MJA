@@ -13,6 +13,7 @@ use App\Http\Controllers\PKWTController;
 use App\Http\Controllers\ProfilController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\UnitController;
+use App\Http\Controllers\ShiftAbsenController;
 use Illuminate\Support\Facades\Route;
 
 // LOGIN
@@ -124,6 +125,9 @@ Route::middleware(['auth', 'role:hrd,pic,admin'])->group(function(){
     Route::get('/unit/detail/{id}', [UnitController::class, 'viewDetailUnit'])->name('view.detail.unit');
     Route::get('/unit/ubah/{id}', [UnitController::class, 'ubahUnit'])->name('view.ubah.unit');
     Route::put('/unit/ubah/{id}', [UnitController::class, 'updateUnit'])->name('update.unit');
+    Route::get('/unit/detail/{id}', [UnitController::class, 'viewDetailUnit'])->name('view.detail.unit');
+
+    Route::put('/unit/detail/{id}/shifts', [ShiftAbsenController::class, 'update'])->name('unit.shifts.update');
 
     //Unit -> Status
     Route::put('/unit/toggle-status/{id}', [UnitController::class, 'toggleStatus']);
