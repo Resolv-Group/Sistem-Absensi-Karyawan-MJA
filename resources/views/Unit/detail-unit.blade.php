@@ -1,7 +1,6 @@
 @extends('layout')
 
 @section('content')
-
     <div x-data="{
         showTambahShift: false
     }" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -222,6 +221,74 @@
                     </svg>
                     Ubah Data
                 </a>
+
+                <button type="button" @click="showTambahShift = true"
+                    class="px-4 py-2 text-sm font-medium text-white bg-black border border-black rounded-lg hover:bg-gray-800 transition shadow-sm flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                    </svg>
+                    Tambah Shift
+                </button>
+            </div>
+        </div>
+
+
+        <div x-show="showTambahShift" class="fixed inset-0 z-[30] flex items-center justify-center p-4 sm:p-6" x-cloak>
+
+            {{-- Backdrop --}}
+            <div x-show="showTambahShift" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200"
+                x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" @click="showTambahShift = false"
+                class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm">
+            </div>
+
+            {{-- Modal Content --}}
+            <div x-show="showTambahShift" x-transition:enter="ease-out duration-300"
+                x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+                x-transition:enter-end="opacity-100 scale-100 translate-y-0" x-transition:leave="ease-in duration-200"
+                x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                x-transition:leave-end="opacity-0 scale-95 translate-y-4"
+                class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md">
+
+                <div
+                    class="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-gray-50/50 rounded-t-2xl">
+                    <h3 class="text-lg font-bold text-gray-900">Change Division</h3>
+                    <button @click="showTambahShift = false" class="text-gray-400 hover:text-gray-600 transition">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <form action="#" method="POST">
+                    @csrf @method('PUT')
+                    {{-- Pass selected IDs --}}
+                    <input type="hidden" name="ids" :value="JSON.stringify(selectedItems)">
+
+                    <div class="p-6">
+                        <div class="mb-6">
+                            <p class="text-sm text-gray-600">
+                                Anda akan mengubah divisi untuk
+                                <span class="font-bold text-blue-600" x-text="selectedItems.length"></span> pekerja.
+                                Tindakan ini akan menggantikan divisi mereka saat ini.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="px-6 py-4 bg-gray-50 flex items-center justify-end gap-3 rounded-b-2xl">
+                        <button type="button" @click="showTambahShift = false"
+                            class="px-4 py-2 text-sm font-bold text-gray-500 hover:text-gray-700 transition">
+                            Batal
+                        </button>
+                        <button type="submit"
+                            class="px-6 py-2 bg-blue-600 text-white text-sm font-bold rounded-xl hover:bg-blue-700 shadow-md shadow-blue-100 transition">
+                            Simpan Perubahan
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
         {{-- 2. TOP SECTION: IDENTITY & CONTRACT (Grid Layout) --}}

@@ -669,6 +669,7 @@
                                                         </template>
                                                     </div>
                                                 </div>
+
                                                 <button type="button" @click="applyGlobalTime()"
                                                     class="px-6 py-2.5 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-blue-700 transition shadow-lg shadow-blue-200 active:scale-95">
                                                     Terapkan

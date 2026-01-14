@@ -157,6 +157,7 @@ class AbsensiController extends Controller
 
         $pkwtPekerja = $pkwtQuery->paginate(25);
 
+
         // 4. Handle AJAX Response
         if ($request->ajax()) {
             return view('Absensi.partials.main-harian-table', compact('pkwtPekerja', 'unit', 'date'))->render();
