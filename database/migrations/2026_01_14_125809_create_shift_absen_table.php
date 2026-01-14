@@ -11,19 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('detil_harian', function (Blueprint $table) {
+        Schema::create('shift_absen', function (Blueprint $table) {
             $table->id();
 
-            $table->integer('id_absensi');
-            $table->integer('id_shift')->default(0);
-            $table->integer('status_kehadiran')->default(0);
-
+            $table->integer('id_unit');
+            $table->char('nama');
             $table->time('waktu_masuk')->default('00:00:00');
             $table->time('waktu_keluar')->default('00:00:00');
-
-            $table->char('catatan')->nullable();
-
-            $table->integer('updated_by');
 
             $table->timestamps();
         });
@@ -34,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('detil_harian');
+        Schema::dropIfExists('shift_absen');
     }
 };

@@ -264,14 +264,16 @@ class AbsensiController extends Controller
                         'FD' => $d->FD,
                         'act_rej' => $d->act_rej,
                         'good_mc' => $d->good_mc,
-                        'bayaranPerusahaan' => $d->bayaran_perusahaan,
-                        'bayaranItem' => $d->bayaran_item,
+                        'bayaranPerusahaan' => $d->bayaranPerusahaan,
+                        'bayaranItem' => $d->bayaranItem,
                         'catatan' => $d->catatan,
                         'fileName' => null,
                     ];
                 })->values();
             }
         }
+
+        // dd($existingBorongan);
 
         // 4. Handle AJAX Response
         if ($request->ajax()) {

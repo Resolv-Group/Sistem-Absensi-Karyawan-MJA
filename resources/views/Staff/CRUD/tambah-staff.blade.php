@@ -102,12 +102,17 @@
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-1">ID Staff</label>
 
-                            <input type="text" name="id_staff" maxlength="16" autocomplete="off"
+                            <input type="text"
+                                name="id_staff"
+                                maxlength="16"
+                                autocomplete="off"
                                 class="id-input w-full rounded-lg shadow-sm border
                                 @error('id_staff') border-red-500 bg-red-50 @else border-gray-500 bg-gray-50 @enderror
                                 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400
                                 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition"
-                                placeholder="Input ID Staff" value="{{ old('id_staff') }}">
+                                placeholder="Input ID Staff"
+                                value="{{ old('id_staff', $defaultIdStaff) }}">
+
 
                             @error('id_staff')
                                 <p class="text-red-600 text-xs mt-1">{{ $message }}</p>
