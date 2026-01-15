@@ -9,6 +9,7 @@ use App\Http\Controllers\BoronganController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MitraKerjaController;
 use App\Http\Controllers\PekerjaController;
+use App\Http\Controllers\PenilaianController;
 use App\Http\Controllers\PKWTController;
 use App\Http\Controllers\ProfilController;
 use App\Http\Controllers\StaffController;
@@ -95,6 +96,7 @@ Route::middleware(['auth', 'role:pic,admin'])->group(function(){
     Route::get('/absensi/{id_unit}/borongan/{date}', [AbsensiController::class, 'ViewBorongan'])->name('view.absensi.borongan');
     Route::put('/absensi/{id_unit}/harian/{date}/bulk-update-harian', [AbsensiController::class, 'bulkAbsensiUpdate'])->name('absensi.bulk.update');
     Route::put('/absensi/{id_unit}/borongan/{date}/bulk-update-borongan', [AbsensiController::class, 'bulkAbsensiBoronganUpdate'])->name('absensi.borongan.bulk.update');
+
 });
 
 Route::middleware(['auth', 'role:hrd,pic,admin'])->group(function(){
@@ -162,6 +164,13 @@ Route::middleware(['auth', 'role:hrd,pic,admin'])->group(function(){
     ->name('stream.mou');
     Route::get('/pkwt/{id}/stream/pkwt', [UnitController::class, 'showDokumenPKWT'])
     ->name('stream.pkwt');
+
+    //Penilaian
+    Route::get('/penilaian/unit/{id}', [PenilaianController::class, 'viewPenilaianMain'])->name('view.penilaian');
+    Route::get('/penilaian/unit/{unitId}/buat-penilaian', [PenilaianController::class, 'viewBuatPenilaian'])->name('view.buat.penilaian');
+    Route::post('/buat-penilaian', [PenilaianController::class, 'buatPenilaian'])->name('buat.penilaian');
+    Route::put('/penilaian/unit/bulk-update', [PenilaianController::class, 'bulkUpdateStatus'])->name('bulk.update.penilaian.pekerja');
+
 });
 
 

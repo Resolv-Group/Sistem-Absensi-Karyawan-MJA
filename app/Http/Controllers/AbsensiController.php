@@ -264,83 +264,6 @@ class AbsensiController extends Controller
         return view('Absensi.detail.main-borongan', compact('unit', 'date', 'workerMap', 'pkwtPekerja', 'totalHadir', 'barangs', 'barangLookup', 'existingBorongan'));
     }
 
-    // public function bulkAbsensiUpdate(Request $request)
-    // {
-    //     $request->validate([
-    //         'date' => 'required|date',
-    //         'data' => 'required|array',
-    //     ]);
-
-    //     $date = $request->date;
-    //     $inputData = $request->data;
-
-
-    //     DB::beginTransaction();
-
-    //     try {
-    //         foreach ($inputData as $pkwtId => $values) {
-    //             $pkwt = PKWT::find($pkwtId);
-    //             if (!$pkwt) continue;
-
-    //             $absensi = Absensi::where('id_pekerja', $pkwt->id_pekerja)
-    //                 ->where('tgl_absensi', $date)
-    //                 ->first();
-
-    //             if (!$absensi) continue;
-
-    //             // Status baru (default HADIR)
-    //             $status = isset($values['status']) ? (int) $values['status'] : 1;
-
-    //             $oldDetil = $absensi->detilHarian; // hasOne
-
-    //             $statusChanged = $oldDetil && $oldDetil->status_kehadiran != $status;
-
-    //             /**
-    //              * 🔥 HARD DELETE JIKA STATUS BERUBAH
-    //              */
-    //             if ($statusChanged) {
-    //                 $oldDetil->delete();
-    //             }
-
-    //             /**
-    //              * LOGIKA WAKTU
-    //              */
-    //             $waktuMasuk = $status === 1 ? ($values['masuk'] ?? '00:00:00') : '00:00:00';
-    //             $waktuKeluar = $status === 1 ? ($values['keluar'] ?? '00:00:00') : '00:00:00';
-
-    //             /**
-    //              * SIMPAN DATA BARU
-    //              */
-    //             Detil_Harian::updateOrCreate(
-    //                 ['id_absensi' => $absensi->id],
-    //                 [
-    //                     'id_shift' => $values['id_shift'],
-    //                     'status_kehadiran' => $status,
-    //                     'waktu_masuk' => $waktuMasuk,
-    //                     'waktu_keluar' => $waktuKeluar,
-    //                     'catatan' => $values['catatan'] ?? null,
-    //                     'updated_by' => Auth::id(),
-    //                 ]
-    //             );
-
-    //             /**
-    //              * RESET VERIFIKASI JIKA STATUS BERUBAH
-    //              */
-    //             if ($statusChanged) {
-    //                 $absensi->update([
-    //                     'verifikasi' => 0,
-    //                 ]);
-    //             }
-    //         }
-
-    //         DB::commit();
-    //         return back()->with('success', 'Data presensi pekerja berhasil diperbarui.');
-    //     } catch (\Exception $e) {
-    //         DB::rollBack();
-    //         return back()->with('error', 'Gagal menyimpan presensi: ' . $e->getMessage());
-    //     }
-    // }
-
     public function bulkAbsensiUpdate(Request $request)
     {
         $request->validate([
@@ -425,88 +348,15 @@ class AbsensiController extends Controller
         }
     }
 
-
-    // public function bulkAbsensiBoronganUpdate(Request $request)
-    // {
-    //     $request->validate([
-    //         'date' => 'required|date',
-    //         'data' => 'required|array',
-    //     ]);
-
-    //     DB::beginTransaction();
-
-    //     try {
-    //         $date = $request->date;
-
-    //         foreach ($request->data as $pkwtId => $payload) {
-    //             $pkwt = PKWT::findOrFail($pkwtId);
-    //             $absensi = Absensi::where('id_pekerja', $pkwt->id_pekerja)->where('tgl_absensi', $date)->first();
-
-    //             if (!$absensi) {
-    //                 continue;
-    //             }
-
-    //             // --- PERBAIKAN UTAMA: Hapus semua detail borongan lama untuk tanggal ini ---
-    //             // Ini memastikan jika sebelumnya "Sakit", datanya dibersihkan total sebelum ganti ke "Produksi"
-    //             // Dan sebaliknya.
-    //             Detil_Borongan::where('id_absensi', $absensi->id)->delete();
-
-    //             if (isset($payload['status'])) {
-    //                 // PATH A: INPUT STATUS KHUSUS (Sakit, Izin, Cuti, Alpha)
-    //                 $status = $payload['status'];
-
-    //                 Detil_Borongan::create([
-    //                     'id_absensi' => $absensi->id,
-    //                     'id_barang' => 0, // Gunakan 0 secara konsisten untuk non-produksi
-    //                     'status_kehadiran' => $status,
-    //                     'FD' => 0,
-    //                     'act_rej' => 0,
-    //                     'good_mc' => 0,
-    //                     'bayaranPerusahaan' => 0,
-    //                     'bayaranItem' => 0,
-    //                     'catatan' => $payload['catatan'] ?? null,
-    //                     'updated_by' => Auth::id(),
-    //                 ]);
-    //             } else {
-    //                 // PATH B: INPUT PRODUKSI (Barang)
-    //                 foreach ($payload as $index => $row) {
-    //                     $fileContent = null;
-
-    //                     // Handle File Upload
-    //                     if ($request->hasFile("data.$pkwtId.$index.buktiSuratJalan")) {
-    //                         $fileContent = file_get_contents($request->file("data.$pkwtId.$index.buktiSuratJalan")->getRealPath());
-    //                     }
-
-    //                     Detil_Borongan::create([
-    //                         'id_absensi' => $absensi->id,
-    //                         'id_barang' => $row['id_barang'],
-    //                         'status_kehadiran' => 1, // Otomatis Hadir jika ada input barang
-    //                         'FD' => $row['FD'] ?? 0,
-    //                         'act_rej' => $row['act_rej'] ?? 0,
-    //                         'good_mc' => $row['good_mc'] ?? 0,
-    //                         'bayaranPerusahaan' => $row['bayaranPerusahaan'] ?? 0,
-    //                         'bayaranItem' => $row['bayaranItem'] ?? 0,
-    //                         'buktiSuratJalan' => $fileContent,
-    //                         'catatan' => $row['catatan'] ?? null,
-    //                         'updated_by' => Auth::id(),
-    //                     ]);
-    //                 }
-    //             }
-    //         }
-
-    //         DB::commit();
-    //         return back()->with('success', 'Data absensi berhasil diperbarui.');
-    //     } catch (\Exception $e) {
-    //         DB::rollBack();
-    //         return back()->with('error', 'Gagal menyimpan: ' . $e->getMessage());
-    //     }
-    // }
-
     public function bulkAbsensiBoronganUpdate(Request $request)
     {
+
         $request->validate([
             'date' => 'required|date',
             'data' => 'required|array',
+        ],[
+            'date.required' => 'Tanggal tidak boleh kosong.',
+            'data.required' => 'Data tidak boleh kosong.'
         ]);
 
         DB::beginTransaction();

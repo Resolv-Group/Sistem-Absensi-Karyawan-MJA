@@ -8,11 +8,15 @@
     {{-- 1. Initialize from PHP Session (Page Reloads) --}}
     x-init="
         @if(session('success'))
-            show = true; type = 'success'; message = '{{ session('success') }}';
-            setTimeout(() => show = false, 3000);
+            show = true;
+            type = 'success';
+            message = '{{ session('success') }}';
+            setTimeout(() => show = false, 7000);
         @elseif(session('error'))
-            show = true; type = 'error'; message = '{{ session('error') }}';
-            setTimeout(() => show = false, 3000);
+            show = true;
+            type = 'error';
+            message = '{{ session('error') }}';
+            setTimeout(() => show = false, 7000);
         @endif
     "
 
@@ -21,7 +25,7 @@
         show = true;
         type = $event.detail.type || 'success';
         message = $event.detail.message;
-        setTimeout(() => show = false, 3000);
+        setTimeout(() => show = false, 7000);
     "
 
     class="fixed top-5 right-5 z-50 flex flex-col gap-2"

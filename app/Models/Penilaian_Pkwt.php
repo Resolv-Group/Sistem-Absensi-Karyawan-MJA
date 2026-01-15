@@ -14,7 +14,6 @@ class Penilaian_Pkwt extends Model
 
         'mk',
         'absensi',
-        'kategori',
         'pengetahuan',
         'kualitas',
         'sikap',
