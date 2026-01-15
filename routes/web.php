@@ -170,7 +170,7 @@ Route::middleware(['auth', 'role:hrd,pic,admin'])->group(function(){
     Route::get('/penilaian/unit/{unitId}/buat-penilaian', [PenilaianController::class, 'viewBuatPenilaian'])->name('view.buat.penilaian');
     Route::post('/buat-penilaian', [PenilaianController::class, 'buatPenilaian'])->name('buat.penilaian');
     Route::put('/penilaian/unit/bulk-update', [PenilaianController::class, 'bulkUpdateStatus'])->name('bulk.update.penilaian.pekerja');
-
+    Route::post('/penilaian/unit/{unitId}', [PenilaianController::class, 'ExportExcel'])->name('export.excel');
 });
 
 

@@ -15,5 +15,6 @@ class BidangUsaha extends Model
     // 2. DON'T FORGET THIS FROM THE PREVIOUS FIX
     protected $fillable = ['nama'];
 
+    
 
 }

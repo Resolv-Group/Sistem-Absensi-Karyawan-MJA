@@ -355,23 +355,18 @@
                                         </button>
 
                                         {{-- Status Update Form --}}
-                                        <form action="{{ route('bulk.update.penilaian.pekerja') }}" method="POST"
-                                            class="flex gap-2">
-                                            @csrf @method('put')
-                                            <input type="hidden" name="ids" :value="JSON.stringify(selectedItems)">
-                                            <button name="action" value="export_excel"
-                                                class="flex items-center gap-1.5 px-4 py-2 bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-xl text-xs font-bold hover:bg-emerald-600 hover:text-white transition-all group"
-                                                title="Export to Excel">
-                                                {{-- Ikon Spreadsheet / Excel --}}
-                                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <form action="{{ route('export.excel', $unit->id) }}" method="POST" class="inline">
+                                            @csrf
+                                            {{-- Alpine.js otomatis mengisi value ini dengan ID yang dicentang dalam format JSON --}}
+                                            <input type="hidden" name="worker_ids" :value="JSON.stringify(selectedItems)">
+
+                                            <button type="submit"
+                                                class="flex items-center gap-1.5 px-4 py-2 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-xl text-xs font-bold hover:bg-emerald-600 hover:text-white transition-all shadow-sm">
+                                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                         d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                                 </svg>
-                                                Export Excel
-                                            </button>
-                                            <button type="button" @click="showStatusModal = true"
-                                                class="px-4 py-2 bg-gray-50 text-gray-600 border border-gray-200 rounded-xl text-xs font-bold hover:bg-gray-800 hover:text-white transition-all">
-                                                Update Status
+                                                Stream Excel
                                             </button>
                                         </form>
                                     </div>
