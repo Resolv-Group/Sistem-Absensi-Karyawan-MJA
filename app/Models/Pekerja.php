@@ -76,4 +76,8 @@ class Pekerja extends Model
             ->whereDate('tgl_absensi', $date);
     }
 
+    public function penilaianPkwt()
+    {
+        return $this->hasMany(Penilaian_Pkwt::class, 'id_pekerja');
+    }
 }

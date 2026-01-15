@@ -130,4 +130,9 @@ class Unit extends Model
             ->count();
     }
 
+    public function penilaian()
+    {
+        // 'id_unit' is the foreign key on the borongan table
+        return $this->hasMany(Penilaian_Pkwt::class, 'id_unit');
+    }
 }

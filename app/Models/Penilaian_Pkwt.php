@@ -28,4 +28,13 @@ class Penilaian_Pkwt extends Model
         'created_by',
     ];
 
+    public function pekerja()
+    {
+        return $this->belongsTo(Pekerja::class, 'id_pekerja');
+    }
+
+    public function unit()
+    {
+        return $this->belongsTo(Unit::class, 'id_unit');
+    }
 }
