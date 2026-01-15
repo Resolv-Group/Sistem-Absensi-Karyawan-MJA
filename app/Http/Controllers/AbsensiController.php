@@ -212,7 +212,7 @@ class AbsensiController extends Controller
                 $q->where('tgl_absensi', $date)->where('id_unit', $id_unit)->where('verifikasi', $status);
             });
         }
-
+        
         $pkwtPekerja = $pkwtQuery->paginate(25)->withQueryString();;
 
         $existingBorongan = [];
