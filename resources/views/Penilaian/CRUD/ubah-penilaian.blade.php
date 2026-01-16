@@ -35,10 +35,10 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             {{-- SISI KIRI: FORM INPUT (8 Kolom) --}}
             <div class="lg:col-span-7 space-y-6">
-                <form action="{{ route('buat.penilaian') }}" method="POST" enctype="multipart/form-data"
-                    x-data="workerForm()" class="space-y-6">
+                <form action="{{ route('ubah.penilaian', ['penilaianId' => $penilaian->id, 'unitId' => $penilaian->id_unit, 'pekerjaId' => $penilaian->id_pekerja]) }}" method="POST" enctype="multipart/form-data"
+                    x-data="workerForm()" x-init="init()" class="space-y-6">
                     @csrf
-                    @method('POST')
+                    @method('put')
 
                     {{-- CARD 1: INFORMASI UNIT --}}
                     <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 relative overflow-hidden group">
@@ -557,7 +557,7 @@
                                             d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                                     </svg>
                                     <span class="text-xs font-medium text-gray-400">
-                                        <span x-text="rows.length + ' penilaian pekerja akan dibuat.'"></span>
+                                        <span x-text="rows.length + ' penilaian pekerja akan diperbarui'"></span>
                                     </span>
                                 </div>
                             </div>
@@ -580,6 +580,7 @@
                                             d="M5 13l4 4L19 7" />
                                     </svg>
                                 </button>
+
                             </div>
 
                         </div>
@@ -727,38 +728,38 @@
 @section('scripts')
     <script>
         window.oldRows = @js(
-    old('pekerja')
-        ? // Jika ada data 'old' dari session (setelah gagal validasi)
-        collect(old('pekerja'))->map(function ($item, $index) use ($pkwtList) {
-            // Cari data asli pekerja dari pkwtList untuk mendapatkan Nama & NIK
-            $original = $pkwtList->firstWhere('id_pekerja', $item['id_pekerja']);
-            return [
-                'id' => $item['id'] ?? ($original->id ?? null),
-                'workerId' => $item['id_pekerja'],
-                'absensi' => $item['absensi'] ?? '',
-                'pengetahuan' => $item['pengetahuan'] ?? '',
-                'kualitas' => $item['kualitas'] ?? '',
-                'sikap' => $item['sikap'] ?? '',
-                'mk' => $item['mk'] ?? 0,
-                'keterangan' => $item['keterangan'] ?? '',
-                'nama' => $original->pekerja->nama ?? 'Tidak Ditemukan',
-                'nik' => $original->pekerja->nik ?? '-',
-            ];
-        })
-        : $pkwtList->map(function ($item) {
-            return [
-                'id' => $item->id,
-                'workerId' => $item->id_pekerja,
-                'gaji' => $item->gaji_harian,
-                // Tambahkan field lain jika perlu
-                'tglMulai' => $item->tgl_mulai_pkwt,
-                'tglAkhir' => $item->tgl_akhir_pkwt,
-                // Kita simpan nama & nik untuk tampilan combobox readonly
-                'nama' => $item->pekerja->nama,
-                'nik' => $item->pekerja->nik,
-            ];
-        }),
-);
+            old('pekerja')
+                ? collect(old('pekerja'))->map(function ($item) use ($pkwt) {
+                    return [
+                        'id' => $item['id'] ?? null,
+                        'workerId' => $item['id_pekerja'],
+                        'absensi' => $item['absensi'] ?? '',
+                        'pengetahuan' => $item['pengetahuan'] ?? '',
+                        'kualitas' => $item['kualitas'] ?? '',
+                        'sikap' => $item['sikap'] ?? '',
+                        'mk' => $item['mk'] ?? 0,
+                        'keterangan' => $item['keterangan'] ?? '',
+                        'totalPoin' => $item['total_skor'] ?? 0,
+                        'nama' => $pkwt->pekerja->nama ?? '',
+                        'nik' => $pkwt->pekerja->nik ?? '',
+                    ];
+                })
+                : [[
+                    'id' => $penilaian->id,
+                    'workerId' => $penilaian->id_pekerja,
+                    'absensi' => $penilaian->absensi,
+                    'pengetahuan' => $penilaian->pengetahuan,
+                    'kualitas' => $penilaian->kualitas,
+                    'sikap' => $penilaian->sikap,
+                    'mk' => $penilaian->mk,
+                    'keterangan' => $penilaian->keterangan,
+                    'totalPoin' => $penilaian->total,
+                    'nama' => $pkwt->pekerja->nama ?? '',
+                    'nik' => $pkwt->pekerja->nik ?? '',
+                    'grade' => '', // Akan dihitung oleh init()
+                ]]
+        );
+
 
         function workerCombobox(row) {
             return {
@@ -767,13 +768,6 @@
                 selectedId: row.workerId || null,
 
                 init() {
-                    // If an ID is already set (e.g., from old() data), populate search field
-                    // if (this.selectedId) {
-                    //     const p = window.workersData.find(w => w.id == this.selectedId);
-                    //     if (p) {
-                    //         this.search = `${p.nama} (${p.nik})`;
-                    //     }
-                    // }
                     if (row.nama && row.nik) {
                         this.search = `${row.nama} (${row.nik})`;
                     }
@@ -874,55 +868,34 @@
             }
         }
 
-        // (Combobox logic for Unit remains the same...)
-        document.addEventListener('alpine:init', () => {
-            Alpine.data('combobox', (listData) => ({
-                // ... existing unit combobox code ...
-                list: listData,
-                search: '',
-                selectedId: '',
-                open: false,
-                get filteredList() {
-                    if (this.search === '') return this.list;
-                    return this.list.filter(i => i.nama.toLowerCase().includes(this.search
-                        .toLowerCase()));
-                },
-                select(item) {
-                    this.selectedId = item.id;
-                    this.search = item.nama;
-                    this.open = false;
-                }
-            }))
-        })
-
         document.getElementById('btnSimpan').addEventListener('click', function () {
 
+    Swal.fire({
+        title: 'Simpan Perubahan Penilaian?',
+        text: 'Pastikan data yang diinput sudah benar.',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#059669', // emerald-600
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Ya, Simpan',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+
             Swal.fire({
-                title: 'Simpan Penilaian?',
-                text: 'Pastikan data yang diinput sudah benar.',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#059669', // emerald-600
-                cancelButtonColor: '#6b7280',
-                confirmButtonText: 'Ya, Simpan',
-                cancelButtonText: 'Batal'
-            }).then((result) => {
-                if (result.isConfirmed) {
-
-                    Swal.fire({
-                        title: 'Menyimpan...',
-                        text: 'Mohon tunggu',
-                        allowOutsideClick: false,
-                        allowEscapeKey: false,
-                        didOpen: () => {
-                            Swal.showLoading()
-                        }
-                    })
-
-                    // submit form terdekat
-                    this.closest('form').submit();
+                title: 'Menyimpan...',
+                text: 'Mohon tunggu',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                didOpen: () => {
+                    Swal.showLoading()
                 }
             })
-        });
+
+            // submit form terdekat
+            this.closest('form').submit();
+        }
+    })
+});
     </script>
 @endsection

@@ -19,6 +19,13 @@ class PKWT extends Model
         return $this->belongsTo(Pekerja::class, 'id_pekerja', 'id');
     }
 
+    //buat view penilaian (more than 1 item)
+public function penilaian()
+{
+    // Hubungkan hanya berdasarkan id_pekerja secara standar
+    return $this->hasMany(Penilaian_Pkwt::class, 'id_pekerja', 'id_pekerja');
+}
+
     public function unit()
     {
         return $this->belongsTo(Unit::class, 'id_unit');

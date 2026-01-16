@@ -37,4 +37,12 @@ class Penilaian_Pkwt extends Model
     {
         return $this->belongsTo(Unit::class, 'id_unit');
     }
+
+    //buat view penilaian (more than 1 item)
+    public function pkwt()
+    {
+        // Menghubungkan kembali ke PKWT berdasarkan id_pekerja
+        return $this->belongsTo(PKWT::class, 'id_pekerja', 'id_pekerja')
+                    ->whereColumn('id_unit', 'penilaian_pkwt.id_unit');
+    }
 }
