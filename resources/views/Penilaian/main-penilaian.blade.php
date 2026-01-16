@@ -14,13 +14,20 @@
         showFilterDropdown: false,
         showStatusModal: false,
         searchQuery: '',
-        filterStatus: '',
         statusValue: '1',
 
         // Track the current page number
         currentPage: {{ $pkwtPekerja->currentPage() }},
 
         allIds: {{ json_encode($pkwtPekerja->pluck('id')) }},
+        alreadyAssessed: @js($alreadyAssessedIds),
+
+        get hasSelectedAssessed() {
+            return this.selectedItems.some(id => this.alreadyAssessed.includes(id));
+        },
+        get isSelectionClean() {
+            return this.selectedItems.length > 0 && this.selectedItems.every(id => !this.alreadyAssessed.includes(id));
+        },
 
         toggleAll() {
             this.selectedItems = this.selectedItems.length === this.allIds.length ? [] : [...this.allIds];
@@ -33,7 +40,7 @@
                 // If called from Pagination Link
                 url = new URL(targetUrl);
                 // If no search is active, save this as our current 'base' page
-                if (!this.searchQuery && !this.filterDivisi && !this.filterJabatan && !this.filterStatus) {
+                if (!this.searchQuery) {
                     this.currentPage = url.searchParams.get('page') || 1;
                 }
             } else {
@@ -42,7 +49,7 @@
 
                 // Logic: If user is typing, we force page 1 to find results.
                 // If user cleared everything, we restore the saved currentPage.
-                if (!this.searchQuery && !this.filterDivisi && !this.filterJabatan && !this.filterStatus) {
+                if (!this.searchQuery ) {
                     url.searchParams.set('page', this.currentPage);
                 } else {
                     url.searchParams.set('page', '1');
@@ -51,7 +58,6 @@
 
             // Apply all filters to the URL
             url.searchParams.set('search', this.searchQuery);
-            url.searchParams.set('status', this.filterStatus);
 
             try {
                 const response = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
@@ -79,8 +85,7 @@
             // Our logic inside updateTable will see filters are empty and restore Page 2
         },
 
-    }" x-init="$watch('searchQuery', () => updateTable());
-    $watch('filterStatus', () => updateTable());">
+    }" x-init="$watch('searchQuery', () => updateTable());">
 
         {{-- HEADER SECTION --}}
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
@@ -142,7 +147,7 @@
                         </div>
 
                         {{-- Right Side: Grid Stats Cards --}}
-                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        <div class="grid grid-cols-2 sm:grid-cols-2 gap-3">
 
                             {{-- Total Card --}}
                             <div
@@ -163,7 +168,13 @@
                                     Ternilai</p>
                                 <div class="flex items-end gap-1">
                                     <span
-                                        class="text-3xl font-black text-emerald-600 leading-none">{{ $unit->pkwt()->where('status_aktif', 1)->count() }}</span>
+                                        class="text-3xl font-black text-emerald-600 leading-none">{{ $unit->pkwt()
+                                            ->where('status_aktif', 1)
+                                            ->whereHas('penilaian', function ($q) use ($unit) {
+                                                $q->where('id_unit', $unit->id);
+                                            })
+                                            ->count()
+                                        }}</span>
                                     <svg class="w-4 h-4 text-emerald-400 mb-1" fill="none" viewBox="0 0 24 24"
                                         stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
@@ -171,26 +182,6 @@
                                     </svg>
                                 </div>
                             </div>
-
-                            {{-- NEW WORKERS CARD (Surprise) --}}
-                            <div
-                                class="bg-gray-50/50 border border-gray-100 rounded-3xl p-5 min-w-[140px] hover:bg-white hover:shadow-xl hover:shadow-purple-900/5 transition-all duration-300 group">
-                                @php
-                                    $newCount = $unit
-                                        ->pkwt()
-                                        ->where('created_at', '>=', now()->subDays(30))
-                                        ->count();
-                                @endphp
-                                <p
-                                    class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 text-purple-500">
-                                    Butuh Penilaian</p>
-                                <div class="flex items-end gap-1">
-                                    <span
-                                        class="text-3xl font-black text-purple-600 leading-none">+{{ $newCount }}</span>
-                                    <span class="flex h-2 w-2 rounded-full bg-purple-400 mb-2 animate-bounce"></span>
-                                </div>
-                            </div>
-
                         </div>
                     </div>
                 </div>
@@ -198,7 +189,7 @@
         </div>
 
         {{-- MAIN CONTENT --}}
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 ">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 mb-8">
             <div class="bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-200">
 
                 {{-- TOOLBAR --}}
@@ -217,107 +208,6 @@
                         </div>
 
                         <div class="relative">
-                            <button @click="showFilterDropdown = !showFilterDropdown"
-                                class="flex items-center gap-2 px-5 py-3 bg-gray-50 rounded-2xl text-sm font-bold text-gray-600 hover:bg-gray-100 transition">
-                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-                                </svg>
-                                Filter
-                                <span x-show="filterDivisi || filterJabatan || filterStatus"
-                                    class="w-2 h-2 bg-blue-500 rounded-full"></span>
-                            </button>
-
-                            <div x-show="showFilterDropdown" x-transition:enter="transition ease-out duration-200"
-                                x-transition:enter-start="opacity-0 scale-95 translate-y-2"
-                                x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-                                x-transition:leave="transition ease-in duration-150"
-                                x-transition:leave-start="opacity-100 scale-100 translate-y-0"
-                                x-transition:leave-end="opacity-0 scale-95 translate-y-2"
-                                @click.outside="showFilterDropdown = false" x-cloak
-                                class="absolute right-0 mt-3 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 z-[70] p-5 origin-top-right">
-
-                                {{-- Header --}}
-                                <div class="flex justify-between items-center mb-5">
-                                    <h3 class="text-sm font-bold text-gray-800">Filter Data</h3>
-                                    <button @click="resetFilters()"
-                                        class="text-xs font-medium text-gray-400 hover:text-red-500 hover:bg-red-50 px-2 py-1 rounded transition">
-                                        Reset Filter
-                                    </button>
-                                </div>
-
-                                <div class="space-y-5">
-
-                                    {{-- STATUS FILTER --}}
-                                    <div x-data="{ open: false, list: [{ val: '', label: 'Semua Status' }, { val: '1', label: 'Aktif' }, { val: '0', label: 'Nonaktif' }] }" class="relative">
-                                        <label
-                                            class="block text-[10px] uppercase tracking-wider font-bold text-gray-400 mb-1.5">Status
-                                            Keaktifan</label>
-                                        <div @click="open = !open"
-                                            class="relative block w-full pl-9 pr-3 py-2.5 text-sm bg-gray-50 border border-transparent rounded-xl text-gray-700 cursor-pointer hover:bg-gray-100 transition flex justify-between items-center">
-                                            <div
-                                                class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24"
-                                                    stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                </svg>
-                                            </div>
-                                            <span class="truncate font-medium"
-                                                x-text="list.find(x => x.val == filterStatus)?.label || 'Semua Status'"></span>
-                                            <svg class="w-4 h-4 text-gray-400 transition-transform duration-200"
-                                                :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M19 9l-7 7-7-7" />
-                                            </svg>
-                                        </div>
-
-                                        {{-- Inner List Dropdown --}}
-                                        <div x-show="open" @click.outside="open = false"
-                                            class="absolute w-full mt-1 bg-white rounded-xl shadow-xl border border-gray-100 z-[80] overflow-hidden">
-                                            <ul class="max-h-60 overflow-y-auto py-1">
-                                                <template x-for="item in list" :key="item.val">
-                                                    <li @click="filterStatus = item.val; open = false"
-                                                        class="px-4 py-2.5 text-sm cursor-pointer transition flex items-center gap-2"
-                                                        :class="filterStatus == item.val ?
-                                                            'bg-blue-50 text-blue-700 font-semibold' :
-                                                            'text-gray-700 hover:bg-gray-50'">
-                                                        <svg x-show="filterStatus == item.val"
-                                                            class="w-4 h-4 text-blue-600" fill="none"
-                                                            viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                stroke-width="2" d="M5 13l4 4L19 7" />
-                                                        </svg>
-                                                        <span x-show="filterStatus != item.val" class="w-4 h-4"></span>
-                                                        <span x-text="item.label"></span>
-                                                    </li>
-                                                </template>
-                                            </ul>
-                                        </div>
-                                    </div>
-
-                                </div>
-
-                                {{-- Info Helper for Preview Limitation --}}
-                                <div class="mt-4 p-3 bg-orange-50 rounded-xl border border-orange-100 flex gap-3">
-                                    <svg class="w-5 h-5 text-orange-500 flex-shrink-0 mt-0.5" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    <p class="text-[10px] text-orange-700 leading-relaxed">
-                                        <span class="font-bold">Mode Preview:</span> Pencarian ini hanya memindai <span
-                                            class="font-bold">5 data terbaru</span>. Jika tidak ditemukan, silakan cek di
-                                        halaman
-                                        <span class="italic font-bold">Master Borongan</span>.
-                                    </p>
-                                </div>
-                                <div class="mt-6 pt-4 border-t border-gray-50 text-center">
-                                    <p class="text-[10px] text-gray-400">Filter akan diterapkan otomatis</p>
-                                </div>
-                            </div>
-
                             {{-- Dropdown Filter UI (Gunakan yang sudah kita buat sebelumnya di sini) --}}
                             <div x-show="selectedItems.length > 0" x-transition:enter="transition ease-out duration-300"
                                 x-transition:enter-start="opacity-0 translate-y-10"
@@ -344,15 +234,41 @@
                                             class="px-3 py-2 text-xs font-bold text-gray-500 hover:text-gray-700 transition">Batal</button>
                                         <div class="h-6 w-px bg-gray-200 mx-1"></div>
 
-                                        {{-- Trigger Modal Button --}}
-                                        <button type="button"
-                                            @click="window.location.href = '{{ route('view.buat.penilaian', $unit->id) }}?ids=' + selectedItems.join(',')"
-                                            class="flex items-center gap-1.5 px-4 py-2 bg-blue-50 text-blue-700 border border-blue-100 rounded-xl text-xs font-bold hover:bg-blue-600 hover:text-white transition-all">
-                                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                                            </svg>
-                                            Buat Penilaian
-                                        </button>
+                                        {{-- 1. TOMBOL BUAT PENILAIAN (Hanya muncul jika SEMUA pilihan belum dinilai) --}}
+                                        <template x-if="isSelectionClean">
+                                            <button type="button"
+                                                @click="window.location.href = '{{ route('view.buat.penilaian', $unit->id) }}?ids=' + selectedItems.join(',')"
+                                                class="flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-xl text-xs font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-200">
+                                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+                                                </svg>
+                                                Buat Penilaian Baru
+                                            </button>
+                                        </template>
+
+                                        {{-- 2. PESAN PERINGATAN (Muncul jika ada campuran atau semua sudah dinilai) --}}
+                                        <template x-if="selectedItems.length > 0 && hasSelectedAssessed">
+                                            <div class="flex items-center gap-3 px-4 py-2 bg-orange-50 border border-orange-100 rounded-xl shadow-sm">
+                                                {{-- Animated Icon --}}
+                                                <div class="flex-shrink-0 relative flex h-2 w-2">
+                                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                                                    <span class="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
+                                                </div>
+
+                                                <div class="flex flex-col">
+                                                    <span class="text-[10px] font-black text-orange-700 uppercase tracking-tight">Pilihan Tidak Valid</span>
+                                                    <p class="text-[9px] font-bold text-orange-500 leading-none mt-0.5">
+                                                        Beberapa pekerja yang Anda pilih sudah memiliki data penilaian.
+                                                    </p>
+                                                </div>
+
+                                                {{-- Action to fix --}}
+                                                <button @click="selectedItems = selectedItems.filter(id => !alreadyAssessed.includes(id))"
+                                                    class="ml-2 px-2 py-1 bg-white border border-orange-200 text-[9px] font-black text-orange-600 rounded-lg hover:bg-orange-600 hover:text-white transition-all uppercase">
+                                                    batalkan pilihan yang sudah dinilai
+                                                </button>
+                                            </div>
+                                        </template>
 
                                         {{-- Status Update Form --}}
                                         <form action="{{ route('export.excel', $unit->id) }}" method="POST" class="inline">
@@ -477,11 +393,12 @@
                         </div>
                     </div>
 
-                    <a href="#"
-                    class="inline-flex items-center justify-center gap-2 px-6 py-3
-                            bg-emerald-600 text-white font-bold rounded-2xl
-                            hover:bg-emerald-700 shadow-lg shadow-emerald-100
-                            transition active:scale-95">
+                    <a href="{{ asset('panduan/INDIKATOR PENILAIAN KINERJA.xls') }}"
+                        download target="_blank"
+                        class="inline-flex items-center justify-center gap-2 px-6 py-3
+                                bg-emerald-600 text-white font-bold rounded-2xl
+                                hover:bg-emerald-700 shadow-lg shadow-emerald-100
+                                transition active:scale-95">
 
                         <!-- Download Icon -->
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -489,7 +406,7 @@
                                 d="M12 3v12m0 0l4-4m-4 4l-4-4M4 17h16" />
                         </svg>
 
-                        Download Panduan Indikator Penilaian
+                            Unduh Panduan Penilaian
                     </a>
 
                 </div>
@@ -512,11 +429,7 @@
                                     Urgensi Nilai</th>
                                 <th
                                     class="px-4 py-4 text-[11px] font-black text-gray-400 uppercase tracking-widest text-center">
-                                    Validasi HRD</th>
-                                <th
-                                    class="px-4 py-4 text-[11px] font-black text-gray-400 uppercase tracking-widest text-center">
                                     Masa Kontrak</th>
-                                <th class="pr-8 py-4"></th>
                             </tr>
                         </thead>
                         <tbody id="main-table-body" class="divide-y divide-gray-50">
