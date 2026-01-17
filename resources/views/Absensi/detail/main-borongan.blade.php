@@ -45,6 +45,39 @@
         /* End of Modal Absen */
     </style>
 
+    {{-- Error Alert Section --}}
+    @if ($errors->any())
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+            <div class="bg-red-50 border border-red-100 rounded-[2rem] p-5 shadow-sm shadow-red-100/50 flex items-start gap-4">
+                {{-- Icon Container --}}
+                <div class="flex-shrink-0 w-10 h-10 bg-white rounded-2xl shadow-sm border border-red-100 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+
+                {{-- Message Content --}}
+                <div class="flex-1 pt-0.5">
+                    <h3 class="text-md font-black text-red-900 uppercase tracking-tight mb-1">Terjadi Kesalahan</h3>
+                    <ul class="space-y-0.5">
+                        @foreach ($errors->all() as $error)
+                            <li class="text-[13px] font-bold text-red-600/80 leading-relaxed">
+                                • {{ $error }}
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+
+                {{-- Close Button (Optional) --}}
+                <button onclick="this.parentElement.parentElement.remove()" class="text-red-400 hover:text-red-600 transition-colors">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    @endif
+
     <div x-data="{
         selectedItems: [],
         showFilterDropdown: false,
@@ -75,8 +108,8 @@
 
             // 1. Calculate the current Total QTY
             const totalQTY = (parseInt(row.FD) || 0) +
-                            (parseInt(row.act_rej) || 0) +
-                            (parseInt(row.good_mc) || 0);
+                (parseInt(row.act_rej) || 0) +
+                (parseInt(row.good_mc) || 0);
 
             // 2. Update the row object so the UI knows the total
             row.totalQTY = totalQTY;
@@ -236,8 +269,7 @@
             // Our logic inside updateTable will see filters are empty and restore Page 2
         },
 
-    }" x-init="
-    calculateAllExistingPrices();
+    }" x-init="calculateAllExistingPrices();
     $watch('searchQuery', () => updateTable());
     $watch('filterStatus', () => updateTable());
     $watch('filterVerifikasi', () => updateTable());">
@@ -360,7 +392,6 @@
         {{-- MAIN CONTENT --}}
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 ">
             <div class="bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-200">
-
                 {{-- TOOLBAR --}}
                 <div
                     class="px-6 py-6 rounded-3xl border-b border-gray-100 flex flex-col md:flex-row justify-between gap-4 bg-white">
@@ -587,7 +618,7 @@
 
                                 <form
                                     action="{{ route('absensi.borongan.bulk.update', ['id_unit' => $unit->id, 'date' => $date]) }}"
-                                    method="POST" enctype="multipart/form-data"
+                                    method="POST" enctype="multipart/form-data" x-ref="absenForm" x-data="absenFormHandler()"
                                     class="relative bg-white rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.1)] w-full max-w-6xl overflow-hidden flex flex-col max-h-[90vh] border border-gray-100">
                                     @csrf
                                     @method('PUT')
@@ -611,7 +642,8 @@
                                                     <h1 class="text-base font-black text-slate-800 tracking-tight">Presensi
                                                         Borongan</h1>
                                                     <span
-                                                        class="px-2 py-0.5 bg-orange-100 text-orange-700 text-[12px] font-black uppercase tracking-widest rounded-md">Sistem Aktif
+                                                        class="px-2 py-0.5 bg-orange-100 text-orange-700 text-[12px] font-black uppercase tracking-widest rounded-md">Sistem
+                                                        Aktif
                                                     </span>
                                                 </div>
                                                 <p
@@ -910,8 +942,8 @@
                                                                             <input type="number"
                                                                                 :name="'data[' + workerId + '][' + rIdx +
                                                                                     '][act_rej]'"
-                                                                                    x-model.number="row.act_rej"
-                                                                                    @input="updatePrices(workerId, rIdx)"
+                                                                                x-model.number="row.act_rej"
+                                                                                @input="updatePrices(workerId, rIdx)"
                                                                                 class="bg-slate-50 border-transparent rounded-xl px-3 py-2 text-xs font-bold focus:bg-white focus:ring-2 focus:ring-orange-100 outline-none transition-all">
                                                                         </div>
 
@@ -923,45 +955,64 @@
                                                                             <input type="number"
                                                                                 :name="'data[' + workerId + '][' + rIdx +
                                                                                     '][good_mc]'"
-                                                                                    x-model.number="row.good_mc"
-                                                                                    @input="updatePrices(workerId, rIdx)"
+                                                                                x-model.number="row.good_mc"
+                                                                                @input="updatePrices(workerId, rIdx)"
                                                                                 class="bg-slate-50 border-transparent rounded-xl px-3 py-2 text-xs font-bold focus:bg-white focus:ring-2 focus:ring-emerald-50 outline-none transition-all">
                                                                         </div>
                                                                     </div>
 
                                                                     {{-- 2. TOTAL QUANTITY DISPLAY (Matches the UI Vibe) --}}
-                                                                    <div class="mt-4 p-4 rounded-2xl border-2 border-dashed border-orange-100 bg-orange-50/30 flex items-center justify-between">
+                                                                    <div
+                                                                        class="mt-4 p-4 rounded-2xl border-2 border-dashed border-orange-100 bg-orange-50/30 flex items-center justify-between">
                                                                         <div class="flex items-center gap-3">
                                                                             <div class="p-2 bg-orange-100 rounded-lg">
-                                                                                <svg class="w-4 h-4 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                                                                <svg class="w-4 h-4 text-orange-600"
+                                                                                    fill="none" viewBox="0 0 24 24"
+                                                                                    stroke="currentColor">
+                                                                                    <path stroke-linecap="round"
+                                                                                        stroke-linejoin="round"
+                                                                                        stroke-width="2.5"
+                                                                                        d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                                                                                 </svg>
                                                                             </div>
                                                                             <div>
-                                                                                <p class="text-[10px] font-black text-orange-400 uppercase tracking-widest leading-none">Total Produksi</p>
-                                                                                <p class="text-[11px] font-bold text-slate-500 mt-1">Akumulasi QTY Terinput</p>
+                                                                                <p
+                                                                                    class="text-[10px] font-black text-orange-400 uppercase tracking-widest leading-none">
+                                                                                    Total Produksi</p>
+                                                                                <p
+                                                                                    class="text-[11px] font-bold text-slate-500 mt-1">
+                                                                                    Akumulasi QTY Terinput</p>
                                                                             </div>
                                                                         </div>
 
                                                                         <div class="flex items-baseline gap-1">
-                                                                            <span class="text-3xl font-black text-orange-600 tracking-tighter"
+                                                                            <span
+                                                                                class="text-3xl font-black text-orange-600 tracking-tighter"
                                                                                 x-text="(parseInt(row.FD) || 0) + (parseInt(row.act_rej) || 0) + (parseInt(row.good_mc) || 0)">
                                                                             </span>
-                                                                            <span class="text-[10px] font-black text-orange-400 uppercase">Pcs</span>
+                                                                            <span
+                                                                                class="text-[10px] font-black text-orange-400 uppercase">Pcs</span>
                                                                         </div>
 
                                                                         {{-- Hidden input for form submission --}}
-                                                                        <input type="hidden" :name="'data[' + workerId + '][' + rIdx + '][totalQTY]'"
-                                                                            :value="(parseInt(row.FD) || 0) + (parseInt(row.act_rej) || 0) + (parseInt(row.good_mc) || 0)">
+                                                                        <input type="hidden"
+                                                                            :name="'data[' + workerId + '][' + rIdx +
+                                                                                '][totalQTY]'"
+                                                                            :value="(parseInt(row.FD) || 0) + (parseInt(row
+                                                                                .act_rej) || 0) + (parseInt(row
+                                                                                .good_mc) || 0)">
                                                                     </div>
 
                                                                     {{-- Baris Bawah: 3 Kolom (Reject MC & Hasil Akhir) --}}
                                                                     <div class="grid grid-cols-2 gap-3 mt-4">
                                                                         {{-- FIELD: TAGIHAN PERUSAHAAN --}}
                                                                         <div class="flex flex-col gap-1.5">
-                                                                            <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Tagihan Perusahaan</label>
+                                                                            <label
+                                                                                class="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Tagihan
+                                                                                Perusahaan</label>
                                                                             <div class="relative flex items-center">
-                                                                                <span class="absolute left-3 text-[10px] font-black text-slate-400">Rp.</span>
+                                                                                <span
+                                                                                    class="absolute left-3 text-[10px] font-black text-slate-400">Rp.</span>
 
                                                                                 {{-- Display Only Input (With Dots) --}}
                                                                                 <input type="text" readonly
@@ -970,16 +1021,20 @@
 
                                                                                 {{-- Actual Data Input (Sent to Database) --}}
                                                                                 <input type="hidden"
-                                                                                    :name="'data[' + workerId + '][' + rIdx + '][bayaranPerusahaan]'"
+                                                                                    :name="'data[' + workerId + '][' + rIdx +
+                                                                                        '][bayaranPerusahaan]'"
                                                                                     x-model="row.bayaranPerusahaan">
                                                                             </div>
                                                                         </div>
 
                                                                         {{-- FIELD: BAYARAN PEKERJA --}}
                                                                         <div class="flex flex-col gap-1.5">
-                                                                            <label class="text-[11px] font-black text-orange-600 uppercase tracking-widest ml-1">Bayaran Pekerja</label>
+                                                                            <label
+                                                                                class="text-[11px] font-black text-orange-600 uppercase tracking-widest ml-1">Bayaran
+                                                                                Pekerja</label>
                                                                             <div class="relative flex items-center">
-                                                                                <span class="absolute left-3 text-[10px] font-black text-orange-300">Rp.</span>
+                                                                                <span
+                                                                                    class="absolute left-3 text-[10px] font-black text-orange-300">Rp.</span>
 
                                                                                 {{-- Display Only Input (With Dots) --}}
                                                                                 <input type="text" readonly
@@ -988,7 +1043,8 @@
 
                                                                                 {{-- Actual Data Input (Sent to Database) --}}
                                                                                 <input type="hidden"
-                                                                                    :name="'data[' + workerId + '][' + rIdx + '][bayaranItem]'"
+                                                                                    :name="'data[' + workerId + '][' + rIdx +
+                                                                                        '][bayaranItem]'"
                                                                                     x-model="row.bayaranItem">
                                                                             </div>
                                                                         </div>
@@ -1066,8 +1122,7 @@
                                                                     <div class="flex flex-col gap-1.5">
                                                                         <label
                                                                             class="text-[12px] font-black text-slate-400 uppercase tracking-widest ml-1">Catatan</label>
-                                                                        <textarea :name="'data[' + workerId + '][' + rIdx + '][catatan]'" rows="1"
-                                                                            x-model="row.catatan"
+                                                                        <textarea :name="'data[' + workerId + '][' + rIdx + '][catatan]'" rows="1" x-model="row.catatan"
                                                                             placeholder="Tambahkan keterangan tambahan..."
                                                                             class="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-2.5 text-xs font-semibold text-slate-700 focus:bg-white focus:ring-2 focus:ring-orange-100 focus:border-orange-400 outline-none transition-all resize-none shadow-sm placeholder:text-slate-300"></textarea>
                                                                     </div>
@@ -1108,7 +1163,7 @@
                                         <div class="flex items-center gap-4">
                                             <button type="button" @click="showAbsenModal = false"
                                                 class="px-6 py-3 text-xs font-black text-gray-400 uppercase tracking-widest hover:text-gray-600 transition">Batal</button>
-                                            <button type="submit"
+                                            <button type="button" @click="confirmSubmit()"
                                                 class="px-10 py-4 bg-orange-600 text-white text-xs font-black uppercase tracking-[0.2em] rounded-2xl hover:bg-orange-700 shadow-xl shadow-orange-100 transition-all active:scale-95">
                                                 Simpan Semua Data
                                             </button>
@@ -1161,7 +1216,9 @@
                                     {{-- Scrollable Table Area --}}
                                     <form
                                         action="{{ route('absensi.borongan.bulk.update', ['id_unit' => $unit->id, 'date' => $date]) }}"
-                                        method="POST" class="flex-1 overflow-y-auto custom-scrollbar bg-white p-10 pt-6">
+                                        method="POST"
+                                        x-ref="absenForm"
+                                        x-data="absenFormHandler()" class="flex-1 overflow-y-auto custom-scrollbar bg-white p-10 pt-6">
                                         @csrf
                                         @method('PUT')
                                         <input type="hidden" name="date" value="{{ $date }}">
@@ -1269,7 +1326,7 @@
                                             class="sticky bottom-0 mt-10 py-6 bg-white/90 backdrop-blur-md border-t border-gray-100 flex items-center justify-end gap-4">
                                             <button type="button" @click="showAbsenStatusModal = false"
                                                 class="px-6 py-3 text-xs font-black text-gray-400 uppercase tracking-widest hover:text-gray-600 transition">Batal</button>
-                                            <button type="submit"
+                                            <button type="button" @click="confirmSubmit()"
                                                 class="px-10 py-4 bg-orange-600 text-white text-xs font-black uppercase tracking-[0.2em] rounded-2xl hover:bg-orange-700 shadow-2xl shadow-orange-200 transition-all active:scale-95">
                                                 Simpan Keterangan
                                             </button>
@@ -1344,5 +1401,36 @@
                 }
             }
         });
+
+    function absenFormHandler() {
+        return {
+            confirmSubmit() {
+                Swal.fire({
+                    title: 'Simpan Data Absensi?',
+                    text: 'Pastikan semua data sudah benar sebelum disimpan.',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#EA580C',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Ya, Simpan',
+                    cancelButtonText: 'Batal',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: 'Menyimpan...',
+                            text: 'Mohon tunggu',
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            didOpen: () => {
+                                Swal.showLoading()
+                            }
+                        })
+
+                        this.$refs.absenForm.submit()
+                    }
+                })
+            }
+        }
+    }
     </script>
 @endsection

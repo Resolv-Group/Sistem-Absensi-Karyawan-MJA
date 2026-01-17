@@ -95,6 +95,7 @@ Route::middleware(['auth', 'role:pic,admin'])->group(function(){
     Route::get('/absensi/{id_unit}/harian/{date}', [AbsensiController::class, 'ViewHarian'])->name('view.absensi.harian');
     Route::get('/absensi/{id_unit}/borongan/{date}', [AbsensiController::class, 'ViewBorongan'])->name('view.absensi.borongan');
     Route::put('/absensi/{id_unit}/harian/{date}/bulk-update-harian', [AbsensiController::class, 'bulkAbsensiUpdate'])->name('absensi.bulk.update');
+    Route::put('/absensi/{id_unit}/harian/{date}/bulk-update-status-harian', [AbsensiController::class, 'bulkAbsensiUpdateStatus'])->name('absensi.bulk.update-status');
     Route::put('/absensi/{id_unit}/borongan/{date}/bulk-update-borongan', [AbsensiController::class, 'bulkAbsensiBoronganUpdate'])->name('absensi.borongan.bulk.update');
 
 });
