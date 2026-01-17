@@ -44,6 +44,39 @@
         /* End of Modal Absen */
     </style>
 
+    {{-- Error Alert Section --}}
+    @if ($errors->any())
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+            <div class="bg-red-50 border border-red-100 rounded-[2rem] p-5 shadow-sm shadow-red-100/50 flex items-start gap-4">
+                {{-- Icon Container --}}
+                <div class="flex-shrink-0 w-10 h-10 bg-white rounded-2xl shadow-sm border border-red-100 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+
+                {{-- Message Content --}}
+                <div class="flex-1 pt-0.5">
+                    <h3 class="text-md font-black text-red-900 uppercase tracking-tight mb-1">Terjadi Kesalahan</h3>
+                    <ul class="space-y-0.5">
+                        @foreach ($errors->all() as $error)
+                            <li class="text-[13px] font-bold text-red-600/80 leading-relaxed">
+                                • {{ $error }}
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+
+                {{-- Close Button (Optional) --}}
+                <button onclick="this.parentElement.parentElement.remove()" class="text-red-400 hover:text-red-600 transition-colors">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    @endif
+
     <div x-data="{
         selectedItems: [],
         showFilterDropdown: false,
@@ -681,7 +714,7 @@
                                     {{-- Scrollable List Area --}}
                                     <form
                                         action="{{ route('absensi.bulk.update', ['id_unit' => $unit->id, 'date' => $date]) }}"
-                                        method="POST" class="flex-1 overflow-y-auto custom-scrollbar bg-white">
+                                        method="POST" x-ref="absenForm" x-data="absenFormHandler()" class="flex-1 overflow-y-auto custom-scrollbar bg-white">
                                         @csrf
                                         @method('PUT')
                                         <input type="hidden" name="date" value="{{ $date }}">
@@ -796,7 +829,7 @@
                                             class="sticky bottom-0 px-10 py-5 bg-white/95 backdrop-blur-md border-t border-gray-100 flex items-center justify-end gap-4">
                                             <button type="button" @click="showAbsenModal = false"
                                                 class="px-6 py-2.5 text-[10px] font-black text-gray-400 uppercase tracking-widest hover:text-gray-600 transition">Batal</button>
-                                            <button type="submit"
+                                            <button type="button" @click="confirmSubmit()"
                                                 class="px-8 py-3 bg-blue-600 text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-xl hover:bg-blue-700 shadow-xl shadow-blue-200 transition-all active:scale-95">Simpan
                                                 Semua</button>
                                         </div>
@@ -847,8 +880,10 @@
 
                                     {{-- Scrollable Table Area --}}
                                     <form
-                                        action="{{ route('absensi.bulk.update', ['id_unit' => $unit->id, 'date' => $date]) }}"
-                                        method="POST" class="flex-1 overflow-y-auto custom-scrollbar bg-white p-10 pt-6">
+                                        action="{{ route('absensi.bulk.update-status', ['id_unit' => $unit->id, 'date' => $date]) }}"
+                                        method="POST" x-ref="absenForm"
+                                        x-data="absenFormHandler()"
+                                        class="flex-1 overflow-y-auto custom-scrollbar bg-white p-10 pt-6">
                                         @csrf
                                         @method('PUT')
                                         <input type="hidden" name="date" value="{{ $date }}">
@@ -901,7 +936,7 @@
                                                                 ]
                                                             }" class="relative">
 
-                                                                <input type="hidden" :name="'data[' + id + '][status]'"
+                                                                <input type="hidden" :name="'data[' + id + '][status_kehadiran]'"
                                                                     x-model="rowStatus[id]">
 
                                                                 <div @click="open = !open" @click.outside="open = false"
@@ -957,7 +992,7 @@
                                             class="sticky bottom-0 mt-10 py-6 bg-white/90 backdrop-blur-md border-t border-gray-100 flex items-center justify-end gap-4">
                                             <button type="button" @click="showAbsenStatusModal = false"
                                                 class="px-6 py-3 text-xs font-black text-gray-400 uppercase tracking-widest hover:text-gray-600 transition">Batal</button>
-                                            <button type="submit"
+                                            <button type="button" @click="confirmSubmit()"
                                                 class="px-10 py-4 bg-blue-600 text-white text-xs font-black uppercase tracking-[0.2em] rounded-2xl hover:bg-blue-700 shadow-2xl shadow-blue-200 transition-all active:scale-95">
                                                 Simpan Keterangan
                                             </button>
@@ -1031,5 +1066,36 @@
                 }
             }
         });
+
+        function absenFormHandler() {
+            return {
+                confirmSubmit() {
+                    Swal.fire({
+                        title: 'Simpan Data Absensi?',
+                        text: 'Pastikan semua data sudah benar sebelum disimpan.',
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#2563EB',
+                        cancelButtonColor: '#6b7280',
+                        confirmButtonText: 'Ya, Simpan',
+                        cancelButtonText: 'Batal',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            Swal.fire({
+                                title: 'Menyimpan...',
+                                text: 'Mohon tunggu',
+                                allowOutsideClick: false,
+                                allowEscapeKey: false,
+                                didOpen: () => {
+                                    Swal.showLoading()
+                                }
+                            })
+
+                            this.$refs.absenForm.submit()
+                        }
+                    })
+                }
+            }
+        }
     </script>
 @endsection

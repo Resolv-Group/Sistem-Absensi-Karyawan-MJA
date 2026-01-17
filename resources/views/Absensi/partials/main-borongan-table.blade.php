@@ -46,6 +46,8 @@
                 $limit = 1;
                 $visibleItems = $allBorongan->take($limit);
                 $hiddenItems = $allBorongan->slice($limit);
+
+
             @endphp
 
             @if ($allBorongan->isNotEmpty())
@@ -95,15 +97,15 @@
                                     </div>
                                 </div>
 
-                                {{-- <div class="flex flex-col items-end flex-shrink-0 ml-4">
+                                <div class="flex flex-col items-end flex-shrink-0 ml-4">
                                     <div class="flex items-baseline gap-1">
                                         <span class="text-[15px] font-black text-orange-600 leading-none">
-                                            {{ number_format($item->totalQTY ?? 0) }}
+                                            {{ number_format($item->FD + $item->act_rej + $item->good_mc ?? 0)  }}
                                         </span>
                                         <span
                                             class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Qty</span>
                                     </div>
-                                </div> --}}
+                                </div>
                             </div>
                         @endif
                     @endforeach
@@ -172,14 +174,14 @@
                                                     @endif
                                                 </div>
                                             </div>
-                                            {{-- <div class="text-right ml-4">
+                                            <div class="text-right ml-4">
                                                 <div class="flex items-baseline gap-1">
                                                     <span
-                                                        class="text-[13px] font-black text-orange-600 leading-none">{{ number_format($item->totalQTY ?? 0) }}</span>
+                                                        class="text-[13px] font-black text-orange-600 leading-none">{{ number_format($item->FD + $item->act_rej + $item->good_mc ?? 0) }}</span>
                                                     <span
                                                         class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Qty</span>
                                                 </div>
-                                            </div> --}}
+                                            </div>
                                         </div>
                                     @endforeach
                                 </div>

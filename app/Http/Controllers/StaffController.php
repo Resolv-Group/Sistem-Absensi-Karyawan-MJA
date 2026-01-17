@@ -115,7 +115,7 @@ class StaffController extends Controller
 
         // Gabungkan
         $defaultIdStaff = "{$numberFormatted}-{$dateFormatted}";
-        
+
         return view('Staff.CRUD.tambah-staff', compact('defaultIdStaff'));
     }
 
@@ -335,11 +335,9 @@ class StaffController extends Controller
                 ->route('view.tambah.staff')
                 ->with('success', 'Data Staff ' . $staff->nama . ' berhasil ditambahkan.');
         } catch (QueryException $e) {
-            // If the DB fails, we catch it here so Laravel doesn't try to render the blob
-            // We only return the text message, not the binary data
-            dd('Database Error Occurred:', $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan query: ' . $e->getMessage());
         } catch (\Exception $e) {
-            dd('General Error:', $e->getMessage());
+            return back()->with('error', 'Gagal menyimpan: ' . $e->getMessage());
         }
     }
 
@@ -526,11 +524,9 @@ class StaffController extends Controller
 
             return redirect()->route('view.detail.staff', $id)->with('success', 'Data staff berhasil diperbarui');
         } catch (QueryException $e) {
-            // If the DB fails, we catch it here so Laravel doesn't try to render the blob
-            // We only return the text message, not the binary data
-            dd('Database Error Occurred:', $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan query: ' . $e->getMessage());
         } catch (\Exception $e) {
-            dd('General Error:', $e->getMessage());
+            return back()->with('error', 'Gagal menyimpan: ' . $e->getMessage());
         }
 
     }
@@ -620,9 +616,9 @@ class StaffController extends Controller
         } catch (QueryException $e) {
             // If the DB fails, we catch it here so Laravel doesn't try to render the blob
             // We only return the text message, not the binary data
-            dd('Database Error Occurred:', $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan query: ' . $e->getMessage());
         } catch (\Exception $e) {
-            dd('General Error:', $e->getMessage());
+            return back()->with('error', 'Gagal menyimpan: ' . $e->getMessage());
         }
     }
 
