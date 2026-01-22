@@ -31,7 +31,7 @@ class UnitSeeder extends Seeder
                 'mulai_perjanjian' => $faker->date(),
                 'akhir_perjanjian' => $faker->date(),
                 'dokumen_mou' => null, // placeholder BLOB
-                'nama_unit' => 1,
+                'nama_unit' => $faker->name(),
                 'persentase_management_fee' => 10,
                 'sistem_pengajian' => 1,
                 //Sistem pengajian, 1 = harian, 2 = borongan
