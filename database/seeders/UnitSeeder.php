@@ -35,6 +35,9 @@ class UnitSeeder extends Seeder
                 'persentase_management_fee' => 10,
                 'sistem_pengajian' => 1,
                 //Sistem pengajian, 1 = harian, 2 = borongan
+                'umk' => 100000,
+                'bpjs_kesehatan' => 0,
+                'bpjs_naker' => 0,
             ]);
         }
 
@@ -48,6 +51,9 @@ class UnitSeeder extends Seeder
                 'persentase_management_fee' => 10,
                 'sistem_pengajian' => 1,
                 //Sistem pengajian, 1 = harian, 2 = borongan
+                'umk' => 100000,
+                'bpjs_kesehatan' => 1,
+                'bpjs_naker' => 2,
             ]);
 
         Unit::create([
@@ -60,6 +66,9 @@ class UnitSeeder extends Seeder
                 'persentase_management_fee' => 10,
                 'sistem_pengajian' => 2,
                 //Sistem pengajian, 1 = harian, 2 = borongan
+                'umk' => 100000,
+                'bpjs_kesehatan' => 1,
+                'bpjs_naker' => 2,
             ]);
 
         PicUnit::create([
@@ -107,6 +116,10 @@ class UnitSeeder extends Seeder
                     'gaji_harian'     => $unitId == 6
                         ? $faker->numberBetween(100000, 150000) // harian
                         : $faker->numberBetween(150000, 250000), // borongan
+                    
+                    'gaji_overtime' => 100000,
+                    'bpjs_kesehatan' => 0,
+                    'bpjs_naker' => 0,
                 ]);
 
                 $index++;

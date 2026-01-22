@@ -21,6 +21,9 @@ class Unit extends Model
         'nama_unit',
         'persentase_management_fee',
         'sistem_pengajian',
+        'umk',
+        'bpjs_naker',
+        'bpjs_kesehatan',
         'status_aktif'
     ];
 
