@@ -13,10 +13,7 @@
                         Nama Unit
                     </th>
                     <th class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">
-                        ID Unit
-                    </th>
-                    <th class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">
-                        Nama PIC
+                        Grandtotal
                     </th>
                     <th class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">
                         Tipe Pengajian
@@ -33,11 +30,9 @@
 
             <tbody id="table-company-body" class="bg-white divide-y divide-gray-200">
 
-                @include('Unit.partials.table-body', ['unit' => $unit])
+                @include('Payroll.partials.table-body', ['unit' => $unit])
             </tbody>
         </table>
-    </div>
-
     @if ($unit->hasPages())
         <!-- Ensure this ID matches the JS selector -->
         <div id="search-pagination" class="border-t border-gray-200 bg-gray-50 px-4 py-3 sm:px-6">
