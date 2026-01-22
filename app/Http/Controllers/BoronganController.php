@@ -23,7 +23,9 @@ class BoronganController extends Controller
             })
             ->exists();
 
-        if (! $isAllowed ) {
+        if(in_array($user->role, ['admin', 'hrd']))
+        {}
+        elseif(! $isAllowed ) {
             abort(403, 'Anda tidak memiliki akses ke unit ini');
         }
 
@@ -65,11 +67,13 @@ class BoronganController extends Controller
             })
             ->exists();
 
-        if (! $isAllowed ) {
+        if(in_array($user->role, ['admin', 'hrd']))
+        {}
+        elseif(! $isAllowed ) {
             abort(403, 'Anda tidak memiliki akses ke unit ini');
         }
 
-        
+
         // Assuming you have Unit and Pekerja models
         $units = \App\Models\Unit::select('id', 'nama_unit as nama')->get();
         $unitSelected = Unit::with('namaMitra')->where('id', $id_unit)->firstOrFail();

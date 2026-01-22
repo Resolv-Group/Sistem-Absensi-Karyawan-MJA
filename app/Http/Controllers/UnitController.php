@@ -187,7 +187,9 @@ class UnitController extends Controller
             })
             ->exists();
 
-        if (! $isAllowed ) {
+        if(in_array($user->role, ['admin', 'hrd']))
+        {}
+        elseif(! $isAllowed ) {
             abort(403, 'Anda tidak memiliki akses ke unit ini');
         }
 
@@ -327,10 +329,12 @@ class UnitController extends Controller
             })
             ->exists();
 
-        if (! $isAllowed ) {
+        if(in_array($user->role, ['admin', 'hrd']))
+        {}
+        elseif(! $isAllowed ) {
             abort(403, 'Anda tidak memiliki akses ke unit ini');
         }
-        
+
         $unit = Unit::findOrFail($id);
 
         $mitraKerjaList = MitraKerja::select('id as val', 'nama_mitra as label')->get();

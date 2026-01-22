@@ -86,6 +86,8 @@ Route::middleware(['auth', 'role:hrd,admin'])->group(function(){
 
     //Payroll
     Route::get('/main-payroll', [PayrollController::class, 'viewPayrollMain'])->name('view.payroll');
+    Route::get('/test/export-detail-borongan', [PayrollController::class, 'ExportDetailBorongan'] )->name('test.export.detail.borongan');
+
 
     //Pekerja
     Route::get('/daftar-pekerja', [PekerjaController::class, 'viewPekerjaMain'])->name('view.pekerja');
