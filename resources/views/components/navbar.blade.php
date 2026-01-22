@@ -109,7 +109,7 @@
         @endif
 
         {{-- Penilaian Logic --}}
-        @if (in_array(Auth::user()->role, ['admin', 'hrd']))
+        @if (in_array(Auth::user()->role, ['admin']))
             <li>
                 <a href="/penilaian"
                     class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all duration-300
@@ -332,7 +332,7 @@
         @endif
 
         {{-- 4. PENILAIAN LOGIC --}}
-        @if (in_array(Auth::user()->role, ['admin', 'hrd']))
+        @if (in_array(Auth::user()->role, ['admin']))
             <a href="/penilaian"
                 class="flex items-center gap-3 p-3 rounded-xl font-bold text-sm transition-all
                 {{ Request::is('penilaian*') ? 'bg-red-50 text-red-600' : 'text-gray-600 hover:bg-gray-50' }}">

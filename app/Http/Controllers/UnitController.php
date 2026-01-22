@@ -178,6 +178,19 @@ class UnitController extends Controller
 
     public function viewDetailUnit(Request $request, $id)
     {
+        $user = auth()->user(); // staff login
+
+        // CEK PIC PUNYA UNIT INI ATAU TIDAK
+        $isAllowed = Unit::where('id', $id)
+            ->whereHas('picUnit', function ($q) use ($user) {
+                $q->where('id_pic', $user->id);
+            })
+            ->exists();
+
+        if (! $isAllowed ) {
+            abort(403, 'Anda tidak memiliki akses ke unit ini');
+        }
+
         $unit = Unit::with(['picUnit.staff', 'namaMitra'])->findOrFail($id);
         $shifts = Shift_Absen::select('id', 'nama', 'waktu_masuk', 'waktu_keluar')->where('id_unit', $id)->get();
 
@@ -305,6 +318,19 @@ class UnitController extends Controller
 
     function ubahUnit(Request $request, $id)
     {
+        $user = auth()->user(); // staff login
+
+        // CEK PIC PUNYA UNIT INI ATAU TIDAK
+        $isAllowed = Unit::where('id', $id)
+            ->whereHas('picUnit', function ($q) use ($user) {
+                $q->where('id_pic', $user->id);
+            })
+            ->exists();
+
+        if (! $isAllowed ) {
+            abort(403, 'Anda tidak memiliki akses ke unit ini');
+        }
+        
         $unit = Unit::findOrFail($id);
 
         $mitraKerjaList = MitraKerja::select('id as val', 'nama_mitra as label')->get();

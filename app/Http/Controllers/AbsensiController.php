@@ -22,7 +22,7 @@ class AbsensiController extends Controller
         $user = Auth::user();
         $staff = $user->staff;
         $today = Carbon::today();
-        $limit = Carbon::today()->addDays(7);
+        $limit = Carbon::today()->addDays(30);
 
         // 🔥 1. Ambil tanggal (default: hari ini)
         $date = $request->date ?? now()->toDateString();
@@ -68,8 +68,6 @@ class AbsensiController extends Controller
                 $q->where('id_pic', $staff->id);
             })
             ->count();
-
-        // dd($totalPenilaian);
 
         // 🔥 7. AJAX support
         if ($request->ajax()) {

@@ -75,8 +75,6 @@ Route::middleware(['auth', 'role:hrd,akuntan,admin'])->group(function(){
     Route::get('/daftar-staff', [StaffController::class, 'viewStaffMain'])->name('view.staff');
     Route::get('/staff/tambah', [StaffController::class, 'viewTambahStaff'])->name('view.tambah.staff');
     Route::post('/tambah-staff', [StaffController::class, 'tambahStaff'])->name('tambah.staff.post');
-
-    
 });
 
 Route::middleware(['auth', 'role:hrd,admin'])->group(function(){
@@ -88,23 +86,6 @@ Route::middleware(['auth', 'role:hrd,admin'])->group(function(){
 
     //Payroll
     Route::get('/main-payroll', [PayrollController::class, 'viewPayrollMain'])->name('view.payroll');
-});
-
-Route::middleware(['auth', 'role:pic,admin'])->group(function(){
-
-    Route::get('/unit/detail/{id}', [UnitController::class, 'viewDetailUnit'])->name('view.detail.unit');
-
-    //Absensi
-    Route::get('/absensi', [AbsensiController::class, 'viewAbsensiMain'])->name('view.absensi');
-    Route::get('/absensi/{id_unit}/harian/{date}', [AbsensiController::class, 'ViewHarian'])->name('view.absensi.harian');
-    Route::get('/absensi/{id_unit}/borongan/{date}', [AbsensiController::class, 'ViewBorongan'])->name('view.absensi.borongan');
-    Route::put('/absensi/{id_unit}/harian/{date}/bulk-update-harian', [AbsensiController::class, 'bulkAbsensiUpdate'])->name('absensi.bulk.update');
-    Route::put('/absensi/{id_unit}/harian/{date}/bulk-update-status-harian', [AbsensiController::class, 'bulkAbsensiUpdateStatus'])->name('absensi.bulk.update-status');
-    Route::put('/absensi/{id_unit}/borongan/{date}/bulk-update-borongan', [AbsensiController::class, 'bulkAbsensiBoronganUpdate'])->name('absensi.borongan.bulk.update');
-
-});
-
-Route::middleware(['auth', 'role:hrd,pic,admin'])->group(function(){
 
     //Pekerja
     Route::get('/daftar-pekerja', [PekerjaController::class, 'viewPekerjaMain'])->name('view.pekerja');
@@ -125,23 +106,53 @@ Route::middleware(['auth', 'role:hrd,pic,admin'])->group(function(){
     Route::put('/mitra-kerja/ubah/{id}', [MitraKerjaController::class, 'updateMitraKerja'])->name('update.mitra-kerja');
     Route::put('/mitra-kerja/toggle-status/{id}', [MitraKerjaController::class, 'toggleStatus']);
 
-    //Unit -> Main - Detail
+    //Tambah Bidang Usaha Mitra Kerja
+    Route::POST('/tambah-bidang-usaha', [BidangUsahaController::class, 'tambahBidangUsaha'])->name('tambah.bidang-usaha.post');
+
+    //Unit Spesifik untuk HRD
     Route::get('/unit', [UnitController::class, 'viewUnitMain'])->name('view.unit');
     Route::get('/unit/tambah', [UnitController::class, 'viewTambahUnit'])->name('view.tambah.unit');
     Route::POST('/tambah-unit', [UnitController::class, 'tambahUnit'])->name('tambah.unit.post');
+});
+
+Route::middleware(['auth', 'role:pic,admin'])->group(function(){
+    //Absensi
+    Route::get('/absensi', [AbsensiController::class, 'viewAbsensiMain'])->name('view.absensi');
+    Route::get('/absensi/{id_unit}/harian/{date}', [AbsensiController::class, 'ViewHarian'])->name('view.absensi.harian');
+    Route::get('/absensi/{id_unit}/borongan/{date}', [AbsensiController::class, 'ViewBorongan'])->name('view.absensi.borongan');
+    Route::put('/absensi/{id_unit}/harian/{date}/bulk-update-harian', [AbsensiController::class, 'bulkAbsensiUpdate'])->name('absensi.bulk.update');
+    Route::put('/absensi/{id_unit}/harian/{date}/bulk-update-status-harian', [AbsensiController::class, 'bulkAbsensiUpdateStatus'])->name('absensi.bulk.update-status');
+    Route::put('/absensi/{id_unit}/borongan/{date}/bulk-update-borongan', [AbsensiController::class, 'bulkAbsensiBoronganUpdate'])->name('absensi.borongan.bulk.update');
+
+    //Penilaian
+    //Filtered
+    Route::get('/penilaian/unit/{id}', [PenilaianController::class, 'viewPenilaianMain'])->name('view.penilaian');
+    //=--=
+    Route::get('/penilaian/unit/{unitId}/buat-penilaian', [PenilaianController::class, 'viewBuatPenilaian'])->name('view.buat.penilaian');
+    Route::post('/buat-penilaian', [PenilaianController::class, 'buatPenilaian'])->name('buat.penilaian');
+    Route::get('/penilaian/{penilaianId}/unit/{unitId}/pekerja/{pekerjaId}/', [PenilaianController::class, 'viewUbahPenilaian'])->name('view.ubah.penilaian');
+    Route::put('/penilaian/{penilaianId}/unit/{unitId}/pekerja/{pekerjaId}/ubah', [PenilaianController::class, 'ubahPenilaian'])->name('ubah.penilaian');
+    Route::put('/penilaian/unit/bulk-update', [PenilaianController::class, 'bulkUpdateStatus'])->name('bulk.update.penilaian.pekerja');
+    Route::post('/penilaian/unit/{unitId}', [PenilaianController::class, 'ExportExcel'])->name('export.excel');
+});
+
+Route::middleware(['auth', 'role:hrd,pic,admin'])->group(function(){
+    //Unit -> Main - Detail
+    //Filtered
     Route::get('/unit/detail/{id}', [UnitController::class, 'viewDetailUnit'])->name('view.detail.unit');
     Route::get('/unit/ubah/{id}', [UnitController::class, 'ubahUnit'])->name('view.ubah.unit');
+    //=--=
     Route::put('/unit/ubah/{id}', [UnitController::class, 'updateUnit'])->name('update.unit');
-    Route::get('/unit/detail/{id}', [UnitController::class, 'viewDetailUnit'])->name('view.detail.unit');
-
     Route::put('/unit/detail/{id}/shifts', [ShiftAbsenController::class, 'update'])->name('unit.shifts.update');
 
     //Unit -> Status
     Route::put('/unit/toggle-status/{id}', [UnitController::class, 'toggleStatus']);
 
     //Unit -> PKWT
+    //Filtered
     Route::get('/unit/{id}/daftar-pkwt', [PKWTController::class, 'viewPKWTMain'])->name('view.pkwt');
     Route::get('/unit/{id}/tambah-pekerja', [PKWTController::class, 'viewTambahUnitHarian'])->name('view.tambah.unit-pekerja');
+    //=--=
     Route::POST('/tambah-unit-pekerja', [PKWTController::class, 'tambahPekerjaUnit'])->name('tambah.unit-pekerja.post');
     Route::get('/unit/{unitId}/pekerja/{pekerjaId}/ubah', [PKWTController::class, 'ubahUnitPekerja'])->name('view.ubah.unit-pekerja');
     Route::put('/unit/{unitId}/pekerja/{pekerjaId}/ubah', [PKWTController::class, 'updateUnitPekerja'])->name('update.unit-pekerja');
@@ -152,8 +163,10 @@ Route::middleware(['auth', 'role:hrd,pic,admin'])->group(function(){
     // Route::put('/unit/{unitId}/pekerja/{pekerjaId]/toggle-status/', [UnitController::class, 'toggleStatusPKWT']);
 
     //Unit -> Borongan
+    //=--=
     Route::get('/unit/{id}/daftar-borongan', [BoronganController::class, 'viewBoronganMain'])->name('view.borongan');
     Route::get('/unit/{id}/tambah-borongan', [BoronganController::class, 'viewTambahBorongan'])->name('view.tambah.unit-borongan');
+    //=--=
     Route::POST('/tambah-unit-borongan', [BoronganController::class, 'tambahBoronganUnit'])->name('tambah.unit-borongan.post');
     Route::get('/unit/{unitId}/borongan/{boronganId}/ubah', [BoronganController::class, 'ubahUnitBorongan'])->name('view.ubah.unit-borongan');
     Route::put('/unit/{unitId}/borongan/{boronganId}/ubah', [BoronganController::class, 'updateUnitBorongan'])->name('update.unit-borongan');
@@ -161,25 +174,11 @@ Route::middleware(['auth', 'role:hrd,pic,admin'])->group(function(){
     Route::put('/unit/borongan/bulk-update-kategori', [BoronganController::class, 'bulkUpdateKategori'])->name('bulk.update.kategori');
     Route::put('/unit/borongan/bulk-update-status', [BoronganController::class, 'bulkUpdateStatus'])->name('bulk.update.borongan');
 
-    //Tambah Bidang Usaha
-    Route::POST('/tambah-bidang-usaha', [BidangUsahaController::class, 'tambahBidangUsaha'])->name('tambah.bidang-usaha.post');
-
     //Show Dokumen
     Route::get('/unit/{id}/stream/mou', [UnitController::class, 'showDokumenMOU'])
     ->name('stream.mou');
     Route::get('/pkwt/{id}/stream/pkwt', [UnitController::class, 'showDokumenPKWT'])
     ->name('stream.pkwt');
-
-    //Penilaian
-    Route::get('/penilaian/unit/{id}', [PenilaianController::class, 'viewPenilaianMain'])->name('view.penilaian');
-    Route::get('/penilaian/unit/{unitId}/buat-penilaian', [PenilaianController::class, 'viewBuatPenilaian'])->name('view.buat.penilaian');
-    Route::post('/buat-penilaian', [PenilaianController::class, 'buatPenilaian'])->name('buat.penilaian');
-    Route::get('/penilaian/{penilaianId}/unit/{unitId}/pekerja/{pekerjaId}/', [PenilaianController::class, 'viewUbahPenilaian'])->name('view.ubah.penilaian');
-    Route::put('/penilaian/{penilaianId}/unit/{unitId}/pekerja/{pekerjaId}/ubah', [PenilaianController::class, 'ubahPenilaian'])->name('ubah.penilaian');
-
-    Route::put('/penilaian/unit/bulk-update', [PenilaianController::class, 'bulkUpdateStatus'])->name('bulk.update.penilaian.pekerja');
-
-    Route::post('/penilaian/unit/{unitId}', [PenilaianController::class, 'ExportExcel'])->name('export.excel');
 });
 
 

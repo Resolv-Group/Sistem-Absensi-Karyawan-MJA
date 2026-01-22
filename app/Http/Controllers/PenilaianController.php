@@ -20,6 +20,19 @@ class PenilaianController extends Controller
     //Ambil periode PKWT hampir habis → filter → pagination → tandai yang sudah dinilai → tampilkan (AJAX / full view)
     public function viewPenilaianMain(Request $request, $id_unit)
     {
+        $user = auth()->user(); // staff login
+
+        // CEK PIC PUNYA UNIT INI ATAU TIDAK
+        $isAllowed = Unit::where('id', $id_unit)
+            ->whereHas('picUnit', function ($q) use ($user) {
+                $q->where('id_pic', $user->id);
+            })
+            ->exists();
+
+        if (! $isAllowed ) {
+            abort(403, 'Anda tidak memiliki akses ke unit ini');
+        }
+
         $unit = Unit::findOrFail($id_unit);
 
         $today = Carbon::today();

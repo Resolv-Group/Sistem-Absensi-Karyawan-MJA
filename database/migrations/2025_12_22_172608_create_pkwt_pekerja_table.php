@@ -32,7 +32,7 @@ return new class extends Migration
             $table->integer('status_aktif')->default(1);
             $table->unsignedInteger('gaji_harian')->nullable();
             $table->unsignedInteger('gaji_overtime')->nullable();
-
+        
             $table->integer('bpjs_kesehatan')->default(0);
             $table->integer('bpjs_naker')->default(0);
 

@@ -15,6 +15,19 @@ class PKWTController extends Controller
 {
     public function viewPKWTMain(Request $request, $id_unit)
     {
+        $user = auth()->user(); // staff login
+
+        // CEK PIC PUNYA UNIT INI ATAU TIDAK
+        $isAllowed = Unit::where('id', $id_unit)
+            ->whereHas('picUnit', function ($q) use ($user) {
+                $q->where('id_pic', $user->id);
+            })
+            ->exists();
+
+        if (! $isAllowed ) {
+            abort(403, 'Anda tidak memiliki akses ke unit ini');
+        }
+
         $unit = Unit::findOrFail($id_unit);
         $query = PKWT::with(['pekerja', 'jabatan', 'divisi'])->where('id_unit', $id_unit);
 
@@ -49,6 +62,21 @@ class PKWTController extends Controller
     }
     public function viewTambahUnitHarian($id_unit)
     {
+        $user = auth()->user(); // staff login
+
+        // CEK PIC PUNYA UNIT INI ATAU TIDAK
+        $isAllowed = Unit::where('id', $id_unit)
+            ->whereHas('picUnit', function ($q) use ($user) {
+                $q->where('id_pic', $user->id);
+            })
+            ->exists();
+
+        
+
+        if (! $isAllowed ) {
+            abort(403, 'Anda tidak memiliki akses ke unit ini');
+        }
+    
         // 1. Get current unit info
         $units = Unit::select('id', 'nama_unit as nama')->get();
         $unitSelected = Unit::with('namaMitra')->where('id', $id_unit)->firstOrFail();
