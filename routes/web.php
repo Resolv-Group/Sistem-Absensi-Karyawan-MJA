@@ -8,6 +8,7 @@ use App\Http\Controllers\BidangUsahaController;
 use App\Http\Controllers\BoronganController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MitraKerjaController;
+use App\Http\Controllers\PayrollController;
 use App\Http\Controllers\PekerjaController;
 use App\Http\Controllers\PenilaianController;
 use App\Http\Controllers\PKWTController;
@@ -75,6 +76,7 @@ Route::middleware(['auth', 'role:hrd,akuntan,admin'])->group(function(){
     Route::get('/staff/tambah', [StaffController::class, 'viewTambahStaff'])->name('view.tambah.staff');
     Route::post('/tambah-staff', [StaffController::class, 'tambahStaff'])->name('tambah.staff.post');
 
+    
 });
 
 Route::middleware(['auth', 'role:hrd,admin'])->group(function(){
@@ -84,6 +86,8 @@ Route::middleware(['auth', 'role:hrd,admin'])->group(function(){
     Route::put('/staff/ubah/{id}', [StaffController::class, 'updateStaff'])->name('update.staff');
     Route::put('/staff/toggle-status/{id}', [StaffController::class, 'toggleStatus']);
 
+    //Payroll
+    Route::get('/main-payroll', [PayrollController::class, 'viewPayrollMain'])->name('view.payroll');
 });
 
 Route::middleware(['auth', 'role:pic,admin'])->group(function(){
