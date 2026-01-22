@@ -69,6 +69,8 @@ class AbsensiController extends Controller
             })
             ->count();
 
+        // dd($totalPenilaian);
+
         // 🔥 7. AJAX support
         if ($request->ajax()) {
             return view('Absensi.partials.absensi-table', compact('units'))->render();
