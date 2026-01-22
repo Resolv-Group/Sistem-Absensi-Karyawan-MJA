@@ -24,7 +24,9 @@ class PKWTController extends Controller
             })
             ->exists();
 
-        if (! $isAllowed ) {
+        if(in_array($user->role, ['admin', 'hrd']))
+        {}
+        elseif(! $isAllowed ) {
             abort(403, 'Anda tidak memiliki akses ke unit ini');
         }
 
@@ -71,9 +73,9 @@ class PKWTController extends Controller
             })
             ->exists();
 
-        
-
-        if (! $isAllowed ) {
+        if(in_array($user->role, ['admin', 'hrd']))
+        {}
+        elseif(! $isAllowed ) {
             abort(403, 'Anda tidak memiliki akses ke unit ini');
         }
     
@@ -93,17 +95,6 @@ class PKWTController extends Controller
 
         return view('Unit.CRUD.tambah-unit-pekerja', compact('unitSelected', 'units', 'pekerjaList', 'divisiList', 'jabatanList'));
     }
-    // function viewTambahUnitHarian($id_unit)
-    // {
-    //     // Assuming you have Unit and Pekerja models
-    //     $units = Unit::select('id', 'nama_unit as nama')->get();
-    //     $unitSelected = Unit::with('namaMitra')->where('id', $id_unit)->firstOrFail();
-    //     $pekerjaList = Pekerja::select('id', 'nama', 'nik')->where('status_aktif', 1)->get();
-    //     $divisiList = Divisi::select('id', 'nama')->get();
-    //     $jabatanList = JabatanPKWT::select('id', 'nama')->get();
-
-    //     return view('Unit.CRUD.tambah-unit-pekerja', compact('unitSelected', 'units', 'pekerjaList', 'divisiList', 'jabatanList'));
-    // }
 
     function tambahPekerjaUnit(Request $request)
     {

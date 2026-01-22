@@ -196,7 +196,7 @@ class PenilaianController extends Controller
     public function ExportExcel(Request $request, $id_unit)
     {
         $ids = json_decode($request->worker_ids, true);
-
+        
         $pkwtList = PKWT::with('pekerja')
             ->whereIn('id', $ids)
             ->where('id_unit', $id_unit) // KUNCI KEAMANAN: Harus dalam unit yang sama
