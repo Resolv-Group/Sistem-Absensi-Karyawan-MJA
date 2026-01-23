@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Exports\DetilBoronganExport;
 use App\Models\Absensi;
+use App\Models\Pekerja;
 use App\Models\Unit;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -18,7 +20,7 @@ class PayrollController extends Controller
         $tidakAktif = Unit::where('status_aktif', '!=', '1')->count(); // pekerja tidak aktif
         $totalHarian = Unit::where('sistem_pengajian', 1)->count();
         $totalBorongan = Unit::where('sistem_pengajian', 2)->count();
-        
+
         // --- 2. BUILD QUERY ---
         $query = Unit::query()
             ->with(['picUnit.staff', 'namaMitra'])
@@ -65,6 +67,105 @@ class PayrollController extends Controller
 
         // Otherwise return the full page
         return view('Payroll.main-payroll', compact('unit', 'totalUnit', 'unitBaru', 'totalHarian', 'totalBorongan', 'tidakAktif'));
+    }
+
+    public function overviewPayroll(Request $request)
+    {
+        // dd($request->all());
+        // dd($id_unit);
+        $id_unit = $request->id_unit;
+
+        $unit = Unit::find($id_unit); // ⬅️ ambil unit
+
+        $paidWorkerIds = $request->input('paid_workers', []);
+        $tanggalMulai = $request->tanggal_mulai;
+        $tanggalAkhir = $request->tanggal_akhir;
+        $pembayaranLain = (int) $request->pembayaran_lain;
+        $tunjangan = (int) $request->tunjangan_bayaran;
+
+        $periode = Carbon::parse($tanggalMulai)->translatedFormat('d')
+        . '—'
+        . Carbon::parse($tanggalAkhir)->translatedFormat('d M Y');
+
+        // Ambil data pekerja yang dipilih
+        $workers = Pekerja::whereIn('id', $paidWorkerIds)
+                    ->orWhereIn('id_pekerja', $paidWorkerIds)
+                    ->get();
+
+        // Olah data potongan tanggal (Step 3) dari modal
+        $specificExclusions = collect($request->input('specific_workers', []))
+            ->filter(fn($item) => !empty($item['id']) && !empty($item['date']))
+            ->groupBy('id');
+
+        $payrollData = [
+            'unit_name' => $request->unit_name ?? 'Unit Borongan',
+            'periode' => Carbon::parse($tanggalMulai)->translatedFormat('d') . ' — ' . Carbon::parse($tanggalAkhir)->translatedFormat('d M Y'),
+            'pembayaran_lain' => $pembayaranLain,
+            'total_pekerja' => $workers->count(),
+            'items' => $workers->map(function($w) use ($id_unit, $periode, $specificExclusions, $pembayaranLain, $tunjangan, $tanggalMulai, $tanggalAkhir) {
+
+                // 1. Dapatkan list tanggal yang dikecualikan (potongan) untuk pekerja ini
+                $excludedDates = $specificExclusions->get($w->id_pekerja)
+                    ? $specificExclusions->get($w->id_pekerja)->pluck('date')->toArray()
+                    : [];
+
+                // 2. Query ke tabel Absensi yang memiliki Detil Borongan
+                // Kita hitung record dalam range tanggal Mula-Selesai, dan TIDAK TERMASUK tanggal potongan
+                $absensiRecords = Absensi::with([
+                        'detilBorongan.borongan:id,harga_pekerja,nama_item'
+                    ])
+                    ->whereBetween('tgl_absensi', [$tanggalMulai, $tanggalAkhir])
+                    ->where('id_unit', $id_unit)
+                    ->where('id_pekerja', $w->id)
+                    ->whereNotIn('tgl_absensi', $excludedDates)
+                    ->get();
+
+                // dd($absensiRecords, $w->id);
+
+                $totalQty = 0;
+                $totalGajiBorongan = 0;
+
+                foreach ($absensiRecords as $absensi) {
+                    foreach ($absensi->detilBorongan as $detil) {
+                        // Sesuai logika JS: totalQTY = FD + act_rej + good_mc
+                        $qtyPerBaris = ($detil->FD ?? 0) + ($detil->act_rej ?? 0) + ($detil->good_mc ?? 0);
+                        $totalQty += $qtyPerBaris;
+
+                        // Sesuai logika JS: bayaranItem = totalQTY * harga_pekerja
+                        // Kita asumsikan kolom 'bayaranItem' sudah tersimpan di DB saat presensi
+                        $totalGajiBorongan += ($detil->bayaranItem ?? 0);
+                    }
+                }
+
+                // Gaji Bersih = Total Hasil Borongan + Penyesuaian Global
+                $netSalary = $totalGajiBorongan - $pembayaranLain + $tunjangan;
+
+                return [
+                    'unit_id'   => $id_unit,
+                    'unit_name' => $unit?->nama_unit ?? '-',
+                    'id_pekerja' => $w->id_pekerja,
+                    'periode' => $periode,
+                    'nama' => $w->nama,
+                    'nik' => $w->nik,
+                    'total_barang' => $totalQty,
+                    'hasil_gaji_borongan' => $totalGajiBorongan,
+                    'potongan_count' => count($excludedDates),
+                    'net_salary' => $netSalary,
+                    'pembayaran_lain' => $pembayaranLain,
+                    'tunjangan' => $tunjangan,
+                ];
+            }),
+        ];
+
+        $payrollData['grand_total'] = collect($payrollData['items'])->sum('net_salary');
+
+        $payrollData['total_potongan_hari'] = collect($payrollData['items'])
+            ->sum('potongan_count');
+
+        $payrollData['total_penyesuaian'] = collect($payrollData['items'])
+            ->sum(fn ($item) => $item['tunjangan'] - $item['pembayaran_lain']);
+
+        return view('Payroll.overview-payroll', compact('payrollData'));
     }
 
     function ExportDetailBorongan()
@@ -142,7 +243,7 @@ class PayrollController extends Controller
             }
         }
 
-        
+
 
         // dd($data);
 
