@@ -123,6 +123,7 @@ class PayrollController extends Controller
                 // dd($absensiRecords, $w->id);
 
                 $totalQty = 0;
+                $tempQty = 0;
                 $totalGajiBorongan = 0;
 
                 foreach ($absensiRecords as $absensi) {
@@ -130,15 +131,19 @@ class PayrollController extends Controller
                         // Sesuai logika JS: totalQTY = FD + act_rej + good_mc
                         $qtyPerBaris = ($detil->FD ?? 0) + ($detil->act_rej ?? 0) + ($detil->good_mc ?? 0);
                         $totalQty += $qtyPerBaris;
+                        $tempQty += $qtyPerBaris;
 
                         // Sesuai logika JS: bayaranItem = totalQTY * harga_pekerja
                         // Kita asumsikan kolom 'bayaranItem' sudah tersimpan di DB saat presensi
-                        $totalGajiBorongan += ($detil->bayaranItem ?? 0);
+                        $totalGajiBorongan += $tempQty * ($detil->bayaranItem ?? 0);
+
+                        $tempQty = 0;
                     }
                 }
-
                 // Gaji Bersih = Total Hasil Borongan + Penyesuaian Global
                 $netSalary = $totalGajiBorongan - $pembayaranLain + $tunjangan;
+
+                // dd($netSalary);
 
                 return [
                     'unit_id'   => $id_unit,
