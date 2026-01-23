@@ -434,9 +434,10 @@
                     x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
                     class="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-slate-200 flex flex-col max-h-[90vh] overflow-hidden">
 
-                    <form action="#" method="POST" class="flex flex-col overflow-hidden">
+                    <form action="{{ route('overview.payroll') }}" method="POST" class="flex flex-col overflow-hidden">
                         @csrf
 
+                        <input type="hidden" name="id_unit" x-model="$store.payslip.unitId">
                         <!-- 1. FIXED HEADER -->
                         <div
                             class="px-8 py-6 border-b border-slate-100 flex justify-between items-center shrink-0 bg-white">
@@ -470,18 +471,29 @@
                                         class="block text-[11px] font-black text-slate-700 uppercase tracking-widest">Tentukan
                                         Periode Penggajian</label>
                                 </div>
+                                @php
+                                    use Carbon\Carbon;
+
+                                    $today = Carbon::today();
+                                    $startOfMonth = Carbon::today()->startOfMonth();
+                                @endphp
                                 <div class="bg-emerald-50/20 p-6 rounded-xl border border-emerald-100/50 ml-9">
                                     <div class="grid grid-cols-2 gap-6">
                                         <div class="space-y-1.5">
-                                            <span class="text-[9px] font-bold text-slate-400 uppercase ml-1">Tanggal
-                                                Mulai</span>
-                                            <input type="date" name="start_date" required
+                                            <span class="text-[9px] font-bold text-slate-400 uppercase ml-1">
+                                                Tanggal Mulai
+                                            </span>
+                                            <input type="date" name="tanggal_mulai"
+                                                value="{{ $startOfMonth->format('Y-m-d') }}" required
                                                 class="w-full bg-white border border-slate-200 rounded-lg text-sm font-bold text-slate-700 py-2.5 px-3 focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm">
                                         </div>
+
                                         <div class="space-y-1.5">
-                                            <span class="text-[9px] font-bold text-slate-400 uppercase ml-1">Tanggal
-                                                Selesai</span>
-                                            <input type="date" name="end_date" required
+                                            <span class="text-[9px] font-bold text-slate-400 uppercase ml-1">
+                                                Tanggal Selesai
+                                            </span>
+                                            <input type="date" name="tanggal_akhir"
+                                                value="{{ $today->format('Y-m-d') }}" required
                                                 class="w-full bg-white border border-slate-200 rounded-lg text-sm font-bold text-slate-700 py-2.5 px-3 focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm">
                                         </div>
                                     </div>
@@ -580,7 +592,8 @@
                                                 </ul>
                                             </div>
                                             <div class="flex-1">
-                                                <input type="date" :name="'specific_workers[' + index + '][date]'" required
+                                                <input type="date" :name="'specific_workers[' + index + '][date]'"
+                                                    required
                                                     class="w-full bg-white border border-slate-200 rounded-xl text-[11px] font-bold text-slate-700 py-2.5 px-3 focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm">
                                             </div>
                                             <button type="button" @click="removeExclusion(index)"
@@ -596,7 +609,7 @@
                                 </div>
                             </div>
 
-                            <!-- STEP 4: GLOBAL ADJUSTMENT (DENGAN RUPIAH FORMAT) -->
+                            <!-- STEP 4: Pembayaran Lain -->
                             <div class="space-y-4" x-data="{
                                 rawVal: '',
                                 // Fungsi pembantu untuk format di dalam komponen jika belum ada di parent
@@ -623,7 +636,39 @@
                                             class="w-full bg-white border border-slate-200 rounded-2xl pl-16 py-4 text-sm font-black text-slate-700 focus:ring-4 focus:ring-emerald-500/5 focus:border-emerald-500 transition-all shadow-sm">
 
                                         {{-- Hidden Input untuk dikirim ke Controller (Angka murni tanpa titik) --}}
-                                        <input type="hidden" name="global_adjustment" x-model="rawVal">
+                                        <input type="hidden" name="pembayaran_lain" x-model="rawVal">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- STEP 5: Tunjangan Lain -->
+                            <div class="space-y-4" x-data="{
+                                rawVal: '',
+                                // Fungsi pembantu untuk format di dalam komponen jika belum ada di parent
+                                formatRupiah(val) {
+                                    if (!val) return '';
+                                    return new Intl.NumberFormat('id-ID').format(val);
+                                }
+                            }">
+                                <div class="flex items-center gap-3">
+                                    <span
+                                        class="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-600 text-white text-[10px] font-black flex items-center justify-center shadow-lg shadow-emerald-200">4</span>
+                                    <label
+                                        class="block text-[11px] font-black text-slate-700 uppercase tracking-widest">Biaya Tunjangan
+                                    </label>
+                                </div>
+                                <div class="ml-9">
+                                    <div class="relative flex items-center group">
+                                        <span
+                                            class="absolute left-5 font-black text-emerald-500 text-xs border-r border-slate-100 pr-3">Rp.</span>
+
+                                        {{-- Input yang dilihat User --}}
+                                        <input type="text" placeholder="0" :value="formatRupiah(rawVal)"
+                                            @input="rawVal = $event.target.value.replace(/\D/g, '')"
+                                            class="w-full bg-white border border-slate-200 rounded-2xl pl-16 py-4 text-sm font-black text-slate-700 focus:ring-4 focus:ring-emerald-500/5 focus:border-emerald-500 transition-all shadow-sm">
+
+                                        {{-- Hidden Input untuk dikirim ke Controller (Angka murni tanpa titik) --}}
+                                        <input type="hidden" name="tunjangan_bayaran" x-model="rawVal">
                                     </div>
                                 </div>
                             </div>
@@ -635,9 +680,9 @@
                             <button type="button" @click="$store.payslip.close()"
                                 class="text-xs font-black text-slate-400 hover:text-slate-600 uppercase tracking-widest transition-colors">Batalkan</button>
 
-                            <button type="submit"
+                            <button type="button" id="btnPayrollSubmit"
                                 class="group flex items-center gap-4 bg-emerald-600 hover:bg-emerald-500 text-white px-10 py-4 rounded-xl font-black text-[11px] uppercase tracking-[0.2em] shadow-lg shadow-emerald-500/30 transition-all active:scale-95">
-                                <span>Execute Payroll</span>
+                                <span>Proses Payroll</span>
                                 <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform"
                                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
@@ -661,11 +706,13 @@
         document.addEventListener('alpine:init', () => {
             Alpine.store('payslip', {
                 isOpen: false,
+                unitId:'',
                 unitName: '',
                 workers: [],
                 selectedWorkers: [], // Array untuk menampung pekerja yang dicentang
 
-                open(unitName, workerList) {
+                open(unitId, unitName, workerList) {
+                    this.unitId = unitId;
                     this.unitName = unitName;
                     this.workers = workerList;
                     // OTOMATIS CENTANG SEMUA:
@@ -678,5 +725,23 @@
                 }
             })
         })
+
+        document.getElementById('btnPayrollSubmit').addEventListener('click', function () {
+            Swal.fire({
+                title: 'Proses Payroll?',
+                text: 'Pastikan data payroll sudah benar sebelum diproses.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#10b981', // emerald
+                cancelButtonColor: '#94a3b8',  // slate
+                confirmButtonText: 'Ya, Proses',
+                cancelButtonText: 'Batal',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // submit form terdekat
+                    this.closest('form').submit();
+                }
+            });
+        });
     </script>
 @endsection
