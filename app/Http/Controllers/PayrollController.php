@@ -71,7 +71,7 @@ class PayrollController extends Controller
 
     public function overviewPayroll(Request $request)
     {
-        // dd($request->all());
+        // dump($request->all());
         // dd($id_unit);
         $id_unit = $request->id_unit;
 
@@ -89,13 +89,14 @@ class PayrollController extends Controller
 
         // Ambil data pekerja yang dipilih
         $workers = Pekerja::whereIn('id', $paidWorkerIds)
-                    ->orWhereIn('id_pekerja', $paidWorkerIds)
                     ->get();
 
         // Olah data potongan tanggal (Step 3) dari modal
         $specificExclusions = collect($request->input('specific_workers', []))
             ->filter(fn($item) => !empty($item['id']) && !empty($item['date']))
             ->groupBy('id');
+
+            // dump($specificExclusions);
 
         $payrollData = [
             'unit_name' => $request->unit_name ?? 'Unit Borongan',
@@ -105,8 +106,8 @@ class PayrollController extends Controller
             'items' => $workers->map(function($w) use ($id_unit, $periode, $specificExclusions, $pembayaranLain, $tunjangan, $tanggalMulai, $tanggalAkhir) {
 
                 // 1. Dapatkan list tanggal yang dikecualikan (potongan) untuk pekerja ini
-                $excludedDates = $specificExclusions->get($w->id_pekerja)
-                    ? $specificExclusions->get($w->id_pekerja)->pluck('date')->toArray()
+                $excludedDates = $specificExclusions->get($w->id)
+                    ? $specificExclusions->get($w->id)->pluck('date')->toArray()
                     : [];
 
                 // 2. Query ke tabel Absensi yang memiliki Detil Borongan
