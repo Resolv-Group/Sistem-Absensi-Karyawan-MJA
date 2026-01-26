@@ -28,42 +28,169 @@
                         <h1 class="text-2xl font-black text-slate-800 tracking-tight leading-none">Review Penggajian<span
                                 class="text-emerald-500">.</span></h1>
                         <p class="text-xs font-bold text-slate-400 mt-1.5 uppercase tracking-widest">
-                            Unit: <span class="text-slate-700"> {{ $payrollData['unit_name'] ?? 'Unit 0'}}</span>
+                            Unit: <span class="text-slate-700"> {{ $payrollData['unit_name'] ?? 'Unit 0' }}</span>
                             <span class="mx-2 text-slate-200">|</span>
                             Periode: <span class="text-slate-700">{{ $payrollData['periode'] }}</span>
                         </p>
                     </div>
                 </div>
-
                 {{-- Export Action Cards --}}
                 <div class="flex gap-3">
-                    <a href="#"
-                        class="flex flex-col items-center justify-center w-20 h-20 bg-slate-50 border border-slate-200 rounded-2xl hover:bg-white hover:border-emerald-500 group transition-all shadow-sm">
-                        <svg class="w-5 h-5 text-slate-400 group-hover:text-emerald-600 transition-colors" fill="none"
-                            stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                        <span class="text-[9px] font-black uppercase tracking-tighter text-slate-500 mt-1">Tanda Terima</span>
-                    </a>
-                    <a href="#"
-                        class="flex flex-col items-center justify-center w-20 h-20 bg-slate-50 border border-slate-200 rounded-2xl hover:bg-white hover:border-emerald-500 group transition-all shadow-sm">
-                        <svg class="w-5 h-5 text-slate-400 group-hover:text-emerald-600 transition-colors" fill="none"
-                            stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                        <span class="text-[9px] font-black uppercase tracking-tighter text-slate-500 mt-1">Invoice</span>
-                    </a>
-                    <a href="#"
-                        class="flex flex-col items-center justify-center w-20 h-20 bg-slate-50 border border-slate-200 rounded-2xl hover:bg-white hover:border-emerald-500 group transition-all shadow-sm">
-                        <svg class="w-5 h-5 text-slate-400 group-hover:text-emerald-600 transition-colors" fill="none"
-                            stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-                        </svg>
-                        <span class="text-[9px] font-black uppercase tracking-tighter text-slate-500 mt-1">Kwitansi</span>
-                    </a>
+                    <div class="flex gap-4" x-data="resiModal()">
+                        {{-- Tanda Terima --}}
+                        @php
+                            // Siapkan array dasar
+                            $queryParameters = [
+                                'id_unit'   => $payrollData['unit_id'],
+                                'tgl_awal'  => $payrollData['tanggal_mulai'],
+                                'tgl_akhir' => $payrollData['tanggal_akhir'],
+                                'grand_total'  => $payrollData['grand_total'],
+                                'workers'   => [] // Inisialisasi array workers
+                            ];
+
+                            // Isi array workers secara berpasangan
+                            foreach ($payrollData['items'] as $index => $item) {
+                                $queryParameters['workers'][$index] = [
+                                    'id'   => $item['id_pekerja'],
+                                    'upah' => $item['net_salary']
+                                ];
+                            }
+                        @endphp
+                        <a href="{{ route('export.tanda-terima.borongan', $queryParameters) }}"
+                            target="_blank"
+                            class="flex flex-col items-center justify-center w-20 h-20 bg-slate-50 border border-slate-200 rounded-2xl hover:bg-white hover:border-emerald-500 group transition-all shadow-sm">
+
+                            <svg class="w-5 h-5 text-slate-400 group-hover:text-emerald-600 transition-colors"
+                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <span class="text-[9px] font-black uppercase tracking-tighter text-slate-500 mt-1">Tanda Terima</span>
+                        </a>
+
+                        {{-- Invoice --}}
+                        @php
+                            // Siapkan data dasar
+                            $payloadInvoice = [
+                                'id_unit'  => $payrollData['unit_id'],
+                                'grand_total'  => $payrollData['grand_total'],
+                            ];
+
+                            // Loop data pekerja untuk membuat key: workers[0][id], workers[0][upah], dst.
+                            foreach ($payrollData['items'] as $index => $item) {
+                                $payloadInvoice["workers[{$index}][id]"] = $item['id_pekerja'];
+                                $payloadInvoice["workers[{$index}][upah]"] = $item['net_salary'];
+                            }
+                        @endphp
+                        <button @click="open('Invoice', '{{ route('export.invoice.borongan') }}', {{ json_encode($payloadInvoice) }})"
+                            class="flex flex-col items-center justify-center w-20 h-20 bg-slate-50 border border-slate-200 rounded-2xl hover:bg-white hover:border-emerald-500 group transition-all shadow-sm">
+                            <svg class="w-5 h-5 text-slate-400 group-hover:text-emerald-600 transition-colors"
+                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <span
+                                class="text-[9px] font-black uppercase tracking-tighter text-slate-500 mt-1">Invoice</span>
+                        </button>
+
+                        {{-- Kwitansi --}}
+                        @php
+                            // Siapkan data dasar
+                            $payloadKwitansi = [
+                                'id_unit'  => $payrollData['unit_id'],
+                                'grand_total'  => $payrollData['grand_total'],
+                                'tanggal_mulai'  => $payrollData['tanggal_mulai'],
+                                'tanggal_akhir'  => $payrollData['tanggal_akhir'],
+                            ];
+
+                            // Loop data pekerja untuk membuat key: workers[0][id], workers[0][upah], dst.
+                            foreach ($payrollData['items'] as $index => $item) {
+                                $payloadKwitansi["workers[{$index}][id]"] = $item['id_pekerja'];
+                                $payloadKwitansi["workers[{$index}][upah]"] = $item['net_salary'];
+                            }
+                        @endphp
+                        <button @click="open('Kwitansi', '{{ route('export.kwitansi.borongan') }}', {{ json_encode($payloadKwitansi) }})"
+                            class="flex flex-col items-center justify-center w-20 h-20 bg-slate-50 border border-slate-200 rounded-2xl hover:bg-white hover:border-emerald-500 group transition-all shadow-sm">
+                            <svg class="w-5 h-5 text-slate-400 group-hover:text-emerald-600 transition-colors"
+                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                            <span
+                                class="text-[9px] font-black uppercase tracking-tighter text-slate-500 mt-1">Kwitansi</span>
+                        </button>
+
+                        {{-- MODAL STRUCTURE --}}
+                        <div x-show="show" class="fixed inset-0 z-[100] flex items-center justify-center p-4" x-cloak>
+                            {{-- Overlay --}}
+                            <div x-show="show" x-transition.opacity @click="show = false"
+                                class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
+
+                            {{-- Modal Content --}}
+                            <div x-show="show" x-transition:enter="transition ease-out duration-300"
+                                x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
+                                class="relative w-full max-w-sm bg-white rounded-[2rem] shadow-2xl overflow-hidden border border-slate-100">
+
+                                <form :action="actionUrl" method="get" enctype="multipart/form-data" target="_blank" class="p-8">
+                                    @csrf
+                                    @method('get')
+
+                                    <template x-for="(value, key) in extraData" :key="key">
+                                        <div>
+                                            <template x-if="Array.isArray(value)">
+                                                <template x-for="item in value">
+                                                    <input type="hidden" :name="key" :value="item">
+                                                </template>
+                                            </template>
+                                            <template x-if="!Array.isArray(value)">
+                                                <input type="hidden" :name="key" :value="value">
+                                            </template>
+                                        </div>
+                                    </template>
+
+                                    <div class="text-center mb-6">
+                                        <div
+                                            class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 mb-4">
+                                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4" />
+                                            </svg>
+                                        </div>
+                                        <h3 class="text-lg font-black text-slate-800 tracking-tight"
+                                            x-text="'Generate ' + title"></h3>
+                                        <p class="text-xs font-bold text-slate-400 mt-1">Masukkan Nomor Resi/Referensi untuk
+                                            dokumen ini.</p>
+                                    </div>
+
+                                    <div class="space-y-4">
+                                        <div>
+                                            <label
+                                                class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Nomor
+                                                Resi / No. Ref</label>
+                                            <input type="text" name="no_resi" required
+                                                placeholder="Silahkan masukkan No Resi Disini.."
+                                                class="w-full px-5 py-3.5 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-emerald-500/10 focus:bg-white transition-all duration-200">
+
+                                            <p class="mt-2 text-[10px] text-slate-400 italic font-medium ml-1">
+                                                * Contoh: 021 RD / MJA - BISI / INVOICE / XI / 2025
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div class="grid grid-cols-2 gap-3 mt-8">
+                                        <button type="button" @click="show = false"
+                                            class="px-5 py-3.5 text-xs font-black text-slate-400 uppercase tracking-widest hover:text-slate-600 transition">
+                                            Batal
+                                        </button>
+                                        <button type="submit"
+                                            class="px-5 py-3.5 bg-emerald-600 text-white text-xs font-black uppercase tracking-widest rounded-2xl shadow-lg shadow-emerald-200 hover:bg-emerald-700 transition active:scale-95">
+                                            Generate
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -89,13 +216,15 @@
                         <span class="w-2 h-2 rounded-full bg-yellow-500"></span>
                         Penyesuaian ({{ $payrollData['total_pekerja'] }} Pekerja)
                     </p>
-                    <p class="text-xl font-black text-yellow-600">Rp {{ number_format($payrollData['total_penyesuaian'], 0, ',', '.') }}</p>
+                    <p class="text-xl font-black text-yellow-600">Rp
+                        {{ number_format($payrollData['total_penyesuaian'], 0, ',', '.') }}</p>
                 </div>
                 <div class="p-6 bg-emerald-50/20 lg:bg-transparent">
                     <p class="text-xs font-black text-slate-500 uppercase tracking-widest mb-2 flex items-center gap-2">
                         <span class="w-2 h-2 rounded-full bg-slate-900"></span> Total Payroll
                     </p>
-                    <p class="text-xl font-black text-slate-900">Rp {{ number_format($payrollData['grand_total'], 0, ',', '.') }}</p>
+                    <p class="text-xl font-black text-slate-900">Rp
+                        {{ number_format($payrollData['grand_total'], 0, ',', '.') }}</p>
                 </div>
             </div>
         </div>
@@ -130,7 +259,6 @@
                     <tbody class="divide-y divide-slate-50 text-sm">
 
                         @foreach ($payrollData['items'] as $item)
-
                             @php
                                 $netSalary = max(0, $item['net_salary']);
                             @endphp
@@ -156,7 +284,7 @@
                                     </p>
                                 </td>
                                 <td class="px-6 py-6 text-center">
-                                    @if($item['total_barang'] === 0)
+                                    @if ($item['total_barang'] === 0)
                                         <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">
                                             Tidak Ada Produksi
                                         </span>
@@ -183,14 +311,24 @@
                                     </div>
                                 </td>
                                 <td class="px-8 py-5 text-right">
-                                    <a href=""
-                                        class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-xl font-bold text-[10px] uppercase tracking-widest hover:border-emerald-500 hover:text-emerald-600 transition-all shadow-sm">
-                                        <svg class="w-4 h-4 text-slate-400 group-hover:text-emerald-500" fill="none"
-                                            stroke="currentColor" viewBox="0 0 24 24">
+                                    <a href="{{ route('export.detail.borongan', [
+                                        'id_unit' => $payrollData['unit_id'],
+                                        'id_pekerja' => $item['id_pekerja'],
+                                        'tgl_awal' => $payrollData['tanggal_mulai'],
+                                        'tgl_akhir' => $payrollData['tanggal_akhir'],
+                                        'potongan' => $item['pembayaran_lain'],
+                                        'tunjangan' => $item['tunjangan'],
+                                        'exclusion_date' => $item['potongan_dates'],
+                                    ]) }}"
+                                        target="_blank" {{-- buka di tab baru untuk slip gaji --}}
+                                        class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-xl font-bold text-[10px] uppercase tracking-widest hover:border-emerald-500 hover:text-emerald-600 transition-all shadow-sm active:scale-95 group">
+
+                                        <svg class="w-4 h-4 text-slate-400 group-hover:text-emerald-500 transition-colors"
+                                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                         </svg>
-                                        Payslip
+                                        <span>Payslip</span>
                                     </a>
                                 </td>
                             </tr>
@@ -250,4 +388,34 @@
             }
         }
     </style>
+@endsection
+
+@section('scripts')
+    <script>
+        function resiModal() {
+            return {
+                show: false,
+                title: '',
+                actionUrl: '',
+                extraData: {}, // Objek penampung payload
+
+                /**
+                 * @param title - Judul modal
+                 * @param url - URL Action Form
+                 * @param payload - Objek berisi { key: value } untuk input hidden
+                 */
+                open(title, url, payload = {}) {
+                    this.title = title;
+                    this.actionUrl = url;
+                    this.extraData = payload; // Masukkan semua data yang ingin dipass ke sini
+                    this.show = true;
+
+                    setTimeout(() => {
+                        const input = document.querySelector('input[name="no_resi"]');
+                        if (input) input.focus();
+                    }, 100);
+                }
+            }
+        }
+    </script>
 @endsection

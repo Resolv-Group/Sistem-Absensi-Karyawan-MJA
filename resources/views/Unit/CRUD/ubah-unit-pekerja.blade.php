@@ -112,16 +112,24 @@
                         <div
                             class="bg-white rounded-2xl border border-gray-200 p-5 relative group transition hover:border-blue-300 hover:shadow-lg hover:shadow-blue-500/10">
 
-                            {{-- Row Number Badge --}}
-                            <div
-                                class="absolute -top-2 -left-2 h-6 w-6 bg-blue-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-md">
-                                <span x-text="index + 1"></span>
+
+                            {{-- HEADER BARIS: Memisahkan Nomor & Tombol Hapus agar tidak menabrak input --}}
+                            <div class="flex items-center justify-between mb-6">
+                                <div
+                                    class="absolute -top-2 -left-2 h-6 w-6 bg-blue-600 text-white text-[13px] font-bold rounded-full flex items-center justify-center shadow-md">
+                                    <span x-text="index + 1"></span>
+                                </div>
+
+                                <div class="flex items-center gap-3">
+                                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Data Pekerja ke-<span x-text="index + 1"></span></span>
+                                </div>
+
                             </div>
 
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
 
                                 {{-- 1. Worker Combobox --}}
-                                <div x-data="workerCombobox(row)" x-init="init()" class="relative">
+                                <div x-data="workerCombobox(row)" x-init="init()" class="relative sm:col-span-2">
                                     <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Nama
                                         Pekerja</label>
                                     <input type="hidden" :name="`pekerja[${index}][id_pekerja]`" x-model="selectedId">
@@ -133,21 +141,7 @@
                                     </div>
                                 </div>
 
-                                {{-- 2. Gaji Harian --}}
-                                <div>
-                                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Gaji
-                                        Harian</label>
-                                    <div class="relative">
-                                        <span
-                                            class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-bold">Rp</span>
-                                        <input type="number" :name="`pekerja[${index}][gaji_harian]`"
-                                            x-model.number="row.gaji"
-                                            class="w-full pl-10 rounded-xl border-gray-200 bg-gray-50 text-sm font-bold text-gray-900 focus:bg-white focus:border-blue-500 py-3 px-4"
-                                            placeholder="0">
-                                    </div>
-                                </div>
-
-                                {{-- 3. Divisi (Searchable Combobox) --}}
+                                {{-- 2. Divisi (Searchable Combobox) --}}
                                 <div x-data="idCombobox(row, 'divisiId', window.divisiData, d => d.nama)" x-init="init()" class="relative">
                                     <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
                                         Divisi
@@ -191,7 +185,7 @@
                                 </div>
 
 
-                                {{-- 4. Jabatan (Searchable Combobox) --}}
+                                {{-- 3. Jabatan (Searchable Combobox) --}}
                                 <div x-data="idCombobox(row, 'jabatanId', window.jabatanData, j => j.nama)" x-init="init()" class="relative">
                                     <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
                                         Jabatan
@@ -234,7 +228,68 @@
                                     <input type="hidden" :name="`pekerja[${index}][jabatan_id]`" :value="row.jabatanId">
                                 </div>
 
-                                {{-- 5. Dates --}}
+
+                                {{-- 4. Gaji Harian (Update ke Format Rupiah) --}}
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Gaji Harian</label>
+                                    <div class="relative">
+                                        {{-- Input Tampilan --}}
+                                        <input type="text"
+                                            :value="formatRupiah(row.gaji)"
+                                            @input="row.gaji = $event.target.value.replace(/\D/g, '')"
+                                            class="w-full rounded-xl border-gray-200 bg-gray-50 text-sm font-bold text-gray-900 focus:bg-white focus:border-blue-500 py-3 px-4"
+                                            placeholder="Rp 0">
+
+                                        {{-- Hidden Input untuk kirim angka murni ke Controller --}}
+                                        <input type="hidden" :name="`pekerja[${index}][gaji_harian]`" :value="row.gaji">
+                                    </div>
+                                </div>
+                                {{-- 5. Gaji Harian (Update ke Format Rupiah) --}}
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Gaji Overtime (Lembur)</label>
+                                    <div class="relative">
+                                        {{-- Input Tampilan --}}
+                                        <input type="text"
+                                            :value="formatRupiah(row.gajiOvertime)"
+                                            @input="row.gajiOvertime = $event.target.value.replace(/\D/g, '')"
+                                            class="w-full rounded-xl border-gray-200 bg-gray-50 text-sm font-bold text-gray-900 focus:bg-white focus:border-blue-500 py-3 px-4"
+                                            placeholder="Rp 0">
+
+                                        {{-- Hidden Input untuk kirim angka murni ke Controller --}}
+                                        <input type="hidden" :name="`pekerja[${index}][gaji_overtime]`" :value="row.gajiOvertime">
+                                    </div>
+                                </div>
+
+                                {{-- 6. Bpjs Kesehatan --}}
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">BPJS
+                                        Kesehatan</label>
+                                    <div class="relative">
+                                        <input type="text" :value="formatRupiah(row.bpjsKesehatan)"
+                                            @input="row.bpjsKesehatan = $event.target.value.replace(/\D/g, '')"
+                                            class="w-full rounded-xl border-gray-200 bg-gray-50 text-sm font-bold text-gray-900 focus:bg-white focus:border-blue-500 py-3 px-4"
+                                            placeholder="Rp 0">
+                                        {{-- Hidden input tetap ada untuk mengirim angka murni ke database --}}
+                                        <input type="hidden" :name="`pekerja[${index}][bpjs_kesehatan]`"
+                                            :value="row.bpjsKesehatan">
+                                    </div>
+                                </div>
+
+                                {{-- 7. Bpjs Ketenagakerjaan --}}
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">BPJS
+                                        Ketenagakerjaan</label>
+                                    <div class="relative">
+                                        <input type="text" :value="formatRupiah(row.bpjsNaker)"
+                                            @input="row.bpjsNaker = $event.target.value.replace(/\D/g, '')"
+                                            class="w-full rounded-xl border-gray-200 bg-gray-50 text-sm font-bold text-gray-900 focus:bg-white focus:border-blue-500 py-3 px-4"
+                                            placeholder="Rp 0">
+                                        <input type="hidden" :name="`pekerja[${index}][bpjs_naker]`"
+                                            :value="row.bpjsNaker">
+                                    </div>
+                                </div>
+
+                                {{-- 8. Dates --}}
                                 <div>
                                     <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Mulai
                                         PKWT</label>
@@ -253,7 +308,7 @@
                                         class="w-full rounded-xl border-gray-200 bg-gray-50 text-sm py-3 px-4 text-gray-600 focus:bg-white focus:border-blue-500">
                                 </div>
 
-                                {{-- 6. File Upload --}}
+                                {{-- 9. File Upload --}}
                                 <div class="sm:col-span-2" x-data="{ fileName: '' }">
                                     <label
                                         class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Perbarui Dokumen
@@ -346,6 +401,9 @@
             id: {{ $pkwt->id }},
             workerId: {{ $pkwt->id_pekerja }},
             gaji: {{ $pkwt->gaji_harian }},
+            gajiOvertime: {{ $pkwt->gaji_overtime }},
+            bpjsKesehatan: {{ $pkwt->bpjs_kesehatan }},
+            bpjsNaker: {{ $pkwt->bpjs_naker }},
             divisiId: {{ $pkwt->divisi_id }},
             jabatanId: {{ $pkwt->jabatan_id }},
             tglMulai: '{{ $pkwt->tgl_mulai_pkwt }}',
@@ -383,33 +441,41 @@
                     [{
                         id: Date.now(),
                         gaji: 0,
+                        gajiOvertime: 0,
                         workerId: '',
                         divisiId: null,
                         jabatanId: null,
                         tglMulai: '',
                         tglAkhir: '',
+                        bpjsKesehatan: 0,
+                        bpjsNaker: 0,
                     }],
 
                 addRow() {
                     this.rows.push({
                         id: Date.now(),
                         gaji: 0,
+                        gajiOvertime: 0,
                         workerId: '',
                         divisiId: null,
                         jabatanId: null,
                         tglMulai: '',
                         tglAkhir: '',
+                        bpjsKesehatan: 0,
+                        bpjsNaker: 0,
                     });
                 },
                 get totalAllocation() {
                     return this.rows.reduce((sum, row) => sum + (parseInt(row.gaji) || 0), 0);
                 },
                 formatRupiah(amount) {
+                    // Jika kosong atau NaN, kembalikan Rp 0
+                    const value = amount ? amount : 0;
                     return new Intl.NumberFormat('id-ID', {
                         style: 'currency',
                         currency: 'IDR',
                         minimumFractionDigits: 0
-                    }).format(amount);
+                    }).format(value);
                 }
             }
         }

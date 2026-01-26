@@ -548,35 +548,48 @@
                                     </div>
                                 </div>
                                 <div class="ml-9">
-                                    <div
-                                        class="grid grid-cols-2 gap-3 max-h-56 overflow-y-auto p-4 border border-slate-200 rounded-xl bg-slate-50/50 custom-scrollbar">
-                                        <template x-for="worker in $store.payslip.workers" :key="worker.id">
-                                            <label
-                                                class="flex items-center gap-3 p-3 bg-white border rounded-xl cursor-pointer transition-all shadow-sm"
-                                                :class="$store.payslip.selectedWorkers.includes(worker.id) ?
-                                                    'border-emerald-500 bg-emerald-50/50' :
-                                                    'border-slate-100 opacity-60'">
-                                                <input type="checkbox" name="paid_workers[]" :value="worker.id"
-                                                    x-model="$store.payslip.selectedWorkers"
-                                                    class="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-slate-300">
-                                                <div class="flex flex-col">
-                                                    <span class="text-[11px] font-bold text-slate-700 leading-tight"
-                                                        x-text="worker.nama"></span>
-                                                    <span class="text-[9px] font-black text-slate-300 uppercase mt-0.5"
-                                                        x-text="'ID: ' + worker.id"></span>
-                                                </div>
-                                            </label>
-                                        </template>
-                                    </div>
+                                    <template x-if="$store.payslip.workers.length > 0">
+                                        <div
+                                            class="grid grid-cols-2 gap-3 max-h-56 overflow-y-auto p-4 border border-slate-200 rounded-xl bg-slate-50/50 custom-scrollbar">
+
+                                            <template x-for="worker in $store.payslip.workers" :key="worker.id">
+                                                <label
+                                                    class="flex items-center gap-3 p-3 bg-white border rounded-xl cursor-pointer transition-all shadow-sm"
+                                                    :class="$store.payslip.selectedWorkers.includes(worker.id) ?
+                                                        'border-emerald-500 bg-emerald-50/50' :
+                                                        'border-slate-100 opacity-60'">
+                                                    <input type="checkbox" name="paid_workers[]" :value="worker.id"
+                                                        x-model="$store.payslip.selectedWorkers"
+                                                        class="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-slate-300">
+                                                    <div class="flex flex-col">
+                                                        <span class="text-[11px] font-bold text-slate-700 leading-tight"
+                                                            x-text="worker.nama"></span>
+                                                        <span class="text-[9px] font-black text-slate-300 uppercase mt-0.5"
+                                                            x-text="'ID: ' + worker.id"></span>
+                                                    </div>
+                                                </label>
+                                            </template>
+
+
+                                        </div>
+                                    </template>
                                 </div>
+                                <!-- Optional: Show something if empty -->
+                                <template x-if="$store.payslip.workers.length === 0">
+                                    <div class="p-4 text-slate-400 text-xs italic text-center">Tidak ada pekerja ditemukan
+                                    </div>
+                                </template>
                             </div>
 
                             <!-- STEP 3: POTONGAN TANGGAL SPESIFIK -->
                             <div class="space-y-4">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center gap-3">
-                                        <span class="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-600 text-white text-[10px] font-black flex items-center justify-center shadow-lg shadow-emerald-200">3</span>
-                                        <label class="block text-[11px] font-black text-slate-700 uppercase tracking-widest">Potongan Tanggal Spesifik (Opsional)</label>
+                                        <span
+                                            class="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-600 text-white text-[10px] font-black flex items-center justify-center shadow-lg shadow-emerald-200">3</span>
+                                        <label
+                                            class="block text-[11px] font-black text-slate-700 uppercase tracking-widest">Potongan
+                                            Tanggal Spesifik (Opsional)</label>
                                     </div>
                                     <button type="button" @click="$store.payslip.addExclusion()"
                                         class="text-[10px] font-black text-emerald-600 hover:text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-100 uppercase">+
@@ -597,25 +610,31 @@
                                                 <div @click.stop="$store.payslip.exclusions[index].open = !$store.payslip.exclusions[index].open"
                                                     class="w-full bg-white border border-slate-200 rounded-xl text-[11px] font-bold text-slate-700 py-3 px-4 flex justify-between items-center cursor-pointer hover:border-emerald-500 transition-all shadow-sm">
 
-                                                    <span :class="!$store.payslip.exclusions[index].worker_id ? 'text-slate-400' : 'text-slate-700'"
+                                                    <span
+                                                        :class="!$store.payslip.exclusions[index].worker_id ? 'text-slate-400' :
+                                                            'text-slate-700'"
                                                         x-text="$store.payslip.workers.find(w => w.id == $store.payslip.exclusions[index].worker_id)?.nama || 'Pilih Pekerja...'"></span>
 
                                                     <svg class="w-4 h-4 text-slate-300 transition-transform duration-200"
-                                                        :class="$store.payslip.exclusions[index].open ? 'rotate-180' : ''" fill="none"
-                                                        stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path d="M19 9l-7 7-7-7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+                                                        :class="$store.payslip.exclusions[index].open ? 'rotate-180' : ''"
+                                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path d="M19 9l-7 7-7-7" stroke-width="3" stroke-linecap="round"
+                                                            stroke-linejoin="round" />
                                                     </svg>
                                                 </div>
 
                                                 <!-- LIST ITEM -->
-                                                <ul x-show="$store.payslip.exclusions[index].open" @click.outside="$store.payslip.exclusions[index].open = false"
+                                                <ul x-show="$store.payslip.exclusions[index].open"
+                                                    @click.outside="$store.payslip.exclusions[index].open = false"
                                                     class="absolute w-full mt-2 border border-slate-200 bg-white rounded-xl shadow-2xl overflow-y-auto max-h-48 z-[150] p-1 custom-scrollbar">
-                                                    <template x-for="worker in $store.payslip.workers" :key="worker.id">
+                                                    <template x-for="worker in $store.payslip.workers"
+                                                        :key="worker.id">
                                                         <!-- FIX: Update langsung ke index Store -->
                                                         <li @click.stop="$store.payslip.exclusions[index].worker_id = worker.id; $store.payslip.exclusions[index].open = false"
                                                             class="px-4 py-2.5 text-[11px] font-bold text-slate-600 hover:bg-emerald-600 hover:text-white rounded-lg cursor-pointer transition flex items-center justify-between">
                                                             <span x-text="worker.nama"></span>
-                                                            <span class="text-[9px] font-black opacity-30" x-text="'ID: ' + worker.id"></span>
+                                                            <span class="text-[9px] font-black opacity-30"
+                                                                x-text="'ID: ' + worker.id"></span>
                                                         </li>
                                                     </template>
                                                 </ul>
@@ -631,9 +650,14 @@
 
                                             <button type="button" @click="$store.payslip.removeExclusion(index)"
                                                 class="mt-3 p-1 transition-colors"
-                                                :class="$store.payslip.exclusions.length > 1 ? 'text-red-400 hover:text-red-500' : 'text-slate-300'">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                                :class="$store.payslip.exclusions.length > 1 ?
+                                                    'text-red-400 hover:text-red-500' : 'text-slate-300'">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path
+                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                                        stroke-width="2" stroke-linecap="round"
+                                                        stroke-linejoin="round" />
                                                 </svg>
                                             </button>
                                         </div>
@@ -745,17 +769,25 @@
                 selectedWorkers: [],
 
                 // Pindahkan variabel input ke sini agar bisa di-reset
-                exclusions: [{ worker_id: '', date: '', open: false }],
+                exclusions: [{
+                    worker_id: '',
+                    date: '',
+                    open: false
+                }],
                 pembayaran_lain: '',
                 tunjangan_bayaran: '',
 
                 open(unitId, unitName, workerList) {
                     this.unitId = unitId;
                     this.unitName = unitName;
-                    this.workers = workerList;
 
-                    // 1. Reset data setiap kali buka modal baru
-                    this.selectedWorkers = workerList.map(worker => worker.id);
+                    // --- FILTER DUPLIKAT DISINI ---
+                    // Menggunakan Map untuk memastikan hanya ID unik yang diambil
+                    const uniqueWorkers = [...new Map(workerList.map(item => [item.id, item])).values()];
+                    this.workers = uniqueWorkers;
+
+                    // Reset data menggunakan list yang sudah unik
+                    this.selectedWorkers = this.workers.map(worker => worker.id);
                     this.exclusions = [{ worker_id: '', date: '', open: false }];
                     this.pembayaran_lain = '';
                     this.tunjangan_bayaran = '';
@@ -768,7 +800,11 @@
 
                 // Helper untuk tambah/hapus baris di Store
                 addExclusion() {
-                    this.exclusions.push({ worker_id: '', date: '', open: false });
+                    this.exclusions.push({
+                        worker_id: '',
+                        date: '',
+                        open: false
+                    });
                 },
                 removeExclusion(index) {
                     if (this.exclusions.length > 1) {
@@ -782,7 +818,7 @@
             })
         });
 
-        document.getElementById('btnPayrollSubmit').addEventListener('click', function () {
+        document.getElementById('btnPayrollSubmit').addEventListener('click', function() {
             const form = this.closest('form');
 
             // 1. Cek validasi HTML5 (termasuk required dinamis yang kita buat di Step 3)
@@ -799,7 +835,7 @@
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#10b981', // emerald
-                cancelButtonColor: '#94a3b8',  // slate
+                cancelButtonColor: '#94a3b8', // slate
                 confirmButtonText: 'Ya, Proses',
                 cancelButtonText: 'Batal',
             }).then((result) => {

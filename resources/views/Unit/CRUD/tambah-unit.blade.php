@@ -325,36 +325,131 @@
                             </ul>
                         </div>
 
-                        {{-- Management Fee --}}
-                        <div>
+                        {{-- UMK Unit --}}
+                        <div x-data="{ umk: '{{ old('umk') }}' }">
                             <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
-                                Management Fee
+                                Nominal Pembayaran (UMK)
                             </label>
 
                             <div class="relative group">
-                                {{-- Input Field --}}
-                                <input type="number" name="persentase_management_fee" placeholder="0" min="0"
-                                    max="100" step="0.01"
+                                {{-- Suffix Symbol (Rp) dengan desain yang lebih menyatu --}}
+                                <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+                                    <span class="text-gray-400 font-black text-sm group-focus-within:text-blue-600 transition-colors duration-200 border-r border-gray-200 pr-2 mr-1">
+                                        Rp
+                                    </span>
+                                </div>
+
+                                {{-- Visual Input (Masking) --}}
+                                <input type="text"
+                                    x-model="umk"
+                                    @input="umk = $event.target.value.replace(/\D/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, '.')"
+                                    placeholder="0"
                                     class="block w-full rounded-xl border-gray-200 bg-gray-50
+                                        text-gray-900 font-bold text-sm placeholder:text-gray-300
+                                        focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10
+                                        transition-all duration-200 py-3 pl-14 pr-4 shadow-sm">
+
+                                {{-- Hidden Input untuk Database (nama: umk_unit) --}}
+                                <input type="hidden" name="umk" :value="umk.replace(/\./g, '')">
+                            </div>
+
+                            {{-- Helper Text --}}
+                            <p class="mt-1.5 ml-1 text-[10px] text-gray-400 italic">
+                                *Contoh: 3.500.000 (Otomatis diformat)
+                            </p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-5 sm:col-span-2">
+                            {{-- Management Fee --}}
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
+                                    Management Fee (%)
+                                </label>
+
+                                <div class="relative group">
+                                    {{-- Input Field --}}
+                                    <input type="number" name="persentase_management_fee" placeholder="0"
+                                        min="0" max="100" step="0.01"
+                                        class="block w-full rounded-xl border-gray-200 bg-gray-50
                    text-gray-900 font-bold text-sm placeholder-gray-400
                    focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10
                    transition-all duration-200 py-3 pl-4 pr-10">
 
-                                {{-- Suffix Symbol --}}
-                                <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
-                                    <span
-                                        class="text-gray-400 font-bold text-sm group-focus-within:text-blue-600 transition-colors duration-200">
-                                        %
-                                    </span>
+                                    {{-- Suffix Symbol --}}
+                                    <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+                                        <span
+                                            class="text-gray-400 font-bold text-sm group-focus-within:text-blue-600 transition-colors duration-200">
+                                            %
+                                        </span>
+                                    </div>
                                 </div>
+
+                                {{-- Helper Text --}}
+                                <p class="mt-1.5 ml-1 text-[10px] text-gray-400">
+                                    Masukkan presentase fee (Ex: 2.5)
+                                </p>
                             </div>
 
-                            {{-- Helper Text --}}
-                            <p class="mt-1.5 ml-1 text-[10px] text-gray-400">
-                                Masukkan presentase fee (Ex: 2.5)
-                            </p>
-                        </div>
+                            {{-- BPJS Naker Fee --}}
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
+                                    BPJS Kesehatan Fee (%)
+                                </label>
 
+                                <div class="relative group">
+                                    {{-- Input Field --}}
+                                    <input type="number" name="bpjs_kesehatan" placeholder="0" min="0"
+                                        max="100" step="0.01"
+                                        class="block w-full rounded-xl border-gray-200 bg-gray-50
+                   text-gray-900 font-bold text-sm placeholder-gray-400
+                   focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10
+                   transition-all duration-200 py-3 pl-4 pr-10">
+
+                                    {{-- Suffix Symbol --}}
+                                    <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+                                        <span
+                                            class="text-gray-400 font-bold text-sm group-focus-within:text-blue-600 transition-colors duration-200">
+                                            %
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {{-- Helper Text --}}
+                                <p class="mt-1.5 ml-1 text-[10px] text-gray-400">
+                                    Masukkan presentase BPJS Kesehatan fee (Ex: 2.5)
+                                </p>
+                            </div>
+
+                            {{-- BPJS Naker Fee --}}
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
+                                    BPJS Naker Fee (%)
+                                </label>
+
+                                <div class="relative group">
+                                    {{-- Input Field --}}
+                                    <input type="number" name="bpjs_naker" placeholder="0" min="0"
+                                        max="100" step="0.01"
+                                        class="block w-full rounded-xl border-gray-200 bg-gray-50
+                   text-gray-900 font-bold text-sm placeholder-gray-400
+                   focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10
+                   transition-all duration-200 py-3 pl-4 pr-10">
+
+                                    {{-- Suffix Symbol --}}
+                                    <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+                                        <span
+                                            class="text-gray-400 font-bold text-sm group-focus-within:text-blue-600 transition-colors duration-200">
+                                            %
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {{-- Helper Text --}}
+                                <p class="mt-1.5 ml-1 text-[10px] text-gray-400">
+                                    Masukkan presentase BPJS Naker fee (Ex: 2.5)
+                                </p>
+                            </div>
+                        </div>
                         {{-- Dates Row --}}
                         <div class="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <div>
@@ -422,7 +517,7 @@
                     class="px-5 py-2.5 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 hover:text-gray-800 transition shadow-sm">
                     Batal
                 </a>
-                <button type="submit"
+                <button type="button" id="save-btn"
                     class="px-5 py-2.5 text-sm font-bold text-white bg-black border border-black rounded-xl hover:bg-gray-800 transition shadow-lg shadow-gray-200 flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
