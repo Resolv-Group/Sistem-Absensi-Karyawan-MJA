@@ -3,10 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Exports\DetilBoronganExport;
+use App\Exports\InvoiceBoronganExport;
+use App\Exports\KwitansiBoronganExport;
+use App\Exports\SlipUpahExport;
 use App\Models\Absensi;
+use App\Models\BidangUsaha;
+use App\Models\Divisi;
+use App\Models\MitraKerja;
 use App\Models\Pekerja;
+use App\Models\PicUnit;
+use App\Models\PKWT;
+use App\Models\Staff;
 use App\Models\Unit;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -183,20 +193,33 @@ class PayrollController extends Controller
 
     function ExportDetailBorongan(Request $request)
     {
-        dd($request->all());
-
-        $tanggal_awal  = '2026-01-20';
-        $tanggal_akhir = '2026-01-23';
+        $tanggal_awal  = Carbon::parse($request->tgl_awal);
+        $tanggal_akhir = Carbon::parse($request->tgl_akhir);
 
         $absensiList = Absensi::with([
             'detilBorongan.borongan:id,harga_pekerja,nama_item'
         ])
         ->whereBetween('tgl_absensi', [$tanggal_awal, $tanggal_akhir])
-        ->get();
+        ->where('id_pekerja', $request->id_pekerja)
+        ->get();    
 
-        // dd($absensiList);
+        $periode = strtoupper(
+    $tanggal_awal->translatedFormat('d F Y') .
+            ' ~ ' .
+            $tanggal_akhir->translatedFormat('d F Y')
+        );
+        
+        $PKWT = PKWT::where('id_pekerja', $request->id_pekerja)
+            ->where('id_unit', $request->id_unit)
+            ->first();
+
+        $pekerja = Pekerja::where('id', $request->id_pekerja)->first();
+
+        $divisi = Divisi::where('id', $PKWT->divisi_id)->first();
 
         $data = collect();
+
+        $take_home_pay = 0;
 
         foreach ($absensiList as $absensi) {
             foreach ($absensi->detilBorongan as $detil) {
@@ -238,7 +261,7 @@ class PayrollController extends Controller
 
                 // ===== PUSH KE DATA =====
                 $data->push((object) [
-                    'tanggal' => $absensi->tgl_absensi,
+                    'tanggal' => Carbon::parse($absensi->tgl_absensi)->format('d-M-y'),
                     'item_name' => $detil->borongan->nama_item ?? '-',
 
                     'qty' => $qty,
@@ -254,48 +277,212 @@ class PayrollController extends Controller
                     'total_dibayar_pcs' => $totalDibayarPcs,
                     'unit_price' => $unitPrice,
                     'total_bayar' => $totalBayarRp,
+                    $take_home_pay += $totalBayarRp
                 ]);
             }
         }
 
-
-
-        // dd($data);
-
-        // $dateawal = date;
-        // $dateakhir = date();
-        // $id_unit;
-        // $id_pekerja;
-        // $divisi;
-        // $absensi;
-        // $detil_borongan;
-        // $potongan_bpjs_naker;
-        // $potongan_bpjs_kesehatan;
-        // $potongan_lain;
-        // $take_home;
+        $take_home_pay = $take_home_pay - $PKWT->bpjs_naker - $PKWT->bpjs_kesehatan - $request->potongan + $request->tunjangan;
 
         return Excel::download(
         new DetilBoronganExport(
             $data,
-            '16 OKTOBER 2025 - 31 OKTOBER 2025',
-            'AGUSTINO TITAN ISKANDAR',
-            'OPERATOR INSPEKSI',
-            48705,
-            0,
-            2596854
+            $periode,
+            $pekerja->nama,
+            $divisi->nama,
+            $PKWT->bpjs_naker,
+            $PKWT->bpjs_kesehatan,
+            $request->potongan,
+            $request->tunjangan,
+            $take_home_pay
         ),
         'summary_upah.xlsx'
     );
     }
 
     function ExportTandaTerimaBorongan(Request $request) {
-        dd($request->all());
+        // dd($request->all());
+
+        $start = \Carbon\Carbon::parse($request->tanggal_mulai);
+        $end   = \Carbon\Carbon::parse($request->tanggal_akhir);
+
+        // Pastikan locale Indonesia
+        \Carbon\Carbon::setLocale('id');
+
+        $periode = 
+        $start->format('d') . 
+        ' ' . 
+        strtoupper($start->translatedFormat('M')) . // 'M' untuk singkatan 3 huruf (SEPT)
+        ' - ' . 
+        $end->format('d') . 
+        ' ' . 
+        strtoupper($end->translatedFormat('M')) .    // 'M' untuk singkatan 3 huruf (OKT)
+        ' ' . 
+        $end->format('Y');  
+        
+
+        $Unit = Unit::where('id_unit', $request->id_unit)->first();
+
+        $workerIds = collect($request->workers)->pluck('id');
+
+        // Ambil data pekerja beserta relasi PKWT, Divisi, dan Jabatan (Unit)
+        $workerMaster = Pekerja::with(['pkwt.divisi', 'pkwt.jabatan'])
+            ->whereIn('id', $workerIds)
+            ->get()
+            ->keyBy('id');
+
+        $dataExport = collect($request->workers)->map(function ($item, $key) use ($workerMaster) {
+            $worker = $workerMaster->get($item['id']);
+            
+            $pkwt = $worker->pkwt; 
+            $activePkwt = ($pkwt instanceof \Illuminate\Support\Collection) ? $pkwt->first() : $pkwt;
+            
+            $upah_mentah = (float) ($item['upah'] ?? 0);
+
+            return [
+                'no'                => $key + 1,
+                'id'                => $worker->id_pekerja,
+                'nama'              => $worker->nama ?? '-',
+                'posisi'            => optional(optional($activePkwt)->jabatan)->nama ?? '-',
+                'divisi'            => optional(optional($activePkwt)->divisi)->nama ?? '-',
+                'no_rek'            => $worker->rekening ?? '-',
+                // Simpan versi angka murni untuk dihitung TOTAL
+                'upah_murni'        => $upah_mentah, 
+                // Simpan versi format untuk TAMPILAN
+                'upah_tenaga_kerja' => number_format($upah_mentah, 0, ',', '.'),
+            ];
+        });
+
+        // 1. Hitung total dari kolom 'upah_murni' yang masih berupa angka
+        $total_seluruh = $dataExport->sum('upah_murni');
+
+        // 2. Format hasil totalnya untuk tampilan di laporan
+        $display_total = number_format($total_seluruh, 0, ',', '.');
+
+        $pic = PicUnit::where('id_unit', $request->id_unit)->first();
+        $namaPic = Staff::where('id', $pic->id_pic)->first();
+
+        $administrator =  Auth::user()->staff->id;
+
+        $admin = Staff::where('id', $administrator)->first();
+
+        return Excel::download(
+            new SlipUpahExport(
+                $dataExport,
+                $Unit->nama_unit,
+                $display_total,
+                $admin->nama,
+                $namaPic->nama,
+                $periode
+            ),
+            'SlipUpah-.xlsx'
+        );
     }
     function ExportInvoiceBorongan(Request $request) {
-        dd($request->all());
+        $start = \Carbon\Carbon::parse($request->tanggal_mulai);
+        $end   = \Carbon\Carbon::parse($request->tanggal_akhir);
+
+        // Pastikan locale Indonesia
+        \Carbon\Carbon::setLocale('id');
+
+        $periode = 
+            $start->format('d') .
+            ' - ' .
+            $end->format('d') .
+            ' ' .
+            strtoupper($start->translatedFormat('F')) .
+            ' ' .
+            $start->format('Y');   
+
+        $a = $request->grand_total;
+
+        $Unit = Unit::where('id_unit', $request->id_unit)->first();
+
+        $MitraKerja = MitraKerja::where('id', $Unit->id_mitra_kerja)->first();
+
+        $Bidang = BidangUsaha::where('id', $MitraKerja->bidang_usaha_id)->first();
+
+        $management_fee = round($a * 6 / 100);
+        $ppn            = round($management_fee * 11 / 100);
+        $pph            = round($management_fee * 2 / 100);
+
+        // Total tagihan dijumlahkan dari hasil yang sudah dibulatkan
+        $total_tagihan  = $a + $management_fee + $ppn - $pph;
+
+        $terbilang = ucwords(terbilang($total_tagihan)). ' Rupiah';
+
+        // Menambahkan format titik (number_format)
+        $display_a              = number_format($a, 0, ',', '.');
+        $display_management_fee = number_format($management_fee, 0, ',', '.');
+        $display_ppn            = number_format($ppn, 0, ',', '.');
+        $display_pph            = number_format($pph, 0, ',', '.');
+        $display_total_tagihan  = number_format($total_tagihan, 0, ',', '.');
+
+        return Excel::download(
+        new InvoiceBoronganExport(
+            $request->resi,
+            $Unit->nama_unit,
+            $MitraKerja->alamat,
+            $Bidang->nama,
+            $MitraKerja->nama_mitra,
+            $display_a,
+            $terbilang,
+            $periode,
+            $display_management_fee,
+            $display_ppn,
+            $display_pph,
+            $display_total_tagihan,
+            $Unit->umk
+        ),
+        'summary_upah.xlsx'
+        );
     }
 
     function ExportKwitansiBorongan(Request $request) {
-        dd($request->all());
+        // dd($request->all());
+
+        $Unit = Unit::where('id_unit', $request->id_unit)->first();
+
+        $MitraKerja = MitraKerja::where('id', $Unit->id_mitra_kerja)->first();
+
+        $Bidang = BidangUsaha::where('id', $MitraKerja->bidang_usaha_id)->first();
+
+        $start = \Carbon\Carbon::parse($request->tanggal_mulai);
+        $end   = \Carbon\Carbon::parse($request->tanggal_akhir);
+
+        // Pastikan locale Indonesia
+        \Carbon\Carbon::setLocale('id');
+
+        $periode = 
+            $start->format('d') .
+            ' - ' .
+            $end->format('d') .
+            ' ' .
+            strtoupper($start->translatedFormat('F')) .
+            ' ' .
+            $start->format('Y'); 
+        
+        $management_fee = round($request->grand_total * 6 / 100);
+        $ppn            = round($management_fee * 11 / 100);
+        $pph            = round($management_fee * 2 / 100);
+
+        // Total tagihan dijumlahkan dari hasil yang sudah dibulatkan
+        $total_tagihan  = $request->grand_total + $management_fee + $ppn - $pph;
+        $display_total_tagihan  = number_format($total_tagihan, 0, ',', '.');
+
+        $terbilang = ucwords(terbilang($total_tagihan)). ' Rupiah';
+
+        return Excel::download(
+            new KwitansiBoronganExport(
+            $request->no_resi,
+            $Unit->nama_unit,
+            $terbilang,
+            $Bidang->nama,
+            $MitraKerja->nama_mitra,
+            $periode,
+            $display_total_tagihan,
+            ),
+            'KWITANSI-.xlsx'
+        );
     }
 }
