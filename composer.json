@@ -26,7 +26,8 @@
             "Database\\Seeders\\": "database/seeders/"
         },
         "files": [
-        "app/Helpers/DateFormatHelper.php"
+        "app/Helpers/DateFormatHelper.php",
+        "app/Helpers/TerbilangHelper.php"
         ]
     },
     "autoload-dev": {

@@ -88,7 +88,7 @@
                 else                        $rank = 'D';
             @endphp
 
-            <tr>
+            <tr style="font-weight:bold">
                 <td>{{ $i + 1 }}</td>
                 <td>{{ $row->pekerja->nama }}</td>
                 <td>{{ $kelamin }}</td>
