@@ -28,7 +28,7 @@ class UnitController extends Controller
         $tidakAktif = Unit::where('status_aktif', '!=', '1')->count(); // pekerja tidak aktif
         $totalHarian = Unit::where('sistem_pengajian', 1)->count();
         $totalBorongan = Unit::where('sistem_pengajian', 2)->count();
-        
+
         // --- 2. BUILD QUERY ---
         $query = Unit::query()
             ->with(['picUnit.staff', 'namaMitra'])
@@ -99,6 +99,9 @@ class UnitController extends Controller
                     'nama_unit' => 'required|string',
                     'dokumen_mou' => 'file|mimes:png,jpg,jpeg,pdf|max:2048',
                     'persentase_management_fee' => 'required|int',
+                    'umk' => 'required|numeric|min:0',
+                    'bpjs_kesehatan' => 'required|int',
+                    'bpjs_naker' => 'required|int',
                     'sistem_pengajian' => 'required|int',
 
                     'pic_ids' => 'required|array|min:1',
@@ -118,6 +121,10 @@ class UnitController extends Controller
 
                     'persentase_management_fee.required' => 'Persentase management fee wajib diisi',
                     'persentase_management_fee.max' => 'Persentase maksimal 100%',
+
+                    'umk.required' => 'Umk wajib diisi',
+                    'bpjs_kesehatan.required' => 'BPJS Kesehatan fee wajib diisi',
+                    'bpjs_naker.required' => 'BPJS Naker fee wajib diisi',
 
                     'sistem_pengajian.required' => 'Sistem pengajian wajib dipilih',
 
@@ -141,6 +148,9 @@ class UnitController extends Controller
                 'akhir_perjanjian' => $request->akhir_perjanjian,
                 'nama_unit' => $request->nama_unit,
                 'persentase_management_fee' => $request->persentase_management_fee,
+                'bpjs_kesehatan' => $request->bpjs_kesehatan,
+                'bpjs_naker' => $request->bpjs_naker,
+                'umk' => $request->umk,
                 'sistem_pengajian' => $request->sistem_pengajian,
 
                 'dokumen_mou' => $dokumen,
@@ -361,6 +371,9 @@ class UnitController extends Controller
                     'nama_unit' => 'required|string|max:255',
                     'sistem_pengajian' => 'required|in:1,2',
                     'persentase_management_fee' => 'required|numeric|min:0|max:100',
+                    'umk' => 'required|numeric|min:0',
+                    'bpjs_kesehatan' => 'required|int',
+                    'bpjs_naker' => 'required|int',
 
                     'mulai_perjanjian' => 'required|date',
                     'akhir_perjanjian' => 'required|date|after_or_equal:mulai_perjanjian',
@@ -375,6 +388,9 @@ class UnitController extends Controller
                     'id_mitra_kerja.required' => 'Mitra kerja wajib dipilih.',
                     'nama_unit.required' => 'Nama unit wajib diisi.',
                     'pic_ids.required' => 'Minimal 1 PIC harus dipilih.',
+                    'umk.required' => 'Umk wajib diisi',
+                    'bpjs_kesehatan.required' => 'BPJS Kesehatan fee wajib diisi',
+                    'bpjs_naker.required' => 'BPJS Naker fee wajib diisi',
                     'dokumen_mou.mimes' => 'Dokumen harus PDF / JPG / PNG.',
                     'dokumen_mou.max' => 'Ukuran dokumen maksimal 5MB.',
                 ],
@@ -402,6 +418,9 @@ class UnitController extends Controller
                 'nama_unit' => $validated['nama_unit'],
                 'sistem_pengajian' => $validated['sistem_pengajian'],
                 'persentase_management_fee' => $validated['persentase_management_fee'],
+                'bpjs_kesehatan' => $validated['bpjs_kesehatan'],
+                'bpjs_naker' => $validated['bpjs_naker'],
+                'umk' => $validated['umk'],
                 'mulai_perjanjian' => $validated['mulai_perjanjian'],
                 'akhir_perjanjian' => $validated['akhir_perjanjian'],
             ]);

@@ -99,10 +99,14 @@ class PayrollController extends Controller
             // dump($specificExclusions);
 
         $payrollData = [
+            'unit_id' => $request->id_unit,
             'unit_name' => $request->unit_name ?? 'Unit Borongan',
             'periode' => Carbon::parse($tanggalMulai)->translatedFormat('d') . ' — ' . Carbon::parse($tanggalAkhir)->translatedFormat('d M Y'),
             'pembayaran_lain' => $pembayaranLain,
+            'tunjangan' => $tunjangan,
             'total_pekerja' => $workers->count(),
+            'tanggal_mulai' => $tanggalMulai,
+            'tanggal_akhir' => $tanggalAkhir,
             'items' => $workers->map(function($w) use ($id_unit, $periode, $specificExclusions, $pembayaranLain, $tunjangan, $tanggalMulai, $tanggalAkhir) {
 
                 // 1. Dapatkan list tanggal yang dikecualikan (potongan) untuk pekerja ini
@@ -149,16 +153,19 @@ class PayrollController extends Controller
                 return [
                     'unit_id'   => $id_unit,
                     'unit_name' => $unit?->nama_unit ?? '-',
-                    'id_pekerja' => $w->id_pekerja,
+                    'id_pekerja' => $w->id,
                     'periode' => $periode,
                     'nama' => $w->nama,
                     'nik' => $w->nik,
                     'total_barang' => $totalQty,
                     'hasil_gaji_borongan' => $totalGajiBorongan,
                     'potongan_count' => count($excludedDates),
+                    'potongan_dates' => $excludedDates,
                     'net_salary' => $netSalary,
                     'pembayaran_lain' => $pembayaranLain,
                     'tunjangan' => $tunjangan,
+                    'tanggal_mulai' => $tanggalMulai,
+                    'tanggal_akhir' => $tanggalAkhir
                 ];
             }),
         ];
@@ -171,11 +178,13 @@ class PayrollController extends Controller
         $payrollData['total_penyesuaian'] = collect($payrollData['items'])
             ->sum(fn ($item) => $item['tunjangan'] - $item['pembayaran_lain']);
 
-        return view('Payroll.overview-payroll', compact('payrollData'));
+        return view('Payroll.overview-payroll', compact('payrollData', 'paidWorkerIds'));
     }
 
-    function ExportDetailBorongan()
+    function ExportDetailBorongan(Request $request)
     {
+        dd($request->all());
+
         $tanggal_awal  = '2026-01-20';
         $tanggal_akhir = '2026-01-23';
 
@@ -277,5 +286,16 @@ class PayrollController extends Controller
         ),
         'summary_upah.xlsx'
     );
+    }
+
+    function ExportTandaTerimaBorongan(Request $request) {
+        dd($request->all());
+    }
+    function ExportInvoiceBorongan(Request $request) {
+        dd($request->all());
+    }
+
+    function ExportKwitansiBorongan(Request $request) {
+        dd($request->all());
     }
 }
