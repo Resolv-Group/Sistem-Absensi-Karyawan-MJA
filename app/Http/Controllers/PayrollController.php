@@ -150,15 +150,13 @@ class PayrollController extends Controller
 
                         // Sesuai logika JS: bayaranItem = totalQTY * harga_pekerja
                         // Kita asumsikan kolom 'bayaranItem' sudah tersimpan di DB saat presensi
-                        $totalGajiBorongan += $tempQty * ($detil->bayaranItem ?? 0);
+                        $totalGajiBorongan += $detil->bayaranItem;
 
                         $tempQty = 0;
                     }
                 }
                 // Gaji Bersih = Total Hasil Borongan + Penyesuaian Global
                 $netSalary = $totalGajiBorongan - $pembayaranLain + $tunjangan;
-
-                // dd($netSalary);
 
                 return [
                     'unit_id'   => $id_unit,
@@ -193,6 +191,8 @@ class PayrollController extends Controller
 
     function ExportDetailBorongan(Request $request)
     {
+        // dd($request->all());
+
         $tanggal_awal  = Carbon::parse($request->tgl_awal);
         $tanggal_akhir = Carbon::parse($request->tgl_akhir);
 
@@ -201,7 +201,8 @@ class PayrollController extends Controller
         ])
         ->whereBetween('tgl_absensi', [$tanggal_awal, $tanggal_akhir])
         ->where('id_pekerja', $request->id_pekerja)
-        ->get();    
+        ->get();   
+        
 
         $periode = strtoupper(
     $tanggal_awal->translatedFormat('d F Y') .
@@ -226,7 +227,7 @@ class PayrollController extends Controller
 
                 // SKIP kalau detil borongan kosong
                 if (
-                    $detil->fd == 0 &&
+                    $detil->FD == 0 &&
                     $detil->act_rej == 0 &&
                     $detil->good_mc == 0
                 ) {
@@ -251,13 +252,14 @@ class PayrollController extends Controller
                 $totalDibayarRumus = $fd + $rejMc + $goodMc;
 
                 // total dibayar (pcs) → dibulatkan
-                $totalDibayarPcs = round($totalDibayarRumus);
+                // $totalDibayarPcs = $totalDibayarRumus;
 
                 // unit price dari tabel borongan
                 $unitPrice = $detil->borongan->harga_pekerja ?? 0;
 
                 // total dibayarkan (Rp)
-                $totalBayarRp = $totalDibayarPcs * $unitPrice;
+                $totalBayarRp = $qty * $unitPrice;
+
 
                 // ===== PUSH KE DATA =====
                 $data->push((object) [
@@ -274,13 +276,14 @@ class PayrollController extends Controller
                     'good_mc' => $goodMc,
                     'total_display' => $qty,
 
-                    'total_dibayar_pcs' => $totalDibayarPcs,
+                    'total_dibayar_pcs' => $qty,
                     'unit_price' => $unitPrice,
                     'total_bayar' => $totalBayarRp,
                     $take_home_pay += $totalBayarRp
                 ]);
             }
         }
+
 
         $take_home_pay = $take_home_pay - $PKWT->bpjs_naker - $PKWT->bpjs_kesehatan - $request->potongan + $request->tunjangan;
 
@@ -319,7 +322,6 @@ class PayrollController extends Controller
         strtoupper($end->translatedFormat('M')) .    // 'M' untuk singkatan 3 huruf (OKT)
         ' ' . 
         $end->format('Y');  
-        
 
         $Unit = Unit::where('id_unit', $request->id_unit)->first();
 
@@ -338,7 +340,6 @@ class PayrollController extends Controller
             $activePkwt = ($pkwt instanceof \Illuminate\Support\Collection) ? $pkwt->first() : $pkwt;
             
             $upah_mentah = (float) ($item['upah'] ?? 0);
-
             return [
                 'no'                => $key + 1,
                 'id'                => $worker->id_pekerja,
