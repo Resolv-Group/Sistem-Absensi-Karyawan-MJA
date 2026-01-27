@@ -142,7 +142,7 @@
 
     <tr style="font-weight:bold;">
         <td colspan="5" align="center"><b>POT. BPJS KESEHATAN</b></td>
-        <td colspan="10" align="right"><b>{{ number_format($pot_lain) }}</b></td>
+        <td colspan="10" align="right"><b>{{ number_format($pot_kesehatan) }}</b></td>
     </tr>
 
     <tr style="font-weight:bold;">

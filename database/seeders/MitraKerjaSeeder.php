@@ -28,6 +28,7 @@ class MitraKerjaSeeder extends Seeder
                 'telp_perusahaan'=> $faker->phoneNumber,
                 'status_pajak'=> $faker->randomElement(['PKP','Non-PKP']),
                 'alamat' => $faker->address,
+                'kota' => $faker->city,
                 'tgl_mulai_kerjasama' => $faker->date(),
                 'tgl_akhir_mou' => $faker->date(),
                 'status_mou' => $faker->randomElement(['Aktif Disnaker','Perpanjangan', 'Tidak Aktif']),

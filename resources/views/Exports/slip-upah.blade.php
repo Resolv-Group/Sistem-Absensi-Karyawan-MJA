@@ -58,7 +58,7 @@
             
             {{-- Upah --}}
             <td align="right" valign="middle" style="border:1px solid #000; font-family:'Times New Roman'; font-size:12px; padding-right: 5px;">
-                {{ $row['upah_tenaga_kerja'] }}
+                {{ $row['upah_tenaga_kerja'] }}&nbsp;
             </td>
 
             {{-- Kolom Tanda Tangan Zig-Zag --}}
@@ -72,7 +72,7 @@
 
     <tr>
         <td colspan="6" align="center" valign="middle" style="border:1px solid #000; background-color:#F2F2F2; height:46px; line-height:46px; font-family:'Times New Roman'; font-size:12px; font-weight:bold;">GRAND TOTAL UPAH</td>
-        <td align="right" valign="middle" style="border:1px solid #000; background-color:#F2F2F2; font-family:'Times New Roman'; font-size:12px; font-weight:bold;">{{ $total }}</td>
+        <td align="right" valign="middle" style="border:1px solid #000; background-color:#F2F2F2; font-family:'Times New Roman'; font-size:12px; font-weight:bold;">{{ $total }}&nbsp;</td>
         <td style="border:1px solid #000; background-color:#F2F2F2"></td>
     </tr>
 
