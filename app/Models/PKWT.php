@@ -34,11 +34,11 @@ class PKWT extends Model
     }
 
     //buat view penilaian (more than 1 item)
-public function penilaian()
-{
-    // Hubungkan hanya berdasarkan id_pekerja secara standar
-    return $this->hasMany(Penilaian_Pkwt::class, 'id_pekerja', 'id_pekerja');
-}
+    public function penilaian()
+    {
+        // Hubungkan hanya berdasarkan id_pekerja secara standar
+        return $this->hasMany(Penilaian_Pkwt::class, 'id_pekerja', 'id_pekerja');
+    }
 
     public function unit()
     {

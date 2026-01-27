@@ -74,6 +74,8 @@
                             $payloadInvoice = [
                                 'id_unit'  => $payrollData['unit_id'],
                                 'grand_total'  => $payrollData['grand_total'],
+                                'tanggal_mulai'  => $payrollData['tanggal_mulai'],
+                                'tanggal_akhir'  => $payrollData['tanggal_akhir'],
                             ];
 
                             // Loop data pekerja untuk membuat key: workers[0][id], workers[0][upah], dst.
