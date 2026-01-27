@@ -110,7 +110,7 @@ class DashboardController extends Controller
                 'status_hrd' => 1,
                 'updated_by' => auth()->id(), // Mencatat ID user yang melakukan verifikasi
             ]);
-
+            
             // 3. Kembalikan ke halaman sebelumnya dengan pesan sukses
             return back()->with('success', 'Penilaian untuk ' . $penilaian->pekerja->nama . ' berhasil diverifikasi.');
 

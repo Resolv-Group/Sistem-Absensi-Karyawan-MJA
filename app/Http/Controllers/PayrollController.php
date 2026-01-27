@@ -150,11 +150,12 @@ class PayrollController extends Controller
 
                         // Sesuai logika JS: bayaranItem = totalQTY * harga_pekerja
                         // Kita asumsikan kolom 'bayaranItem' sudah tersimpan di DB saat presensi
-                        $totalGajiBorongan += $tempQty * ($detil->bayaranItem ?? 0);
+                        $totalGajiBorongan += ($detil->bayaranItem ?? 0);
 
                         $tempQty = 0;
                     }
                 }
+                
                 // Gaji Bersih = Total Hasil Borongan + Penyesuaian Global
                 $netSalary = $totalGajiBorongan - $pembayaranLain + $tunjangan;
 

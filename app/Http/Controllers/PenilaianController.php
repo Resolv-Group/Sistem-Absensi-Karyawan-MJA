@@ -216,14 +216,17 @@ class PenilaianController extends Controller
         $divisi = MitraKerja::with('bidangUsaha:id,nama')->where('id', $unit->id_mitra_kerja)->first()->bidangUsaha->nama ?? '-';
 
         $supervisorId = $data->first()->created_by ?? null;
+        $hrdId = $data->first()->updated_by ?? null;
 
         // Cari di tabel Staff berdasarkan ID yang didapat
         $pic = Staff::where('id', $supervisorId)->first();
+        $hrdStaff = Staff::where('id', $hrdId)->first();
 
         // Ambil kolom 'nama', jika tidak ada ganti dengan titik-titik
-        $supervisor = $pic->nama ?? '';    
+        $supervisor = $pic->nama ?? '';
+        $hrd = $hrdStaff->nama ?? '';     
 
-        return Excel::download(new PenilaianExport($data, $unit, $divisi, $supervisor), 'PPK_Karyawan.xlsx');
+        return Excel::download(new PenilaianExport($data, $unit, $divisi, $supervisor, $hrd), 'PPK_Karyawan.xlsx');
     }
 
     //Validasi penilaian → ambil PKWT aktif → ambil unit → tampilkan form ubah
