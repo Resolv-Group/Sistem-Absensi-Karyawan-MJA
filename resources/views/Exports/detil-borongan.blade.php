@@ -7,7 +7,7 @@
     }
 </style>
 
-<table border="1" cellspacing="0" cellpadding="4" width="100%">
+<table border="5" cellspacing="0" cellpadding="4" width="100%" style="border-collapse: collapse; border: 3pt solid black;">
 
     {{-- HEADER --}}
     <tr>
@@ -16,24 +16,24 @@
         </td>
     </tr>
     <tr>
-        <td colspan="15" align="center">
+        <td colspan="15" align="center" style="font-weight:bold;">
             PT MITRA JUA ABADI
         </td>   
     </tr>
 
         <tr>
-        <td colspan="15" align="center">
+        <td colspan="15" align="center" style="font-weight:bold;">
             PERIODE : {{ $periode }}
         </td>   
     </tr>
 
     <tr>
-        <td colspan="2"><b>NAMA</b></td>
-        <td colspan="13">: {{ $nama }}</td>
+        <td colspan="2" style="font-weight:bold;"><b>NAMA</b></td>
+        <td colspan="13" style="font-weight:bold;">: {{ $nama }}</td>
     </tr>
     <tr>
-        <td colspan="2"><b>BAGIAN</b></td>
-        <td colspan="13">: {{ $bagian }}</td>
+        <td colspan="2" style="font-weight:bold;"><b>BAGIAN</b></td>
+        <td colspan="13" style="font-weight:bold;">: {{ $bagian }}</td>
     </tr>
 
     {{-- HEADER TABLE --}}
@@ -142,7 +142,7 @@
 
     <tr style="font-weight:bold;">
         <td colspan="5" align="center"><b>POT. BPJS KESEHATAN</b></td>
-        <td colspan="10" align="right"><b>{{ number_format($pot_kesehatan) }}</b></td>
+        <td colspan="10" align="right"><b>{{ number_format($pot_lain) }}</b></td>
     </tr>
 
     <tr style="font-weight:bold;">
@@ -168,7 +168,7 @@
     <tr>
         <td colspan="13"></td>
         <td align="center"><b>SPV</b></td>
-        <td align="right"><b>ADMIN</b></td>
+        <td align="center"><b>ADMIN</b></td>
     </tr>
     <tr>
         <td colspan="13"></td>
@@ -188,7 +188,7 @@
     <tr>
         <td colspan="13"></td>
         <td align="center"><b>SPV</b></td>
-        <td align="right"><b>ADMIN</b></td>
+        <td align="center"><b>ADMIN</b></td>
     </tr>
 
 

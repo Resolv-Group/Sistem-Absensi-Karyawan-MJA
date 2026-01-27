@@ -19,7 +19,6 @@ class MitraKerja extends Model
         'telp_perusahaan',
         'status_pajak',
         'alamat',
-        'kota',
         'tgl_mulai_kerjasama',
         'tgl_akhir_mou',
         'status_mou',

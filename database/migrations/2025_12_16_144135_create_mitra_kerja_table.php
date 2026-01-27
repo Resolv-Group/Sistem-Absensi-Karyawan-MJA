@@ -17,7 +17,6 @@ return new class extends Migration
             $table->string('nama_mitra');          // Nama Mitra
             $table->string('pimpinan');            // Pimpinan
             $table->string('alamat');              // Alamat
-            $table->string('kota');
             $table->binary('foto')->nullable();
 
             $table->integer('bidang_usaha_id');       // Bidang Usaha (bisa FK nanti)
