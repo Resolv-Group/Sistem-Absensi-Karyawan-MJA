@@ -8,47 +8,13 @@ use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use App\Models\History;
+use App\Models\Penilaian_Pkwt;
+use App\Models\PKWT;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 class PekerjaController extends Controller
 {
-    // function viewPekerjaMain()
-    // {
-    //     $pekerja = Pekerja::where('status_aktif', 1)->orderby('created_at', 'desc')->paginate(3);
-    //     $totalPekerja = Pekerja::count(); // total pekerja
-    //     $pekerjaBaru = Pekerja::where('created_at', '>=', now()->subMonth())->count(); // pekerja baru dari bulan lalu
-    //     $tidakAktif = Pekerja::where('status_aktif', '!=', '1')->count(); // pekerja tidak aktif
-
-    //     return view('Pekerja.main-pekerja', compact('pekerja', 'totalPekerja', 'pekerjaBaru', 'tidakAktif'));
-    // }
-
-    // public function viewPekerjaMain(Request $request)
-    // {
-    //     $totalPekerja = Pekerja::count(); // total pekerja
-    //     $pekerjaBaru = Pekerja::where('created_at', '>=', now()->subMonth())->count(); // pekerja baru dari bulan lalu
-    //     $tidakAktif = Pekerja::where('status_aktif', '!=', '1')->count(); // pekerja tidak aktif
-
-    //     // 1. Capture the search query
-    //     $q = $request->input('q');
-
-    //     // 2. Query the database with the filter
-    //     $pekerja = Pekerja::when($q, function ($query) use ($q) {
-    //         $query->where('nama', 'LIKE', "%$q%")->orWhere('nik', 'LIKE', "%$q%")->orWhere('kpj', 'LIKE', "%$q%");
-    //     })
-    //         ->orderBy('created_at', 'desc')
-    //         ->paginate(10)
-    //         ->withQueryString(); // Keeps the search term in the pagination links
-
-    //     // 3. If it's an AJAX request (from JS), return ONLY the table partial
-    //     if ($request->ajax()) {
-    //         return view('pekerja.partials.pekerja-table', compact('pekerja'))->render();
-    //     }
-
-    //     // 4. Otherwise, return the full page (header, sidebar, etc)
-    //     return view('pekerja.main-pekerja', compact('pekerja', 'totalPekerja', 'pekerjaBaru', 'tidakAktif'));
-    // }
-
     public function viewPekerjaMain(Request $request)
     {
         // --- 1. CALCULATE STATS (Top Cards) ---
@@ -123,14 +89,14 @@ class PekerjaController extends Controller
 
         // 3. Detect the MIME type (PDF, JPG, PNG) from the binary data
         $finfo = new \finfo(FILEINFO_MIME_TYPE);
-        $mimeType = $finfo->buffer($data->dokumen);
+        $mimeType = $finfo->buffer($data->dokumen_pkwt);
 
         // 4. Determine if it's "View" (inline) or "Download" (attachment)
         // If URL has ?download=true, we force download.
         $disposition = $request->has('download') ? 'attachment' : 'inline';
 
         // Generate a filename
-        $filename = 'dokumen-mitra-' . $id;
+        $filename = 'pkwt-pekerja-mitra-' . $id;
 
         // 5. Return the binary data as a proper HTTP response
         return response($data->dokumen)
@@ -138,16 +104,77 @@ class PekerjaController extends Controller
             ->header('Content-Disposition', $disposition . '; filename="' . $filename . '"');
     }
 
-    function viewDetailPekerja($id)
+    // For Current & History PKWT (Blob from pkwt_pekerja table)
+    public function showPkwtDokumen($id, Request $request)
     {
-        $pekerja = Pekerja::where('id', $id)->first();
+        $data = PKWT::findOrFail($id);
 
-        $pekerja->image_base64 = 'data:image/jpeg;base64,' . base64_encode($pekerja->image_blob);
+        if (!$data->dokumen_pkwt) {
+            abort(404, 'Dokumen PKWT tidak ditemukan.');
+        }
 
-        $historiPekerja = History::where('foreign_id', $id)->where('nama_tabel', 'pekerja')->get();
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $mimeType = $finfo->buffer($data->dokumen_pkwt);
+        $disposition = $request->has('download') ? 'attachment' : 'inline';
+        $filename = 'pkwt-pekerja-' . $id;
 
-        return view('Pekerja.detail-pekerja', compact('pekerja', 'historiPekerja'));
+        return response($data->dokumen_pkwt)
+            ->header('Content-Type', $mimeType)
+            ->header('Content-Disposition', "$disposition; filename=\"$filename\"");
     }
+
+    // function viewDetailPekerja($id)
+    // {
+    //     $pekerja = Pekerja::where('id', $id)->first();
+
+    //     $pekerja->image_base64 = 'data:image/jpeg;base64,' . base64_encode($pekerja->image_blob);
+
+    //     $historiPekerja = History::where('foreign_id', $id)->where('nama_tabel', 'pekerja')->get();
+
+    //     return view('Pekerja.detail-pekerja', compact('pekerja', 'historiPekerja'));
+    // }
+
+    public function viewDetailPekerja($id)
+{
+    // 1. Ambil data pekerja
+    $pekerja = Pekerja::findOrFail($id);
+
+    // 2. Konversi foto blob ke base64
+    if ($pekerja->foto) {
+        $pekerja->image_base64 = 'data:image/jpeg;base64,' . base64_encode($pekerja->foto);
+    } else {
+        $pekerja->image_base64 = null;
+    }
+
+    // 3. Ambil PKWT yang paling terbaru (Aktif)
+    $currentPkwt = PKWT::where('id_pekerja', $id)
+                        ->latest('tgl_mulai_pkwt')
+                        ->first();
+
+    // 4. Ambil Histori PKWT (Semua kontrak kecuali yang aktif jika perlu difilter di view)
+    $historiPkwt = PKWT::where('id_pekerja', $id)
+                        ->orderBy('tgl_mulai_pkwt', 'desc')
+                        ->get();
+
+    // 5. Ambil Histori Penilaian (Lengkap dengan data Staff/Penilai)
+    // Kita ambil semua kolom agar detailnya bisa langsung muncul di popup tanpa fetch lagi
+    $historiPenilaian = Penilaian_Pkwt::where('id_pekerja', $id)
+                            ->orderBy('created_at', 'desc')
+                            ->get();
+
+    // 6. Ambil Histori Log/Audit
+    $historiPekerja = History::where('foreign_id', $id)
+                            ->where('nama_tabel', 'pekerja')
+                            ->get();
+
+    return view('Pekerja.detail-pekerja', compact(
+        'pekerja',
+        'currentPkwt',
+        'historiPkwt',
+        'historiPenilaian', // Variabel baru
+        'historiPekerja'
+    ));
+}
 
     function tambahPekerja(request $request)
     {

@@ -152,7 +152,7 @@
             <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-start justify-between">
                 <div>
                     <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Hadir Hari Ini</p>
-                    <h3 class="text-2xl font-bold text-gray-900 mt-1">112</h3>
+                    <h3 class="text-2xl font-bold text-gray-900 mt-1">{{ $hadirHariIni }}</h3>
                     <span class="text-xs text-gray-500 mt-1">Absensi masuk tercatat</span>
                 </div>
                 <div class="p-3 bg-green-50 text-green-600 rounded-lg">
@@ -168,8 +168,8 @@
             <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-start justify-between">
                 <div>
                     <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Izin / Sakit</p>
-                    <h3 class="text-2xl font-bold text-gray-900 mt-1">4</h3>
-                    <span class="text-xs text-orange-600 font-medium mt-1">Perlu review</span>
+                    <h3 class="text-2xl font-bold text-gray-900 mt-1">{{ $izinSakitHariIni }}</h3>
+                    <span class="text-xs text-orange-600 font-medium mt-1">Status tidak hadir</span>
                 </div>
                 <div class="p-3 bg-orange-50 text-orange-600 rounded-lg">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
@@ -184,8 +184,8 @@
             <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-start justify-between">
                 <div>
                     <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Terlambat</p>
-                    <h3 class="text-2xl font-bold text-gray-900 mt-1">12</h3>
-                    <span class="text-xs text-red-600 font-medium mt-1">+3 dari kemarin</span>
+                    <h3 class="text-2xl font-bold text-gray-900 mt-1">{{ $terlambatHariIni }}</h3>
+                    <span class="text-xs text-red-600 font-medium mt-1">Melebihi jam shift</span>
                 </div>
                 <div class="p-3 bg-red-50 text-red-600 rounded-lg">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
@@ -201,12 +201,10 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
             {{-- LEFT: Live Attendance Table --}}
-            <div class="lg:col-span-2">
+            <div class="lg:col-span-2 space-y-8">
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
                     <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
                         <h3 class="text-lg font-bold text-gray-900">Kehadiran Terbaru</h3>
-                        <a href="#"
-                            class="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline">Lihat Semua</a>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
@@ -220,48 +218,191 @@
                                         Jam Masuk</th>
                                     <th
                                         class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                        Jam Keluar</th>
+                                    <th
+                                        class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">
                                         Status</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                                @foreach ([1, 2, 3, 4, 5] as $i)
+                                @forelse ($kehadiranTerbaru as $hadir)
+                                    @php
+                                        $pekerja = $hadir->absensi->pekerja;
+                                        $shift = $hadir->shiftAbsen;
+                                        $isCuti = $hadir->status_kehadiran == 2;
+
+                                        // Logika terlambat hanya jika statusnya Hadir (1)
+                                        $isTerlambat = false;
+                                        if (!$isCuti && $hadir->waktu_masuk && $shift) {
+                                            $jamMasukPekerja = \Carbon\Carbon::parse($hadir->waktu_masuk);
+                                            $jamMasukShift = \Carbon\Carbon::parse($shift->waktu_masuk);
+                                            $isTerlambat = $jamMasukPekerja->greaterThan($jamMasukShift);
+                                        }
+                                    @endphp
                                     <tr class="hover:bg-gray-50 transition-colors">
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="flex items-center">
-                                                <img class="h-8 w-8 rounded-full bg-gray-200"
-                                                    src="https://ui-avatars.com/api/?name=User+{{ $i }}&background=random"
+                                                <img class="h-8 w-8 rounded-full bg-gray-200 object-cover"
+                                                    src="{{ $pekerja->foto ? asset('storage/' . $pekerja->foto) : 'https://ui-avatars.com/api/?name=' . urlencode($pekerja->nama ?? 'U') . '&background=random' }}"
                                                     alt="">
                                                 <div class="ml-3">
-                                                    <p class="text-sm font-bold text-gray-900">Nama Pegawai
-                                                        {{ $i }}</p>
-                                                    <p class="text-xs text-gray-500">Divisi IT</p>
+                                                    <p class="text-sm font-bold text-gray-900">
+                                                        {{ $pekerja->nama ?? 'N/A' }}</p>
+                                                    <p class="text-[10px] text-gray-500 uppercase font-medium">
+                                                        {{ $pekerja->nik ?? '-' }}</p>
                                                 </div>
                                             </div>
                                         </td>
                                         <td
                                             class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium text-gray-900">
-                                            07:{{ 45 + $i }} WIB
+                                            {{-- Jika Cuti, tampilkan strip atau keterangan --}}
+                                            @if ($isCuti)
+                                                <span class="text-gray-400">--:--</span>
+                                            @else
+                                                {{ \Carbon\Carbon::parse($hadir->waktu_masuk)->format('H:i') }} WIB
+                                            @endif
+                                        </td>
+                                        <td
+                                            class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium text-gray-900">
+                                            {{-- Jika Cuti, tampilkan strip atau keterangan --}}
+                                            @if ($isCuti)
+                                                <span class="text-gray-400">--:--</span>
+                                            @else
+                                                {{ \Carbon\Carbon::parse($hadir->waktu_keluar)->format('H:i') }} WIB
+                                            @endif
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-center">
-                                            @if ($i % 2 == 0)
+                                            @if ($isCuti)
+                                                {{-- Badge Status CUTI --}}
                                                 <span
-                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Tepat
-                                                    Waktu</span>
+                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800 uppercase shadow-sm">
+                                                    Cuti / Izin
+                                                </span>
                                             @else
-                                                <span
-                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">Terlambat</span>
+                                                {{-- Badge Status HADIR --}}
+                                                @if (!$isTerlambat)
+                                                    <span
+                                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-green-100 text-green-800 uppercase">
+                                                        Tepat Waktu
+                                                    </span>
+                                                @else
+                                                    <span
+                                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-800 uppercase">
+                                                        Terlambat
+                                                    </span>
+                                                @endif
                                             @endif
                                         </td>
                                     </tr>
-                                @endforeach
+                                @empty
+                                    <tr>
+                                        <td colspan="3" class="px-6 py-10 text-center text-sm text-gray-400 italic">
+                                            Belum ada data aktivitas hari ini.
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+                    <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
+                        <h3 class="text-lg font-bold text-gray-900">Penilaian PKWT Terbaru</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                        Pegawai</th>
+                                    <th
+                                        class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                        Skor</th>
+                                    <th
+                                        class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                        Grade</th>
+                                    <th
+                                        class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                        Status Verif</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                @forelse ($penilaianTerbaru as $nilai)
+                                    @php
+                                        // Logika Grade
+                                        $score = $nilai->total;
+                                        if ($score >= 50) {
+                                            $grade = 'A';
+                                            $color = 'green';
+                                        } elseif ($score >= 41) {
+                                            $grade = 'B';
+                                            $color = 'blue';
+                                        } elseif ($score >= 29) {
+                                            $grade = 'C';
+                                            $color = 'yellow';
+                                        } else {
+                                            $grade = 'D';
+                                            $color = 'red';
+                                        }
+                                    @endphp
+                                    <tr class="hover:bg-gray-50 transition-colors">
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center">
+                                                <div class="flex-shrink-0 h-8 w-8">
+                                                    <img class="h-8 w-8 rounded-full object-cover"
+                                                        src="{{ $nilai->pekerja->foto ? asset('storage/' . $nilai->pekerja->foto) : 'https://ui-avatars.com/api/?name=' . urlencode($nilai->pekerja->nama) . '&background=random' }}">
+                                                </div>
+                                                <div class="ml-3">
+                                                    <p class="text-sm font-bold text-gray-900">{{ $nilai->pekerja->nama }}
+                                                    </p>
+                                                    <p class="text-[10px] text-gray-400 uppercase font-bold">
+                                                        {{ $nilai->unit->nama_unit ?? 'Unit N/A' }}</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-center">
+                                            <span class="text-sm font-black text-gray-900">{{ $nilai->total }}</span>
+                                            <span class="text-[10px] text-gray-400">/ 56</span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-center">
+                                            <span
+                                                class="inline-flex items-center justify-center w-8 h-8 rounded-lg font-black text-xs bg-{{ $color }}-50 text-{{ $color }}-700 border border-{{ $color }}-100">
+                                                {{ $grade }}
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-center">
+                                            <div class="flex items-center justify-center gap-1.5">
+                                                {{-- Mini Dots for Status --}}
+                                                <div title="Staff Verify"
+                                                    class="w-2 h-2 rounded-full {{ $nilai->status_staff ? 'bg-green-500' : 'bg-gray-200' }}">
+                                                </div>
+                                                <div title="HRD Verify"
+                                                    class="w-2 h-2 rounded-full {{ $nilai->status_hrd ? 'bg-green-500' : 'bg-gray-200' }}">
+                                                </div>
+                                            </div>
+                                            <p class="text-[8px] text-gray-400 uppercase mt-1 font-bold">
+                                                {{ $nilai->status_hrd ? 'Verified' : 'In Progress' }}
+                                            </p>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="4" class="px-6 py-10 text-center text-sm text-gray-400 italic">
+                                            Belum ada penilaian yang dicatat.
+                                        </td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
+
             {{-- RIGHT: Quick Actions & Alerts --}}
-            <div class="space-y-6">
+            <div x-data="{ showApprovalModal: false }" class="space-y-6">
 
                 {{-- Quick Actions --}}
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
@@ -280,17 +421,6 @@
                             <span class="text-xs font-semibold mt-2 text-center">Tambah Pegawai</span>
                         </a>
                         <a href="#"
-                            class="flex flex-col items-center justify-center p-4 bg-gray-50 border border-gray-100 rounded-xl hover:bg-green-50 hover:border-green-200 hover:text-green-700 transition group">
-                            <div class="p-2 bg-white rounded-full shadow-sm group-hover:scale-110 transition-transform">
-                                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                            </div>
-                            <span class="text-xs font-semibold mt-2 text-center">Approval Izin</span>
-                        </a>
-                        <a href="#"
                             class="flex flex-col items-center justify-center p-4 bg-gray-50 border border-gray-100 rounded-xl hover:bg-purple-50 hover:border-purple-200 hover:text-purple-700 transition group">
                             <div class="p-2 bg-white rounded-full shadow-sm group-hover:scale-110 transition-transform">
                                 <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor"
@@ -302,6 +432,134 @@
                             </div>
                             <span class="text-xs font-semibold mt-2 text-center">Laporan Absen</span>
                         </a>
+
+                        <button @click="showApprovalModal = true"
+                            class="relative flex flex-col items-center justify-center p-4 bg-gray-50 border border-gray-100 rounded-xl hover:bg-green-50 hover:border-green-200 hover:text-green-700 transition group">
+
+                            {{-- Badge Angka Terintegrasi --}}
+                            @if ($penilaianPending->count() > 0)
+                                <span class="absolute top-2 right-2 flex h-5 w-5">
+                                    <span
+                                        class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                    <span
+                                        class="relative inline-flex rounded-full h-5 w-5 bg-green-600 text-white text-[10px] font-black items-center justify-center">
+                                        {{ $penilaianPending->count() }}
+                                    </span>
+                                </span>
+                            @endif
+
+                            <div class="p-2 bg-white rounded-full shadow-sm group-hover:scale-110 transition-transform">
+                                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <span class="text-xs font-semibold mt-2 text-center">Approval Penilaian</span>
+                        </button>
+
+                        <!-- MODAL APPROVAL PENILAIAN -->
+                        <div x-show="showApprovalModal"
+                            class="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6" x-cloak>
+
+                            {{-- Background Overlay --}}
+                            <div x-show="showApprovalModal" x-transition.opacity @click="showApprovalModal = false"
+                                class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
+
+                            {{-- Modal Panel --}}
+                            <div x-show="showApprovalModal" x-transition:enter="transition ease-out duration-300"
+                                x-transition:enter-start="opacity-0 scale-95 translate-y-8"
+                                x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                                class="relative bg-white rounded-[2.5rem] shadow-2xl w-full max-w-2xl overflow-hidden border border-white flex flex-col max-h-[85vh]">
+
+                                {{-- Header --}}
+                                <div
+                                    class="px-8 py-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+                                    <div>
+                                        <h3 class="text-xl font-black text-gray-900 tracking-tight">Verifikasi Penilaian
+                                        </h3>
+                                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">Total:
+                                            {{ $penilaianPending->count() }} Perlu Disetujui</p>
+                                    </div>
+                                    <button @click="showApprovalModal = false"
+                                        class="p-2 text-gray-400 hover:text-red-500 transition-colors">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                                d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </div>
+
+                                {{-- Scrollable List --}}
+                                <div class="p-6 overflow-y-auto custom-scrollbar flex-1 bg-white">
+                                    <div class="space-y-4">
+                                        @forelse($penilaianPending as $pending)
+                                            <div
+                                                class="group p-4 bg-gray-50 border border-gray-100 rounded-3xl flex items-center justify-between hover:bg-white hover:border-green-200 hover:shadow-xl hover:shadow-green-900/5 transition-all duration-300">
+                                                <div class="flex items-center gap-4">
+                                                    {{-- Grade Avatar --}}
+                                                    <div
+                                                        class="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center border border-gray-100 group-hover:border-green-500 transition-colors">
+                                                        <span
+                                                            class="text-xl font-black text-gray-900">{{ $pending->total }}</span>
+                                                    </div>
+                                                    <div>
+                                                        <p class="text-sm font-black text-gray-900 leading-tight">
+                                                            {{ $pending->pekerja->nama }}</p>
+                                                        <div class="flex items-center gap-2 mt-1">
+                                                            <span
+                                                                class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">{{ $pending->unit->nama_unit ?? 'Unit N/A' }}</span>
+                                                            <span class="text-gray-300">•</span>
+                                                            <span
+                                                                class="text-[10px] font-black text-blue-600 uppercase">{{ \Carbon\Carbon::parse($pending->created_at)->translatedFormat('d M Y') }}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="flex items-center gap-2">
+                                                    {{-- Link View Detail --}}
+                                                    <a href="{{ route('view.detail.unit', $pending->id_unit) }}"
+                                                        class="px-4 py-2 bg-white text-gray-600 text-[10px] font-black uppercase tracking-widest rounded-xl border border-gray-200 hover:bg-gray-900 hover:text-white hover:border-gray-900 transition-all">
+                                                        Detail
+                                                    </a>
+
+                                                    {{-- Form Approve --}}
+                                                    <form action="{{ route('penilaian.verify.hrd', $pending->id) }}"
+                                                        method="POST">
+                                                        @csrf
+                                                        <button type="submit"
+                                                            class="px-4 py-2 bg-green-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl shadow-lg shadow-green-200 hover:bg-green-700 transition-all active:scale-95">
+                                                            Verify
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        @empty
+                                            <div class="py-12 text-center">
+                                                <div
+                                                    class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                                                    <svg class="w-8 h-8 text-gray-200" fill="none"
+                                                        stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2" d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                </div>
+                                                <p class="text-sm font-bold text-gray-400 italic">Semua penilaian sudah
+                                                    diverifikasi.</p>
+                                            </div>
+                                        @endforelse
+                                    </div>
+                                </div>
+
+                                {{-- Footer --}}
+                                <div class="px-8 py-5 border-t border-gray-100 bg-gray-50/50 flex justify-end">
+                                    <button @click="showApprovalModal = false"
+                                        class="px-6 py-2.5 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-gray-900 transition-colors">
+                                        Tutup
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                         <a href="#"
                             class="flex flex-col items-center justify-center p-4 bg-gray-50 border border-gray-100 rounded-xl hover:bg-orange-50 hover:border-orange-200 hover:text-orange-700 transition group">
                             <div class="p-2 bg-white rounded-full shadow-sm group-hover:scale-110 transition-transform">
@@ -371,9 +629,15 @@
                             </div>
                         </div>
                     </div>
+
+
                 </div>
 
+
+
             </div>
+
+
         </div>
 
     </div>
