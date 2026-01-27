@@ -15,6 +15,7 @@
         showStatusModal: false,
         searchQuery: '',
         statusValue: '1',
+        hrdStatuses: {{ json_encode($pkwtPekerja->mapWithKeys(fn($item) => [$item->id => ($item->penilaian->first()->status_hrd ?? 0)])) }},
 
         // Track the current page number
         currentPage: {{ $pkwtPekerja->currentPage() }},
@@ -271,9 +272,19 @@
                                         </template>
 
                                         {{-- Status Update Form --}}
-                                        <form action="{{ route('export.excel', $unit->id) }}" method="POST" class="inline">
+                                        <form action="{{ route('export.excel', $unit->id) }}"
+                                            method="POST"
+                                            class="inline"
+                                            {{-- Tombol hanya muncul jika:
+                                                1. Ada item yang dipilih (length > 0)
+                                                2. SEMUA id di selectedItems memiliki status_hrd == 1 --}}
+                                            x-show="selectedItems.length > 0 && selectedItems.every(id => hrdStatuses[id] == 1)"
+                                            x-transition:enter="transition ease-out duration-200"
+                                            x-transition:enter-start="opacity-0 scale-95"
+                                            x-transition:enter-end="opacity-100 scale-100"
+                                            x-cloak>
+
                                             @csrf
-                                            {{-- Alpine.js otomatis mengisi value ini dengan ID yang dicentang dalam format JSON --}}
                                             <input type="hidden" name="worker_ids" :value="JSON.stringify(selectedItems)">
 
                                             <button type="submit"
