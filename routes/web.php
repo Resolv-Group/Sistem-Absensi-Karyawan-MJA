@@ -89,16 +89,12 @@ Route::middleware(['auth', 'role:hrd,admin'])->group(function(){
 
     Route::get('/payroll-overview', [PayrollController::class, 'viewPayrollOverview'])->name('view.payroll.overview');
     Route::post('/payroll-overview', [PayrollController::class, 'overviewPayroll'])->name('overview.payroll');
-    Route::get('/test/export-detail-borongan', [PayrollController::class, 'ExportDetailBorongan'] )->name('export.detail.borongan');
-    Route::get('/test/export-tanda-terima-borongan', [PayrollController::class, 'ExportTandaTerimaBorongan'] )->name('export.tanda-terima.borongan');
-    Route::get('/test/export-invoice-borongan', [PayrollController::class, 'ExportInvoiceBorongan'] )->name('export.invoice.borongan');
-    Route::get('/test/export-kwitansi-borongan', [PayrollController::class, 'ExportKwitansiBorongan'] )->name('export.kwitansi.borongan');
+    Route::get('/export-detail-borongan', [PayrollController::class, 'ExportDetailBorongan'] )->name('export.detail.borongan');
+    Route::get('/export-tanda-terima-borongan', [PayrollController::class, 'ExportTandaTerimaBorongan'] )->name('export.tanda-terima.borongan');
+    Route::get('/export-invoice-borongan', [PayrollController::class, 'ExportInvoiceBorongan'] )->name('export.invoice.borongan');
+    Route::get('/export-kwitansi-borongan', [PayrollController::class, 'ExportKwitansiBorongan'] )->name('export.kwitansi.borongan');
 
-    // Route::get('/test/export-detail-borongan', [PayrollController::class, 'ExportDetailBorongan'] )->name('test.export.detail.borongan');
-    // Route::get('/test/export-invoice-borongan', [PayrollController::class, 'ExportInvoiceBorongan'] )->name('test.export.invoice.borongan');
-    // Route::get('/test/export-kwitansi-borongan', [PayrollController::class, 'ExportKwitansiBorongan'] )->name('test.export.kwitansi.borongan');
-    // Route::get('/test/export-slip-upah', [PayrollController::class, 'ExportSlipUpah'] )->name('test.export.slip.upah');
-
+    
 
     //Pekerja
     Route::get('/daftar-pekerja', [PekerjaController::class, 'viewPekerjaMain'])->name('view.pekerja');

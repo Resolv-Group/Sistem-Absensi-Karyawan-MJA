@@ -105,57 +105,57 @@ use Carbon\Carbon;
 
     {{-- TABLE HEADER --}}
     <tr style="font-weight:bold;">
-        <td rowspan="4" align="center" valign="middle" style="background-color:#F2F2F2; font-weight:bold;">No</td>
-        <td rowspan="4" align="center" valign="middle" style="background-color:#F2F2F2; font-weight:bold;">Jml Naker</td>
-        <td rowspan="4" align="center" valign="middle" style="background-color:#F2F2F2; font-weight:bold;">Item</td>
-        <td rowspan="4" align="center" valign="middle" style="background-color:#F2F2F2; white-space: normal;
+        <td rowspan="4" align="center" valign="middle" style="border:1px solid #000; background-color:#F2F2F2; font-weight:bold;">No</td>
+        <td rowspan="4" align="center" valign="middle" style="border:1px solid #000; background-color:#F2F2F2; font-weight:bold;">Jml Naker</td>
+        <td rowspan="4" align="center" valign="middle" style="border:1px solid #000; background-color:#F2F2F2; font-weight:bold;">Item</td>
+        <td rowspan="4" align="center" valign="middle" style="border:1px solid #000; background-color:#F2F2F2; white-space: normal;
         word-wrap: break-word; font-weight:bold;">Total Upah Borongan</td>
-        <td colspan="2" align="center" valign="middle" style="background-color:#92D050; white-space: normal;
+        <td colspan="2" align="center" valign="middle" style="border:1px solid #000; background-color:#92D050; white-space: normal;
         word-wrap: break-word; font-weight:bold;">TOTAL BPJS KETENAGAKERJAAN</td>
-        <td rowspan="3" align="center" valign="middle" style="background-color:#F2F2F2; font-weight:bold;">Management Fee</td>
-        <td rowspan="3" align="center" valign="middle" style="background-color:#F2F2F2; font-weight:bold;">PPN</td>
-        <td rowspan="3" align="center" valign="middle" style="background-color:#F2F2F2; font-weight:bold;">PPH 23</td>
-        <td rowspan="4" align="center" valign="middle" style="background-color:#F2F2F2; font-weight:bold;">Grand Total Tagihan</td>
+        <td rowspan="3" align="center" valign="middle" style="border:1px solid #000; background-color:#F2F2F2; font-weight:bold;">Management Fee</td>
+        <td rowspan="3" align="center" valign="middle" style="border:1px solid #000; background-color:#F2F2F2; font-weight:bold;">PPN</td>
+        <td rowspan="3" align="center" valign="middle" style="border:1px solid #000; background-color:#F2F2F2; font-weight:bold;">PPH 23</td>
+        <td rowspan="4" align="center" valign="middle" style="border:1px solid #000; background-color:#F2F2F2; font-weight:bold;">Grand Total Tagihan</td>
     </tr>
 
     {{-- DATA --}}
     <tr>
-        <td align="left" valign="middle" style="background-color:#92D050; white-space: normal;
+        <td align="left" valign="middle" style="border:1px solid #000; background-color:#92D050; white-space: normal;
         word-wrap: break-word; font-weight:bold;">UMK KAB. KEDIRI 2024</td>
-        <td align="center" valign="middle" style="background-color:#92D050; white-space: normal;
+        <td align="center" valign="middle" style="border:1px solid #000; background-color:#92D050; white-space: normal;
         word-wrap: break-word; font-weight:bold;">Rp. {{ $umk }}</td>
     </tr>
 
     <tr>
-        <td align="center" valign="middle" style="background-color:#92D050; white-space: normal;
+        <td align="center" valign="middle" style="border:1px solid #000; background-color:#92D050; white-space: normal;
         word-wrap: break-word; font-weight:bold;">JKK</td>
-        <td align="center" valign="middle" style="background-color:#92D050; white-space: normal;
+        <td align="center" valign="middle" style="border:1px solid #000; background-color:#92D050; white-space: normal;
         word-wrap: break-word; font-weight:bold;">JKM</td>
     </tr>
 
     <tr>
-        <td align="center" valign="middle" style="background-color:#92D050; white-space: normal;
+        <td align="center" valign="middle" style="border:1px solid #000; background-color:#92D050; white-space: normal;
         word-wrap: break-word; font-weight:bold;">0,24%</td>
-        <td align="center" valign="middle" style="background-color:#92D050; white-space: normal;
+        <td align="center" valign="middle" style="border:1px solid #000; background-color:#92D050; white-space: normal;
         word-wrap: break-word; font-weight:bold;">0,30%</td>
-        <td align="center" valign="middle" style="background-color:#F2F2F2; font-weight:bold;">6%</td>
-        <td align="center" valign="middle" style="background-color:#F2F2F2; font-weight:bold;">11%</td>
-        <td align="center" valign="middle" style="background-color:#F2F2F2; font-weight:bold;">2%</td>
+        <td align="center" valign="middle" style="border:1px solid #000; background-color:#F2F2F2; font-weight:bold;">6%</td>
+        <td align="center" valign="middle" style="border:1px solid #000; background-color:#F2F2F2; font-weight:bold;">11%</td>
+        <td align="center" valign="middle" style="border:1px solid #000; background-color:#F2F2F2; font-weight:bold;">2%</td>
     </tr>
     
     {{-- Tabel Data --}}
     <tr>
-        <td align="center" valign="middle">1</td>
-        <td align="center" valign="middle">0</td>
-        <td style="white-space: normal;
+        <td align="center" valign="middle" style="border:1px solid #000;">1</td>
+        <td align="center" valign="middle" style="border:1px solid #000;">0</td>
+        <td style="border:1px solid #000; white-space: normal;
         word-wrap: break-word;">{{ $nama_mitra }}</td>
-        <td align="right" valign="middle" style="font-weight:bold;">{{ $grand_total }}</td>
-        <td align="right" valign="middle" style="font-weight:bold;">-</td>
-        <td align="right" valign="middle" style="font-weight:bold;">-</td>
-        <td align="right" valign="middle" style="font-weight:bold;">{{ $management_fee }}</td>
-        <td align="right" valign="middle" style="font-weight:bold;">{{ $ppn }}</td>
-        <td align="right" valign="middle" style="font-weight:bold;">{{ $pph }}</td>
-        <td align="right" valign="middle" style="font-weight:bold;">{{ $total_tagihan }}</td>
+        <td align="right" valign="middle" style="border:1px solid #000; font-weight:bold;">{{ $grand_total }}</td>
+        <td align="right" valign="middle" style="border:1px solid #000; font-weight:bold;">-</td>
+        <td align="right" valign="middle" style="border:1px solid #000; font-weight:bold;">-</td>
+        <td align="right" valign="middle" style="border:1px solid #000; font-weight:bold;">{{ $management_fee }}</td>
+        <td align="right" valign="middle" style="border:1px solid #000; font-weight:bold;">{{ $ppn }}</td>
+        <td align="right" valign="middle" style="border:1px solid #000; font-weight:bold;">{{ $pph }}</td>
+        <td align="right" valign="middle" style="border:1px solid #000; font-weight:bold;">{{ $total_tagihan }}</td>
     </tr>
 
     {{-- TERBILANG --}}
