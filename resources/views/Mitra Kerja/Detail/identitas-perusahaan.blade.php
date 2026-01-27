@@ -24,7 +24,7 @@
         <div class="sm:col-span-2">
             <dt class="text-sm font-medium text-gray-500">Alamat Lengkap</dt>
             <dd class="mt-1 text-sm text-gray-900 bg-gray-50 p-3 rounded-lg border border-gray-100">
-                {{ $mitraKerja->alamat_formatted }}
+                {{ $mitraKerja->alamat_formatted }}, {{ $mitraKerja->kota }}
             </dd>
         </div>
     </dl>

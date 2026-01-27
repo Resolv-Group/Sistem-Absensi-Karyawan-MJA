@@ -27,6 +27,9 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 //DASHBOARD
 Route::get('/dashboard', [DashboardController::class, 'viewDashboardMain'])->name('view.dashboard')->middleware('auth');
+Route::post('/penilaian/verify-hrd/{id}', [DashboardController::class, 'verifyPenilaianHrd'])
+    ->name('penilaian.verify.hrd')
+    ->middleware('auth');
 
 //PROFIL
 Route::get('/profil/{id}', function () { return view('profil'); })->name('view.profil');
@@ -94,8 +97,6 @@ Route::middleware(['auth', 'role:hrd,admin'])->group(function(){
     Route::get('/export-invoice-borongan', [PayrollController::class, 'ExportInvoiceBorongan'] )->name('export.invoice.borongan');
     Route::get('/export-kwitansi-borongan', [PayrollController::class, 'ExportKwitansiBorongan'] )->name('export.kwitansi.borongan');
 
-    
-
     //Pekerja
     Route::get('/daftar-pekerja', [PekerjaController::class, 'viewPekerjaMain'])->name('view.pekerja');
     Route::get('/pekerja/tambah', [PekerjaController::class, 'viewTambahPekerja'])->name('view.tambah.pekerja');
@@ -104,6 +105,7 @@ Route::middleware(['auth', 'role:hrd,admin'])->group(function(){
     Route::get('/pekerja/ubah/{id}', [PekerjaController::class, 'ubahPekerja'])->name('view.ubah.pekerja');
     Route::put('/pekerja/ubah/{id}', [PekerjaController::class, 'updatePekerja'])->name('update.pekerja');
     // Route::get('/pekerja/dokumen/{id}', [PekerjaController::class, 'showDokumen'])->name('pekerja.dokumen.show');
+    Route::get('/pkwt/dokumen/{id}', [PekerjaController::class, 'showPkwtDokumen'])->name('pkwt.dokumen.show');// Route for specific PKWT records (Current and History)
     Route::put('/pekerja/toggle-status/{id}', [PekerjaController::class, 'toggleStatus']);
 
     //Mitra Kerja

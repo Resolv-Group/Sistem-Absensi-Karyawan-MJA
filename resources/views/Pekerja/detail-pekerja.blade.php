@@ -182,6 +182,11 @@
                                 class="whitespace-nowrap py-4 px-1 font-medium text-sm">
                                 PKWT
                             </button>
+                            <button @click="tab='Penilaian'"
+                                :class="tab == 'Penilaian' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'"
+                                class="whitespace-nowrap py-4 px-1 font-medium text-sm">
+                                Penilaian
+                            </button>
                             <button @click="tab='history'"
                                 :class="tab == 'history' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'"
                                 class="whitespace-nowrap py-4 px-1 font-medium text-sm">
@@ -198,8 +203,13 @@
                         <div x-show="tab=='emergency'">
                             @include('Pekerja.Detail.emergency')
                         </div>
+
                         <div x-show="tab=='PKWT'">
                             @include('Pekerja.Detail.contract')
+                        </div>
+
+                        <div x-show="tab=='Penilaian'">
+                            @include('Pekerja.Detail.penilaian')
                         </div>
 
                         <div x-show="tab=='history'">

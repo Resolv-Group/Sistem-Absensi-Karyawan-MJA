@@ -894,6 +894,17 @@
                                     & Divisi</th>
                                 <th
                                     class="px-4 py-4 text-[11px] font-black text-gray-400 uppercase tracking-widest text-center">
+                                    Gaji Harian
+                                    & Gaji Lembur</th>
+                                <th
+                                    class="px-4 py-4 text-[11px] font-black text-gray-400 uppercase tracking-widest text-center">
+                                    BPJS Kesehatan
+                                    & Naker</th>
+                                <th
+                                    class="px-4 py-4 text-[11px] font-black text-gray-400 uppercase tracking-widest text-center">
+                                    PKWT</th>
+                                <th
+                                    class="px-4 py-4 text-[11px] font-black text-gray-400 uppercase tracking-widest text-center">
                                     Kontrak</th>
                                 <th
                                     class="px-4 py-4 text-[11px] font-black text-gray-400 uppercase tracking-widest text-center">
