@@ -7,10 +7,13 @@ use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
+use Maatwebsite\Excel\Concerns\WithDrawings;
+use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Events\AfterSheet;
+use PhpOffice\PhpSpreadsheet\Style\Border;
 
-class InvoiceBoronganExport implements FromView, WithStyles, WithColumnWidths, WithEvents
+class InvoiceBoronganExport implements FromView, WithStyles, WithColumnWidths, WithEvents, WithDrawings
 {
     public function __construct(
         public $resi,
@@ -46,14 +49,6 @@ class InvoiceBoronganExport implements FromView, WithStyles, WithColumnWidths, W
             'umk' => $this->umk,
         ]);
     }
-
-    public function styles(Worksheet $sheet)
-    {
-        $sheet->getParent()->getDefaultStyle()->getFont()
-            ->setName('Times New Roman')
-            ->setSize(12);
-    }
-
     public function columnWidths(): array
     {
         return [
@@ -77,4 +72,40 @@ class InvoiceBoronganExport implements FromView, WithStyles, WithColumnWidths, W
         ];
     }
 
+    public function drawings()
+    {
+        $mja = new Drawing();
+        $mja->setPath(public_path('images\mja-logo-excel.png'));
+        $mja->setCoordinates('B1');
+        $mja->setHeight(60); 
+        $mja->setOffsetX(60); 
+
+        $ars = new Drawing();
+        $ars->setPath(public_path('images\ISO.jpg'));
+        $ars->setCoordinates('I1'); // Contoh posisi di area tanda tangan
+        $ars->setHeight(60); 
+
+        $iso = new Drawing();
+        $iso->setPath(public_path('images\ARS.png'));
+        $iso->setCoordinates('J1'); // Contoh posisi di area tanda tangan
+        $iso->setHeight(60); 
+        $iso->setOffsetX(20); 
+
+        return [$mja, $ars, $iso];
+    }
+    public function styles(Worksheet $sheet)
+    {
+        $sheet->getParent()->getDefaultStyle()->getFont()
+            ->setName('Times New Roman')
+            ->setSize(12);
+
+        $sheet->getStyle('A20:J24')->applyFromArray([
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['rgb' => '000000'],
+                ],
+            ]
+        ]);
+    }
 }

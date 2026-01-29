@@ -8,10 +8,12 @@ use Maatwebsite\Excel\Concerns\FromView;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
+use Maatwebsite\Excel\Concerns\WithDrawings;
+use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use MaatWebsite\Excel\Facades\Excel;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 
-class KwitansiBoronganExport implements FromView, WithStyles, WithColumnWidths
+class KwitansiBoronganExport implements FromView, WithStyles, WithColumnWidths, WithDrawings
 {
     public function __construct(
         public $resi,
@@ -111,5 +113,27 @@ class KwitansiBoronganExport implements FromView, WithStyles, WithColumnWidths
             'O' => 4,
             'P' => 15,
         ];
+    }
+
+    public function drawings()
+    {
+        $mja = new Drawing();
+        $mja->setPath(public_path('images\mja-logo-excel.png'));
+        $mja->setCoordinates('G2');
+        $mja->setHeight(60); 
+        $mja->setOffsetX(40); 
+
+        $ars = new Drawing();
+        $ars->setPath(public_path('images\ISO.jpg'));
+        $ars->setCoordinates('P2'); // Contoh posisi di area tanda tangan
+        $ars->setHeight(60); 
+
+        $iso = new Drawing();
+        $iso->setPath(public_path('images\ARS.png'));
+        $iso->setCoordinates('Q2'); // Contoh posisi di area tanda tangan
+        $iso->setHeight(60); 
+        $iso->setOffsetX(-10); 
+
+        return [$mja, $ars, $iso];
     }
 }

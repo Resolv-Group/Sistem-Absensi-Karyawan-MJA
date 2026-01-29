@@ -23,7 +23,7 @@
                 word-wrap: break-word; font-family:'Times New Roman'; font-size:12px; font-weight:bold;">UPAH TENAGA KERJA</td>
         <td align="center" valign="middle" style="border:1px solid #000; background-color:#FCE4D6; font-family:'Times New Roman'; font-size:12px; font-weight:bold;">TANDA TANGAN</td>
     </tr>
-
+    
     @foreach($data as $row)
         <tr>
             {{-- No --}}
