@@ -100,11 +100,10 @@
                         open: false,
                         selected: '{{ $selectedYear }}',
                         list: [
+                            { val: '2028', label: 'Tahun 2028' },
                             { val: '2027', label: 'Tahun 2027' },
                             { val: '2026', label: 'Tahun 2026' },
                             { val: '2025', label: 'Tahun 2025' },
-                            { val: '2024', label: 'Tahun 2024' },
-                            { val: '2023', label: 'Tahun 2023' }
                         ]
                     }" class="relative w-40 z-10">
 
@@ -167,9 +166,9 @@
             {{-- Izin / Sakit --}}
             <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-start justify-between">
                 <div>
-                    <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Izin / Sakit</p>
+                    <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Cuti / Izin</p>
                     <h3 class="text-2xl font-bold text-gray-900 mt-1">{{ $izinSakitHariIni }}</h3>
-                    <span class="text-xs text-orange-600 font-medium mt-1">Status tidak hadir</span>
+                    <span class="text-xs text-orange-600 font-medium mt-1">Status tidak hadir / cuti</span>
                 </div>
                 <div class="p-3 bg-orange-50 text-orange-600 rounded-lg">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
@@ -296,7 +295,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="3" class="px-6 py-10 text-center text-sm text-gray-400 italic">
+                                        <td colspan="4" class="px-6 py-10 text-center text-sm text-gray-400 italic">
                                             Belum ada data aktivitas hari ini.
                                         </td>
                                     </tr>
@@ -420,43 +419,86 @@
                             </div>
                             <span class="text-xs font-semibold mt-2 text-center">Tambah Pegawai</span>
                         </a>
-                        <a href="#"
-                            class="flex flex-col items-center justify-center p-4 bg-gray-50 border border-gray-100 rounded-xl hover:bg-purple-50 hover:border-purple-200 hover:text-purple-700 transition group">
+
+                        <a href="{{ route('view.tambah.staff') }}"
+                            class="flex flex-col items-center justify-center p-4 bg-gray-50 border border-gray-100 rounded-xl hover:bg-violet-50 hover:border-violet-200 hover:text-violet-700 transition group">
                             <div class="p-2 bg-white rounded-full shadow-sm group-hover:scale-110 transition-transform">
-                                <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor"
+                                <svg class="w-6 h-6 text-violet-600" fill="none" stroke="currentColor"
                                     viewBox="0 0 24 24">
+                                    {{-- Kepala --}}
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                                    </path>
+                                        d="M12 11a4 4 0 100-8 4 4 0 000 8z" />
+                                    {{-- Bahu/Badan --}}
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2" />
+                                    {{-- Detail Dasi (Membedakan Staff/Office dengan Pekerja Lapangan) --}}
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 15l1 2-1 2-1-2 1-2z" />
                                 </svg>
                             </div>
-                            <span class="text-xs font-semibold mt-2 text-center">Laporan Absen</span>
+                            <span class="text-xs font-semibold mt-2 text-center">Tambah Staff</span>
                         </a>
 
-                        <button @click="showApprovalModal = true"
-                            class="relative flex flex-col items-center justify-center p-4 bg-gray-50 border border-gray-100 rounded-xl hover:bg-green-50 hover:border-green-200 hover:text-green-700 transition group">
-
-                            {{-- Badge Angka Terintegrasi --}}
-                            @if ($penilaianPending->count() > 0)
-                                <span class="absolute top-2 right-2 flex h-5 w-5">
-                                    <span
-                                        class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                                    <span
-                                        class="relative inline-flex rounded-full h-5 w-5 bg-green-600 text-white text-[10px] font-black items-center justify-center">
-                                        {{ $penilaianPending->count() }}
-                                    </span>
-                                </span>
-                            @endif
-
+                        <a href="{{ route('view.tambah.mitra-kerja') }}"
+                            class="flex flex-col items-center justify-center p-4 bg-gray-50 border border-gray-100 rounded-xl hover:bg-indigo-50 hover:border-indigo-200 hover:text-indigo-700 transition group">
                             <div class="p-2 bg-white rounded-full shadow-sm group-hover:scale-110 transition-transform">
-                                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor"
+                                <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor"
                                     viewBox="0 0 24 24">
+                                    {{-- Icon: Office Building --}}
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
+                                    </path>
+                                    {{-- Icon: Plus Sign inside --}}
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 9v3m0 0v3m0-3h3m-3 0H9"></path>
                                 </svg>
                             </div>
-                            <span class="text-xs font-semibold mt-2 text-center">Approval Penilaian</span>
-                        </button>
+                            <span class="text-xs font-semibold mt-2 text-center">Tambah Mitra</span>
+                        </a>
+
+                        <a href="{{ route('view.tambah.unit') }}"
+                            class="flex flex-col items-center justify-center p-4 bg-gray-50 border border-gray-100 rounded-xl hover:bg-amber-50 hover:border-amber-200 hover:text-amber-700 transition group">
+                            <div class="p-2 bg-white rounded-full shadow-sm group-hover:scale-110 transition-transform">
+                                <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    {{-- Icon: Layers/Unit Structure --}}
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                                    {{-- Icon: Plus sign at the bottom --}}
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 14v3m-1.5-1.5h3" />
+                                </svg>
+                            </div>
+                            <span class="text-xs font-semibold mt-2 text-center">Tambah Unit</span>
+                        </a>
+
+                        <div class="col-span-2">
+                            <button @click="showApprovalModal = true"
+                                class="w-full relative flex flex-col items-center justify-center p-4 bg-gray-50 border border-gray-100 rounded-xl hover:bg-green-50 hover:border-green-200 hover:text-green-700 transition group">
+
+                                {{-- Badge Angka Terintegrasi --}}
+                                @if ($penilaianPending->count() > 0)
+                                    <span class="absolute top-2 right-2 flex h-5 w-5">
+                                        <span
+                                            class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                        <span
+                                            class="relative inline-flex rounded-full h-5 w-5 bg-green-600 text-white text-[10px] font-black items-center justify-center">
+                                            {{ $penilaianPending->count() }}
+                                        </span>
+                                    </span>
+                                @endif
+
+                                <div
+                                    class="p-2 bg-white rounded-full shadow-sm group-hover:scale-110 transition-transform">
+                                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                </div>
+                                <span class="text-xs font-semibold mt-2 text-center">Approval Penilaian</span>
+                            </button>
+                        </div>
 
                         <!-- MODAL APPROVAL PENILAIAN -->
                         <div x-show="showApprovalModal"
@@ -560,80 +602,157 @@
                                 </div>
                             </div>
                         </div>
-                        <a href="#"
-                            class="flex flex-col items-center justify-center p-4 bg-gray-50 border border-gray-100 rounded-xl hover:bg-orange-50 hover:border-orange-200 hover:text-orange-700 transition group">
-                            <div class="p-2 bg-white rounded-full shadow-sm group-hover:scale-110 transition-transform">
-                                <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
-                                    </path>
-                                </svg>
-                            </div>
-                            <span class="text-xs font-semibold mt-2 text-center">Jadwal Shift</span>
-                        </a>
                     </div>
                 </div>
 
                 {{-- Important Alerts --}}
+                @php
+                    // Hitung total kategori yang memiliki peringatan untuk angka di Badge
+                    $totalPerhatian =
+                        ($urgentKontrak ? 1 : 0) + ($mitraMendekati > 0 ? 1 : 0) + ($absensiPendingCount > 0 ? 1 : 0);
+                @endphp
+
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="text-lg font-bold text-gray-900">Perlu Perhatian</h3>
-                        <span class="bg-red-100 text-red-800 text-xs font-bold px-2 py-0.5 rounded-full">3</span>
+                        {{-- Badge Angka Dinamis --}}
+                        <span class="bg-red-100 text-red-800 text-xs font-bold px-2 py-0.5 rounded-full">
+                            {{ $totalPerhatian }}
+                        </span>
                     </div>
 
                     <div class="space-y-3">
-                        {{-- Alert 1: Kontrak Pegawai --}}
-                        <div class="flex items-start gap-3 p-3 bg-red-50 rounded-lg border border-red-100">
-                            <div class="flex-shrink-0 mt-0.5 text-red-600">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
-                                    </path>
-                                </svg>
-                            </div>
-                            <div>
-                                <p class="text-sm font-bold text-red-900">Kontrak Berakhir</p>
-                                <p class="text-xs text-red-700 mt-0.5">Kontrak <strong>Siti Aminah</strong> berakhir dalam
-                                    7 hari.</p>
-                            </div>
-                        </div>
+                        {{-- Alert 1: Kontrak Pegawai (Hanya muncul jika ada data) --}}
+                        @if ($urgentKontrak)
+                            @php
+                                $target = \Carbon\Carbon::parse($urgentKontrak->tgl_akhir_pkwt)->startOfDay();
+                                $hariIni = \Carbon\Carbon::today();
+                                $sisaHari = $hariIni->diffInDays($target, false);
+                            @endphp
 
-                        {{-- Alert 2 (NEW): Mendekati Masa Kerja Sama (Mitra) --}}
-                        <div class="flex items-start gap-3 p-3 bg-orange-50 rounded-lg border border-orange-100">
-                            <div class="flex-shrink-0 mt-0.5 text-orange-600">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
-                                    </path>
-                                </svg>
-                            </div>
-                            <div>
-                                <p class="text-sm font-bold text-orange-900">Masa Mitra Kerja</p>
-                                <p class="text-xs text-orange-700 mt-0.5"><strong> {{ $mitraMendekati }} Kontrak </strong>
-                                    akan habis bulan depan.</p>
-                            </div>
-                        </div>
+                            <div class="flex items-start gap-3 p-3 bg-red-50 rounded-lg border border-red-100">
+                                <div class="flex-shrink-0 mt-0.5 text-red-600">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                                        </path>
+                                    </svg>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex items-center justify-between">
+                                        <p class="text-sm font-bold text-red-900">Kontrak Berakhir</p>
 
-                        {{-- Alert 3: Approval --}}
-                        <div class="flex items-start gap-3 p-3 bg-yellow-50 rounded-lg border border-yellow-100">
-                            <div class="flex-shrink-0 mt-0.5 text-yellow-600">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
+                                        {{-- DROPDOWN HOVER --}}
+                                        @if ($totalKontrakMendekati > 1)
+                                            <div x-data="{ open: false }" class="relative" @mouseenter="open = true"
+                                                @mouseleave="open = false">
+                                                <span
+                                                    class="cursor-help px-1.5 py-0.5 bg-red-200 text-red-800 text-[10px] font-black rounded-md uppercase tracking-tighter transition-colors hover:bg-red-300">
+                                                    +{{ $totalKontrakMendekati - 1 }} Lainnya
+                                                </span>
+
+                                                {{-- Kotak Dropdown --}}
+                                                <div x-show="open" x-transition:enter="transition ease-out duration-200"
+                                                    x-transition:enter-start="opacity-0 translate-y-2"
+                                                    x-transition:enter-end="opacity-100 translate-y-0"
+                                                    x-transition:leave="transition ease-in duration-150"
+                                                    class="absolute right-0 mt-2 w-64 bg-white border border-red-100 shadow-xl rounded-2xl z-50 p-3"
+                                                    x-cloak>
+
+                                                    <p
+                                                        class="text-[9px] font-black text-red-400 uppercase tracking-widest mb-2 px-1">
+                                                        Daftar Pegawai</p>
+
+                                                    <div class="space-y-1 max-h-48 overflow-y-auto custom-scrollbar">
+                                                        @foreach ($othersKontrak as $other)
+                                                            @php
+                                                                $otherTarget = \Carbon\Carbon::parse(
+                                                                    $other->tgl_akhir_pkwt,
+                                                                )->startOfDay();
+                                                                $otherSisa = \Carbon\Carbon::today()->diffInDays(
+                                                                    $otherTarget,
+                                                                    false,
+                                                                );
+                                                            @endphp
+                                                            <div
+                                                                class="flex items-center justify-between p-2 rounded-xl hover:bg-red-50 transition-colors">
+                                                                <span
+                                                                    class="text-[11px] font-bold text-gray-700 truncate w-32">{{ $other->pekerja->nama }}</span>
+                                                                <span
+                                                                    class="text-[10px] font-black text-red-600 bg-red-100/50 px-2 py-0.5 rounded-lg">
+                                                                    {{ $otherSisa <= 0 ? 'Hari Ini' : $otherSisa . ' hari' }}
+                                                                </span>
+                                                            </div>
+                                                        @endforeach
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endif
+                                    </div>
+
+                                    <p class="text-xs text-red-700 mt-1">
+                                        Kontrak <strong>{{ $urgentKontrak->pekerja->nama }}</strong> berakhir dalam
+                                        <strong>{{ $sisaHari <= 0 ? 'Hari Ini' : $sisaHari . ' hari' }}</strong>.
+                                    </p>
+                                </div>
                             </div>
-                            <div>
-                                <p class="text-sm font-bold text-yellow-900">Menunggu Approval</p>
-                                <p class="text-xs text-yellow-700 mt-0.5">3 Pengajuan cuti menunggu persetujuan Anda.</p>
+                        @endif
+
+                        {{-- Alert 2: Masa Mitra Kerja (Hanya muncul jika ada data) --}}
+                        @if ($mitraMendekati > 0)
+                            <div class="flex items-start gap-3 p-3 bg-orange-50 rounded-lg border border-orange-100">
+                                <div class="flex-shrink-0 mt-0.5 text-orange-600">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                        </path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-bold text-orange-900">Masa Mitra Kerja</p>
+                                    <p class="text-xs text-orange-700 mt-0.5">
+                                        Ada <strong>{{ $mitraMendekati }} Kontrak Mitra</strong> yang akan habis bulan
+                                        depan.
+                                    </p>
+                                </div>
                             </div>
-                        </div>
+                        @endif
+
+                        {{-- Alert 3: Approval Absensi (Hanya muncul jika ada data) --}}
+                        @if ($absensiPendingCount > 0)
+                            <div class="flex items-start gap-3 p-3 bg-yellow-50 rounded-lg border border-yellow-100">
+                                <div class="flex-shrink-0 mt-0.5 text-yellow-600">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-bold text-yellow-900">Menunggu Approval</p>
+                                    <p class="text-xs text-yellow-700 mt-0.5">
+                                        Ada <strong>{{ $absensiPendingCount }} data absensi</strong> menunggu verifikasi.
+                                    </p>
+                                </div>
+                            </div>
+                        @endif
+
+                        {{-- Tampilan saat semuanya kosong --}}
+                        @if ($totalPerhatian == 0)
+                            <div class="flex flex-col items-center justify-center py-6">
+                                <div class="p-3 bg-green-50 rounded-full mb-3">
+                                    <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </div>
+                                <p class="text-xs text-gray-400 font-medium italic text-center px-4">
+                                    Semua sistem berjalan normal. Tidak ada peringatan saat ini.
+                                </p>
+                            </div>
+                        @endif
                     </div>
-
-
                 </div>
-
-
 
             </div>
 

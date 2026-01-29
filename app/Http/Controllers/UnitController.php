@@ -272,6 +272,8 @@ class UnitController extends Controller
             ->limit(5)
             ->get();
 
+        // dd($pkwtPekerja);
+
         $borongan = Borongan::with('kategoriRel')->where('id_unit', $id)->latest()->limit(5)->get();
 
         $divisions = Divisi::all();
