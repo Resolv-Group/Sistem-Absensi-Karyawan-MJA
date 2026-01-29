@@ -21,7 +21,7 @@ use Carbon\Carbon;
 <table width="100%" cellpadding="4" cellspacing="0">
     {{-- HEADER --}}
     <tr>
-        <td colspan="10" align="center" style="font-size:18px;font-weight:bold;color:red">
+        <td colspan="10" align="center" style="font-size:35px; font-weight:bold;color:red; text-decoration: underline;">
             PT. MITRA JUA ABADI
         </td>
     </tr>

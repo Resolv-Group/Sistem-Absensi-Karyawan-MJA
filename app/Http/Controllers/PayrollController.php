@@ -382,6 +382,7 @@ class PayrollController extends Controller
         );
     }
     function ExportInvoiceBorongan(Request $request) {
+
         $start = \Carbon\Carbon::parse($request->tanggal_mulai);
         $end   = \Carbon\Carbon::parse($request->tanggal_akhir);
 
@@ -423,7 +424,7 @@ class PayrollController extends Controller
 
         return Excel::download(
         new InvoiceBoronganExport(
-            $request->resi,
+            $request->no_resi,
             $Unit->nama_unit,
             $MitraKerja->alamat,
             $Bidang->nama,
