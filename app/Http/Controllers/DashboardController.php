@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Absensi;
 use App\Models\Detil_Harian;
 use App\Models\MitraKerja;
 use App\Models\Pekerja;
 use App\Models\Penilaian_Pkwt;
+use App\Models\PKWT;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -68,6 +70,31 @@ class DashboardController extends Controller
                 ->limit(5)
                 ->get();
 
+            $today = now()->startOfDay();
+            $thirtyDaysLater = now()->addDays(30)->endOfDay();
+
+            $urgentKontrak = PKWT::with('pekerja')
+                ->whereBetween('tgl_akhir_pkwt', [$today, $thirtyDaysLater])
+                ->orderBy('tgl_akhir_pkwt', 'asc')
+                ->first();
+
+            // 2. Hitung total kontrak yang memenuhi kriteria (untuk angka +X lainnya)
+            $totalKontrakMendekati = PKWT::whereBetween('tgl_akhir_pkwt', [$today, $thirtyDaysLater])
+                ->count();
+
+            // Ambil semua data kontrak yang mendekati (Misal limit 5 untuk performa)
+            $kontrakMendekatiList = PKWT::with('pekerja')
+                ->whereBetween('tgl_akhir_pkwt', [$today, $thirtyDaysLater])
+                ->orderBy('tgl_akhir_pkwt', 'asc')
+                ->get();
+
+            $urgentKontrak = $kontrakMendekatiList->first();
+            $totalKontrakMendekati = $kontrakMendekatiList->count();
+            // Sisanya (untuk list dropdown)
+            $othersKontrak = $kontrakMendekatiList->skip(1);
+
+            $absensiPendingCount = Absensi::where('verifikasi', 0)->count();
+
             $penilaianTerbaru = Penilaian_Pkwt::with(['pekerja', 'unit']) // Eager load relasi
             ->orderBy('created_at', 'desc')
             ->limit(5)
@@ -86,6 +113,10 @@ class DashboardController extends Controller
                 'kehadiranTerbaru' => $kehadiranTerbaru,
                 'penilaianTerbaru' => $penilaianTerbaru,
                 'penilaianPending' => $penilaianPending,
+                'urgentKontrak' => $urgentKontrak,
+                'totalKontrakMendekati' => $totalKontrakMendekati,
+                'absensiPendingCount' => $absensiPendingCount,
+                'othersKontrak' => $othersKontrak
             ],
             compact(
                 'totalPekerja',
@@ -110,7 +141,7 @@ class DashboardController extends Controller
                 'status_hrd' => 1,
                 'updated_by' => auth()->id(), // Mencatat ID user yang melakukan verifikasi
             ]);
-            
+
             // 3. Kembalikan ke halaman sebelumnya dengan pesan sukses
             return back()->with('success', 'Penilaian untuk ' . $penilaian->pekerja->nama . ' berhasil diverifikasi.');
 

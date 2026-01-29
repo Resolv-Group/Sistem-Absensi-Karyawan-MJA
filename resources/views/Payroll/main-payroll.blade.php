@@ -732,21 +732,21 @@
                         </div>
 
                         <!-- 3. FIXED FOOTER (Rounded Bottom Corners) -->
-                        <div
-                            class="px-8 py-6 bg-slate-50 border-t border-slate-100 flex justify-between items-center shrink-0 bg-white">
-                            <button type="button" @click="$store.payslip.close()"
-                                class="text-xs font-black text-slate-400 hover:text-slate-600 uppercase tracking-widest transition-colors">Batalkan</button>
+                                <div
+                                    class="px-8 py-6 bg-slate-50 border-t border-slate-100 flex justify-between items-center shrink-0 bg-white">
+                                    <button type="button" @click="$store.payslip.close()"
+                                        class="text-xs font-black text-slate-400 hover:text-slate-600 uppercase tracking-widest transition-colors">Batalkan</button>
 
-                            <button type="button" id="btnPayrollSubmit"
-                                class="group flex items-center gap-4 bg-emerald-600 hover:bg-emerald-500 text-white px-10 py-4 rounded-xl font-black text-[11px] uppercase tracking-[0.2em] shadow-lg shadow-emerald-500/30 transition-all active:scale-95">
-                                <span>Proses Payroll</span>
-                                <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform"
-                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                                        d="M13 7l5 5-5 5M6 7l5 5-5 5" />
-                                </svg>
-                            </button>
-                        </div>
+                                    <button type="button" id="btnPayrollSubmit"
+                                        class="group flex items-center gap-4 bg-emerald-600 hover:bg-emerald-500 text-white px-10 py-4 rounded-xl font-black text-[11px] uppercase tracking-[0.2em] shadow-lg shadow-emerald-500/30 transition-all active:scale-95">
+                                        <span>Proses Payroll</span>
+                                        <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform"
+                                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                                d="M13 7l5 5-5 5M6 7l5 5-5 5" />
+                                        </svg>
+                                    </button>
+                                </div>
                     </form>
                 </div>
             </div>

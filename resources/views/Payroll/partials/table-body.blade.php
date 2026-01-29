@@ -30,15 +30,6 @@
             </div>
         </td>
 
-        {{-- 3. ID (Monospace for technical look) --}}
-        <td class="px-6 py-4 whitespace-nowrap text-center">
-            <span class="font-mono text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded border border-gray-200">
-                123123123
-            </span>
-        </td>
-
-
-
         {{-- 5. PAYMENT SYSTEM --}}
         @php
             $sistemPengajian = [1 => 'Harian', 2 => 'Borongan'];
@@ -74,8 +65,8 @@
         </td>
 
         {{-- 8. ACTIONS --}}
-        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-            <div class="flex justify-end">
+        <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+            <div class="flex justify-center">
                 <button type="button"
                     @click="$store.payslip.open('{{ $u->id }}', '{{ $u->nama_unit }}', {{ $u->pkwt->map(fn($p) => ['id' => $p->id_pekerja, 'nama' => $p->pekerja->nama])->toJson() }})"
                     class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-xl font-bold text-[11px] uppercase tracking-widest hover:bg-slate-50 hover:border-emerald-500 hover:text-emerald-600 transition-all duration-200 shadow-sm active:scale-95 group">

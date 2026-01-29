@@ -111,6 +111,7 @@ class PayrollController extends Controller
         $payrollData = [
             'unit_id' => $request->id_unit,
             'unit_name' => $request->unit_name ?? 'Unit Borongan',
+            'sistem_pengajian' => $unit->sistem_pengajian,
             'periode' => Carbon::parse($tanggalMulai)->translatedFormat('d') . ' — ' . Carbon::parse($tanggalAkhir)->translatedFormat('d M Y'),
             'pembayaran_lain' => $pembayaranLain,
             'tunjangan' => $tunjangan,
@@ -155,7 +156,7 @@ class PayrollController extends Controller
                         $tempQty = 0;
                     }
                 }
-                
+
                 // Gaji Bersih = Total Hasil Borongan + Penyesuaian Global
                 $netSalary = $totalGajiBorongan - $pembayaranLain + $tunjangan;
 
@@ -164,6 +165,7 @@ class PayrollController extends Controller
                 return [
                     'unit_id'   => $id_unit,
                     'unit_name' => $unit?->nama_unit ?? '-',
+                    'sistem_pengajian' => $unit?->sistem_pengajian ?? '1',
                     'id_pekerja' => $w->id,
                     'periode' => $periode,
                     'nama' => $w->nama,
@@ -202,14 +204,14 @@ class PayrollController extends Controller
         ])
         ->whereBetween('tgl_absensi', [$tanggal_awal, $tanggal_akhir])
         ->where('id_pekerja', $request->id_pekerja)
-        ->get();    
+        ->get();
 
         $periode = strtoupper(
     $tanggal_awal->translatedFormat('d F Y') .
             ' ~ ' .
             $tanggal_akhir->translatedFormat('d F Y')
         );
-        
+
         $PKWT = PKWT::where('id_pekerja', $request->id_pekerja)
             ->where('id_unit', $request->id_unit)
             ->first();
@@ -310,17 +312,17 @@ class PayrollController extends Controller
         // Pastikan locale Indonesia
         \Carbon\Carbon::setLocale('id');
 
-        $periode = 
-        $start->format('d') . 
-        ' ' . 
+        $periode =
+        $start->format('d') .
+        ' ' .
         strtoupper($start->translatedFormat('M')) . // 'M' untuk singkatan 3 huruf (SEPT)
-        ' - ' . 
-        $end->format('d') . 
-        ' ' . 
+        ' - ' .
+        $end->format('d') .
+        ' ' .
         strtoupper($end->translatedFormat('M')) .    // 'M' untuk singkatan 3 huruf (OKT)
-        ' ' . 
-        $end->format('Y');  
-        
+        ' ' .
+        $end->format('Y');
+
 
         $Unit = Unit::where('id_unit', $request->id_unit)->first();
 
@@ -334,10 +336,10 @@ class PayrollController extends Controller
 
         $dataExport = collect($request->workers)->map(function ($item, $key) use ($workerMaster) {
             $worker = $workerMaster->get($item['id']);
-            
-            $pkwt = $worker->pkwt; 
+
+            $pkwt = $worker->pkwt;
             $activePkwt = ($pkwt instanceof \Illuminate\Support\Collection) ? $pkwt->first() : $pkwt;
-            
+
             $upah_mentah = (float) ($item['upah'] ?? 0);
 
             return [
@@ -348,7 +350,7 @@ class PayrollController extends Controller
                 'divisi'            => optional(optional($activePkwt)->divisi)->nama ?? '-',
                 'no_rek'            => $worker->rekening ?? '-',
                 // Simpan versi angka murni untuk dihitung TOTAL
-                'upah_murni'        => $upah_mentah, 
+                'upah_murni'        => $upah_mentah,
                 // Simpan versi format untuk TAMPILAN
                 'upah_tenaga_kerja' => number_format($upah_mentah, 0, ',', '.'),
             ];
@@ -386,14 +388,14 @@ class PayrollController extends Controller
         // Pastikan locale Indonesia
         \Carbon\Carbon::setLocale('id');
 
-        $periode = 
+        $periode =
             $start->format('d') .
             ' - ' .
             $end->format('d') .
             ' ' .
             strtoupper($start->translatedFormat('F')) .
             ' ' .
-            $start->format('Y');   
+            $start->format('Y');
 
         $a = $request->grand_total;
 
@@ -454,15 +456,15 @@ class PayrollController extends Controller
         // Pastikan locale Indonesia
         \Carbon\Carbon::setLocale('id');
 
-        $periode = 
+        $periode =
             $start->format('d') .
             ' - ' .
             $end->format('d') .
             ' ' .
             strtoupper($start->translatedFormat('F')) .
             ' ' .
-            $start->format('Y'); 
-        
+            $start->format('Y');
+
         $management_fee = round($request->grand_total * 6 / 100);
         $ppn            = round($management_fee * 11 / 100);
         $pph            = round($management_fee * 2 / 100);
