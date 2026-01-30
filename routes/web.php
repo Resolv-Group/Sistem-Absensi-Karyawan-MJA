@@ -88,10 +88,10 @@ Route::middleware(['auth', 'role:hrd,admin'])->group(function(){
     Route::put('/staff/toggle-status/{id}', [StaffController::class, 'toggleStatus']);
 
     //Payroll
-    Route::get('/main-payroll', [PayrollController::class, 'viewPayrollMain'])->name('view.payroll');
+    Route::get('/payroll', [PayrollController::class, 'viewPayrollMain'])->name('view.payroll');
 
-    Route::get('/payroll-overview', [PayrollController::class, 'viewPayrollOverview'])->name('view.payroll.overview');
-    Route::post('/payroll-overview', [PayrollController::class, 'overviewPayroll'])->name('overview.payroll');
+    Route::get('/payroll/overview', [PayrollController::class, 'viewPayrollOverview'])->name('view.payroll.overview');
+    Route::post('/payroll/overview', [PayrollController::class, 'overviewPayroll'])->name('overview.payroll');
     Route::get('/test/export-detail-borongan', [PayrollController::class, 'ExportDetailBorongan'] )->name('export.detail.borongan');
     Route::get('/test/export-tanda-terima-borongan', [PayrollController::class, 'ExportTandaTerimaBorongan'] )->name('export.tanda-terima.borongan');
     Route::get('/test/export-invoice-borongan', [PayrollController::class, 'ExportInvoiceBorongan'] )->name('export.invoice.borongan');

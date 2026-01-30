@@ -182,7 +182,7 @@ class PKWTController extends Controller
         }
     }
 
-    function ubahUnitPekerja(Request $request, $unitId, $pekerjaId)
+    public function ubahUnitPekerja(Request $request, $unitId, $pekerjaId)
     {
         $unitSelected = Unit::with('namaMitra')->findOrFail($unitId);
 
