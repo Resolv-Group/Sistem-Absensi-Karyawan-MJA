@@ -425,6 +425,17 @@
                         }
                     }
                 },
+                close() {
+                    if (this.selectedId) {
+                        const p = window.workersData.find(w => w.id == this.selectedId);
+                        if (p) {
+                            this.search = `${p.nama} (${p.nik})`;
+                        }
+                    } else {
+                        this.search = '';
+                    }
+                    this.open = false;
+                }
             }
         }
 

@@ -404,15 +404,21 @@ class AbsensiController extends Controller
 
     public function bulkAbsensiBoronganUpdate(Request $request)
     {
+        // dd($request->all());
         $validator = Validator::make(
             $request->all(),
             [
                 'date' => 'required|date',
                 'data' => 'required|array|min:1',
+
+                'data.*.*.buktiSuratJalan' => 'nullable|file|mimes:png,jpg,jpeg,pdf|max:2048'
             ],
             [
                 'date.required' => 'Tanggal tidak boleh kosong.',
                 'data.required' => 'Data tidak boleh kosong.',
+
+                'data.*.*.buktiSuratJalan.mimes' => 'Bukti surat jalan harus bentuk PDF / JPG / PNG.',
+                'data.*.*.buktiSuratJalan.max'   => 'Ukuran bukti surat jalan maksimal 2MB.',
             ],
         );
 

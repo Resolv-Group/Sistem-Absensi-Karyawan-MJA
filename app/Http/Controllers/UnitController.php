@@ -106,6 +106,10 @@ class UnitController extends Controller
 
                     'pic_ids' => 'required|array|min:1',
                     'pic_ids.*' => 'exists:staff,id',
+                    'shifts' => 'required|array|min:1',
+                    'shifts.*.nama' => 'required|string',
+                    'shifts.*.waktu_masuk' => 'required',
+                    'shifts.*.waktu_keluar' => 'required',
                 ],
                 [
                     'id_unit.required' => 'ID Unit wajib diisi',
@@ -129,6 +133,8 @@ class UnitController extends Controller
                     'sistem_pengajian.required' => 'Sistem pengajian wajib dipilih',
 
                     'pic_ids.required' => 'PIC wajib dipilih minimal 1',
+                    'shifts.required' => 'Shift wajib ditambahkan minimal 1',
+                    'shifts.*.nama.required' => 'Nama shift tidak boleh kosong',
                 ],
             );
 
@@ -165,6 +171,17 @@ class UnitController extends Controller
                 DB::table('pic_unit')->insert([
                     'id_unit' => $unit->id, // atau $unit->id_unit
                     'id_pic' => $picId,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+
+            foreach ($request->shifts as $shiftData) {
+                DB::table('shift_absen')->insert([
+                    'id_unit' => $unit->id,
+                    'nama' => $shiftData['nama'],
+                    'waktu_masuk' => $shiftData['waktu_masuk'],
+                    'waktu_keluar' => $shiftData['waktu_keluar'],
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
@@ -384,7 +401,7 @@ class UnitController extends Controller
                     'pic_ids.*' => 'exists:staff,id',
 
                     // FILE OPTIONAL
-                    'dokumen_mou' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
+                    'dokumen_mou' => 'nullable|file|mimes:png,jpg,jpeg,pdf|max:2048',
                 ],
                 [
                     'id_mitra_kerja.required' => 'Mitra kerja wajib dipilih.',
@@ -394,7 +411,7 @@ class UnitController extends Controller
                     'bpjs_kesehatan.required' => 'BPJS Kesehatan fee wajib diisi',
                     'bpjs_naker.required' => 'BPJS Naker fee wajib diisi',
                     'dokumen_mou.mimes' => 'Dokumen harus PDF / JPG / PNG.',
-                    'dokumen_mou.max' => 'Ukuran dokumen maksimal 5MB.',
+                    'dokumen_mou.max' => 'Ukuran dokumen maksimal 2MB.',
                 ],
             );
 

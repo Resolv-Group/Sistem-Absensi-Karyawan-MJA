@@ -515,7 +515,7 @@
                                     <span class="text-sm font-bold text-gray-800" x-text="fileName"></span>
                                 </div>
 
-                                <input type="file" name="dokumen_mou" class="hidden"
+                                <input type="file" name="dokumen_mou" class="hidden" accept=".pdf,.jpg,.jpeg,.png"
                                     @change="fileName = $event.target.files[0] ? $event.target.files[0].name : ''" />
                             </label>
                             <div class="mt-2 flex items-start gap-2 text-xs text-gray-500 italic">
