@@ -7,6 +7,7 @@ use App\Models\MitraKerja;
 use App\Models\Pekerja;
 use App\Models\Penilaian_Pkwt;
 use App\Models\PKWT;
+use App\Models\Staff;
 use App\Models\Unit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -20,6 +21,19 @@ class PenilaianController extends Controller
     //Ambil periode PKWT hampir habis → filter → pagination → tandai yang sudah dinilai → tampilkan (AJAX / full view)
     public function viewPenilaianMain(Request $request, $id_unit)
     {
+        $user = auth()->user(); // staff login
+
+        // CEK PIC PUNYA UNIT INI ATAU TIDAK
+        $isAllowed = Unit::where('id', $id_unit)
+            ->whereHas('picUnit', function ($q) use ($user) {
+                $q->where('id_pic', $user->id);
+            })
+            ->exists();
+
+        if (! $isAllowed ) {
+            abort(403, 'Anda tidak memiliki akses ke unit ini');
+        }
+
         $unit = Unit::findOrFail($id_unit);
 
         $today = Carbon::today();
@@ -183,7 +197,7 @@ class PenilaianController extends Controller
     public function ExportExcel(Request $request, $id_unit)
     {
         $ids = json_decode($request->worker_ids, true);
-
+        
         $pkwtList = PKWT::with('pekerja')
             ->whereIn('id', $ids)
             ->where('id_unit', $id_unit) // KUNCI KEAMANAN: Harus dalam unit yang sama
@@ -201,7 +215,18 @@ class PenilaianController extends Controller
 
         $divisi = MitraKerja::with('bidangUsaha:id,nama')->where('id', $unit->id_mitra_kerja)->first()->bidangUsaha->nama ?? '-';
 
-        return Excel::download(new PenilaianExport($data, $unit, $divisi), 'PPK_Karyawan.xlsx');
+        $supervisorId = $data->first()->created_by ?? null;
+        $hrdId = $data->first()->updated_by ?? null;
+
+        // Cari di tabel Staff berdasarkan ID yang didapat
+        $pic = Staff::where('id', $supervisorId)->first();
+        $hrdStaff = Staff::where('id', $hrdId)->first();
+
+        // Ambil kolom 'nama', jika tidak ada ganti dengan titik-titik
+        $supervisor = $pic->nama ?? '';
+        $hrd = $hrdStaff->nama ?? '';     
+
+        return Excel::download(new PenilaianExport($data, $unit, $divisi, $supervisor, $hrd), 'PPK_Karyawan.xlsx');
     }
 
     //Validasi penilaian → ambil PKWT aktif → ambil unit → tampilkan form ubah

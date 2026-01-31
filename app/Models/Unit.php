@@ -21,6 +21,9 @@ class Unit extends Model
         'nama_unit',
         'persentase_management_fee',
         'sistem_pengajian',
+        'umk',
+        'bpjs_naker',
+        'bpjs_kesehatan',
         'status_aktif'
     ];
 
@@ -125,7 +128,7 @@ class Unit extends Model
         return $this->pkwt()
             ->whereBetween('tgl_akhir_pkwt', [
                 Carbon::today(),
-                Carbon::today()->addDays(7)
+                Carbon::today()->addDays(30)
             ])
             ->count();
     }

@@ -109,20 +109,7 @@
         @endif
 
         {{-- Penilaian Logic --}}
-        @if (in_array(Auth::user()->role, ['admin', 'hrd']))
-            <li>
-                <a href="/penilaian"
-                    class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all duration-300
-                    {{ Request::is('penilaian*') || request()->routeIs('view.penilaian*') ? 'bg-white text-red-600 shadow-sm ring-1 ring-black/5' : 'text-gray-500 hover:text-gray-900 hover:bg-white/50' }}">
-
-                    {{-- Ikon Baru: Badge Check (Lencana Penilaian) --}}
-                    <svg class="w-4 h-4 {{ Request::is('penilaian*') ? 'text-red-500' : '' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-                    </svg>
-                    <span>Penilaian</span>
-                </a>
-            </li>
-        @elseif(Auth::user()->role === 'pic' && Auth::user()->units->count())
+        @if(Auth::user()->role === 'pic' && Auth::user()->units->count())
             <li class="relative group">
                 <button
                     class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all duration-300
@@ -332,16 +319,7 @@
         @endif
 
         {{-- 4. PENILAIAN LOGIC --}}
-        @if (in_array(Auth::user()->role, ['admin', 'hrd']))
-            <a href="/penilaian"
-                class="flex items-center gap-3 p-3 rounded-xl font-bold text-sm transition-all
-                {{ Request::is('penilaian*') ? 'bg-red-50 text-red-600' : 'text-gray-600 hover:bg-gray-50' }}">
-                <svg class="w-5 h-5 {{ Request::is('penilaian*') ? 'text-red-500' : '' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-                </svg>
-                Penilaian
-            </a>
-        @elseif(Auth::user()->role === 'pic' && Auth::user()->units->count())
+        @if(Auth::user()->role === 'pic' && Auth::user()->units->count())
             <div x-data="{ open: false }">
                 <button @click="open = !open"
                     class="w-full flex items-center justify-between p-3 rounded-xl font-bold text-sm text-gray-600 hover:bg-gray-50">

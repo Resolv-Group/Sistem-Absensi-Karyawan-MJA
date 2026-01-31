@@ -22,9 +22,13 @@ return new class extends Migration
 
             $table->binary('dokumen_mou')->nullable();
 
+
             $table->char('nama_unit');
             $table->integer('persentase_management_fee');
             $table->integer('sistem_pengajian');
+            $table->integer('umk');
+            $table->integer('bpjs_kesehatan');
+            $table->integer('bpjs_naker');
             $table->integer('status_aktif')->default(1);
 
             $table->timestamps();

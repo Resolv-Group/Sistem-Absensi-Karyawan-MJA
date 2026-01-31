@@ -15,6 +15,21 @@ class PKWTController extends Controller
 {
     public function viewPKWTMain(Request $request, $id_unit)
     {
+        $user = auth()->user(); // staff login
+
+        // CEK PIC PUNYA UNIT INI ATAU TIDAK
+        $isAllowed = Unit::where('id', $id_unit)
+            ->whereHas('picUnit', function ($q) use ($user) {
+                $q->where('id_pic', $user->id);
+            })
+            ->exists();
+
+        if(in_array($user->role, ['admin', 'hrd']))
+        {}
+        elseif(! $isAllowed ) {
+            abort(403, 'Anda tidak memiliki akses ke unit ini');
+        }
+
         $unit = Unit::findOrFail($id_unit);
         $query = PKWT::with(['pekerja', 'jabatan', 'divisi'])->where('id_unit', $id_unit);
 
@@ -49,6 +64,21 @@ class PKWTController extends Controller
     }
     public function viewTambahUnitHarian($id_unit)
     {
+        $user = auth()->user(); // staff login
+
+        // CEK PIC PUNYA UNIT INI ATAU TIDAK
+        $isAllowed = Unit::where('id', $id_unit)
+            ->whereHas('picUnit', function ($q) use ($user) {
+                $q->where('id_pic', $user->id);
+            })
+            ->exists();
+
+        if(in_array($user->role, ['admin', 'hrd']))
+        {}
+        elseif(! $isAllowed ) {
+            abort(403, 'Anda tidak memiliki akses ke unit ini');
+        }
+
         // 1. Get current unit info
         $units = Unit::select('id', 'nama_unit as nama')->get();
         $unitSelected = Unit::with('namaMitra')->where('id', $id_unit)->firstOrFail();
@@ -65,17 +95,6 @@ class PKWTController extends Controller
 
         return view('Unit.CRUD.tambah-unit-pekerja', compact('unitSelected', 'units', 'pekerjaList', 'divisiList', 'jabatanList'));
     }
-    // function viewTambahUnitHarian($id_unit)
-    // {
-    //     // Assuming you have Unit and Pekerja models
-    //     $units = Unit::select('id', 'nama_unit as nama')->get();
-    //     $unitSelected = Unit::with('namaMitra')->where('id', $id_unit)->firstOrFail();
-    //     $pekerjaList = Pekerja::select('id', 'nama', 'nik')->where('status_aktif', 1)->get();
-    //     $divisiList = Divisi::select('id', 'nama')->get();
-    //     $jabatanList = JabatanPKWT::select('id', 'nama')->get();
-
-    //     return view('Unit.CRUD.tambah-unit-pekerja', compact('unitSelected', 'units', 'pekerjaList', 'divisiList', 'jabatanList'));
-    // }
 
     function tambahPekerjaUnit(Request $request)
     {
@@ -99,6 +118,9 @@ class PKWTController extends Controller
                     'pekerja.*.tgl_akhir_pkwt' => 'required|date|after_or_equal:pekerja.*.tgl_mulai_pkwt',
 
                     'pekerja.*.gaji_harian' => 'required|integer|min:0',
+                    'pekerja.*.gaji_overtime' => 'required|integer|min:0',
+                    'pekerja.*.bpjs_kesehatan' => 'required|integer|min:0',
+                    'pekerja.*.bpjs_naker' => 'required|integer|min:0',
 
                     'pekerja.*.dokumen_pkwt' => 'nullable|file|mimes:png,jpg,jpeg,pdf|max:2048',
                 ],
@@ -109,6 +131,9 @@ class PKWTController extends Controller
                     'pekerja.*.divisi_id.required' => 'Divisi wajib dipilih',
                     'pekerja.*.jabatan_id.required' => 'Jabatan wajib dipilih',
                     'pekerja.*.gaji_harian.required' => 'Gaji harian wajib diisi',
+                    'pekerja.*.gaji_overtime.required' => 'Gaji Overtime harian wajib diisi',
+                    'pekerja.*.bpjs_kesehatan.required' => 'BPJS Kesehatan wajib diisi',
+                    'pekerja.*.bpjs_naker.required' => 'BPJS Naker wajib diisi',
                 ],
             );
 
@@ -132,6 +157,9 @@ class PKWTController extends Controller
                     'tgl_mulai_pkwt' => $data['tgl_mulai_pkwt'],
                     'tgl_akhir_pkwt' => $data['tgl_akhir_pkwt'],
                     'gaji_harian' => $data['gaji_harian'],
+                    'gaji_overtime' => $data['gaji_overtime'],
+                    'bpjs_kesehatan' => $data['bpjs_kesehatan'],
+                    'bpjs_naker' => $data['bpjs_naker'],
                     'dokumen_pkwt' => $dokumen,
                     'dokumen_mime' => $dokumenMime,
                     'status_aktif' => 1,
@@ -154,7 +182,7 @@ class PKWTController extends Controller
         }
     }
 
-    function ubahUnitPekerja(Request $request, $unitId, $pekerjaId)
+    public function ubahUnitPekerja(Request $request, $unitId, $pekerjaId)
     {
         $unitSelected = Unit::with('namaMitra')->findOrFail($unitId);
 
@@ -181,6 +209,9 @@ class PKWTController extends Controller
             $request->validate([
                 'pekerja.*.id_pekerja' => 'required|exists:pekerja,id',
                 'pekerja.*.gaji_harian' => 'required|numeric|min:0',
+                'pekerja.*.gaji_overtime' => 'required|numeric|min:0',
+                'pekerja.*.bpjs_kesehatan' => 'required|numeric|min:0',
+                'pekerja.*.bpjs_naker' => 'required|numeric|min:0',
                 'pekerja.*.divisi_id' => 'required|exists:divisi,id',
                 'pekerja.*.jabatan_id' => 'required|exists:jabatan_pkwt,id',
                 'pekerja.*.tgl_mulai_pkwt' => 'required|date',
@@ -198,6 +229,9 @@ class PKWTController extends Controller
             $pkwt->update([
                 'id_pekerja' => $data['id_pekerja'],
                 'gaji_harian' => $data['gaji_harian'],
+                'gaji_overtime' => $data['gaji_overtime'],
+                'bpjs_kesehatan' => $data['bpjs_kesehatan'],
+                'bpjs_naker' => $data['bpjs_naker'],
                 'divisi_id' => $data['divisi_id'],
                 'jabatan_id' => $data['jabatan_id'],
                 'tgl_mulai_pkwt' => $data['tgl_mulai_pkwt'],

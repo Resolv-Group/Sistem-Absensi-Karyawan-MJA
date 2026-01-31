@@ -31,4 +31,9 @@ class Detil_Borongan extends Model
     {
         return $this->belongsTo(Absensi::class, 'id_absensi', 'id');
     }
+
+    public function borongan()
+    {
+        return $this->belongsTo(Borongan::class, 'id_barang');
+    }
 }

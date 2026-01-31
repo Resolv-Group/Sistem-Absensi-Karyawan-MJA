@@ -12,7 +12,21 @@ class PKWT extends Model
 
     protected $table = 'pkwt_pekerja';
 
-    protected $fillable = ['id_pekerja', 'id_unit', 'divisi_id', 'jabatan_id', 'tgl_mulai_pkwt', 'tgl_akhir_pkwt', 'dokumen_pkwt', 'dokumen_mime', 'status_aktif', 'gaji_harian'];
+    protected $fillable = [
+        'id_pekerja', 
+        'id_unit', 
+        'divisi_id', 
+        'jabatan_id', 
+        'tgl_mulai_pkwt', 
+        'tgl_akhir_pkwt', 
+        'dokumen_pkwt', 
+        'dokumen_mime', 
+        'status_aktif', 
+        'gaji_harian',
+        'gaji_overtime',
+        'bpjs_kesehatan',
+        'bpjs_naker',
+    ];
 
     public function pekerja()
     {
@@ -20,11 +34,11 @@ class PKWT extends Model
     }
 
     //buat view penilaian (more than 1 item)
-public function penilaian()
-{
-    // Hubungkan hanya berdasarkan id_pekerja secara standar
-    return $this->hasMany(Penilaian_Pkwt::class, 'id_pekerja', 'id_pekerja');
-}
+    public function penilaian()
+    {
+        // Hubungkan hanya berdasarkan id_pekerja secara standar
+        return $this->hasMany(Penilaian_Pkwt::class, 'id_pekerja', 'id_pekerja');
+    }
 
     public function unit()
     {

@@ -28,7 +28,7 @@ class UnitController extends Controller
         $tidakAktif = Unit::where('status_aktif', '!=', '1')->count(); // pekerja tidak aktif
         $totalHarian = Unit::where('sistem_pengajian', 1)->count();
         $totalBorongan = Unit::where('sistem_pengajian', 2)->count();
-        
+
         // --- 2. BUILD QUERY ---
         $query = Unit::query()
             ->with(['picUnit.staff', 'namaMitra'])
@@ -99,10 +99,17 @@ class UnitController extends Controller
                     'nama_unit' => 'required|string',
                     'dokumen_mou' => 'file|mimes:png,jpg,jpeg,pdf|max:2048',
                     'persentase_management_fee' => 'required|int',
+                    'umk' => 'required|numeric|min:0',
+                    'bpjs_kesehatan' => 'required|int',
+                    'bpjs_naker' => 'required|int',
                     'sistem_pengajian' => 'required|int',
 
                     'pic_ids' => 'required|array|min:1',
                     'pic_ids.*' => 'exists:staff,id',
+                    'shifts' => 'required|array|min:1',
+                    'shifts.*.nama' => 'required|string',
+                    'shifts.*.waktu_masuk' => 'required',
+                    'shifts.*.waktu_keluar' => 'required',
                 ],
                 [
                     'id_unit.required' => 'ID Unit wajib diisi',
@@ -119,9 +126,15 @@ class UnitController extends Controller
                     'persentase_management_fee.required' => 'Persentase management fee wajib diisi',
                     'persentase_management_fee.max' => 'Persentase maksimal 100%',
 
+                    'umk.required' => 'Umk wajib diisi',
+                    'bpjs_kesehatan.required' => 'BPJS Kesehatan fee wajib diisi',
+                    'bpjs_naker.required' => 'BPJS Naker fee wajib diisi',
+
                     'sistem_pengajian.required' => 'Sistem pengajian wajib dipilih',
 
                     'pic_ids.required' => 'PIC wajib dipilih minimal 1',
+                    'shifts.required' => 'Shift wajib ditambahkan minimal 1',
+                    'shifts.*.nama.required' => 'Nama shift tidak boleh kosong',
                 ],
             );
 
@@ -141,6 +154,9 @@ class UnitController extends Controller
                 'akhir_perjanjian' => $request->akhir_perjanjian,
                 'nama_unit' => $request->nama_unit,
                 'persentase_management_fee' => $request->persentase_management_fee,
+                'bpjs_kesehatan' => $request->bpjs_kesehatan,
+                'bpjs_naker' => $request->bpjs_naker,
+                'umk' => $request->umk,
                 'sistem_pengajian' => $request->sistem_pengajian,
 
                 'dokumen_mou' => $dokumen,
@@ -155,6 +171,17 @@ class UnitController extends Controller
                 DB::table('pic_unit')->insert([
                     'id_unit' => $unit->id, // atau $unit->id_unit
                     'id_pic' => $picId,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+
+            foreach ($request->shifts as $shiftData) {
+                DB::table('shift_absen')->insert([
+                    'id_unit' => $unit->id,
+                    'nama' => $shiftData['nama'],
+                    'waktu_masuk' => $shiftData['waktu_masuk'],
+                    'waktu_keluar' => $shiftData['waktu_keluar'],
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
@@ -178,6 +205,21 @@ class UnitController extends Controller
 
     public function viewDetailUnit(Request $request, $id)
     {
+        $user = auth()->user(); // staff login
+
+        // CEK PIC PUNYA UNIT INI ATAU TIDAK
+        $isAllowed = Unit::where('id', $id)
+            ->whereHas('picUnit', function ($q) use ($user) {
+                $q->where('id_pic', $user->id);
+            })
+            ->exists();
+
+        if(in_array($user->role, ['admin', 'hrd']))
+        {}
+        elseif(! $isAllowed ) {
+            abort(403, 'Anda tidak memiliki akses ke unit ini');
+        }
+
         $unit = Unit::with(['picUnit.staff', 'namaMitra'])->findOrFail($id);
         $shifts = Shift_Absen::select('id', 'nama', 'waktu_masuk', 'waktu_keluar')->where('id_unit', $id)->get();
 
@@ -247,6 +289,8 @@ class UnitController extends Controller
             ->limit(5)
             ->get();
 
+        // dd($pkwtPekerja);
+
         $borongan = Borongan::with('kategoriRel')->where('id_unit', $id)->latest()->limit(5)->get();
 
         $divisions = Divisi::all();
@@ -305,6 +349,21 @@ class UnitController extends Controller
 
     function ubahUnit(Request $request, $id)
     {
+        $user = auth()->user(); // staff login
+
+        // CEK PIC PUNYA UNIT INI ATAU TIDAK
+        $isAllowed = Unit::where('id', $id)
+            ->whereHas('picUnit', function ($q) use ($user) {
+                $q->where('id_pic', $user->id);
+            })
+            ->exists();
+
+        if(in_array($user->role, ['admin', 'hrd']))
+        {}
+        elseif(! $isAllowed ) {
+            abort(403, 'Anda tidak memiliki akses ke unit ini');
+        }
+
         $unit = Unit::findOrFail($id);
 
         $mitraKerjaList = MitraKerja::select('id as val', 'nama_mitra as label')->get();
@@ -331,6 +390,9 @@ class UnitController extends Controller
                     'nama_unit' => 'required|string|max:255',
                     'sistem_pengajian' => 'required|in:1,2',
                     'persentase_management_fee' => 'required|numeric|min:0|max:100',
+                    'umk' => 'required|numeric|min:0',
+                    'bpjs_kesehatan' => 'required|int',
+                    'bpjs_naker' => 'required|int',
 
                     'mulai_perjanjian' => 'required|date',
                     'akhir_perjanjian' => 'required|date|after_or_equal:mulai_perjanjian',
@@ -339,14 +401,17 @@ class UnitController extends Controller
                     'pic_ids.*' => 'exists:staff,id',
 
                     // FILE OPTIONAL
-                    'dokumen_mou' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
+                    'dokumen_mou' => 'nullable|file|mimes:png,jpg,jpeg,pdf|max:2048',
                 ],
                 [
                     'id_mitra_kerja.required' => 'Mitra kerja wajib dipilih.',
                     'nama_unit.required' => 'Nama unit wajib diisi.',
                     'pic_ids.required' => 'Minimal 1 PIC harus dipilih.',
+                    'umk.required' => 'Umk wajib diisi',
+                    'bpjs_kesehatan.required' => 'BPJS Kesehatan fee wajib diisi',
+                    'bpjs_naker.required' => 'BPJS Naker fee wajib diisi',
                     'dokumen_mou.mimes' => 'Dokumen harus PDF / JPG / PNG.',
-                    'dokumen_mou.max' => 'Ukuran dokumen maksimal 5MB.',
+                    'dokumen_mou.max' => 'Ukuran dokumen maksimal 2MB.',
                 ],
             );
 
@@ -372,6 +437,9 @@ class UnitController extends Controller
                 'nama_unit' => $validated['nama_unit'],
                 'sistem_pengajian' => $validated['sistem_pengajian'],
                 'persentase_management_fee' => $validated['persentase_management_fee'],
+                'bpjs_kesehatan' => $validated['bpjs_kesehatan'],
+                'bpjs_naker' => $validated['bpjs_naker'],
+                'umk' => $validated['umk'],
                 'mulai_perjanjian' => $validated['mulai_perjanjian'],
                 'akhir_perjanjian' => $validated['akhir_perjanjian'],
             ]);

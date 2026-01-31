@@ -127,6 +127,54 @@
                                     value="{{ old('nama_mitra', $mitraKerja->nama_mitra) }}">
                             </div>
 
+                            {{-- Pimpinan --}}
+                            <div class="sm:col-span-2">
+                                <label class="block text-sm font-bold text-gray-700 mb-1">Nama Pimpinan</label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z">
+                                            </path>
+                                        </svg>
+                                    </span>
+                                    <input type="text" name="pimpinan" placeholder="Nama Direktur"
+                                        class="w-full pl-10 rounded-lg border-gray-300 bg-gray-50 focus:bg-white focus:border-blue-500 focus:ring-blue-200 transition py-2.5 px-4 text-sm font-medium"
+                                        value="{{ old('pimpinan', $mitraKerja->pimpinan) }}">
+                                </div>
+                            </div>
+
+
+                            <div x-data="{ open: false, selected: '{{ old('status_pajak', $mitraKerja->status_pajak) }}' || '', list: ['PKP (Pengusaha Kena Pajak)', 'NON-PKP', ] }" class="relative">
+                                <label class="block text-sm font-bold text-gray-700 mb-1">Status Pajak</label>
+
+                                <input type="hidden" name="status_pajak" x-model="selected">
+
+                                <div @click="open=!open"
+                                    class=" bg-gray-50 rounded-lg py-2.5 px-3 cursor-pointer flex justify-between items-center select-none shadow-sm hover:border-gray-200 hover:ring-1 hover:ring-gray-200 transition">
+                                    <span x-text="selected || 'Pilih Status Pajak'"
+                                        :class="selected ? 'text-gray-900' : 'text-gray-400'"></span>
+                                    <svg class="w-4 h-4 text-gray-500" :class="{ 'rotate-180': open }" fill="none"
+                                        stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </div>
+
+                                <ul x-show="open" @click.outside="open=false" x-transition.opacity.duration.200ms
+                                    class="absolute w-full mt-1 border border-gray-200 bg-white rounded-lg shadow-xl overflow-y-auto max-h-60 z-50">
+                                    <template x-for="item in list" :key="item">
+                                        <li @click="selected=item; open=false"
+                                            class="px-3 py-2.5 text-sm hover:bg-blue-50 hover:text-blue-700 cursor-pointer transition border-b border-gray-50 last:border-0"
+                                            x-text="item">
+                                        </li>
+                                    </template>
+                                </ul>
+                                @error('jabatan')
+                                    <p class="text-red-600 text-xs mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+
                             <div x-data="bidangUsahaCombobox()" x-init="init()" class="relative">
 
                                 {{-- Label & Add Button --}}
@@ -327,23 +375,6 @@
                                 </div>
                             </div>
 
-                            {{-- Pimpinan --}}
-                            <div>
-                                <label class="block text-sm font-bold text-gray-700 mb-1">Nama Pimpinan</label>
-                                <div class="relative">
-                                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z">
-                                            </path>
-                                        </svg>
-                                    </span>
-                                    <input type="text" name="pimpinan" placeholder="Nama Direktur"
-                                        class="w-full pl-10 rounded-lg border-gray-300 bg-gray-50 focus:bg-white focus:border-blue-500 focus:ring-blue-200 transition py-2.5 px-4 text-sm font-medium"
-                                        value="{{ old('pimpinan', $mitraKerja->pimpinan) }}">
-                                </div>
-                            </div>
-
                             {{-- Telepon --}}
                             <div>
                                 <label class="block text-sm font-bold text-gray-700 mb-1">No. Telp Perusahaan</label>
@@ -363,35 +394,14 @@
                                 </div>
                             </div>
 
-                            <div x-data="{ open: false, selected: '{{ old('status_pajak', $mitraKerja->status_pajak) }}' || '', list: ['PKP (Pengusaha Kena Pajak)', 'NON-PKP', ] }" class="relative">
-                                <label class="block text-sm font-bold text-gray-700 mb-1">Status Pajak</label>
-
-                                <input type="hidden" name="status_pajak" x-model="selected">
-
-                                <div @click="open=!open"
-                                    class=" bg-gray-50 rounded-lg py-2.5 px-3 cursor-pointer flex justify-between items-center select-none shadow-sm hover:border-gray-200 hover:ring-1 hover:ring-gray-200 transition">
-                                    <span x-text="selected || 'Pilih Status Pajak'"
-                                        :class="selected ? 'text-gray-900' : 'text-gray-400'"></span>
-                                    <svg class="w-4 h-4 text-gray-500" :class="{ 'rotate-180': open }" fill="none"
-                                        stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 9l-7 7-7-7" />
-                                    </svg>
-                                </div>
-
-                                <ul x-show="open" @click.outside="open=false" x-transition.opacity.duration.200ms
-                                    class="absolute w-full mt-1 border border-gray-200 bg-white rounded-lg shadow-xl overflow-y-auto max-h-60 z-50">
-                                    <template x-for="item in list" :key="item">
-                                        <li @click="selected=item; open=false"
-                                            class="px-3 py-2.5 text-sm hover:bg-blue-50 hover:text-blue-700 cursor-pointer transition border-b border-gray-50 last:border-0"
-                                            x-text="item">
-                                        </li>
-                                    </template>
-                                </ul>
-                                @error('jabatan')
-                                    <p class="text-red-600 text-xs mt-1">{{ $message }}</p>
-                                @enderror
+                            {{-- Kota --}}
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-1">Kota</label>
+                                <input type="text" name="kota" placeholder="PT. Contoh Sejahtera Abadi"
+                                    class="w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white focus:border-blue-500 focus:ring-blue-200 transition py-2.5 px-4 text-sm font-medium"
+                                    value="{{ old('kota', $mitraKerja->kota) }}">
                             </div>
+
 
                             {{-- Alamat (New from ERD) --}}
                             <div class="sm:col-span-2">

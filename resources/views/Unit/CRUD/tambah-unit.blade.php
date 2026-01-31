@@ -159,9 +159,6 @@
                                 value="{{ old('nama_unit') }}">
                         </div>
 
-                        {{-- Mitra Kerja (Searchable Combobox) --}}
-
-
                         {{-- PIC Name --}}
                         <div x-data="picCombobox()" x-init="init()" class="group"> {{-- Hapus relative di sini --}}
 
@@ -180,7 +177,7 @@
 
                                 {{-- Main Container (Input Box) --}}
                                 <div class="relative w-full min-h-[50px] rounded-xl border border-gray-200 bg-gray-50 px-2 py-1.5 flex flex-wrap gap-2 transition-all duration-200
-             cursor-text"
+                                    cursor-text"
                                     @click="$refs.searchInput.focus()">
 
                                     {{-- A. Selected Chips --}}
@@ -282,6 +279,126 @@
                 </div>
 
                 {{-- Divider --}}
+                <div class="h-px bg-gray-100 w-full my-8"></div>
+
+                {{-- SECTION 3: PENGATURAN SHIFT --}}
+                <div x-data="shiftManager()">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="h-8 w-8 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <h2 class="text-lg font-bold text-gray-900">Pengaturan Shift</h2>
+                        </div>
+                        <span class="px-3 py-1 bg-purple-100 text-purple-700 text-xs font-bold rounded-full"
+                            x-text="shifts.length + ' Shift Terdaftar'"></span>
+                    </div>
+
+                    <div
+                        class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end bg-gray-50/50 p-6 rounded-2xl border border-gray-100 mb-6">
+                        {{-- Nama Shift --}}
+                        <div class="md:col-span-5">
+                            <label
+                                class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Nama
+                                Shift</label>
+                            <input type="text" x-model="newShift.nama" placeholder="Contoh: Pagi / Shift 1 / Malam"
+                                class="w-full rounded-xl border-gray-200 bg-white focus:border-purple-500 focus:ring-purple-100 transition py-3 px-4 text-sm font-medium">
+                        </div>
+
+                        {{-- Jam Mulai --}}
+                        <div class="md:col-span-3">
+                            <label
+                                class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Jam
+                                Mulai</label>
+                            <input type="time" x-model="newShift.waktu_masuk"
+                                class="w-full rounded-xl border-gray-200 bg-white focus:border-purple-500 transition py-3 px-4 text-sm font-medium">
+                        </div>
+
+                        {{-- Jam Selesai --}}
+                        <div class="md:col-span-3">
+                            <label
+                                class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Jam
+                                Selesai</label>
+                            <input type="time" x-model="newShift.waktu_keluar"
+                                class="w-full rounded-xl border-gray-200 bg-white focus:border-purple-500 transition py-3 px-4 text-sm font-medium">
+                        </div>
+
+                        {{-- Button Add --}}
+                        <div class="md:col-span-1">
+                            <button type="button" @click="addShift()"
+                                class="w-full h-[46px] flex items-center justify-center bg-purple-600 hover:bg-purple-700 text-white rounded-xl transition shadow-md shadow-purple-100">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    {{-- LIST PREVIEW --}}
+                    <div class="space-y-3">
+                        {{-- Hidden Inputs for Backend --}}
+                        <template x-for="(s, index) in shifts" :key="index">
+                            <div>
+                                <input type="hidden" :name="'shifts[' + index + '][nama]'" :value="s.nama">
+                                <input type="hidden" :name="'shifts[' + index + '][waktu_masuk]'"
+                                    :value="s.waktu_masuk">
+                                <input type="hidden" :name="'shifts[' + index + '][waktu_keluar]'"
+                                    :value="s.waktu_keluar">
+                            </div>
+                        </template>
+
+                        <template x-for="(s, index) in shifts" :key="index">
+                            <div
+                                class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-2xl hover:border-purple-300 transition group animate-fadeIn">
+                                <div class="flex items-center gap-4">
+                                    <div class="h-10 w-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center font-bold text-sm"
+                                        x-text="index + 1"></div>
+                                    <div>
+                                        <h4 class="text-sm font-bold text-gray-900" x-text="s.nama"></h4>
+                                        <div class="flex items-center gap-2 mt-0.5">
+                                            <span class="text-xs font-medium text-gray-500" x-text="s.waktu_masuk"></span>
+                                            <svg class="w-3 h-3 text-gray-300" fill="none" viewBox="0 0 24 24"
+                                                stroke="currentColor">
+                                                <path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-width="2" />
+                                            </svg>
+                                            <span class="text-xs font-medium text-gray-500"
+                                                x-text="s.waktu_keluar"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="button" @click="removeShift(index)"
+                                    class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition">
+                                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </template>
+
+                        {{-- Empty State --}}
+                        <div x-show="shifts.length === 0"
+                            class="py-12 border-2 border-dashed border-gray-100 rounded-2xl flex flex-col items-center justify-center">
+                            <div class="p-3 bg-gray-50 rounded-full mb-3">
+                                <svg class="w-6 h-6 text-gray-300" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                            <p class="text-sm text-gray-400 font-medium">Belum ada shift yang ditambahkan</p>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Divider --}}
                 <div class="h-px bg-gray-100 w-full"></div>
 
                 {{-- SECTION 2: KONTRAK & LEGALITAS --}}
@@ -300,7 +417,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
                         {{-- Sistem Pengajian --}}
-                        <div x-data="{ open: false, selected: '{{ old('sistem_pengajian') }}' || '', list: [{ val: '1', label: 'Harian' }, { val: '2', label: 'Borongan' }] }" class="relative">
+                        <div x-data="{ open: false, selected: @js(old('sistem_pengajian')) || '', list: [{ val: '1', label: 'Harian' }, { val: '2', label: 'Borongan' }] }" class="relative">
                             <label class="block text-sm font-bold text-gray-700 mb-1">Sistem Pengajian</label>
 
                             <input type="hidden" name="sistem_pengajian" x-model="selected">
@@ -325,36 +442,131 @@
                             </ul>
                         </div>
 
-                        {{-- Management Fee --}}
-                        <div>
+                        {{-- UMK Unit --}}
+                        <div x-data="{ umk: '{{ old('umk') }}' }">
                             <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
-                                Management Fee
+                                Nominal Pembayaran (UMK)
                             </label>
 
                             <div class="relative group">
-                                {{-- Input Field --}}
-                                <input type="number" name="persentase_management_fee" placeholder="0" min="0"
-                                    max="100" step="0.01"
+                                {{-- Suffix Symbol (Rp) dengan desain yang lebih menyatu --}}
+                                <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+                                    <span
+                                        class="text-gray-400 font-black text-sm group-focus-within:text-blue-600 transition-colors duration-200 border-r border-gray-200 pr-2 mr-1">
+                                        Rp
+                                    </span>
+                                </div>
+
+                                {{-- Visual Input (Masking) --}}
+                                <input type="text" x-model="umk"
+                                    @input="umk = $event.target.value.replace(/\D/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, '.')"
+                                    placeholder="0"
                                     class="block w-full rounded-xl border-gray-200 bg-gray-50
+                                        text-gray-900 font-bold text-sm placeholder:text-gray-300
+                                        focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10
+                                        transition-all duration-200 py-3 pl-14 pr-4 shadow-sm">
+
+                                {{-- Hidden Input untuk Database (nama: umk_unit) --}}
+                                <input type="hidden" name="umk" :value="umk.replace(/\./g, '')">
+                            </div>
+
+                            {{-- Helper Text --}}
+                            <p class="mt-1.5 ml-1 text-[10px] text-gray-400 italic">
+                                *Contoh: 3.500.000 (Otomatis diformat)
+                            </p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-5 sm:col-span-2">
+                            {{-- Management Fee --}}
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
+                                    Management Fee (%)
+                                </label>
+
+                                <div class="relative group">
+                                    {{-- Input Field --}}
+                                    <input type="number" name="persentase_management_fee" placeholder="0"
+                                        min="0" max="100" step="0.01"
+                                        class="block w-full rounded-xl border-gray-200 bg-gray-50
                    text-gray-900 font-bold text-sm placeholder-gray-400
                    focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10
                    transition-all duration-200 py-3 pl-4 pr-10">
 
-                                {{-- Suffix Symbol --}}
-                                <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
-                                    <span
-                                        class="text-gray-400 font-bold text-sm group-focus-within:text-blue-600 transition-colors duration-200">
-                                        %
-                                    </span>
+                                    {{-- Suffix Symbol --}}
+                                    <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+                                        <span
+                                            class="text-gray-400 font-bold text-sm group-focus-within:text-blue-600 transition-colors duration-200">
+                                            %
+                                        </span>
+                                    </div>
                                 </div>
+
+                                {{-- Helper Text --}}
+                                <p class="mt-1.5 ml-1 text-[10px] text-gray-400">
+                                    Masukkan presentase fee (Ex: 2.5)
+                                </p>
                             </div>
 
-                            {{-- Helper Text --}}
-                            <p class="mt-1.5 ml-1 text-[10px] text-gray-400">
-                                Masukkan presentase fee (Ex: 2.5)
-                            </p>
-                        </div>
+                            {{-- BPJS Naker Fee --}}
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
+                                    BPJS Kesehatan Fee (%)
+                                </label>
 
+                                <div class="relative group">
+                                    {{-- Input Field --}}
+                                    <input type="number" name="bpjs_kesehatan" placeholder="0" min="0"
+                                        max="100" step="0.01"
+                                        class="block w-full rounded-xl border-gray-200 bg-gray-50
+                   text-gray-900 font-bold text-sm placeholder-gray-400
+                   focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10
+                   transition-all duration-200 py-3 pl-4 pr-10">
+
+                                    {{-- Suffix Symbol --}}
+                                    <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+                                        <span
+                                            class="text-gray-400 font-bold text-sm group-focus-within:text-blue-600 transition-colors duration-200">
+                                            %
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {{-- Helper Text --}}
+                                <p class="mt-1.5 ml-1 text-[10px] text-gray-400">
+                                    Masukkan presentase BPJS Kesehatan fee (Ex: 2.5)
+                                </p>
+                            </div>
+
+                            {{-- BPJS Naker Fee --}}
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
+                                    BPJS Naker Fee (%)
+                                </label>
+
+                                <div class="relative group">
+                                    {{-- Input Field --}}
+                                    <input type="number" name="bpjs_naker" placeholder="0" min="0"
+                                        max="100" step="0.01"
+                                        class="block w-full rounded-xl border-gray-200 bg-gray-50
+                   text-gray-900 font-bold text-sm placeholder-gray-400
+                   focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10
+                   transition-all duration-200 py-3 pl-4 pr-10">
+
+                                    {{-- Suffix Symbol --}}
+                                    <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+                                        <span
+                                            class="text-gray-400 font-bold text-sm group-focus-within:text-blue-600 transition-colors duration-200">
+                                            %
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {{-- Helper Text --}}
+                                <p class="mt-1.5 ml-1 text-[10px] text-gray-400">
+                                    Masukkan presentase BPJS Naker fee (Ex: 2.5)
+                                </p>
+                            </div>
+                        </div>
                         {{-- Dates Row --}}
                         <div class="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <div>
@@ -422,7 +634,7 @@
                     class="px-5 py-2.5 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 hover:text-gray-800 transition shadow-sm">
                     Batal
                 </a>
-                <button type="submit"
+                <button type="button" id="save-btn"
                     class="px-5 py-2.5 text-sm font-bold text-white bg-black border border-black rounded-xl hover:bg-gray-800 transition shadow-lg shadow-gray-200 flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
@@ -612,6 +824,78 @@
                 // Placeholder for modal logic
                 openModalWithSearch() {
                     alert("Logic Modal Tambah PIC (Sama seperti sebelumnya)");
+                }
+            }
+        }
+
+        function shiftManager() {
+            return {
+                shifts: [],
+                newShift: {
+                    nama: 'Pagi',
+                    waktu_masuk: '09:00', // Ganti nama key
+                    waktu_keluar: '17:00' // Ganti nama key
+                },
+
+                init() {
+                    let oldShifts = @json(old('shifts', []));
+                    if (oldShifts.length > 0) {
+                        this.shifts = oldShifts;
+                    }
+                },
+
+                addShift() {
+                    if (this.shifts.length >= 3) {
+                        this.sendNotification('error', 'Maksimal hanya boleh 3 shift!');
+                        return;
+                    }
+
+                    // Gunakan key baru waktu_masuk & waktu_keluar
+                    if (!this.newShift.nama || !this.newShift.waktu_masuk || !this.newShift.waktu_keluar) {
+                        this.sendNotification('error', 'Mohon isi semua field shift!');
+                        return;
+                    }
+
+                    const isDuplicateName = this.shifts.some(s =>
+                        s.nama.toLowerCase().trim() === this.newShift.nama.toLowerCase().trim()
+                    );
+                    if (isDuplicateName) {
+                        this.sendNotification('error', 'Nama shift "' + this.newShift.nama + '" sudah ada!');
+                        return;
+                    }
+
+                    const isDuplicateTime = this.shifts.some(s =>
+                        s.waktu_masuk === this.newShift.waktu_masuk &&
+                        s.waktu_keluar === this.newShift.waktu_keluar
+                    );
+                    if (isDuplicateTime) {
+                        this.sendNotification('error', 'Shift dengan jam kerja tersebut sudah terdaftar!');
+                        return;
+                    }
+
+                    this.shifts.push({
+                        ...this.newShift
+                    });
+
+                    // Reset dengan key yang konsisten
+                    this.newShift.nama = '';
+                    this.newShift.waktu_masuk = '09:00';
+                    this.newShift.waktu_keluar = '17:00';
+
+                    this.sendNotification('success', 'Shift berhasil ditambahkan.');
+                },
+
+                sendNotification(type, message) {
+                    window.dispatchEvent(new CustomEvent('notify', {
+                        detail: {
+                            type: type,
+                            message: message
+                        }
+                    }));
+                },
+
+                removeShift(index) {
+                    this.shifts.splice(index, 1);
                 }
             }
         }

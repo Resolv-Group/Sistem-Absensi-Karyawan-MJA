@@ -14,6 +14,21 @@ class BoronganController extends Controller
 {
     public function viewBoronganMain(Request $request, $id_unit)
     {
+        $user = auth()->user(); // staff login
+
+        // CEK PIC PUNYA UNIT INI ATAU TIDAK
+        $isAllowed = Unit::where('id', $id_unit)
+            ->whereHas('picUnit', function ($q) use ($user) {
+                $q->where('id_pic', $user->id);
+            })
+            ->exists();
+
+        if(in_array($user->role, ['admin', 'hrd']))
+        {}
+        elseif(! $isAllowed ) {
+            abort(403, 'Anda tidak memiliki akses ke unit ini');
+        }
+
         $unit = Unit::findOrFail($id_unit);
 
         // Base Query
@@ -43,6 +58,22 @@ class BoronganController extends Controller
 
     function viewTambahBorongan($id_unit)
     {
+        $user = auth()->user(); // staff login
+
+        // CEK PIC PUNYA UNIT INI ATAU TIDAK
+        $isAllowed = Unit::where('id', $id_unit)
+            ->whereHas('picUnit', function ($q) use ($user) {
+                $q->where('id_pic', $user->id);
+            })
+            ->exists();
+
+        if(in_array($user->role, ['admin', 'hrd']))
+        {}
+        elseif(! $isAllowed ) {
+            abort(403, 'Anda tidak memiliki akses ke unit ini');
+        }
+
+
         // Assuming you have Unit and Pekerja models
         $units = \App\Models\Unit::select('id', 'nama_unit as nama')->get();
         $unitSelected = Unit::with('namaMitra')->where('id', $id_unit)->firstOrFail();

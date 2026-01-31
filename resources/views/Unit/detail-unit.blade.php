@@ -402,20 +402,6 @@
                             </p>
                         </div>
 
-                        {{-- 2. Fee --}}
-                        <div
-                            class="p-4 rounded-xl bg-gray-50 border border-gray-100 hover:border-orange-200 hover:bg-orange-50/30 transition group">
-                            <div class="flex items-center gap-2 mb-2">
-                                <div class="p-1 rounded bg-white shadow-sm text-gray-500 group-hover:text-orange-600">
-                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                                    </svg>
-                                </div>
-                                <span class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Mgmt Fee</span>
-                            </div>
-                            <p class="font-bold text-gray-900">{{ $unit->persentase_management_fee }}%</p>
-                        </div>
 
                         {{-- 3. Expiry Date --}}
                         <div
@@ -440,6 +426,72 @@
                             </div>
                         </div>
 
+                        {{-- 2. Fee --}}
+                        {{-- 1. UMK Fee --}}
+                        <div
+                            class="p-4 rounded-xl bg-gray-50 border border-gray-100 hover:border-orange-200 hover:bg-orange-50/30 transition group">
+                            <div class="flex items-center gap-2 mb-2">
+                                <div class="p-1 rounded bg-white shadow-sm text-gray-500 group-hover:text-orange-600">
+                                    {{-- Icon: Cash/Banknote --}}
+                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                                    </svg>
+                                </div>
+                                <span class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">UMK Fee</span>
+                            </div>
+                            <p class="font-bold text-gray-900">Rp.{{ number_format($unit->umk) }}</p>
+                        </div>
+
+                        {{-- 2. Management Fee --}}
+                        <div
+                            class="p-4 rounded-xl bg-gray-50 border border-gray-100 hover:border-orange-200 hover:bg-orange-50/30 transition group">
+                            <div class="flex items-center gap-2 mb-2">
+                                <div class="p-1 rounded bg-white shadow-sm text-gray-500 group-hover:text-orange-600">
+                                    {{-- Icon: Briefcase (Professional Service) --}}
+                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M21 13.255A2.396 2.396 0 0019.5 13H17c-1.105 0-2 .895-2 2s.895 2 2 2h2.5c.39 0 .753-.105 1.055-.255A5.002 5.002 0 1121 13.255zM11 13.255A2.396 2.396 0 009.5 13H7c-1.105 0-2 .895-2 2s.895 2 2 2h2.5c.39 0 .753-.105 1.055-.255A5.002 5.002 0 1111 13.255z" />
+                                    </svg>
+                                </div>
+                                <span class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Mgmt Fee</span>
+                            </div>
+                            <p class="font-bold text-gray-900">{{ $unit->persentase_management_fee }}%</p>
+                        </div>
+
+                        {{-- 3. BPJS Kesehatan Fee --}}
+                        <div
+                            class="p-4 rounded-xl bg-gray-50 border border-gray-100 hover:border-orange-200 hover:bg-orange-50/30 transition group">
+                            <div class="flex items-center gap-2 mb-2">
+                                <div class="p-1 rounded bg-white shadow-sm text-gray-500 group-hover:text-orange-600">
+                                    {{-- Icon: Heart (Health) --}}
+                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                    </svg>
+                                </div>
+                                <span class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">BPJS Kesehatan
+                                    Fee</span>
+                            </div>
+                            <p class="font-bold text-gray-900">{{ $unit->bpjs_kesehatan }}%</p>
+                        </div>
+
+                        {{-- 4. BPJS Naker Fee --}}
+                        <div
+                            class="p-4 rounded-xl bg-gray-50 border border-gray-100 hover:border-orange-200 hover:bg-orange-50/30 transition group">
+                            <div class="flex items-center gap-2 mb-2">
+                                <div class="p-1 rounded bg-white shadow-sm text-gray-500 group-hover:text-orange-600">
+                                    {{-- Icon: Users/Workers (Labor) --}}
+                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                                    </svg>
+                                </div>
+                                <span class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">BPJS Naker
+                                    Fee</span>
+                            </div>
+                            <p class="font-bold text-gray-900">{{ $unit->bpjs_naker }}%</p>
+                        </div>
 
                     </div>
 
