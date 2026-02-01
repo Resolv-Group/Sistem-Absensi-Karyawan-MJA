@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Borongan;
 use App\Models\Kategori;
+use App\Models\Satuan;
 use App\Models\Unit;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
@@ -77,10 +78,10 @@ class BoronganController extends Controller
         // Assuming you have Unit and Pekerja models
         $units = \App\Models\Unit::select('id', 'nama_unit as nama')->get();
         $unitSelected = Unit::with('namaMitra')->where('id', $id_unit)->firstOrFail();
-        $kategoriList = Kategori::select('id', 'nama')->get();
+        $kategoriList = Kategori::select('id as val', 'nama as label')->get();
+        $satuanList = Satuan::select('id as val', 'nama as label')->get();
 
-
-        return view('Unit.CRUD.tambah-unit-borongan', compact('unitSelected', 'units', 'kategoriList'));
+        return view('Unit.CRUD.tambah-unit-borongan', compact('unitSelected', 'units', 'kategoriList', 'satuanList'));
     }
 
     function tambahBoronganUnit(Request $request)
@@ -104,6 +105,7 @@ class BoronganController extends Controller
                     'borongan.*.nama_item' => 'required|string',
 
                     'borongan.*.satuan' => 'required|integer',
+                    'borongan.*.max_reject' => 'required|integer'
                 ],
                 [
                     'id_unit.required' => 'ID Unit wajib diisi',
@@ -113,6 +115,7 @@ class BoronganController extends Controller
                     'borongan.*.kategori.required' => 'Kategori wajib dipilih',
                     'borongan.*.nama_item.required' => 'Nama Item wajib diisi',
                     'borongan.*.satuan.required' => 'Satuan wajib diisi',
+                    'borongan.*.max_reject.required' => 'Max Rej Subkon wajib diisi',
                 ],
             );
 
@@ -125,6 +128,7 @@ class BoronganController extends Controller
                     'kategori' => $data['kategori'],
                     'nama_item' => $data['nama_item'],
                     'satuan' => $data['satuan'],
+                    'Max Rej Subkon' => $data['max_reject'],
                     'status_aktif' => 1,
                 ]);
             }
@@ -318,5 +322,9 @@ class BoronganController extends Controller
             DB::rollBack();
             return back()->with('error', 'Terjadi kesalahan saat memperbarui data: ' . $e->getMessage());
         }
+    }
+
+    function tambahKategori(Request $request) {
+
     }
 }

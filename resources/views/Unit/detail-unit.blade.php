@@ -9,7 +9,7 @@
         <div class="mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div>
                 <nav class="flex text-sm font-medium text-gray-500 mb-2">
-                    <a href="{{ route('view.unit') }}" class="hover:text-gray-700 transition">Unit</a>
+                    <span class="hover:text-gray-700">Unit</a>
                     <span class="mx-2 text-gray-400">/</span>
                     <span class="text-blue-600">Detail</span>
                 </nav>
@@ -551,7 +551,7 @@
                     @endif
 
                     {{-- Tab 1: Pekerja --}}
-                    <button @click="activeTab = 'Inventaris'"
+                    {{-- <button @click="activeTab = 'Inventaris'"
                         :class="activeTab === 'Inventaris'
                             ?
                             'border-blue-600 text-blue-600' :
@@ -567,7 +567,7 @@
                             :class="activeTab === 'Inventaris' ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-900'">
                             {{ $pkwtPekerja->count() }}
                         </span>
-                    </button>
+                    </button> --}}
                 </nav>
             </div>
 
@@ -584,9 +584,9 @@
             </div>
 
             {{-- C. TAB CONTENT: BORONGAN --}}
-            <div x-show="activeTab === 'Inventaris'" x-transition:enter.opacity.duration.300ms style="display: none;">
+            {{-- <div x-show="activeTab === 'Inventaris'" x-transition:enter.opacity.duration.300ms style="display: none;">
                 @include('Unit.Detail.borongan')
-            </div>
+            </div> --}}
 
         </div>
 

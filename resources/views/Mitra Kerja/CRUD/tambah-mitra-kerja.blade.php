@@ -212,7 +212,7 @@
                                         @click="open = true" @click.outside="closeDropdown()"
                                         @keydown.escape="open = false" placeholder="Cari atau pilih bidang usaha..."
                                         class="w-full pl-10 pr-10 rounded-lg border-gray-300 bg-gray-50 text-gray-900 placeholder-gray-400
-                   focus:bg-white focus:border-blue-500 focus:ring-blue-200 transition py-2.5 px-4 text-sm font-medium"
+                                    focus:bg-white focus:border-blue-500 focus:ring-blue-200 transition py-2.5 px-4 text-sm font-medium"
                                         autocomplete="off">
 
                                     {{-- Chevron Icon (Visual cue that it is a list) --}}
@@ -322,7 +322,7 @@
                                                         <input type="text" x-model="newBidangName"
                                                             @keydown.enter.prevent="saveBidang()"
                                                             class="w-full pl-10 rounded-lg border-gray-300 bg-gray-50 text-gray-900
-                            focus:bg-white focus:border-blue-500 focus:ring-blue-200 transition py-2.5 px-3 text-sm font-medium placeholder-gray-400"
+                                                        focus:bg-white focus:border-blue-500 focus:ring-blue-200 transition py-2.5 px-3 text-sm font-medium placeholder-gray-400"
                                                             placeholder="Contoh: Logistik & Transportasi"
                                                             autocomplete="off">
                                                     </div>

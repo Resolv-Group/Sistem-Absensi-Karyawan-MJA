@@ -137,7 +137,7 @@
 
                                 {{-- 1. Nama Barang --}}
                                 <div class="sm:col-span-2">
-                                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Nama
+                                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-2">Nama
                                         Item
                                         <span class="text-red-500">*</span></label>
                                     <input type="text" :name="`borongan[${index}][nama_item]`" x-model="row.nama_item"
@@ -145,117 +145,454 @@
                                         class="w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-blue-500 py-3 px-4 text-sm" />
                                 </div>
 
+
                                 {{-- 2. Kategori (Searchable Combobox) --}}
-                                <div x-data="idCombobox(row, 'kategoriId', window.kategoriData, k => k.nama)" x-init="init()" class="relative">
-                                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
-                                        Kategori
-                                    </label>
+                                <div x-data="kategoriCombobox(row, index)" x-init="init()" class="relative">
 
-                                    <div class="relative">
-                                        <!-- Visible input (search / display only) -->
-                                        <input type="text" x-model="search" @focus="open = true" @click="open = true"
-                                            @click.outside="close()" @keydown.escape="open = false"
-                                            placeholder="Pilih kategori..."
-                                            class="w-full pl-4 pr-10 py-3 text-sm font-medium text-gray-800 bg-gray-50 rounded-xl focus:bg-white focus:border-blue-500 transition"
-                                            autocomplete="off">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <label class="block text-sm font-bold text-gray-700">Kategori</label>
 
-                                        <!-- Chevron -->
-                                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
+                                        <button type="button" @click="openModal()"
+                                            class="text-xs flex items-center gap-1 text-blue-600 hover:text-blue-800 font-semibold transition">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                 viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M19 9l-7 7-7-7" />
+                                                    d="M12 4v16m8-8H4"></path>
+                                            </svg>
+                                            Tambah Baru
+                                        </button>
+                                    </div>
+
+                                    <input
+                                        type="hidden"
+                                        :name="`borongan[${index}][kategori]`"
+                                        x-model="row.kategoriId"
+                                    />
+
+                                    <div class="relative">
+                                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                            </svg>
+                                        </div>
+
+                                        <input type="text" x-model="search" @input="open = true; selectedId = ''"
+                                            @click="open = true" @click.outside="closeDropdown()"
+                                            @keydown.escape="open = false" placeholder="Cari atau pilih kategori..."
+                                            class="w-full pl-10 pr-10 rounded-lg border-gray-300 bg-gray-50 text-gray-900
+                                        focus:bg-white focus:border-blue-500 focus:ring-blue-200 transition py-2.5 px-4 text-sm font-medium"
+                                            autocomplete="off">
+
+                                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                                            @click="toggleDropdown()">
+                                            <svg class="w-4 h-4 text-gray-400 transition-transform duration-200"
+                                                :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M19 9l-7 7-7-7"></path>
                                             </svg>
                                         </div>
                                     </div>
 
-                                    <!-- Dropdown -->
                                     <ul x-show="open" x-transition.opacity
-                                        class="absolute z-50 w-full mt-1 bg-white border border-gray-100 rounded-xl shadow-xl max-h-48 overflow-y-auto py-1">
-                                        <template x-for="item in filtered" :key="item.id">
-                                            <li @click="select(item)"
-                                                class="px-4 py-2.5 text-sm cursor-pointer hover:bg-blue-50 hover:text-blue-700 font-medium text-gray-700">
-                                                <span x-text="item.nama"></span>
+                                        class="absolute w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl max-h-60 overflow-y-auto z-40 py-1">
+
+                                        <template x-for="item in filteredList" :key="item.val">
+                                            <li @click="selectOption(item)"
+                                                class="px-4 py-2.5 text-sm hover:bg-blue-50 hover:text-blue-600 cursor-pointer transition flex justify-between">
+
+                                                <span x-text="item.label"
+                                                    :class="selectedId == item.val ? 'font-bold text-blue-600' : 'text-gray-700'"></span>
+
+                                                <svg x-show="selectedId == item.val" class="w-4 h-4 text-blue-600"
+                                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M5 13l4 4L19 7"></path>
+                                                </svg>
                                             </li>
                                         </template>
 
-                                        <li x-show="filtered.length === 0" class="px-4 py-2 text-xs text-gray-400 italic">
-                                            Tidak ada hasil
+                                        <li x-show="filteredList.length === 0"
+                                            class="px-4 py-3 text-sm text-gray-700 text-center">
+                                            <p>Tidak ditemukan "<span x-text="search" class="font-bold"></span>"</p>
+                                            <button type="button" @click="openModalWithSearch()"
+                                                class="mt-1 text-blue-600 hover:underline font-semibold text-xs">
+                                                + Tambah Baru
+                                            </button>
                                         </li>
                                     </ul>
 
-                                    <!-- Hidden input (submitted value) -->
-                                    <input type="hidden" :name="`borongan[${index}][kategori]`" :value="row.kategoriId">
+                                    {{-- MODAL: PERSIS, CUMA TEXT DIGANTI --}}
+                                    <div x-show="showModal" style="display: none;" class="relative z-50"
+                                        aria-labelledby="modal-title" role="dialog" aria-modal="true">
+
+                                        {{-- BACKDROP: Fades in/out only (No scaling) --}}
+                                        <div x-show="showModal" x-transition:enter="ease-out duration-300"
+                                            x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                                            x-transition:leave="ease-in duration-200"
+                                            x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+                                            class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm transition-opacity"></div>
+
+                                        {{-- MODAL POSITIONING WRAPPER --}}
+                                        <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+                                            <div
+                                                class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+
+                                                {{-- ACTUAL MODAL CARD: Scales and Pops up --}}
+                                                <div x-show="showModal" @click.outside="showModal = false"
+                                                    x-transition:enter="ease-out duration-300"
+                                                    x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                                                    x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                                                    x-transition:leave="ease-in duration-200"
+                                                    x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                                                    x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                                                    class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:my-8 w-full max-w-md border border-gray-100">
+
+                                                    {{-- Modal Header --}}
+                                                    <div
+                                                        class="px-6 py-5 border-b border-gray-100 flex items-center gap-3 bg-gray-50/50">
+                                                        <div class="p-2 bg-blue-50 text-blue-600 rounded-lg">
+                                                            <svg class="w-5 h-5" fill="none" stroke="currentColor"
+                                                                viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                                            </svg>
+                                                        </div>
+                                                        <div>
+                                                            <h3 class="text-lg font-bold text-gray-900">Tambah Kategori
+                                                                Baru</h3>
+                                                            <p class="text-xs text-gray-700">Masukkan nama kategori baru.
+                                                            </p>
+                                                        </div>
+                                                    </div>
+
+                                                    {{-- Modal Body --}}
+                                                    <div class="p-6">
+                                                        <label class="block text-sm font-bold text-gray-700 mb-2">Nama
+                                                            Kategori</label>
+
+                                                        <div class="relative">
+                                                            <div
+                                                                class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                                <svg class="w-5 h-5 text-gray-400" fill="none"
+                                                                    stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                                        stroke-width="2"
+                                                                        d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
+                                                                    </path>
+                                                                </svg>
+                                                            </div>
+
+                                                            <input type="text" x-model="newKategoriName"
+                                                                @keydown.enter.prevent="saveKategori()"
+                                                                class="w-full pl-10 rounded-lg border-gray-300 bg-gray-50 text-gray-900
+                                                        focus:bg-white focus:border-blue-500 focus:ring-blue-200 transition py-2.5 px-3 text-sm font-medium placeholder-gray-400"
+                                                                placeholder="Contoh: Logistik & Transportasi"
+                                                                autocomplete="off">
+                                                        </div>
+
+                                                        {{-- Error Message --}}
+                                                        <p x-show="errorMessage" x-transition
+                                                            class="mt-3 text-red-600 text-xs flex items-center gap-1 font-medium bg-red-50 p-2.5 rounded-lg border border-red-100">
+                                                            <svg class="w-4 h-4 flex-shrink-0" fill="none"
+                                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    stroke-width="2"
+                                                                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                                                                </path>
+                                                            </svg>
+                                                            <span x-text="errorMessage"></span>
+                                                        </p>
+                                                    </div>
+
+                                                    {{-- Modal Footer --}}
+                                                    <div
+                                                        class="bg-gray-50 px-6 py-4 flex justify-end gap-3 border-t border-gray-100">
+                                                        <button type="button" @click="showModal = false"
+                                                            class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-2 focus:ring-gray-200 transition shadow-sm">
+                                                            Batalkan
+                                                        </button>
+
+                                                        <button type="button" @click="saveKategori()"
+                                                            :disabled="isLoading"
+                                                            class="px-4 py-2 text-sm font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition shadow-md hover:shadow-lg flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed">
+
+                                                            <span x-show="!isLoading">Simpan Data</span>
+
+                                                            <div x-show="isLoading" class="flex items-center gap-2">
+                                                                <svg class="animate-spin h-4 w-4 text-white"
+                                                                    xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                                    viewBox="0 0 24 24">
+                                                                    <circle class="opacity-25" cx="12"
+                                                                        cy="12" r="10" stroke="currentColor"
+                                                                        stroke-width="4">
+                                                                    </circle>
+                                                                    <path class="opacity-75" fill="currentColor"
+                                                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                                                    </path>
+                                                                </svg>
+                                                                <span>Menyimpan...</span>
+                                                            </div>
+                                                        </button>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
 
-                                {{-- 3. Gaji Unit --}}
+                                {{-- 3. Max Reject --}}
                                 <div>
-                                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Harga
-                                        Barang Unit</label>
+                                    <label class="block text-sm font-bold text-gray-700 mb-1">Max Rej Subkon</label>
                                     <div class="relative">
-                                        <span
-                                            class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-bold">Rp</span>
-                                        <input
-                                            type="number"
-                                            step="0.01"
-                                            :name="`borongan[${index}][harga_unit]`"
-                                            x-model.number="row.harga_unit"
-                                            @input="autoHitung(row)"
-                                            @blur="row.harga_unit = Number(row.harga_unit || 0).toFixed(2)"
-                                            class="w-full pl-10 rounded-xl border-gray-200 bg-gray-50 text-sm font-bold text-gray-900
-                                                focus:bg-white focus:border-blue-500 py-3 px-4"
-                                            placeholder="0.00">
-
+                                        <input type="number"
+                                            :name="`borongan[${index}][max_reject]`"
+                                            x-model.number="row.max_reject"
+                                            min="0"
+                                            step="1"
+                                            oninput="this.value = !!this.value && Math.abs(this.value) >= 0 ? Math.abs(Math.round(this.value)) : 0"
+                                            placeholder="0"
+                                            class="w-full rounded-lg border-gray-300 bg-gray-50 text-gray-900 focus:bg-white focus:border-blue-500 focus:ring-blue-200 transition py-2.5 px-4 text-sm font-medium" />
                                     </div>
                                 </div>
 
-                                {{-- 4. Gaji Pekerja --}}
-                                <div>
-                                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
-                                        Harga Barang Pekerja (Potongan {{ $unitSelected->persentase_management_fee ?? 0 }}%)
-                                    </label>
-                                    <div class="relative">
-                                        <span
-                                            class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-bold">Rp</span>
+                                {{-- Row for 3 Columns: Harga Unit, Harga Pekerja, Satuan --}}
+                                <div class="sm:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-6">
+                                    {{-- 4. Gaji Unit --}}
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-2">Harga
+                                            B.Unit</label>
+                                        <div class="relative">
+                                            <span
+                                                class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-bold">Rp</span>
+                                            <input type="number" step="0.01" :name="`borongan[${index}][harga_unit]`"
+                                                x-model.number="row.harga_unit" @input="autoHitung(row)"
+                                                @blur="row.harga_unit = Number(row.harga_unit || 0).toFixed(2)"
+                                                class="w-full pl-10 rounded-xl border-gray-200 bg-gray-50 text-sm font-bold text-gray-900
+                                                    focus:bg-white focus:border-blue-500 py-3 px-4"
+                                                placeholder="0.00">
+
+                                        </div>
+                                    </div>
+
+                                    {{-- 4. Gaji Pekerja --}}
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-2">
+                                            Harga B.Pekerja (Pot.{{ $unitSelected->persentase_management_fee ?? 0 }}%)
+                                        </label>
+                                        <div class="relative">
+                                            <span
+                                                class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-bold">Rp</span>
+                                            <input type="number" step="0.01" :name="`borongan[${index}][harga_pekerja]`"
+                                                x-model.number="row.harga_pekerja" @input="row.manual = true"
+                                                @blur="row.harga_pekerja = Number(row.harga_pekerja || 0).toFixed(2)"
+                                                class="w-full pl-10 rounded-xl border-gray-200 bg-gray-50 text-sm font-bold text-gray-900
+                                                    focus:bg-white focus:border-blue-500 py-3 px-4"
+                                                placeholder="0.00">
+
+                                        </div>
+                                    </div>
+
+                                    {{-- 4. Satuan  --}}
+                                    <div x-data="satuanCombobox(row, index)" x-init="init()" class="relative">
+
+                                        <div class="flex justify-between items-center mb-1">
+                                            <label class="block text-sm font-bold text-gray-700">Satuan</label>
+
+                                            <button type="button" @click="openModal()"
+                                                class="text-xs flex items-center gap-1 text-blue-600 hover:text-blue-800 font-semibold transition">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M12 4v16m8-8H4"></path>
+                                                </svg>
+                                                Tambah Baru
+                                            </button>
+                                        </div>
+
                                         <input
-                                            type="number"
-                                            step="0.01"
-                                            :name="`borongan[${index}][harga_pekerja]`"
-                                            x-model.number="row.harga_pekerja"
-                                            @input="row.manual = true"
-                                            @blur="row.harga_pekerja = Number(row.harga_pekerja || 0).toFixed(2)"
-                                            class="w-full pl-10 rounded-xl border-gray-200 bg-gray-50 text-sm font-bold text-gray-900
-                                                focus:bg-white focus:border-blue-500 py-3 px-4"
-                                            placeholder="0.00">
+                                            type="hidden"
+                                            :name="`borongan[${index}][satuan]`"
+                                            x-model="row.satuanId"
+                                        />
 
-                                    </div>
-                                </div>
-                                
-                                {{-- 4. Satuan  --}}
-                                <div x-data="{ open: false, selected: '{{ old('satuan') }}' || '', list: [{ val: '1', label: 'Rue' }, { val: '2', label: 'M' }, { val: '3', label: 'Biji' }, { val: '4', label: 'Unit' }] }" class="relative">
-                                    <label class="block text-sm font-bold text-gray-700 mb-1">Satuan</label>
+                                        <div class="relative">
+                                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                                </svg>
+                                            </div>
 
-                                    <input type="hidden" :name="`borongan[${index}][satuan]`" x-model="selected" />
+                                            <input type="text" x-model="search" @input="open = true; selectedId = ''"
+                                                @click="open = true" @click.outside="closeDropdown()"
+                                                @keydown.escape="open = false" placeholder="Cari atau pilih satuan..."
+                                                class="w-full pl-10 pr-10 rounded-lg border-gray-300 bg-gray-50 text-gray-900
+                                            focus:bg-white focus:border-blue-500 focus:ring-blue-200 transition py-2.5 px-4 text-sm font-medium"
+                                                autocomplete="off">
 
+                                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                                                @click="toggleDropdown()">
+                                                <svg class="w-4 h-4 text-gray-400 transition-transform duration-200"
+                                                    :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M19 9l-7 7-7-7"></path>
+                                                </svg>
+                                            </div>
+                                        </div>
 
-                                    <div @click="open=!open"
-                                        class=" bg-gray-50 rounded-lg py-2.5 px-3 cursor-pointer flex justify-between items-center">
-                                        <span x-text="list.find(x=>x.val==selected)?.label || 'Pilih Tipe Satuan'"></span>
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M19 9l-7 7-7-7" />
-                                        </svg>
-                                    </div>
+                                        <ul x-show="open" x-transition.opacity
+                                            class="absolute w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl max-h-60 overflow-y-auto z-40 py-1">
 
-                                    <ul x-show="open" @click.outside="open=false"
-                                        class="absolute w-full mt-1 border border-gray-300 bg-white rounded-lg shadow-md overflow-y-auto max-h-40 z-50">
-                                        <template x-for="item in list" :key="item.val">
-                                            <li @click="selected=item.val; open=false"
-                                                class="px-3 py-2 hover:bg-blue-600 hover:text-white cursor-pointer transition"
-                                                x-text="item.label">
+                                            <template x-for="item in filteredList" :key="item.val">
+                                                <li @click="selectOption(item)"
+                                                    class="px-4 py-2.5 text-sm hover:bg-blue-50 hover:text-blue-600 cursor-pointer transition flex justify-between">
+
+                                                    <span x-text="item.label"
+                                                        :class="selectedId == item.val ? 'font-bold text-blue-600' : 'text-gray-700'"></span>
+
+                                                    <svg x-show="selectedId == item.val" class="w-4 h-4 text-blue-600"
+                                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            d="M5 13l4 4L19 7"></path>
+                                                    </svg>
+                                                </li>
+                                            </template>
+
+                                            <li x-show="filteredList.length === 0"
+                                                class="px-4 py-3 text-sm text-gray-700 text-center">
+                                                <p>Tidak ditemukan "<span x-text="search" class="font-bold"></span>"</p>
+                                                <button type="button" @click="openModalWithSearch()"
+                                                    class="mt-1 text-blue-600 hover:underline font-semibold text-xs">
+                                                    + Tambah Baru
+                                                </button>
                                             </li>
-                                        </template>
-                                    </ul>
+                                        </ul>
+
+                                        {{-- MODAL: PERSIS, CUMA TEXT DIGANTI --}}
+                                        <div x-show="showModal" style="display: none;" class="relative z-50"
+                                            aria-labelledby="modal-title" role="dialog" aria-modal="true">
+
+                                            {{-- BACKDROP: Fades in/out only (No scaling) --}}
+                                            <div x-show="showModal" x-transition:enter="ease-out duration-300"
+                                                x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                                                x-transition:leave="ease-in duration-200"
+                                                x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+                                                class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm transition-opacity"></div>
+
+                                            {{-- MODAL POSITIONING WRAPPER --}}
+                                            <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+                                                <div
+                                                    class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+
+                                                    {{-- ACTUAL MODAL CARD: Scales and Pops up --}}
+                                                    <div x-show="showModal" @click.outside="showModal = false"
+                                                        x-transition:enter="ease-out duration-300"
+                                                        x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                                                        x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                                                        x-transition:leave="ease-in duration-200"
+                                                        x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                                                        x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                                                        class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:my-8 w-full max-w-md border border-gray-100">
+
+                                                        {{-- Modal Header --}}
+                                                        <div
+                                                            class="px-6 py-5 border-b border-gray-100 flex items-center gap-3 bg-gray-50/50">
+                                                            <div class="p-2 bg-blue-50 text-blue-600 rounded-lg">
+                                                                <svg class="w-5 h-5" fill="none" stroke="currentColor"
+                                                                    viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                                        stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                                                </svg>
+                                                            </div>
+                                                            <div>
+                                                                <h3 class="text-lg font-bold text-gray-900">Tambah Satuan
+                                                                    Baru</h3>
+                                                                <p class="text-xs text-gray-700">Masukkan nama satuan baru.
+                                                                </p>
+                                                            </div>
+                                                        </div>
+
+                                                        {{-- Modal Body --}}
+                                                        <div class="p-6">
+                                                            <label class="block text-sm font-bold text-gray-700 mb-2">Nama
+                                                                Satuan</label>
+
+                                                            <div class="relative">
+                                                                <div
+                                                                    class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                                    <svg class="w-5 h-5 text-gray-400" fill="none"
+                                                                        stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                                            stroke-width="2"
+                                                                            d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
+                                                                        </path>
+                                                                    </svg>
+                                                                </div>
+
+                                                                <input type="text" x-model="newSatuanName"
+                                                                    @keydown.enter.prevent="saveSatuan()"
+                                                                    class="w-full pl-10 rounded-lg border-gray-300 bg-gray-50 text-gray-900
+                                                            focus:bg-white focus:border-blue-500 focus:ring-blue-200 transition py-2.5 px-3 text-sm font-medium placeholder-gray-400"
+                                                                    placeholder="Contoh: Logistik & Transportasi"
+                                                                    autocomplete="off">
+                                                            </div>
+
+                                                            {{-- Error Message --}}
+                                                            <p x-show="errorMessage" x-transition
+                                                                class="mt-3 text-red-600 text-xs flex items-center gap-1 font-medium bg-red-50 p-2.5 rounded-lg border border-red-100">
+                                                                <svg class="w-4 h-4 flex-shrink-0" fill="none"
+                                                                    stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                                        stroke-width="2"
+                                                                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                                                                    </path>
+                                                                </svg>
+                                                                <span x-text="errorMessage"></span>
+                                                            </p>
+                                                        </div>
+
+                                                        {{-- Modal Footer --}}
+                                                        <div
+                                                            class="bg-gray-50 px-6 py-4 flex justify-end gap-3 border-t border-gray-100">
+                                                            <button type="button" @click="showModal = false"
+                                                                class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-2 focus:ring-gray-200 transition shadow-sm">
+                                                                Batalkan
+                                                            </button>
+
+                                                            <button type="button" @click="saveSatuan()"
+                                                                :disabled="isLoading"
+                                                                class="px-4 py-2 text-sm font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition shadow-md hover:shadow-lg flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed">
+
+                                                                <span x-show="!isLoading">Simpan Data</span>
+
+                                                                <div x-show="isLoading" class="flex items-center gap-2">
+                                                                    <svg class="animate-spin h-4 w-4 text-white"
+                                                                        xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                                        viewBox="0 0 24 24">
+                                                                        <circle class="opacity-25" cx="12"
+                                                                            cy="12" r="10" stroke="currentColor"
+                                                                            stroke-width="4">
+                                                                        </circle>
+                                                                        <path class="opacity-75" fill="currentColor"
+                                                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                                                        </path>
+                                                                    </svg>
+                                                                    <span>Menyimpan...</span>
+                                                                </div>
+                                                            </button>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
 
                             </div>
@@ -314,7 +651,6 @@
 
 @section('scripts')
     <script>
-        
         function unitCombobox() {
             return {
                 list: @json($units ?? []),
@@ -413,6 +749,7 @@
 
         // 1. DATA SOURCES (You can pass these from Controller later)
         window.kategoriData = @json($kategoriList);
+        window.satuanData = @json($satuanList);
         window.workersData = @json($pekerjaList ?? []);
 
         const managementFee = {{ $unitSelected->persentase_management_fee ?? 0 }} / 100;
@@ -446,64 +783,256 @@
                     this.borongan.splice(index, 1);
                 },
 
-                
+
 
                 autoHitung(row) {
-                if (row.manual) return;
+                    if (row.manual) return;
 
-                const unit = Number(row.harga_unit || 0);
+                    const unit = Number(row.harga_unit || 0);
 
-                // Hitung 82%
-                const hasil = unit * (1 - managementFee);
+                    // Hitung 82%
+                    const hasil = unit * (1 - managementFee);
 
-                // Simpan 2 angka di belakang koma
-                row.harga_pekerja = Number(hasil.toFixed(2));
+                    // Simpan 2 angka di belakang koma
+                    row.harga_pekerja = Number(hasil.toFixed(2));
+                }
+
             }
-
         }
-    }
 
 
         // 3. GENERIC STRING COMBOBOX (For Divisi & Jabatan)
         // This allows selecting from list OR typing a new value (Hybrid)
-        function idCombobox(row, field, dataSource, labelFn) {
+        function kategoriCombobox(row, index) {
             return {
-                open: false,
+                row,
+                index,
+                list: window.kategoriData || [],
+                selectedId: row.kategoriId ?? null,
                 search: '',
-                selectedId: row[field],
+                open: false,
+                showModal: false,
+                newKategoriName: '',
+                isLoading: false,
+                errorMessage: '',
 
                 init() {
                     if (this.selectedId) {
-                        const found = dataSource.find(i => i.id == this.selectedId);
-                        if (found) this.search = labelFn(found);
+                        const found = this.list.find(item => item.val == this.selectedId);
+                        if (found) {
+                            this.search = found.label;
+                        }
                     }
                 },
 
-                get filtered() {
-                    if (!this.search) return dataSource;
-                    return dataSource.filter(item =>
-                        labelFn(item).toLowerCase().includes(this.search.toLowerCase())
+                get filteredList() {
+                    if (this.search === '') {
+                        return this.list;
+                    }
+                    return this.list.filter(item =>
+                        item.label.toLowerCase().includes(this.search.toLowerCase())
                     );
                 },
 
-                select(item) {
-                    this.selectedId = item.id;
-                    row[field] = item.id;
-                    this.search = labelFn(item);
+                toggleDropdown() {
+                    this.open = !this.open;
+                },
+
+                closeDropdown() {
+                    this.open = false;
+                    const found = this.list.find(item => item.val == this.selectedId);
+                    this.search = found ? found.label : '';
+                },
+
+                selectOption(item) {
+                    this.selectedId = item.val;
+                    this.row.kategoriId = item.val
+                    this.search = item.label;
                     this.open = false;
                 },
 
-                close() {
-                    if (this.selectedId) {
-                        const found = dataSource.find(i => i.id == this.selectedId);
-                        if (found) this.search = labelFn(found);
-                    } else {
-                        this.search = '';
-                    }
+                /* MODAL */
+                openModal() {
+                    this.newKategoriName = '';
+                    this.errorMessage = '';
+                    this.showModal = true;
+                },
+
+                openModalWithSearch() {
+                    this.newKategoriName = this.search;
+                    this.errorMessage = '';
+                    this.showModal = true;
                     this.open = false;
+                },
+
+                saveKategori() {
+                    if (!this.newKategoriName) {
+                        this.errorMessage = 'Nama tidak boleh kosong.';
+                        return;
+                    }
+
+                    this.isLoading = true;
+                    this.errorMessage = '';
+
+                    fetch("{{ route('tambah.kategori.post') }}", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document
+                                    .querySelector('meta[name="csrf-token"]')
+                                    .getAttribute('content')
+                            },
+                            body: JSON.stringify({
+                                nama: this.newKategoriName
+                            })
+                        })
+                        .then(res => res.ok ? res.json() : Promise.reject(res))
+                        .then(data => {
+                            this.list = [...this.list, {
+                                val: data.val,
+                                label: data.label
+                            }];
+
+                            this.selectOption({
+                                val: data.val,
+                                label: data.label
+                            });
+
+                            this.showModal = false;
+                            this.newKategoriName = '';
+
+                            window.dispatchEvent(new CustomEvent('notify', {
+                                detail: {
+                                    type: 'success',
+                                    message: 'Kategori baru berhasil ditambahkan!'
+                                }
+                            }));
+                        })
+                        .catch(() => {
+                            this.errorMessage = 'Gagal menyimpan. Nama mungkin sudah ada.';
+                        })
+                        .finally(() => {
+                            this.isLoading = false;
+                        });
                 }
             }
         }
+
+        function satuanCombobox(row, index) {
+            return {
+                row,
+                index,
+                list: window.satuanData || [],
+                selectedId: row.satuanId ?? null,
+                search: '',
+                open: false,
+                showModal: false,
+                newSatuanName: '',
+                isLoading: false,
+                errorMessage: '',
+
+                init() {
+                    if (this.selectedId) {
+                        const found = this.list.find(item => item.val == this.selectedId);
+                        if (found) {
+                            this.search = found.label;
+                        }
+                    }
+                },
+
+                get filteredList() {
+                    if (this.search === '') {
+                        return this.list;
+                    }
+                    return this.list.filter(item =>
+                        item.label.toLowerCase().includes(this.search.toLowerCase())
+                    );
+                },
+
+                toggleDropdown() {
+                    this.open = !this.open;
+                },
+
+                closeDropdown() {
+                    this.open = false;
+                    const found = this.list.find(item => item.val == this.selectedId);
+                    this.search = found ? found.label : '';
+                },
+
+                selectOption(item) {
+                    this.selectedId = item.val;
+                    this.row.satuanId = item.val
+                    this.search = item.label;
+                    this.open = false;
+                },
+
+                /* MODAL */
+                openModal() {
+                    this.newSatuanName = '';
+                    this.errorMessage = '';
+                    this.showModal = true;
+                },
+
+                openModalWithSearch() {
+                    this.newSatuanName = this.search;
+                    this.errorMessage = '';
+                    this.showModal = true;
+                    this.open = false;
+                },
+
+                saveSatuan() {
+                    if (!this.newSatuanName) {
+                        this.errorMessage = 'Nama tidak boleh kosong.';
+                        return;
+                    }
+
+                    this.isLoading = true;
+                    this.errorMessage = '';
+
+                    fetch("{{ route('tambah.satuan.post') }}", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document
+                                    .querySelector('meta[name="csrf-token"]')
+                                    .getAttribute('content')
+                            },
+                            body: JSON.stringify({
+                                nama: this.newSatuanName
+                            })
+                        })
+                        .then(res => res.ok ? res.json() : Promise.reject(res))
+                        .then(data => {
+                            this.list = [...this.list, {
+                                val: data.val,
+                                label: data.label
+                            }];
+
+                            this.selectOption({
+                                val: data.val,
+                                label: data.label
+                            });
+
+                            this.showModal = false;
+                            this.newSatuanName = '';
+
+                            window.dispatchEvent(new CustomEvent('notify', {
+                                detail: {
+                                    type: 'success',
+                                    message: 'Satuan baru berhasil ditambahkan!'
+                                }
+                            }));
+                        })
+                        .catch(() => {
+                            this.errorMessage = 'Gagal menyimpan. Nama mungkin sudah ada.';
+                        })
+                        .finally(() => {
+                            this.isLoading = false;
+                        });
+                }
+            }
+        }
+
 
         // (Combobox logic for Unit remains the same...)
         document.addEventListener('alpine:init', () => {

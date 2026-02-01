@@ -15,6 +15,7 @@ class Borongan extends Model
         'kategori',
         'nama_item',
         'satuan',
+        'Max Rej Subkon',
         'status_aktif',
     ];
 
