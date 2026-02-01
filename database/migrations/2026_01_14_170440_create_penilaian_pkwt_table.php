@@ -28,7 +28,7 @@ return new class extends Migration
             $table->integer('status_hrd');
             $table->integer('status_aktif');
 
-            $table->char('keterangan');
+            $table->char('keterangan')->nullable();
 
             $table->integer('updated_by');
             $table->integer('created_by');
