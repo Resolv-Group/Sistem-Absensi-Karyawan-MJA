@@ -205,6 +205,7 @@ class UnitController extends Controller
 
     public function viewDetailUnit(Request $request, $id)
     {
+
         $user = auth()->user(); // staff login
 
         // CEK PIC PUNYA UNIT INI ATAU TIDAK
