@@ -7,12 +7,14 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\BidangUsahaController;
 use App\Http\Controllers\BoronganController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\MitraKerjaController;
 use App\Http\Controllers\PayrollController;
 use App\Http\Controllers\PekerjaController;
 use App\Http\Controllers\PenilaianController;
 use App\Http\Controllers\PKWTController;
 use App\Http\Controllers\ProfilController;
+use App\Http\Controllers\SatuanController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\ShiftAbsenController;
@@ -119,6 +121,10 @@ Route::middleware(['auth', 'role:hrd,admin'])->group(function(){
 
     //Tambah Bidang Usaha Mitra Kerja
     Route::POST('/tambah-bidang-usaha', [BidangUsahaController::class, 'tambahBidangUsaha'])->name('tambah.bidang-usaha.post');
+    //Tambah Kategori Unit - Borongan
+    Route::POST('/tambah-kategori', [KategoriController::class, 'tambahKategori'])->name('tambah.kategori.post');
+    //Tambah Satuan Unit - Borongan
+    Route::POST('/tambah-satuan', [SatuanController::class, 'tambahSatuan'])->name('tambah.satuan.post');
 
     //Unit Spesifik untuk HRD
     Route::get('/unit', [UnitController::class, 'viewUnitMain'])->name('view.unit');
