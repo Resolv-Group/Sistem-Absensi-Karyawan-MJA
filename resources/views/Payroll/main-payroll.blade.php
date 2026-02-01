@@ -16,16 +16,19 @@
 
         /* Custom Scrollbar untuk Modal Body */
         .custom-scrollbar::-webkit-scrollbar {
-            width: 5px;
+            width: 6px;
         }
 
         .custom-scrollbar::-webkit-scrollbar-track {
-            background: transparent;
+            background: #f8fafc;
+            /* Slate 50 */
         }
 
         .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
+            background: #e2e8f0;
+            /* Slate 200 */
             border-radius: 10px;
+            border: 2px solid #f8fafc;
         }
 
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
@@ -457,7 +460,7 @@
                 <div @click.away="$store.payslip.close()" x-transition:enter="ease-out duration-300"
                     x-transition:enter-start="opacity-0 translate-y-4 sm:scale-[0.98]"
                     x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
-                    class="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-slate-200 flex flex-col max-h-[90vh] overflow-hidden">
+                    class="relative w-full max-w-5xl bg-white rounded-2xl shadow-2xl border border-slate-200 flex flex-col max-h-[90vh] overflow-hidden">
 
                     <form action="{{ route('overview.payroll') }}" @submit="handleSubmit($event)" method="POST"
                         class="flex flex-col overflow-hidden">
@@ -471,7 +474,7 @@
                                 <h3 class="text-xl font-black text-slate-800 tracking-tight">Proses Penggajian Unit</h3>
                                 <div class="flex items-center gap-2 mt-1">
                                     <span
-                                        class="text-[9px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded uppercase tracking-wider border border-emerald-100">Unit
+                                        class="text-[11px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded uppercase tracking-wider border border-emerald-100">Unit
                                         Aktif</span>
                                     <p class="text-xs font-bold text-slate-500" x-text="$store.payslip.unitName"></p>
                                 </div>
@@ -492,7 +495,7 @@
                             <div class="space-y-4">
                                 <div class="flex items-center gap-3">
                                     <span
-                                        class="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-600 text-white text-[10px] font-black flex items-center justify-center shadow-lg shadow-emerald-200">1</span>
+                                        class="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-600 text-white text-[12px] font-black flex items-center justify-center shadow-lg shadow-emerald-200">1</span>
                                     <label
                                         class="block text-[11px] font-black text-slate-700 uppercase tracking-widest">Tentukan
                                         Periode Penggajian</label>
@@ -506,7 +509,7 @@
                                 <div class="bg-emerald-50/20 p-6 rounded-xl border border-emerald-100/50 ml-9">
                                     <div class="grid grid-cols-2 gap-6">
                                         <div class="space-y-1.5">
-                                            <span class="text-[9px] font-bold text-slate-400 uppercase ml-1">
+                                            <span class="text-[11px] font-bold text-slate-400 uppercase ml-1">
                                                 Tanggal Mulai
                                             </span>
                                             <input type="date" name="tanggal_mulai"
@@ -515,7 +518,7 @@
                                         </div>
 
                                         <div class="space-y-1.5">
-                                            <span class="text-[9px] font-bold text-slate-400 uppercase ml-1">
+                                            <span class="text-[11px] font-bold text-slate-400 uppercase ml-1">
                                                 Tanggal Selesai
                                             </span>
                                             <input type="date" name="tanggal_akhir"
@@ -531,7 +534,7 @@
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center gap-3">
                                         <span
-                                            class="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-600 text-white text-[10px] font-black flex items-center justify-center shadow-lg shadow-emerald-200">2</span>
+                                            class="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-600 text-white text-[12px] font-black flex items-center justify-center shadow-lg shadow-emerald-200">2</span>
                                         <label
                                             class="block text-[11px] font-black text-slate-700 uppercase tracking-widest">Pilih
                                             Pekerja yang Akan Dibayar</label>
@@ -539,11 +542,11 @@
                                     <div class="flex gap-2">
                                         <button type="button"
                                             @click="$store.payslip.selectedWorkers = $store.payslip.workers.map(w => w.id)"
-                                            class="text-[9px] font-black text-emerald-600 hover:underline uppercase tracking-tighter">Pilih
+                                            class="text-[11px] font-black text-emerald-600 hover:underline uppercase tracking-tighter">Pilih
                                             Semua</button>
-                                        <span class="text-slate-300 text-[9px]">|</span>
+                                        <span class="text-slate-300 text-[11px]">|</span>
                                         <button type="button" @click="$store.payslip.selectedWorkers = []"
-                                            class="text-[9px] font-black text-slate-400 hover:underline uppercase tracking-tighter">Hapus
+                                            class="text-[11px] font-black text-slate-400 hover:underline uppercase tracking-tighter">Hapus
                                             Semua</button>
                                     </div>
                                 </div>
@@ -564,7 +567,8 @@
                                                     <div class="flex flex-col">
                                                         <span class="text-[11px] font-bold text-slate-700 leading-tight"
                                                             x-text="worker.nama"></span>
-                                                        <span class="text-[9px] font-black text-slate-300 uppercase mt-0.5"
+                                                        <span
+                                                            class="text-[11px] font-black text-slate-300 uppercase mt-0.5"
                                                             x-text="'ID: ' + worker.id"></span>
                                                     </div>
                                                 </label>
@@ -586,13 +590,13 @@
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center gap-3">
                                         <span
-                                            class="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-600 text-white text-[10px] font-black flex items-center justify-center shadow-lg shadow-emerald-200">3</span>
+                                            class="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-600 text-white text-[12px] font-black flex items-center justify-center shadow-lg shadow-emerald-200">3</span>
                                         <label
                                             class="block text-[11px] font-black text-slate-700 uppercase tracking-widest">Potongan
                                             Tanggal Spesifik (Opsional)</label>
                                     </div>
                                     <button type="button" @click="$store.payslip.addExclusion()"
-                                        class="text-[10px] font-black text-emerald-600 hover:text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-100 uppercase">+
+                                        class="text-[12px] font-black text-emerald-600 hover:text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-100 uppercase">+
                                         Tambah Baris</button>
                                 </div>
 
@@ -633,7 +637,7 @@
                                                         <li @click.stop="$store.payslip.exclusions[index].worker_id = worker.id; $store.payslip.exclusions[index].open = false"
                                                             class="px-4 py-2.5 text-[11px] font-bold text-slate-600 hover:bg-emerald-600 hover:text-white rounded-lg cursor-pointer transition flex items-center justify-between">
                                                             <span x-text="worker.nama"></span>
-                                                            <span class="text-[9px] font-black opacity-30"
+                                                            <span class="text-[11px] font-black opacity-30"
                                                                 x-text="'ID: ' + worker.id"></span>
                                                         </li>
                                                     </template>
@@ -665,88 +669,171 @@
                                 </div>
                             </div>
 
-                            <!-- STEP 4: Pembayaran Lain -->
-                            <div class="space-y-4" x-data="{
-                                rawVal: '',
-                                // Fungsi pembantu untuk format di dalam komponen jika belum ada di parent
-                                formatRupiah(val) {
-                                    if (!val) return '';
-                                    return new Intl.NumberFormat('id-ID').format(val);
-                                }
-                            }">
-                                <div class="flex items-center gap-3">
-                                    <span
-                                        class="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-600 text-white text-[10px] font-black flex items-center justify-center shadow-lg shadow-emerald-200">4</span>
-                                    <label
-                                        class="block text-[11px] font-black text-slate-700 uppercase tracking-widest">Penyesuaian
-                                        Biaya Lain-lain</label>
+                            <!-- STEP 4: Penyesuaian & Tunjangan -->
+                            <!-- STEP 4: PENYESUAIAN & TUNJANGAN -->
+<div class="space-y-6">
+    <!-- Section Title -->
+    <div class="flex items-center gap-3">
+        <span class="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-600 text-white text-[12px] font-black flex items-center justify-center shadow-lg shadow-emerald-200">4</span>
+        <h3 class="text-[11px] font-black text-slate-700 uppercase tracking-[0.1em]">Penyesuaian & Tunjangan</h3>
+    </div>
+
+    <div class="ml-9 space-y-6">
+        <!-- QUICK ACTION BAR -->
+        <div class="flex flex-col md:flex-row items-center justify-between bg-white border border-slate-200 rounded-2xl p-2.5 mb-3 shadow-sm">
+            <div class="flex items-center gap-3 px-3">
+                <div class="flex flex-col">
+                    <span class="text-[11px] font-black text-slate-800 uppercase tracking-tighter">Quick Apply</span>
+                    <span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-none">Aksi Massal</span>
+                </div>
+                <div class="h-6 w-px bg-slate-100"></div>
+                <div class="relative">
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-[12px] font-black text-indigo-500">Rp</span>
+                    <input type="text" placeholder="0" x-model="$store.payslip.globalVal"
+                        @input="$store.payslip.globalVal = $event.target.value.replace(/\D/g, '')"
+                        :value="$store.payslip.formatRupiah($store.payslip.globalVal)"
+                        class="w-32 pl-8 pr-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-black text-slate-700 focus:ring-2 focus:ring-indigo-500/10 outline-none transition-all">
+                </div>
+            </div>
+
+            <div class="flex items-center gap-1.5 p-1">
+                <button type="button" @click="$store.payslip.applyToAll('pembayaran_lain')"
+                    class="flex items-center gap-2 px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl transition-all active:scale-95 group">
+                    <span class="text-[11px] font-black uppercase tracking-widest">Lain-lain</span>
+                    <svg class="w-3 h-3 opacity-50 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                </button>
+                <button type="button" @click="$store.payslip.applyToAll('tunjangan_bayaran')"
+                    class="flex items-center gap-2 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl transition-all active:scale-95 group">
+                    <span class="text-[11px] font-black uppercase tracking-widest">Tunjangan</span>
+                    <svg class="w-3 h-3 opacity-50 group-hover:translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- DATA TABLE CONTAINER -->
+        <div class="rounded-[2rem] border border-slate-200 bg-white overflow-hidden shadow-sm">
+            <div class="max-h-96 overflow-y-auto custom-scrollbar">
+                <table class="w-full text-left border-separate border-spacing-0">
+                    <thead class="rounded-[2rem] sticky top-0 z-30 bg-slate-50/95 backdrop-blur-md">
+                        <tr>
+                            <th class="px-6 py-4 w-1/2 border-b border-slate-200">
+                                <div class="relative group">
+                                    <input type="text" x-model="$store.payslip.searchAdjustments"
+                                        placeholder="CARI NAMA PEKERJA..."
+                                        class="w-full pl-9 pr-4 py-1.5 bg-transparent border-none text-[11px] font-black text-slate-800 placeholder-slate-400 focus:ring-0 outline-none uppercase tracking-[0.2em]">
+                                    <svg class="w-4 h-4 text-slate-300 absolute left-2 top-1/2 -translate-y-1/2 group-focus-within:text-emerald-500 transition-colors"
+                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                    </svg>
                                 </div>
-                                <div class="ml-9">
-                                    <div class="relative flex items-center group">
-                                        <span
-                                            class="absolute left-5 font-black text-emerald-500 text-xs border-r border-slate-100 pr-3">Rp.</span>
+                            </th>
+                            <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center border-b border-l border-slate-200">
+                                Pembayaran Lain
+                            </th>
+                            <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center border-b border-l border-slate-200">
+                                Tunjangan
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        <!-- TEMPLATE LOOPING PEKERJA -->
+                        <template x-for="worker in $store.payslip.workers" :key="worker.id">
+                            <tr x-show="$store.payslip.selectedWorkers.includes(worker.id) && (worker.nama.toLowerCase().includes($store.payslip.searchAdjustments.toLowerCase()))"
+                                class="group hover:bg-slate-50/50 transition-colors">
 
-                                        {{-- Input yang dilihat User --}}
-                                        <input type="text" placeholder="0" :value="formatRupiah(rawVal)"
-                                            @input="rawVal = $event.target.value.replace(/\D/g, '')"
-                                            class="w-full bg-white border border-slate-200 rounded-2xl pl-16 py-4 text-sm font-black text-slate-700 focus:ring-4 focus:ring-emerald-500/5 focus:border-emerald-500 transition-all shadow-sm">
-
-                                        {{-- Hidden Input untuk dikirim ke Controller (Angka murni tanpa titik) --}}
-                                        <input type="hidden" name="pembayaran_lain" x-model="rawVal">
+                                <td class="px-6 py-5">
+                                    <div class="flex items-center gap-4">
+                                        <div class="flex-shrink-0 w-10 h-10 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center text-[13px] font-black text-slate-400 group-hover:bg-white group-hover:text-emerald-600 group-hover:border-emerald-100 transition-all"
+                                            x-text="worker.nama.charAt(0)"></div>
+                                        <div class="flex flex-col">
+                                            <span class="text-sm font-black text-slate-800 leading-tight" x-text="worker.nama"></span>
+                                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tight mt-0.5" x-text="'ID: ' + worker.id"></span>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
+                                </td>
 
-                            <!-- STEP 5: Tunjangan Lain -->
-                            <div class="space-y-4" x-data="{
-                                rawVal: '',
-                                // Fungsi pembantu untuk format di dalam komponen jika belum ada di parent
-                                formatRupiah(val) {
-                                    if (!val) return '';
-                                    return new Intl.NumberFormat('id-ID').format(val);
-                                }
-                            }">
-                                <div class="flex items-center gap-3">
-                                    <span
-                                        class="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-600 text-white text-[10px] font-black flex items-center justify-center shadow-lg shadow-emerald-200">5</span>
-                                    <label
-                                        class="block text-[11px] font-black text-slate-700 uppercase tracking-widest">Biaya
-                                        Tunjangan
-                                    </label>
-                                </div>
-                                <div class="ml-9">
-                                    <div class="relative flex items-center group">
-                                        <span
-                                            class="absolute left-5 font-black text-emerald-500 text-xs border-r border-slate-100 pr-3">Rp.</span>
-
-                                        {{-- Input yang dilihat User --}}
-                                        <input type="text" placeholder="0" :value="formatRupiah(rawVal)"
-                                            @input="rawVal = $event.target.value.replace(/\D/g, '')"
-                                            class="w-full bg-white border border-slate-200 rounded-2xl pl-16 py-4 text-sm font-black text-slate-700 focus:ring-4 focus:ring-emerald-500/5 focus:border-emerald-500 transition-all shadow-sm">
-
-                                        {{-- Hidden Input untuk dikirim ke Controller (Angka murni tanpa titik) --}}
-                                        <input type="hidden" name="tunjangan_bayaran" x-model="rawVal">
+                                <td class="px-6 py-5 border-l border-slate-50/50">
+                                    <div class="relative flex items-center max-w-[140px] mx-auto">
+                                        <span class="absolute left-3 text-[11px] font-black text-emerald-500 z-10">Rp</span>
+                                        <input type="text" placeholder="0"
+                                            :value="$store.payslip.formatRupiah($store.payslip.adjustments[worker.id].pembayaran_lain)"
+                                            @input="$store.payslip.adjustments[worker.id].pembayaran_lain = $event.target.value.replace(/\D/g, '')"
+                                            class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2.5 text-center text-[12px] font-black text-slate-700 focus:bg-white focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all outline-none shadow-sm placeholder:text-slate-300">
+                                        <input type="hidden" :name="'adjustments[' + worker.id + '][pembayaran_lain]'"
+                                            :value="$store.payslip.adjustments[worker.id].pembayaran_lain">
                                     </div>
+                                </td>
+
+                                <td class="px-6 py-5 border-l border-slate-50/50">
+                                    <div class="relative flex items-center max-w-[140px] mx-auto">
+                                        <span class="absolute left-3 text-[11px] font-black text-emerald-500 z-10">Rp</span>
+                                        <input type="text" placeholder="0"
+                                            :value="$store.payslip.formatRupiah($store.payslip.adjustments[worker.id].tunjangan_bayaran)"
+                                            @input="$store.payslip.adjustments[worker.id].tunjangan_bayaran = $event.target.value.replace(/\D/g, '')"
+                                            class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2.5 text-center text-[12px] font-black text-slate-700 focus:bg-white focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all outline-none shadow-sm placeholder:text-slate-300">
+                                        <input type="hidden" :name="'adjustments[' + worker.id + '][tunjangan_bayaran]'"
+                                            :value="$store.payslip.adjustments[worker.id].tunjangan_bayaran">
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>
+
+                        <!-- EMPTY STATE UI -->
+                        <tr x-show="$store.payslip.workers.filter(w => $store.payslip.selectedWorkers.includes(w.id) && w.nama.toLowerCase().includes($store.payslip.searchAdjustments.toLowerCase())).length === 0">
+                            <td colspan="3" class="py-16">
+                                <div class="flex flex-col items-center justify-center text-center">
+                                    <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
+                                        <svg class="w-8 h-8 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                        </svg>
+                                    </div>
+                                    <h4 class="text-[13px] font-black text-slate-700 uppercase tracking-widest">Tidak Ada Pekerja</h4>
+                                    <p class="text-[11px] text-slate-400 font-bold mt-1 max-w-[250px]">
+                                        Tidak ditemukan pekerja yang memiliki absensi atau sesuai dengan pencarian Anda.
+                                    </p>
                                 </div>
-                            </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Table Footer -->
+            <div class="bg-slate-50 border-t border-slate-200 px-6 py-3 flex justify-between items-center">
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                    Pekerja Terpilih: <span class="text-emerald-600" x-text="$store.payslip.selectedWorkers.length"></span>
+                </span>
+                <div class="flex items-center gap-2">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase">Input Aktif</span>
+                    <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
                         </div>
 
                         <!-- 3. FIXED FOOTER (Rounded Bottom Corners) -->
-                                <div
-                                    class="px-8 py-6 bg-slate-50 border-t border-slate-100 flex justify-between items-center shrink-0 bg-white">
-                                    <button type="button" @click="$store.payslip.close()"
-                                        class="text-xs font-black text-slate-400 hover:text-slate-600 uppercase tracking-widest transition-colors">Batalkan</button>
+                        <div
+                            class="px-8 py-6 bg-slate-50 border-t border-slate-100 flex justify-between items-center shrink-0 bg-white">
+                            <button type="button" @click="$store.payslip.close()"
+                                class="text-xs font-black text-slate-400 hover:text-slate-600 uppercase tracking-widest transition-colors">Batalkan</button>
 
-                                    <button type="button" id="btnPayrollSubmit"
-                                        class="group flex items-center gap-4 bg-emerald-600 hover:bg-emerald-500 text-white px-10 py-4 rounded-xl font-black text-[11px] uppercase tracking-[0.2em] shadow-lg shadow-emerald-500/30 transition-all active:scale-95">
-                                        <span>Proses Payroll</span>
-                                        <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform"
-                                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                                                d="M13 7l5 5-5 5M6 7l5 5-5 5" />
-                                        </svg>
-                                    </button>
-                                </div>
+                            <button type="button" id="btnPayrollSubmit"
+                                class="group flex items-center gap-4 bg-emerald-600 hover:bg-emerald-500 text-white px-10 py-4 rounded-xl font-black text-[11px] uppercase tracking-[0.2em] shadow-lg shadow-emerald-500/30 transition-all active:scale-95">
+                                <span>Proses Payroll</span>
+                                <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform"
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                        d="M13 7l5 5-5 5M6 7l5 5-5 5" />
+                                </svg>
+                            </button>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -767,6 +854,7 @@
                 unitName: '',
                 workers: [],
                 selectedWorkers: [],
+                searchAdjustments: '',
 
                 // Pindahkan variabel input ke sini agar bisa di-reset
                 exclusions: [{
@@ -774,24 +862,72 @@
                     date: '',
                     open: false
                 }],
+
+                formatRupiah(val) {
+                    if (val === undefined || val === null || val === '') return '';
+                    // Convert to string and clean any non-digit chars just in case
+                    let number = val.toString().replace(/\D/g, '');
+                    return new Intl.NumberFormat('id-ID').format(number);
+                },
+
                 pembayaran_lain: '',
                 tunjangan_bayaran: '',
+                adjustments: {},
+                globalVal: '',
+
+
+                applyToAll(field) {
+                    // 1. If the global input is empty, don't do anything
+                    if (!this.globalVal) return;
+
+                    // 2. Clean the value (remove dots/letters) so it's a pure number
+                    const cleanVal = this.globalVal.replace(/\D/g, '');
+
+                    // 3. We ONLY loop through workers that were SELECTED in Step 2
+                    // We don't want to give a bonus to someone who isn't even being paid.
+                    this.selectedWorkers.forEach(id => {
+                        // 4. Update the specific field for this worker ID in our adjustments object
+                        if (this.adjustments[id]) {
+                            this.adjustments[id][field] = cleanVal;
+                        }
+                    });
+
+                    // 5. Clear the global input field so it's empty for the next use
+                    this.globalVal = '';
+
+                    // 6. Visual feedback so the user knows it worked
+                    Swal.fire({
+                        toast: true,
+                        position: 'top',
+                        icon: 'success',
+                        title: `Tersalin ke ${this.selectedWorkers.length} pekerja`,
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
+
+                },
 
                 open(unitId, unitName, workerList) {
                     this.unitId = unitId;
                     this.unitName = unitName;
-
-                    // --- FILTER DUPLIKAT DISINI ---
-                    // Menggunakan Map untuk memastikan hanya ID unik yang diambil
                     const uniqueWorkers = [...new Map(workerList.map(item => [item.id, item])).values()];
                     this.workers = uniqueWorkers;
 
-                    // Reset data menggunakan list yang sudah unik
-                    this.selectedWorkers = this.workers.map(worker => worker.id);
-                    this.exclusions = [{ worker_id: '', date: '', open: false }];
-                    this.pembayaran_lain = '';
-                    this.tunjangan_bayaran = '';
+                    // Initialize adjustments for each worker
+                    this.adjustments = {};
+                    this.workers.forEach(worker => {
+                        this.adjustments[worker.id] = {
+                            pembayaran_lain: '',
+                            tunjangan_bayaran: ''
+                        };
+                    });
 
+                    this.selectedWorkers = this.workers.map(worker => worker.id);
+                    this.exclusions = [{
+                        worker_id: '',
+                        date: '',
+                        open: false
+                    }];
                     this.isOpen = true;
                 },
                 close() {

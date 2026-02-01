@@ -90,8 +90,7 @@ class PayrollController extends Controller
         $paidWorkerIds = $request->input('paid_workers', []);
         $tanggalMulai = $request->tanggal_mulai;
         $tanggalAkhir = $request->tanggal_akhir;
-        $pembayaranLain = (int) $request->pembayaran_lain;
-        $tunjangan = (int) $request->tunjangan_bayaran;
+        $allAdjustments = $request->input('adjustments', []);
 
         $periode = Carbon::parse($tanggalMulai)->translatedFormat('d')
         . '—'
@@ -113,12 +112,10 @@ class PayrollController extends Controller
             'unit_name' => $request->unit_name ?? 'Unit Borongan',
             'sistem_pengajian' => $unit->sistem_pengajian,
             'periode' => Carbon::parse($tanggalMulai)->translatedFormat('d') . ' — ' . Carbon::parse($tanggalAkhir)->translatedFormat('d M Y'),
-            'pembayaran_lain' => $pembayaranLain,
-            'tunjangan' => $tunjangan,
             'total_pekerja' => $workers->count(),
             'tanggal_mulai' => $tanggalMulai,
             'tanggal_akhir' => $tanggalAkhir,
-            'items' => $workers->map(function($w) use ($id_unit, $periode, $specificExclusions, $pembayaranLain, $tunjangan, $tanggalMulai, $tanggalAkhir) {
+            'items' => $workers->map(function($w) use ($id_unit, $periode, $specificExclusions, $allAdjustments, $tanggalMulai, $tanggalAkhir) {
 
                 // 1. Dapatkan list tanggal yang dikecualikan (potongan) untuk pekerja ini
                 $excludedDates = $specificExclusions->get($w->id)
@@ -137,6 +134,10 @@ class PayrollController extends Controller
                     ->get();
 
                 // dd($absensiRecords, $w->id);
+                $workerAdj = $allAdjustments[$w->id] ?? ['pembayaran_lain' => 0, 'tunjangan_bayaran' => 0];
+
+                $workerPembayaranLain = (int) ($workerAdj['pembayaran_lain'] ?? 0);
+                $workerTunjangan = (int) ($workerAdj['tunjangan_bayaran'] ?? 0);
 
                 $totalQty = 0;
                 $tempQty = 0;
@@ -158,7 +159,7 @@ class PayrollController extends Controller
                 }
 
                 // Gaji Bersih = Total Hasil Borongan + Penyesuaian Global
-                $netSalary = $totalGajiBorongan - $pembayaranLain + $tunjangan;
+                $netSalary = $totalGajiBorongan - $workerPembayaranLain  + $workerTunjangan;
 
                 // dd($netSalary);
 
@@ -175,8 +176,8 @@ class PayrollController extends Controller
                     'potongan_count' => count($excludedDates),
                     'potongan_dates' => $excludedDates,
                     'net_salary' => $netSalary,
-                    'pembayaran_lain' => $pembayaranLain,
-                    'tunjangan' => $tunjangan,
+                    'pembayaran_lain' => $workerPembayaranLain,
+                    'tunjangan' => $workerTunjangan,
                     'tanggal_mulai' => $tanggalMulai,
                     'tanggal_akhir' => $tanggalAkhir
                 ];
@@ -189,13 +190,14 @@ class PayrollController extends Controller
             ->sum('potongan_count');
 
         $payrollData['total_penyesuaian'] = collect($payrollData['items'])
-            ->sum(fn ($item) => $item['tunjangan'] - $item['pembayaran_lain']);
+            ->sum(fn ($item) => (int)$item['tunjangan'] - (int)$item['pembayaran_lain']);
 
         return view('Payroll.overview-payroll', compact('payrollData', 'paidWorkerIds'));
     }
 
     function ExportDetailBorongan(Request $request)
     {
+        // dd($request->all());
         $tanggal_awal  = Carbon::parse($request->tgl_awal);
         $tanggal_akhir = Carbon::parse($request->tgl_akhir);
 
