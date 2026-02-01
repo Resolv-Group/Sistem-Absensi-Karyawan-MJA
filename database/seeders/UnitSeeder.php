@@ -23,26 +23,8 @@ class UnitSeeder extends Seeder
         // ==================
         $faker = Faker::create('id_ID');
 
-        for ($i = 1; $i <= 5; $i++) {
-
-            Unit::create([
-                'id_unit' => $i,
-                'id_mitra_kerja' => rand(1,10),
-                'mulai_perjanjian' => $faker->date(),
-                'akhir_perjanjian' => $faker->date(),
-                'dokumen_mou' => null, // placeholder BLOB
-                'nama_unit' => $faker->name(),
-                'persentase_management_fee' => 10,
-                'sistem_pengajian' => 1,
-                //Sistem pengajian, 1 = harian, 2 = borongan
-                'umk' => 100000,
-                'bpjs_kesehatan' => 0,
-                'bpjs_naker' => 0,
-            ]);
-        }
-
         Unit::create([
-                'id_unit' => 6,
+                'id_unit' => 1,
                 'id_mitra_kerja' => rand(1,10),
                 'mulai_perjanjian' => $faker->date(),
                 'akhir_perjanjian' => $faker->date(),
@@ -57,7 +39,7 @@ class UnitSeeder extends Seeder
             ]);
 
         Unit::create([
-                'id_unit' => 7,
+                'id_unit' => 2,
                 'id_mitra_kerja' => rand(1,10),
                 'mulai_perjanjian' => $faker->date(),
                 'akhir_perjanjian' => $faker->date(),
@@ -72,28 +54,28 @@ class UnitSeeder extends Seeder
             ]);
 
         PicUnit::create([
-            'id_unit' => 6,
+            'id_unit' => 1,
             'id_pic' => 8,
         ]);
 
         PicUnit::create([
-            'id_unit' => 6,
+            'id_unit' => 1,
             'id_pic' => 9,
         ]);
 
         PicUnit::create([
-            'id_unit' => 7,
+            'id_unit' => 2,
             'id_pic' => 8,
         ]);
 
         PicUnit::create([
-            'id_unit' => 7,
+            'id_unit' => 2,
             'id_pic' => 9,
         ]);
 
         $pekerjaIds = Pekerja::inRandomOrder()->limit(6)->pluck('id')->toArray();
 
-        $units = [6, 7]; // Unit Harian & Unit Borongan
+        $units = [1, 2]; // Unit Harian & Unit Borongan
         $index = 0;
 
         foreach ($units as $unitId) {
@@ -135,6 +117,7 @@ class UnitSeeder extends Seeder
                 'nama_item'      => 'Borongan ' . $kategoriList[$i - 1],
                 'kategori'       => rand(1, 3),
                 'satuan'         => rand(1, 5),
+                'Max Rej Subkon' => 1,
                 'harga_unit'     => $faker->numberBetween(5000, 15000),
                 'harga_pekerja'  => $faker->numberBetween(3000, 10000),
                 'status_aktif'   => 1,
