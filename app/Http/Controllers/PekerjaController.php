@@ -135,46 +135,46 @@ class PekerjaController extends Controller
     // }
 
     public function viewDetailPekerja($id)
-{
-    // 1. Ambil data pekerja
-    $pekerja = Pekerja::findOrFail($id);
+    {
+        // 1. Ambil data pekerja
+        $pekerja = Pekerja::findOrFail($id);
 
-    // 2. Konversi foto blob ke base64
-    if ($pekerja->foto) {
-        $pekerja->image_base64 = 'data:image/jpeg;base64,' . base64_encode($pekerja->foto);
-    } else {
-        $pekerja->image_base64 = null;
+        // 2. Konversi foto blob ke base64
+        if ($pekerja->foto) {
+            $pekerja->image_base64 = 'data:image/jpeg;base64,' . base64_encode($pekerja->foto);
+        } else {
+            $pekerja->image_base64 = null;
+        }
+
+        // 3. Ambil PKWT yang paling terbaru (Aktif)
+        $currentPkwt = PKWT::where('id_pekerja', $id)
+                            ->latest('tgl_mulai_pkwt')
+                            ->first();
+
+        // 4. Ambil Histori PKWT (Semua kontrak kecuali yang aktif jika perlu difilter di view)
+        $historiPkwt = PKWT::where('id_pekerja', $id)
+                            ->orderBy('tgl_mulai_pkwt', 'desc')
+                            ->get();
+
+        // 5. Ambil Histori Penilaian (Lengkap dengan data Staff/Penilai)
+        // Kita ambil semua kolom agar detailnya bisa langsung muncul di popup tanpa fetch lagi
+        $historiPenilaian = Penilaian_Pkwt::where('id_pekerja', $id)
+                                ->orderBy('created_at', 'desc')
+                                ->get();
+
+        // 6. Ambil Histori Log/Audit
+        $historiPekerja = History::where('foreign_id', $id)
+                                ->where('nama_tabel', 'pekerja')
+                                ->get();
+
+        return view('Pekerja.detail-pekerja', compact(
+            'pekerja',
+            'currentPkwt',
+            'historiPkwt',
+            'historiPenilaian', // Variabel baru
+            'historiPekerja'
+        ));
     }
-
-    // 3. Ambil PKWT yang paling terbaru (Aktif)
-    $currentPkwt = PKWT::where('id_pekerja', $id)
-                        ->latest('tgl_mulai_pkwt')
-                        ->first();
-
-    // 4. Ambil Histori PKWT (Semua kontrak kecuali yang aktif jika perlu difilter di view)
-    $historiPkwt = PKWT::where('id_pekerja', $id)
-                        ->orderBy('tgl_mulai_pkwt', 'desc')
-                        ->get();
-
-    // 5. Ambil Histori Penilaian (Lengkap dengan data Staff/Penilai)
-    // Kita ambil semua kolom agar detailnya bisa langsung muncul di popup tanpa fetch lagi
-    $historiPenilaian = Penilaian_Pkwt::where('id_pekerja', $id)
-                            ->orderBy('created_at', 'desc')
-                            ->get();
-
-    // 6. Ambil Histori Log/Audit
-    $historiPekerja = History::where('foreign_id', $id)
-                            ->where('nama_tabel', 'pekerja')
-                            ->get();
-
-    return view('Pekerja.detail-pekerja', compact(
-        'pekerja',
-        'currentPkwt',
-        'historiPkwt',
-        'historiPenilaian', // Variabel baru
-        'historiPekerja'
-    ));
-}
 
     function tambahPekerja(request $request)
     {

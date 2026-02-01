@@ -8,8 +8,8 @@
 <div x-data="{
     showModal: false,
     showApprovalModal: false,
-    selected: {
-        pekerja: { nama: '' },
+    selected: { 
+        pekerja: { nama: '' }, 
         unit: { nama_unit: '' },
         total: 0,
         mk: 0,
@@ -18,7 +18,7 @@
         kualitas: 0,
         sikap: 0,
         keterangan: ''
-    }, {{-- Inisialisasi struktur agar tidak error undefined --}}
+    }, 
     getGrade(score) {
         if (!score) return { label: '-', color: 'gray', desc: '-' };
         if (score >= 50) return { label: 'A', color: 'emerald', desc: 'Sangat Baik' };
@@ -27,16 +27,15 @@
         return { label: 'D', color: 'red', desc: 'Kurang' };
     },
     openDetail(item) {
-        this.selected = item; {{-- Mengambil objek lengkap --}}
+        this.selected = item; 
         this.showModal = true;
     }
-}">
+}"> 
 
 <style>
     [x-cloak] { display: none !important; }
 </style>
 
-    {{-- Load ApexCharts via CDN (You can also install via npm if preferred) --}}
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -64,70 +63,58 @@
             </div>
         </div>
 
-        {{-- 2. GENERAL COMPANY STATS (Pegawai, Unit, Mitra) --}}
+        {{-- 2. GENERAL COMPANY STATS --}}
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
-            {{-- Total Pegawai --}}
             <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-start justify-between">
                 <div>
                     <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Total Pegawai</p>
                     <h3 class="text-2xl font-bold text-gray-900 mt-1">{{ $totalPekerja }}</h3>
                     <span class="text-xs text-green-600 font-medium flex items-center mt-1">
                         <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
                         </svg>
                         +{{ $pegawaiBulanIni }} bulan ini
                     </span>
                 </div>
                 <div class="p-3 bg-blue-50 text-blue-600 rounded-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0z" />
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0z" />
                     </svg>
                 </div>
             </div>
 
-            {{-- NEW: Total Unit Aktif --}}
             <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-start justify-between">
                 <div>
                     <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Total Unit Aktif</p>
-                    <h3 class="text-2xl font-bold text-gray-900 mt-1">12</h3> {{-- Replace with $totalUnit --}}
+                    <h3 class="text-2xl font-bold text-gray-900 mt-1">12</h3>
                     <span class="text-xs text-gray-500 mt-1">Unit Operasional</span>
                 </div>
                 <div class="p-3 bg-indigo-50 text-indigo-600 rounded-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                     </svg>
                 </div>
             </div>
 
-            {{-- NEW: Total Mitra Kerja --}}
             <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-start justify-between">
                 <div>
                     <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Total Mitra Kerja</p>
-                    <h3 class="text-2xl font-bold text-gray-900 mt-1">{{ $totalMitra }}</h3> {{-- Replace with $totalMitra --}}
+                    <h3 class="text-2xl font-bold text-gray-900 mt-1">{{ $totalMitra }}</h3>
                     <span class="text-xs text-gray-500 mt-1">Vendor & Klien</span>
                 </div>
                 <div class="p-3 bg-teal-50 text-teal-600 rounded-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
                 </div>
             </div>
         </div>
 
-        {{-- 3. NEW: CHART SECTION (DIAGRAM PERTUMBUHAN) --}}
+        {{-- 3. CHART SECTION --}}
         <div class="mb-8">
             <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-lg font-bold text-gray-900">Pertumbuhan Karyawan</h3>
-
-                    {{-- Custom Dropdown UI --}}
                     <div x-data="{
                         open: false,
                         selected: '{{ $selectedYear }}',
@@ -138,48 +125,29 @@
                             { val: '2025', label: 'Tahun 2025' },
                         ]
                     }" class="relative w-40 z-10">
-
-                        {{-- Trigger Button --}}
-                        <div @click="open = !open"
-                            class="border border-gray-300 bg-white text-sm rounded-lg py-2 px-3 cursor-pointer flex justify-between items-center hover:border-blue-500 transition-colors">
-                            <span x-text="list.find(x => x.val == selected)?.label || 'Pilih Tahun'"
-                                class="text-gray-600 font-medium"></span>
-                            <svg class="w-4 h-4 text-gray-400" :class="{ 'rotate-180': open }" fill="none"
-                                stroke="currentColor" viewBox="0 0 24 24" style="transition: transform 0.2s">
+                        <div @click="open = !open" class="border border-gray-300 bg-white text-sm rounded-lg py-2 px-3 cursor-pointer flex justify-between items-center hover:border-blue-500 transition-colors">
+                            <span x-text="list.find(x => x.val == selected)?.label || 'Pilih Tahun'" class="text-gray-600 font-medium"></span>
+                            <svg class="w-4 h-4 text-gray-400" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="transition: transform 0.2s">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                             </svg>
                         </div>
-
-                        {{-- Dropdown List --}}
-                        <ul x-show="open" @click.outside="open = false"
-                            x-transition:enter="transition ease-out duration-100"
-                            x-transition:enter-start="transform opacity-0 scale-95"
-                            x-transition:enter-end="transform opacity-100 scale-100"
-                            x-transition:leave="transition ease-in duration-75"
-                            x-transition:leave-start="transform opacity-100 scale-100"
-                            x-transition:leave-end="transform opacity-0 scale-95"
-                            class="absolute w-full mt-1 border border-gray-200 bg-white rounded-lg shadow-lg overflow-y-auto max-h-40 z-50">
-
+                        <ul x-show="open" @click.outside="open = false" x-transition class="absolute w-full mt-1 border border-gray-200 bg-white rounded-lg shadow-lg overflow-y-auto max-h-40 z-50">
                             <template x-for="item in list" :key="item.val">
                                 <li @click="selected = item.val; open = false; window.location.href='?year=' + item.val"
                                     class="px-3 py-2 text-sm cursor-pointer transition"
-                                    :class="selected == item.val ? 'bg-blue-50 text-blue-700 font-semibold' :
-                                        'text-gray-600 hover:bg-blue-600 hover:text-white'"
+                                    :class="selected == item.val ? 'bg-blue-50 text-blue-700 font-semibold' : 'text-gray-600 hover:bg-blue-600 hover:text-white'"
                                     x-text="item.label">
                                 </li>
                             </template>
                         </ul>
                     </div>
-                    {{-- End Custom Dropdown --}}
-
                 </div>
                 <div id="employeeGrowthChart" class="w-full h-80" data-chart='@json($employeeChartData)'></div>
             </div>
         </div>
 
-        {{-- 4. DAILY ATTENDANCE STATS (Grid 3) --}}
+        {{-- 4. DAILY ATTENDANCE STATS --}}
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
-            {{-- Hadir Hari Ini --}}
             <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-start justify-between">
                 <div>
                     <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Hadir Hari Ini</p>
@@ -187,15 +155,12 @@
                     <span class="text-xs text-gray-500 mt-1">Absensi masuk tercatat</span>
                 </div>
                 <div class="p-3 bg-green-50 text-green-600 rounded-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                 </div>
             </div>
 
-            {{-- Izin / Sakit --}}
             <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-start justify-between">
                 <div>
                     <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Cuti / Izin</p>
@@ -203,15 +168,12 @@
                     <span class="text-xs text-orange-600 font-medium mt-1">Status tidak hadir / cuti</span>
                 </div>
                 <div class="p-3 bg-orange-50 text-orange-600 rounded-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                     </svg>
                 </div>
             </div>
 
-            {{-- Terlambat --}}
             <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-start justify-between">
                 <div>
                     <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Terlambat</p>
@@ -219,20 +181,19 @@
                     <span class="text-xs text-red-600 font-medium mt-1">Melebihi jam shift</span>
                 </div>
                 <div class="p-3 bg-red-50 text-red-600 rounded-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                 </div>
             </div>
         </div>
 
-        {{-- 5. SPLIT VIEW (Table Left, Sidebar Right) --}}
+        {{-- 5. SPLIT VIEW --}}
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-            {{-- LEFT: Live Attendance Table --}}
+            {{-- LEFT: Tables --}}
             <div class="lg:col-span-2 space-y-8">
+                {{-- Kehadiran Terbaru Table --}}
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
                     <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
                         <h3 class="text-lg font-bold text-gray-900">Kehadiran Terbaru</h3>
@@ -241,18 +202,10 @@
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
-                                        Pegawai</th>
-                                    <th
-                                        class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">
-                                        Jam Masuk</th>
-                                    <th
-                                        class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">
-                                        Jam Keluar</th>
-                                    <th
-                                        class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">
-                                        Status</th>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Pegawai</th>
+                                    <th class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Jam Masuk</th>
+                                    <th class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Jam Keluar</th>
+                                    <th class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Status</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
@@ -261,8 +214,6 @@
                                         $pekerja = $hadir->absensi->pekerja;
                                         $shift = $hadir->shiftAbsen;
                                         $isCuti = $hadir->status_kehadiran == 2;
-
-                                        // Logika terlambat hanya jika statusnya Hadir (1)
                                         $isTerlambat = false;
                                         if (!$isCuti && $hadir->waktu_masuk && $shift) {
                                             $jamMasukPekerja = \Carbon\Carbon::parse($hadir->waktu_masuk);
@@ -273,70 +224,40 @@
                                     <tr class="hover:bg-gray-50 transition-colors">
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="flex items-center">
-                                                <img class="h-8 w-8 rounded-full bg-gray-200 object-cover"
-                                                    src="{{ $pekerja->foto ? asset('storage/' . $pekerja->foto) : 'https://ui-avatars.com/api/?name=' . urlencode($pekerja->nama ?? 'U') . '&background=random' }}"
-                                                    alt="">
+                                                <img class="h-8 w-8 rounded-full bg-gray-200 object-cover" src="{{ $pekerja->foto ? asset('storage/' . $pekerja->foto) : 'https://ui-avatars.com/api/?name=' . urlencode($pekerja->nama ?? 'U') . '&background=random' }}">
                                                 <div class="ml-3">
-                                                    <p class="text-sm font-bold text-gray-900">
-                                                        {{ $pekerja->nama ?? 'N/A' }}</p>
-                                                    <p class="text-[10px] text-gray-500 uppercase font-medium">
-                                                        {{ $pekerja->nik ?? '-' }}</p>
+                                                    <p class="text-sm font-bold text-gray-900">{{ $pekerja->nama ?? 'N/A' }}</p>
+                                                    <p class="text-[10px] text-gray-500 uppercase font-medium">{{ $pekerja->nik ?? '-' }}</p>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td
-                                            class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium text-gray-900">
-                                            {{-- Jika Cuti, tampilkan strip atau keterangan --}}
-                                            @if ($isCuti)
-                                                <span class="text-gray-400">--:--</span>
-                                            @else
-                                                {{ \Carbon\Carbon::parse($hadir->waktu_masuk)->format('H:i') }} WIB
-                                            @endif
+                                        <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium text-gray-900">
+                                            @if ($isCuti) <span class="text-gray-400">--:--</span> @else {{ \Carbon\Carbon::parse($hadir->waktu_masuk)->format('H:i') }} WIB @endif
                                         </td>
-                                        <td
-                                            class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium text-gray-900">
-                                            {{-- Jika Cuti, tampilkan strip atau keterangan --}}
-                                            @if ($isCuti)
-                                                <span class="text-gray-400">--:--</span>
-                                            @else
-                                                {{ \Carbon\Carbon::parse($hadir->waktu_keluar)->format('H:i') }} WIB
-                                            @endif
+                                        <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium text-gray-900">
+                                            @if ($isCuti) <span class="text-gray-400">--:--</span> @else {{ \Carbon\Carbon::parse($hadir->waktu_keluar)->format('H:i') }} WIB @endif
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-center">
                                             @if ($isCuti)
-                                                {{-- Badge Status CUTI --}}
-                                                <span
-                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800 uppercase shadow-sm">
-                                                    Cuti / Izin
-                                                </span>
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800 uppercase shadow-sm">Cuti / Izin</span>
                                             @else
-                                                {{-- Badge Status HADIR --}}
                                                 @if (!$isTerlambat)
-                                                    <span
-                                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-green-100 text-green-800 uppercase">
-                                                        Tepat Waktu
-                                                    </span>
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-green-100 text-green-800 uppercase">Tepat Waktu</span>
                                                 @else
-                                                    <span
-                                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-800 uppercase">
-                                                        Terlambat
-                                                    </span>
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-800 uppercase">Terlambat</span>
                                                 @endif
                                             @endif
                                         </td>
                                     </tr>
                                 @empty
-                                    <tr>
-                                        <td colspan="4" class="px-6 py-10 text-center text-sm text-gray-400 italic">
-                                            Belum ada data aktivitas hari ini.
-                                        </td>
-                                    </tr>
+                                    <tr><td colspan="4" class="px-6 py-10 text-center text-sm text-gray-400 italic">Belum ada data aktivitas hari ini.</td></tr>
                                 @endforelse
                             </tbody>
                         </table>
                     </div>
                 </div>
 
+                {{-- Penilaian PKWT Table --}}
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
                     <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
                         <h3 class="text-lg font-bold text-gray-900">Penilaian PKWT Terbaru</h3>
@@ -345,54 +266,31 @@
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
-                                        Pegawai</th>
-                                    <th
-                                        class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">
-                                        Skor</th>
-                                    <th
-                                        class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">
-                                        Grade</th>
-                                    <th
-                                        class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">
-                                        Status Verif</th>
-                                    <th
-                                        class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">
-                                        Detail</th>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Pegawai</th>
+                                    <th class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Skor</th>
+                                    <th class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Grade</th>
+                                    <th class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Status Verif</th>
+                                    <th class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Detail</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
                                 @forelse ($penilaianTerbaru as $nilai)
                                     @php
-                                        // Logika Grade
                                         $score = $nilai->total;
-                                        if ($score >= 50) {
-                                            $grade = 'A';
-                                            $color = 'green';
-                                        } elseif ($score >= 41) {
-                                            $grade = 'B';
-                                            $color = 'blue';
-                                        } elseif ($score >= 29) {
-                                            $grade = 'C';
-                                            $color = 'yellow';
-                                        } else {
-                                            $grade = 'D';
-                                            $color = 'red';
-                                        }
+                                        if ($score >= 50) { $grade = 'A'; $color = 'green'; }
+                                        elseif ($score >= 41) { $grade = 'B'; $color = 'blue'; }
+                                        elseif ($score >= 29) { $grade = 'C'; $color = 'yellow'; }
+                                        else { $grade = 'D'; $color = 'red'; }
                                     @endphp
                                     <tr class="hover:bg-gray-50 transition-colors">
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="flex items-center">
                                                 <div class="flex-shrink-0 h-8 w-8">
-                                                    <img class="h-8 w-8 rounded-full object-cover"
-                                                        src="{{ $nilai->pekerja->foto ? asset('storage/' . $nilai->pekerja->foto) : 'https://ui-avatars.com/api/?name=' . urlencode($nilai->pekerja->nama) . '&background=random' }}">
+                                                    <img class="h-8 w-8 rounded-full object-cover" src="{{ $nilai->pekerja->foto ? asset('storage/' . $nilai->pekerja->foto) : 'https://ui-avatars.com/api/?name=' . urlencode($nilai->pekerja->nama) . '&background=random' }}">
                                                 </div>
                                                 <div class="ml-3">
-                                                    <p class="text-sm font-bold text-gray-900">{{ $nilai->pekerja->nama }}
-                                                    </p>
-                                                    <p class="text-[10px] text-gray-400 uppercase font-bold">
-                                                        {{ $nilai->unit->nama_unit ?? 'Unit N/A' }}</p>
+                                                    <p class="text-sm font-bold text-gray-900">{{ $nilai->pekerja->nama }}</p>
+                                                    <p class="text-[10px] text-gray-400 uppercase font-bold">{{ $nilai->unit->nama_unit ?? 'Unit N/A' }}</p>
                                                 </div>
                                             </div>
                                         </td>
@@ -401,40 +299,21 @@
                                             <span class="text-[10px] text-gray-400">/ 56</span>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-center">
-                                            <span
-                                                class="inline-flex items-center justify-center w-8 h-8 rounded-lg font-black text-xs bg-{{ $color }}-50 text-{{ $color }}-700 border border-{{ $color }}-100">
-                                                {{ $grade }}
-                                            </span>
+                                            <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg font-black text-xs bg-{{ $color }}-50 text-{{ $color }}-700 border border-{{ $color }}-100">{{ $grade }}</span>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-center">
                                             <div class="flex items-center justify-center gap-1.5">
-                                                {{-- Mini Dots for Status --}}
-                                                <div title="Staff Verify"
-                                                    class="w-2 h-2 rounded-full {{ $nilai->status_staff ? 'bg-green-500' : 'bg-gray-200' }}">
-                                                </div>
-                                                <div title="HRD Verify"
-                                                    class="w-2 h-2 rounded-full {{ $nilai->status_hrd ? 'bg-green-500' : 'bg-gray-200' }}">
-                                                </div>
+                                                <div title="Staff Verify" class="w-2 h-2 rounded-full {{ $nilai->status_staff ? 'bg-green-500' : 'bg-gray-200' }}"></div>
+                                                <div title="HRD Verify" class="w-2 h-2 rounded-full {{ $nilai->status_hrd ? 'bg-green-500' : 'bg-gray-200' }}"></div>
                                             </div>
-                                            <p class="text-[8px] text-gray-400 uppercase mt-1 font-bold">
-                                                {{ $nilai->status_hrd ? 'Verified' : 'In Progress' }}
-                                            </p>
+                                            <p class="text-[8px] text-gray-400 uppercase mt-1 font-bold">{{ $nilai->status_hrd ? 'Verified' : 'In Progress' }}</p>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-center">
-                                            {{-- Gunakan $nilai (bukan $pending) karena mengikuti foreach ($penilaianTerbaru as $nilai) --}}
-                                            <button
-                                                @click="openDetail({{ Js::from($nilai) }})"
-                                                class="group inline-flex items-center gap-2 px-4 py-2 bg-gray-900 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-blue-600 transition-all active:scale-95 shadow-md shadow-gray-200">
-                                                <span>View</span>
-                                            </button>
+                                            <button @click="openDetail({{ Js::from($nilai) }})" class="group inline-flex items-center gap-2 px-4 py-2 bg-gray-900 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-blue-600 transition-all active:scale-95 shadow-md shadow-gray-200"><span>View</span></button>
                                         </td>
                                     </tr>
                                 @empty
-                                    <tr>
-                                        <td colspan="5" class="px-6 py-10 text-center text-sm text-gray-400 italic">
-                                            Belum ada penilaian yang dicatat.
-                                        </td>
-                                    </tr>
+                                    <tr><td colspan="5" class="px-6 py-10 text-center text-sm text-gray-400 italic">Belum ada penilaian yang dicatat.</td></tr>
                                 @endforelse
                             </tbody>
                         </table>
@@ -596,450 +475,97 @@
             </div>
 
 
-            {{-- RIGHT: Quick Actions & Alerts --}}
+            {{-- RIGHT: SIDEBAR --}}
             <div class="space-y-6">
 
                 {{-- Quick Actions --}}
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
                     <h3 class="text-lg font-bold text-gray-900 mb-4">Pintasan Cepat</h3>
                     <div class="grid grid-cols-2 gap-3">
-                        <a href="{{ route('view.tambah.pekerja') }}"
-                            class="flex flex-col items-center justify-center p-4 bg-gray-50 border border-gray-100 rounded-xl hover:bg-blue-50 hover:border-blue-200 hover:text-blue-700 transition group">
+                        <a href="{{ route('view.tambah.pekerja') }}" class="flex flex-col items-center justify-center p-4 bg-gray-50 border border-gray-100 rounded-xl hover:bg-blue-50 hover:border-blue-200 hover:text-blue-700 transition group">
                             <div class="p-2 bg-white rounded-full shadow-sm group-hover:scale-110 transition-transform">
-                                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z">
-                                    </path>
-                                </svg>
+                                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
                             </div>
                             <span class="text-xs font-semibold mt-2 text-center">Tambah Pegawai</span>
                         </a>
 
-                        <a href="{{ route('view.tambah.staff') }}"
-                            class="flex flex-col items-center justify-center p-4 bg-gray-50 border border-gray-100 rounded-xl hover:bg-violet-50 hover:border-violet-200 hover:text-violet-700 transition group">
+                        <a href="{{ route('view.tambah.staff') }}" class="flex flex-col items-center justify-center p-4 bg-gray-50 border border-gray-100 rounded-xl hover:bg-violet-50 hover:border-violet-200 hover:text-violet-700 transition group">
                             <div class="p-2 bg-white rounded-full shadow-sm group-hover:scale-110 transition-transform">
-                                <svg class="w-6 h-6 text-violet-600" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    {{-- Kepala --}}
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 11a4 4 0 100-8 4 4 0 000 8z" />
-                                    {{-- Bahu/Badan --}}
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2" />
-                                    {{-- Detail Dasi (Membedakan Staff/Office dengan Pekerja Lapangan) --}}
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 15l1 2-1 2-1-2 1-2z" />
+                                <svg class="w-6 h-6 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11a4 4 0 100-8 4 4 0 000 8z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15l1 2-1 2-1-2 1-2z" />
                                 </svg>
                             </div>
                             <span class="text-xs font-semibold mt-2 text-center">Tambah Staff</span>
                         </a>
 
-                        <a href="{{ route('view.tambah.mitra-kerja') }}"
-                            class="flex flex-col items-center justify-center p-4 bg-gray-50 border border-gray-100 rounded-xl hover:bg-indigo-50 hover:border-indigo-200 hover:text-indigo-700 transition group">
+                        <a href="{{ route('view.tambah.mitra-kerja') }}" class="flex flex-col items-center justify-center p-4 bg-gray-50 border border-gray-100 rounded-xl hover:bg-indigo-50 hover:border-indigo-200 hover:text-indigo-700 transition group">
                             <div class="p-2 bg-white rounded-full shadow-sm group-hover:scale-110 transition-transform">
-                                <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    {{-- Icon: Office Building --}}
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
-                                    </path>
-                                    {{-- Icon: Plus Sign inside --}}
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 9v3m0 0v3m0-3h3m-3 0H9"></path>
+                                <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9"></path>
                                 </svg>
                             </div>
                             <span class="text-xs font-semibold mt-2 text-center">Tambah Mitra</span>
                         </a>
 
-                        <a href="{{ route('view.tambah.unit') }}"
-                            class="flex flex-col items-center justify-center p-4 bg-gray-50 border border-gray-100 rounded-xl hover:bg-amber-50 hover:border-amber-200 hover:text-amber-700 transition group">
+                        <a href="{{ route('view.tambah.unit') }}" class="flex flex-col items-center justify-center p-4 bg-gray-50 border border-gray-100 rounded-xl hover:bg-amber-50 hover:border-amber-200 hover:text-amber-700 transition group">
                             <div class="p-2 bg-white rounded-full shadow-sm group-hover:scale-110 transition-transform">
-                                <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    {{-- Icon: Layers/Unit Structure --}}
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                                    {{-- Icon: Plus sign at the bottom --}}
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 14v3m-1.5-1.5h3" />
-                                </svg>
+                                <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14v3m-1.5-1.5h3" /></svg>
                             </div>
                             <span class="text-xs font-semibold mt-2 text-center">Tambah Unit</span>
                         </a>
 
                         <div class="col-span-2">
-                            <button @click="showApprovalModal = true"
-                                class="w-full relative flex flex-col items-center justify-center p-4 bg-gray-50 border border-gray-100 rounded-xl hover:bg-green-50 hover:border-green-200 hover:text-green-700 transition group">
-
-                                {{-- Badge Angka Terintegrasi --}}
+                            <button @click="showApprovalModal = true" class="w-full relative flex flex-col items-center justify-center p-4 bg-gray-50 border border-gray-100 rounded-xl hover:bg-green-50 hover:border-green-200 hover:text-green-700 transition group">
                                 @if ($penilaianPending->count() > 0)
                                     <span class="absolute top-2 right-2 flex h-5 w-5">
-                                        <span
-                                            class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                                        <span
-                                            class="relative inline-flex rounded-full h-5 w-5 bg-green-600 text-white text-[10px] font-black items-center justify-center">
-                                            {{ $penilaianPending->count() }}
-                                        </span>
+                                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                        <span class="relative inline-flex rounded-full h-5 w-5 bg-green-600 text-white text-[10px] font-black items-center justify-center">{{ $penilaianPending->count() }}</span>
                                     </span>
                                 @endif
-
-                                <div
-                                    class="p-2 bg-white rounded-full shadow-sm group-hover:scale-110 transition-transform">
-                                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                    </svg>
-                                </div>
+                                <div class="p-2 bg-white rounded-full shadow-sm group-hover:scale-110 transition-transform"><svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>
                                 <span class="text-xs font-semibold mt-2 text-center">Approval Penilaian</span>
                             </button>
-                        </div>
-
-                        <!-- MODAL APPROVAL PENILAIAN -->
-                        <div x-show="showApprovalModal"
-                            class="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6" x-cloak>
-
-                            {{-- Background Overlay --}}
-                            <div x-show="showApprovalModal" x-transition.opacity @click="showApprovalModal = false"
-                                class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
-
-                            {{-- Modal Panel --}}
-                            <div x-show="showApprovalModal" x-transition:enter="transition ease-out duration-300"
-                                x-transition:enter-start="opacity-0 scale-95 translate-y-8"
-                                x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-                                class="relative bg-white rounded-[2.5rem] shadow-2xl w-full max-w-2xl overflow-hidden border border-white flex flex-col max-h-[85vh]">
-
-                                {{-- Header --}}
-                                <div
-                                    class="px-8 py-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
-                                    <div>
-                                        <h3 class="text-xl font-black text-gray-900 tracking-tight">Verifikasi Penilaian
-                                        </h3>
-                                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">Total:
-                                            {{ $penilaianPending->count() }} Perlu Disetujui</p>
-                                    </div>
-                                    <button @click="showApprovalModal = false"
-                                        class="p-2 text-gray-400 hover:text-red-500 transition-colors">
-                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                                d="M6 18L18 6M6 6l12 12" />
-                                        </svg>
-                                    </button>
-                                </div>
-
-                                {{-- Scrollable List --}}
-                                <div class="p-6 overflow-y-auto custom-scrollbar flex-1 bg-white">
-                                    <div class="space-y-4">
-                                        @forelse($penilaianPending as $pending)
-                                            <div
-                                                class="group p-4 bg-gray-50 border border-gray-100 rounded-3xl flex items-center justify-between hover:bg-white hover:border-green-200 hover:shadow-xl hover:shadow-green-900/5 transition-all duration-300">
-                                                <div class="flex items-center gap-4">
-                                                    {{-- Grade Avatar --}}
-                                                    <div
-                                                        class="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center border border-gray-100 group-hover:border-green-500 transition-colors">
-                                                        <span
-                                                            class="text-xl font-black text-gray-900">{{ $pending->total }}</span>
-                                                    </div>
-                                                    <div>
-                                                        <p class="text-sm font-black text-gray-900 leading-tight">
-                                                            {{ $pending->pekerja->nama }}</p>
-                                                        <div class="flex items-center gap-2 mt-1">
-                                                            <span
-                                                                class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">{{ $pending->unit->nama_unit ?? 'Unit N/A' }}</span>
-                                                            <span class="text-gray-300">•</span>
-                                                            <span
-                                                                class="text-[10px] font-black text-blue-600 uppercase">{{ \Carbon\Carbon::parse($pending->created_at)->translatedFormat('d M Y') }}</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div class="flex items-center gap-2">
-                                                    {{-- Link View Detail --}}
-                                                    {{-- <a href="{{ route('view.detail.unit', $pending->id_unit) }}"
-                                                        class="px-4 py-2 bg-white text-gray-600 text-[10px] font-black uppercase tracking-widest rounded-xl border border-gray-200 hover:bg-gray-900 hover:text-white hover:border-gray-900 transition-all">
-                                                        Detail
-                                                    </a> --}}
-                                                    <button
-                                                        @click="openDetail({{ json_encode($pending) }})"
-                                                        class="px-5 py-2.5 bg-gray-50 text-gray-600 text-xs font-black uppercase tracking-widest rounded-xl hover:bg-gray-900 hover:text-white transition-all active:scale-95">
-                                                        View
-                                                    </button>
-
-                                                    {{-- Form Approve --}}
-                                                    <form action="{{ route('penilaian.verify.hrd', $pending->id) }}"
-                                                        method="POST">
-                                                        @csrf
-                                                        <button type="submit"
-                                                            class="px-4 py-2 bg-green-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl shadow-lg shadow-green-200 hover:bg-green-700 transition-all active:scale-95">
-                                                            Verify
-                                                        </button>
-                                                    </form>
-
-                                                    {{-- MODAL DETAIL --}}
-                                                    <div x-show="showModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4" x-cloak>
-                                                        <div x-show="showModal" x-transition.opacity @click="showModal = false"
-                                                            class="absolute inset-0 bg-slate-900/80 backdrop-blur-md"></div>
-
-                                                        <div x-show="showModal" x-transition:enter="transition ease-out duration-300"
-                                                            x-transition:enter-start="opacity-0 scale-95 translate-y-8"
-                                                            class="relative w-full max-w-lg bg-white rounded-[3rem] shadow-2xl overflow-hidden border border-white">
-
-                                                            <div class="p-10">
-                                                                {{-- Header with Large Grade --}}
-                                                                <div class="flex items-center justify-between mb-10">
-                                                                    <div class="flex items-center gap-4">
-                                                                        <div :class="'bg-' + getGrade(selected.total).color + '-600'"
-                                                                            class="w-16 h-16 rounded-[1.5rem] flex items-center justify-center text-white shadow-xl transform -rotate-3">
-                                                                            <span class="text-3xl font-black" x-text="getGrade(selected.total).label"></span>
-                                                                        </div>
-                                                                        <div>
-                                                                            <h4 class="text-2xl font-black text-gray-900 tracking-tighter leading-none">Hasil Evaluasi
-                                                                            </h4>
-                                                                            <p class="text-xs font-bold text-gray-400 mt-2 uppercase tracking-[0.2em]"
-                                                                                x-text="getGrade(selected.total).desc"></p>
-                                                                        </div>
-                                                                    </div>
-                                                                    <button @click="showModal = false"
-                                                                        class="p-3 bg-gray-50 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all">
-                                                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                            <path d="M6 18L18 6M6 6l12 12" stroke-width="3" stroke-linecap="round"
-                                                                                stroke-linejoin="round" />
-                                                                        </svg>
-                                                                    </button>
-                                                                </div>
-
-                                                                {{-- Metrics Grid (Horizontal Scrolling on mobile, Grid on desktop) --}}
-                                                                <div class="grid grid-cols-5 gap-2 mb-10">
-                                                                    <template
-                                                                        x-for="field in [
-                                                                        {key: 'mk', label: 'MK'},
-                                                                        {key: 'absensi', label: 'ABS'},
-                                                                        {key: 'pengetahuan', label: 'PNG'},
-                                                                        {key: 'kualitas', label: 'KLT'},
-                                                                        {key: 'sikap', label: 'SKP'}
-                                                                    ]">
-                                                                        <div class="text-center p-3 bg-gray-50/50 rounded-2xl border border-gray-100">
-                                                                            <p class="text-[8px] font-black text-gray-400 uppercase mb-1.5" x-text="field.label"></p>
-                                                                            <p class="text-sm font-black text-gray-900" x-text="selected[field.key]"></p>
-                                                                        </div>
-                                                                    </template>
-                                                                </div>
-                                                                {{-- Summary & Verification Section --}}
-                                                                <div class="space-y-6 mb-10">
-
-                                                                    {{-- 1. Hero Score Card --}}
-                                                                    <div class="relative overflow-hidden bg-gray-900 rounded-[2.5rem] p-8 text-white shadow-2xl">
-                                                                        {{-- Background Pattern Decoration --}}
-                                                                        <div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16 blur-2xl">
-                                                                        </div>
-
-                                                                        <div class="relative flex items-center justify-between">
-                                                                            <div>
-                                                                                <p class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-1">Skor
-                                                                                    Akumulasi</p>
-                                                                                <div class="flex items-baseline gap-2">
-                                                                                    <span class="text-6xl font-black tracking-tighter" x-text="selected.total"></span>
-                                                                                    <span class="text-xl font-bold text-gray-500">/ 56</span>
-                                                                                </div>
-                                                                            </div>
-                                                                            <div class="text-right">
-                                                                                <p class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-2">Predikat
-                                                                                </p>
-                                                                                <div :class="'bg-' + getGrade(selected.total).color + '-500'"
-                                                                                    class="px-4 py-2 rounded-2xl inline-block shadow-lg shadow-black/20">
-                                                                                    <span class="text-2xl font-black" x-text="getGrade(selected.total).label"></span>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-
-                                                                    {{-- 2. Verification Status Row --}}
-                                                                    <div class="grid grid-cols-2 gap-4">
-                                                                        {{-- Staff Verification --}}
-                                                                        <div class="p-4 rounded-[1.5rem] border border-gray-100 transition-all"
-                                                                            :class="selected.status_staff ? 'bg-emerald-50/50 border-emerald-100' : 'bg-gray-50/50'">
-                                                                            <div class="flex items-center gap-3">
-                                                                                <div :class="selected.status_staff ? 'bg-emerald-500 text-white' : 'bg-gray-200 text-gray-400'"
-                                                                                    class="w-8 h-8 rounded-xl flex items-center justify-center transition-colors">
-                                                                                    <svg x-show="selected.status_staff" class="w-5 h-5" fill="none"
-                                                                                        stroke="currentColor" viewBox="0 0 24 24">
-                                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                                                                                            d="M5 13l4 4L19 7" />
-                                                                                    </svg>
-                                                                                    <svg x-show="!selected.status_staff" class="w-4 h-4" fill="none"
-                                                                                        stroke="currentColor" viewBox="0 0 24 24">
-                                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                                                                            d="M12 8v4l3 3" />
-                                                                                    </svg>
-                                                                                </div>
-                                                                                <div>
-                                                                                    <p
-                                                                                        class="text-[9px] font-black uppercase tracking-widest text-gray-400 leading-none mb-1">
-                                                                                        Staff Verify</p>
-                                                                                    <p class="text-[11px] font-bold"
-                                                                                        :class="selected.status_staff ? 'text-emerald-700' : 'text-gray-400'"
-                                                                                        x-text="selected.status_staff ? 'Verified' : 'Pending'"></p>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-
-                                                                        {{-- HRD Verification --}}
-                                                                        <div class="p-4 rounded-[1.5rem] border border-gray-100 transition-all"
-                                                                            :class="selected.status_hrd ? 'bg-emerald-50/50 border-emerald-100' : 'bg-gray-50/50'">
-                                                                            <div class="flex items-center gap-3">
-                                                                                <div :class="selected.status_hrd ? 'bg-emerald-500 text-white' : 'bg-gray-200 text-gray-400'"
-                                                                                    class="w-8 h-8 rounded-xl flex items-center justify-center transition-colors">
-                                                                                    <svg x-show="selected.status_hrd" class="w-5 h-5" fill="none"
-                                                                                        stroke="currentColor" viewBox="0 0 24 24">
-                                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                                                                                            d="M5 13l4 4L19 7" />
-                                                                                    </svg>
-                                                                                    <svg x-show="!selected.status_hrd" class="w-4 h-4" fill="none"
-                                                                                        stroke="currentColor" viewBox="0 0 24 24">
-                                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                                                                            d="M12 8v4l3 3" />
-                                                                                    </svg>
-                                                                                </div>
-                                                                                <div>
-                                                                                    <p
-                                                                                        class="text-[9px] font-black uppercase tracking-widest text-gray-400 leading-none mb-1">
-                                                                                        HRD Verify</p>
-                                                                                    <p class="text-[11px] font-bold"
-                                                                                        :class="selected.status_hrd ? 'text-emerald-700' : 'text-gray-400'"
-                                                                                        x-text="selected.status_hrd ? 'Verified' : 'Pending'"></p>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-
-                                                                    {{-- 3. Comments Box --}}
-                                                                    <div class="p-6 bg-blue-50/50 border border-blue-100/50 rounded-[2rem]">
-                                                                        <p class="text-[9px] font-black text-blue-400 uppercase tracking-widest mb-3">Catatan Penilai
-                                                                        </p>
-                                                                        <p class="text-[13px] text-blue-900 font-medium italic leading-relaxed"
-                                                                            x-text="selected.keterangan || 'Tidak ada catatan khusus untuk periode ini.'"></p>
-                                                                    </div>
-                                                                </div>
-
-
-                                                                <button @click="showModal = false"
-                                                                    class="w-full py-5 bg-white border-2 border-gray-100 text-gray-900 text-xs font-black uppercase tracking-[0.2em] rounded-[1.5rem] hover:bg-gray-50 hover:border-gray-200 transition-all">
-                                                                    Tutup Rincian
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        @empty
-                                            <div class="py-12 text-center">
-                                                <div
-                                                    class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                                                    <svg class="w-8 h-8 text-gray-200" fill="none"
-                                                        stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2" d="M5 13l4 4L19 7" />
-                                                    </svg>
-                                                </div>
-                                                <p class="text-sm font-bold text-gray-400 italic">Semua penilaian sudah
-                                                    diverifikasi.</p>
-                                            </div>
-                                        @endforelse
-                                    </div>
-                                </div>
-
-                                {{-- Footer --}}
-                                <div class="px-8 py-5 border-t border-gray-100 bg-gray-50/50 flex justify-end">
-                                    <button @click="showApprovalModal = false"
-                                        class="px-6 py-2.5 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-gray-900 transition-colors">
-                                        Tutup
-                                    </button>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
 
                 {{-- Important Alerts --}}
                 @php
-                    // Hitung total kategori yang memiliki peringatan untuk angka di Badge
-                    $totalPerhatian =
-                        ($urgentKontrak ? 1 : 0) + ($mitraMendekati > 0 ? 1 : 0) + ($absensiPendingCount > 0 ? 1 : 0);
+                    $totalPerhatian = ($urgentKontrak ? 1 : 0) + ($mitraMendekati > 0 ? 1 : 0) + ($absensiPendingCount > 0 ? 1 : 0);
                 @endphp
 
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="text-lg font-bold text-gray-900">Perlu Perhatian</h3>
-                        {{-- Badge Angka Dinamis --}}
-                        <span class="bg-red-100 text-red-800 text-xs font-bold px-2 py-0.5 rounded-full">
-                            {{ $totalPerhatian }}
-                        </span>
+                        <span class="bg-red-100 text-red-800 text-xs font-bold px-2 py-0.5 rounded-full">{{ $totalPerhatian }}</span>
                     </div>
 
                     <div class="space-y-3">
-                        {{-- Alert 1: Kontrak Pegawai (Hanya muncul jika ada data) --}}
                         @if ($urgentKontrak)
                             @php
                                 $target = \Carbon\Carbon::parse($urgentKontrak->tgl_akhir_pkwt)->startOfDay();
-                                $hariIni = \Carbon\Carbon::today();
-                                $sisaHari = $hariIni->diffInDays($target, false);
+                                $sisaHari = \Carbon\Carbon::today()->diffInDays($target, false);
                             @endphp
-
                             <div class="flex items-start gap-3 p-3 bg-red-50 rounded-lg border border-red-100">
                                 <div class="flex-shrink-0 mt-0.5 text-red-600">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
-                                        </path>
-                                    </svg>
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                                 </div>
                                 <div class="flex-1">
                                     <div class="flex items-center justify-between">
                                         <p class="text-sm font-bold text-red-900">Kontrak Berakhir</p>
-
-                                        {{-- DROPDOWN HOVER --}}
                                         @if ($totalKontrakMendekati > 1)
-                                            <div x-data="{ open: false }" class="relative" @mouseenter="open = true"
-                                                @mouseleave="open = false">
-                                                <span
-                                                    class="cursor-help px-1.5 py-0.5 bg-red-200 text-red-800 text-[10px] font-black rounded-md uppercase tracking-tighter transition-colors hover:bg-red-300">
-                                                    +{{ $totalKontrakMendekati - 1 }} Lainnya
-                                                </span>
-
-                                                {{-- Kotak Dropdown --}}
-                                                <div x-show="open" x-transition:enter="transition ease-out duration-200"
-                                                    x-transition:enter-start="opacity-0 translate-y-2"
-                                                    x-transition:enter-end="opacity-100 translate-y-0"
-                                                    x-transition:leave="transition ease-in duration-150"
-                                                    class="absolute right-0 mt-2 w-64 bg-white border border-red-100 shadow-xl rounded-2xl z-50 p-3"
-                                                    x-cloak>
-
-                                                    <p
-                                                        class="text-[9px] font-black text-red-400 uppercase tracking-widest mb-2 px-1">
-                                                        Daftar Pegawai</p>
-
+                                            <div x-data="{ open: false }" class="relative" @mouseenter="open = true" @mouseleave="open = false">
+                                                <span class="cursor-help px-1.5 py-0.5 bg-red-200 text-red-800 text-[10px] font-black rounded-md uppercase tracking-tighter transition-colors hover:bg-red-300">+{{ $totalKontrakMendekati - 1 }} Lainnya</span>
+                                                <div x-show="open" x-transition.opacity class="absolute right-0 mt-2 w-64 bg-white border border-red-100 shadow-xl rounded-2xl z-50 p-3" x-cloak>
+                                                    <p class="text-[9px] font-black text-red-400 uppercase tracking-widest mb-2 px-1">Daftar Pegawai</p>
                                                     <div class="space-y-1 max-h-48 overflow-y-auto custom-scrollbar">
                                                         @foreach ($othersKontrak as $other)
-                                                            @php
-                                                                $otherTarget = \Carbon\Carbon::parse(
-                                                                    $other->tgl_akhir_pkwt,
-                                                                )->startOfDay();
-                                                                $otherSisa = \Carbon\Carbon::today()->diffInDays(
-                                                                    $otherTarget,
-                                                                    false,
-                                                                );
-                                                            @endphp
-                                                            <div
-                                                                class="flex items-center justify-between p-2 rounded-xl hover:bg-red-50 transition-colors">
-                                                                <span
-                                                                    class="text-[11px] font-bold text-gray-700 truncate w-32">{{ $other->pekerja->nama }}</span>
-                                                                <span
-                                                                    class="text-[10px] font-black text-red-600 bg-red-100/50 px-2 py-0.5 rounded-lg">
-                                                                    {{ $otherSisa <= 0 ? 'Hari Ini' : $otherSisa . ' hari' }}
-                                                                </span>
+                                                            <div class="flex items-center justify-between p-2 rounded-xl hover:bg-red-50 transition-colors">
+                                                                <span class="text-[11px] font-bold text-gray-700 truncate w-32">{{ $other->pekerja->nama }}</span>
+                                                                <span class="text-[10px] font-black text-red-600 bg-red-100/50 px-2 py-0.5 rounded-lg">{{ \Carbon\Carbon::today()->diffInDays(\Carbon\Carbon::parse($other->tgl_akhir_pkwt), false) <= 0 ? 'Hari Ini' : \Carbon\Carbon::today()->diffInDays(\Carbon\Carbon::parse($other->tgl_akhir_pkwt), false) . ' hari' }}</span>
                                                             </div>
                                                         @endforeach
                                                     </div>
@@ -1047,77 +573,179 @@
                                             </div>
                                         @endif
                                     </div>
-
-                                    <p class="text-xs text-red-700 mt-1">
-                                        Kontrak <strong>{{ $urgentKontrak->pekerja->nama }}</strong> berakhir dalam
-                                        <strong>{{ $sisaHari <= 0 ? 'Hari Ini' : $sisaHari . ' hari' }}</strong>.
-                                    </p>
+                                    <p class="text-xs text-red-700 mt-1">Kontrak <strong>{{ $urgentKontrak->pekerja->nama }}</strong> berakhir dalam <strong>{{ $sisaHari <= 0 ? 'Hari Ini' : $sisaHari . ' hari' }}</strong>.</p>
                                 </div>
                             </div>
                         @endif
 
-                        {{-- Alert 2: Masa Mitra Kerja (Hanya muncul jika ada data) --}}
                         @if ($mitraMendekati > 0)
                             <div class="flex items-start gap-3 p-3 bg-orange-50 rounded-lg border border-orange-100">
-                                <div class="flex-shrink-0 mt-0.5 text-orange-600">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
-                                        </path>
-                                    </svg>
-                                </div>
-                                <div>
-                                    <p class="text-sm font-bold text-orange-900">Masa Mitra Kerja</p>
-                                    <p class="text-xs text-orange-700 mt-0.5">
-                                        Ada <strong>{{ $mitraMendekati }} Kontrak Mitra</strong> yang akan habis bulan
-                                        depan.
-                                    </p>
-                                </div>
+                                <div class="flex-shrink-0 mt-0.5 text-orange-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg></div>
+                                <div><p class="text-sm font-bold text-orange-900">Masa Mitra Kerja</p><p class="text-xs text-orange-700 mt-0.5">Ada <strong>{{ $mitraMendekati }} Kontrak Mitra</strong> yang akan habis bulan depan.</p></div>
                             </div>
                         @endif
 
-                        {{-- Alert 3: Approval Absensi (Hanya muncul jika ada data) --}}
                         @if ($absensiPendingCount > 0)
                             <div class="flex items-start gap-3 p-3 bg-yellow-50 rounded-lg border border-yellow-100">
-                                <div class="flex-shrink-0 mt-0.5 text-yellow-600">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                    </svg>
-                                </div>
-                                <div>
-                                    <p class="text-sm font-bold text-yellow-900">Menunggu Approval</p>
-                                    <p class="text-xs text-yellow-700 mt-0.5">
-                                        Ada <strong>{{ $absensiPendingCount }} data absensi</strong> menunggu verifikasi.
-                                    </p>
-                                </div>
+                                <div class="flex-shrink-0 mt-0.5 text-yellow-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>
+                                <div><p class="text-sm font-bold text-yellow-900">Menunggu Approval</p><p class="text-xs text-yellow-700 mt-0.5">Ada <strong>{{ $absensiPendingCount }} data absensi</strong> menunggu verifikasi.</p></div>
                             </div>
                         @endif
 
-                        {{-- Tampilan saat semuanya kosong --}}
                         @if ($totalPerhatian == 0)
                             <div class="flex flex-col items-center justify-center py-6">
-                                <div class="p-3 bg-green-50 rounded-full mb-3">
-                                    <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M5 13l4 4L19 7" />
-                                    </svg>
-                                </div>
-                                <p class="text-xs text-gray-400 font-medium italic text-center px-4">
-                                    Semua sistem berjalan normal. Tidak ada peringatan saat ini.
-                                </p>
+                                <div class="p-3 bg-green-50 rounded-full mb-3"><svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg></div>
+                                <p class="text-xs text-gray-400 font-medium italic text-center px-4">Semua sistem berjalan normal. Tidak ada peringatan saat ini.</p>
                             </div>
                         @endif
                     </div>
                 </div>
+            </div> {{-- End Sidebar --}}
+        </div> {{-- End Split View --}}
 
+    </div> {{-- End Container --}}
 
+    {{-- MODALS --}}
+
+    {{-- MODAL DETAIL EVALUASI --}}
+    <div x-show="showModal" class="fixed inset-0 z-[200] flex items-center justify-center p-4" x-cloak>
+        <div x-show="showModal" x-transition.opacity @click="showModal = false" class="absolute inset-0 bg-slate-900/80 backdrop-blur-md"></div>
+        <div x-show="showModal" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95 translate-y-8" class="relative w-full max-w-lg bg-white rounded-[3rem] shadow-2xl overflow-hidden border border-white">
+            <div class="p-10">
+                <div class="flex items-center justify-between mb-10">
+                    <div class="flex items-center gap-4">
+                        <div :class="'bg-' + getGrade(selected.total).color + '-600'" class="w-16 h-16 rounded-[1.5rem] flex items-center justify-center text-white shadow-xl transform -rotate-3">
+                            <span class="text-3xl font-black" x-text="getGrade(selected.total).label"></span>
+                        </div>
+                        <div>
+                            <h4 class="text-2xl font-black text-gray-900 tracking-tighter leading-none">Hasil Evaluasi</h4>
+                            <p class="text-xs font-bold text-gray-400 mt-2 uppercase tracking-[0.2em]" x-text="getGrade(selected.total).desc"></p>
+                        </div>
+                    </div>
+                    <button @click="showModal = false" class="p-3 bg-gray-50 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-5 gap-2 mb-10">
+                    <template x-for="field in [{key: 'mk', label: 'MK'}, {key: 'absensi', label: 'ABS'}, {key: 'pengetahuan', label: 'PNG'}, {key: 'kualitas', label: 'KLT'}, {key: 'sikap', label: 'SKP'}]">
+                        <div class="text-center p-3 bg-gray-50/50 rounded-2xl border border-gray-100">
+                            <p class="text-[8px] font-black text-gray-400 uppercase mb-1.5" x-text="field.label"></p>
+                            <p class="text-sm font-black text-gray-900" x-text="selected[field.key]"></p>
+                        </div>
+                    </template>
+                </div>
+
+                <div class="space-y-6 mb-10">
+                    <div class="relative overflow-hidden bg-gray-900 rounded-[2.5rem] p-8 text-white shadow-2xl">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16 blur-2xl"></div>
+                        <div class="relative flex items-center justify-between">
+                            <div>
+                                <p class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-1">Skor Akumulasi</p>
+                                <div class="flex items-baseline gap-2">
+                                    <span class="text-6xl font-black tracking-tighter" x-text="selected.total"></span>
+                                    <span class="text-xl font-bold text-gray-500">/ 56</span>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-2">Predikat</p>
+                                <div :class="'bg-' + getGrade(selected.total).color + '-500'" class="px-4 py-2 rounded-2xl inline-block shadow-lg shadow-black/20">
+                                    <span class="text-2xl font-black" x-text="getGrade(selected.total).label"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="p-4 rounded-[1.5rem] border border-gray-100 transition-all" :class="selected.status_staff ? 'bg-emerald-50/50 border-emerald-100' : 'bg-gray-50/50'">
+                            <div class="flex items-center gap-3">
+                                <div :class="selected.status_staff ? 'bg-emerald-500 text-white' : 'bg-gray-200 text-gray-400'" class="w-8 h-8 rounded-xl flex items-center justify-center transition-colors">
+                                    <svg x-show="selected.status_staff" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+                                    <svg x-show="!selected.status_staff" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3" /></svg>
+                                </div>
+                                <div>
+                                    <p class="text-[9px] font-black uppercase tracking-widest text-gray-400 leading-none mb-1">Staff Verify</p>
+                                    <p class="text-[11px] font-bold" :class="selected.status_staff ? 'text-emerald-700' : 'text-gray-400'" x-text="selected.status_staff ? 'Verified' : 'Pending'"></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-4 rounded-[1.5rem] border border-gray-100 transition-all" :class="selected.status_hrd ? 'bg-emerald-50/50 border-emerald-100' : 'bg-gray-50/50'">
+                            <div class="flex items-center gap-3">
+                                <div :class="selected.status_hrd ? 'bg-emerald-500 text-white' : 'bg-gray-200 text-gray-400'" class="w-8 h-8 rounded-xl flex items-center justify-center transition-colors">
+                                    <svg x-show="selected.status_hrd" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+                                    <svg x-show="!selected.status_hrd" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3" /></svg>
+                                </div>
+                                <div>
+                                    <p class="text-[9px] font-black uppercase tracking-widest text-gray-400 leading-none mb-1">HRD Verify</p>
+                                    <p class="text-[11px] font-bold" :class="selected.status_hrd ? 'text-emerald-700' : 'text-gray-400'" x-text="selected.status_hrd ? 'Verified' : 'Pending'"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-6 bg-blue-50/50 border border-blue-100/50 rounded-[2rem]">
+                        <p class="text-[9px] font-black text-blue-400 uppercase tracking-widest mb-3">Catatan Penilai</p>
+                        <p class="text-[13px] text-blue-900 font-medium italic leading-relaxed" x-text="selected.keterangan || 'Tidak ada catatan khusus untuk periode ini.'"></p>
+                    </div>
+                </div>
+
+                <button @click="showModal = false" class="w-full py-5 bg-white border-2 border-gray-100 text-gray-900 text-xs font-black uppercase tracking-[0.2em] rounded-[1.5rem] hover:bg-gray-50 hover:border-gray-200 transition-all">Tutup Rincian</button>
             </div>
-
         </div>
-
     </div>
+
+    {{-- MODAL APPROVAL PENILAIAN --}}
+    <div x-show="showApprovalModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6" x-cloak>
+        <div x-show="showApprovalModal" x-transition.opacity @click="showApprovalModal = false" class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
+        <div x-show="showApprovalModal" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95 translate-y-8" class="relative bg-white rounded-[2.5rem] shadow-2xl w-full max-w-2xl overflow-hidden border border-white flex flex-col max-h-[85vh]">
+            <div class="px-8 py-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+                <div>
+                    <h3 class="text-xl font-black text-gray-900 tracking-tight">Verifikasi Penilaian</h3>
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">Total: {{ $penilaianPending->count() }} Perlu Disetujui</p>
+                </div>
+                <button @click="showApprovalModal = false" class="p-2 text-gray-400 hover:text-red-500 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+            <div class="p-6 overflow-y-auto custom-scrollbar flex-1 bg-white">
+                <div class="space-y-4">
+                    @forelse($penilaianPending as $pending)
+                        <div class="group p-4 bg-gray-50 border border-gray-100 rounded-3xl flex items-center justify-between hover:bg-white hover:border-green-200 hover:shadow-xl hover:shadow-green-900/5 transition-all duration-300">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center border border-gray-100 group-hover:border-green-500 transition-colors">
+                                    <span class="text-xl font-black text-gray-900">{{ $pending->total }}</span>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-black text-gray-900 leading-tight">{{ $pending->pekerja->nama }}</p>
+                                    <div class="flex items-center gap-2 mt-1">
+                                        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">{{ $pending->unit->nama_unit ?? 'Unit N/A' }}</span>
+                                        <span class="text-gray-300">•</span>
+                                        <span class="text-[10px] font-black text-blue-600 uppercase">{{ \Carbon\Carbon::parse($pending->created_at)->translatedFormat('d M Y') }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button @click="openDetail({{ json_encode($pending) }})" class="px-5 py-2.5 bg-gray-50 text-gray-600 text-xs font-black uppercase tracking-widest rounded-xl hover:bg-gray-900 hover:text-white transition-all active:scale-95">View</button>
+                                <form action="{{ route('penilaian.verify.hrd', $pending->id) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="px-4 py-2 bg-green-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl shadow-lg shadow-green-200 hover:bg-green-700 transition-all active:scale-95">Verify</button>
+                                </form>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="py-12 text-center">
+                            <p class="text-sm font-bold text-gray-400 italic">Semua penilaian sudah diverifikasi.</p>
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+            <div class="px-8 py-5 border-t border-gray-100 bg-gray-50/50 flex justify-end">
+                <button @click="showApprovalModal = false" class="px-6 py-2.5 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-gray-900 transition-colors">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+</div>
 @endsection
 
 @section('scripts')
