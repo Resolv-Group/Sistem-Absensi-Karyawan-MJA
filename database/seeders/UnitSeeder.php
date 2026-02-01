@@ -113,11 +113,11 @@ class UnitSeeder extends Seeder
 
         for ($i = 1; $i <= 3; $i++) {
             Borongan::create([
-                'id_unit'        => 7,
+                'id_unit'        => 2,
                 'nama_item'      => 'Borongan ' . $kategoriList[$i - 1],
                 'kategori'       => rand(1, 3),
                 'satuan'         => rand(1, 5),
-                'Max Rej Subkon' => 1,
+                'max_rej_subkon' => 1,
                 'harga_unit'     => $faker->numberBetween(5000, 15000),
                 'harga_pekerja'  => $faker->numberBetween(3000, 10000),
                 'status_aktif'   => 1,
