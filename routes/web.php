@@ -121,10 +121,6 @@ Route::middleware(['auth', 'role:hrd,admin'])->group(function(){
 
     //Tambah Bidang Usaha Mitra Kerja
     Route::POST('/tambah-bidang-usaha', [BidangUsahaController::class, 'tambahBidangUsaha'])->name('tambah.bidang-usaha.post');
-    //Tambah Kategori Unit - Borongan
-    Route::POST('/tambah-kategori', [KategoriController::class, 'tambahKategori'])->name('tambah.kategori.post');
-    //Tambah Satuan Unit - Borongan
-    Route::POST('/tambah-satuan', [SatuanController::class, 'tambahSatuan'])->name('tambah.satuan.post');
 
     //Unit Spesifik untuk HRD
     Route::get('/unit', [UnitController::class, 'viewUnitMain'])->name('view.unit');
@@ -196,6 +192,12 @@ Route::middleware(['auth', 'role:hrd,pic,admin'])->group(function(){
     ->name('stream.mou');
     Route::get('/pkwt/{id}/stream/pkwt', [UnitController::class, 'showDokumenPKWT'])
     ->name('stream.pkwt');
+
+    //Tambah Kategori Unit - Borongan
+    Route::POST('/tambah-kategori', [KategoriController::class, 'tambahKategori'])->name('tambah.kategori.post');
+    //Tambah Satuan Unit - Borongan
+    Route::POST('/tambah-satuan', [SatuanController::class, 'tambahSatuan'])->name('tambah.satuan.post');
+
 });
 
 
