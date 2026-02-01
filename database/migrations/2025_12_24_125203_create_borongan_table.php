@@ -21,6 +21,7 @@ return new class extends Migration
             $table->integer('kategori');
             $table->char('nama_item');
             $table->integer('satuan');
+            $table->integer('Max Rej Subkon');
 
             $table->boolean('status_aktif')->default(true);
 

@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
         $this->call(JabatanPKWTSeeder::class);
         $this->call(KategoriSeeder::class);
         $this->call(ShiftSeeder::class);
+        $this->call(SatuanSeeder::class);
         // $this->call(PenilaianSeeder::class);
     }
 }
