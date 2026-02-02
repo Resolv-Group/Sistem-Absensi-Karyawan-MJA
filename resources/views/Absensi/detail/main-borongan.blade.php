@@ -1029,6 +1029,7 @@
                                                                                     class="bg-red-50 border-transparent rounded-xl px-3 py-2 text-xs font-black text-red-700 outline-none transition-all"
                                                                                     placeholder="0"
                                                                                 >
+                                                                                
                                                                                 {{-- Info tambahan untuk user --}}
                                                                                 <span class="text-[10px] text-slate-400 mt-1 italic" x-show="row.rej_mc_dibebankan > 0">
                                                                                     *Melebihi batas toleransi <span x-text="row.act_rej_max"></span> Pcs
@@ -1071,15 +1072,15 @@
                                                                                         </svg>
                                                                                     </div>
                                                                                     <div>
-                                                                                        <p class="text-[10px] font-black text-emerald-500 uppercase tracking-widest leading-none">Total Bayar</p>
-                                                                                        <p class="text-[11px] font-bold text-slate-400 mt-1">Estimasi Pendapatan</p>
+                                                                                        <p class="text-[10px] font-black text-emerald-500 uppercase tracking-widest leading-none">Yang Dibayar</p>
+                                                                                        <p class="text-[11px] font-bold text-slate-400 mt-1">Barang Disetujui</p>
                                                                                     </div>
                                                                                 </div>
                                                                                 <div class="flex items-baseline gap-1">
-                                                                                    <span class="text-[10px] font-black text-emerald-500 uppercase">Rp</span>
                                                                                     <span class="text-2xl font-black text-emerald-600 tracking-tighter" 
                                                                                         x-text="(row.good_mc + row.FD - row.rej_mc_dibebankan)  || 0">
                                                                                     </span>
+                                                                                    <span class="text-[10px] font-black text-emerald-500 uppercase">Pcs</span>
                                                                                 </div>
                                                                             </div>
                                                                         </div>

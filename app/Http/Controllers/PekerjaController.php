@@ -147,7 +147,8 @@ class PekerjaController extends Controller
         }
 
         // 3. Ambil PKWT yang paling terbaru (Aktif)
-        $currentPkwt = PKWT::where('id_pekerja', $id)
+        $currentPkwt = PKWT::with('unit')
+                            ->where('id_pekerja', $id)
                             ->latest('tgl_mulai_pkwt')
                             ->first();
 

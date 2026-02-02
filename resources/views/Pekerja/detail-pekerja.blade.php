@@ -118,7 +118,7 @@
                             <div class="flex justify-between items-center">
                                 <span class="text-sm text-gray-500 font-medium">Unit Kerja</span>
                                 <span
-                                    class="text-sm font-bold text-gray-900">{{ '-' }}</span>
+                                    class="text-sm font-bold text-gray-900">{{ $currentPkwt->unit->nama_unit }}</span>
                             </div>
                             <div class="flex justify-between items-center">
                                 <span class="text-sm text-gray-500 font-medium">Tanggal Bergabung</span>
