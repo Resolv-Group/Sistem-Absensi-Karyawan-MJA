@@ -106,20 +106,35 @@
             const row = this.rowItems[workerId][rIdx];
             const item = this.barangLookup[row.id_barang];
 
+            if (item && (row.max_rej_subkon === undefined || row.max_rej_subkon === null)) {
+                row.max_rej_subkon = item.max_rej_subkon;
+            }
+
             // 1. Calculate the current Total QTY
             const totalQTY = (parseInt(row.FD) || 0) +
                 (parseInt(row.act_rej) || 0) +
                 (parseInt(row.good_mc) || 0);
-
-            // 2. Update the row object so the UI knows the total
             row.totalQTY = totalQTY;
+
+            // 2. Hitung Max Reject yang Diizinkan (F9 di rumus Anda)
+            row.act_rej_max = Math.round((row.max_rej_subkon / 100) * totalQTY);
+
+            // 3. Hitung Rej. MC Dibebankan (Rumus: =IF(F9>=G9;0;G9-F9))
+            // F9 = row.act_rej_max | G9 = row.act_rej
+            if (row.act_rej_max >= row.act_rej) {
+                row.rej_mc_dibebankan = 0;
+            } else {
+                row.rej_mc_dibebankan = row.act_rej - row.act_rej_max;
+            }
+
+            const totalBayar = row.FD + row.good_mc - row.rej_mc_dibebankan;
 
             if (item && totalQTY > 0) {
                 // rumus: totalQTY * harga_unit
-                row.bayaranPerusahaan = totalQTY * item.harga_unit;
+                row.bayaranPerusahaan = totalBayar * item.harga_unit;
 
                 // rumus: totalQTY * harga_pekerja
-                row.bayaranItem = totalQTY * item.harga_pekerja;
+                row.bayaranItem = totalBayar * item.harga_pekerja;
             } else {
                 // Reset to 0 if no item selected or QTY is 0
                 row.bayaranPerusahaan = 0;
@@ -160,6 +175,8 @@
                 good_mc: 0,
                 act_rej: 0,
                 rej_mc: 0,
+                max_rej_subkon: 0,
+                rej_mc_dibebankan: 0,
                 bayaranPerusahaan: 0,
                 bayaranItem: 0,
                 totalQTY: 0,
@@ -882,8 +899,18 @@
                                                                                                     row.id_barang = item.id;
                                                                                                     row.bayaranPerusahaan = item.harga_unit; {{-- Direct mapping --}}
                                                                                                     row.bayaranItem = item.harga_pekerja;   {{-- Direct mapping --}}
+                                                                                                    row.max_rej_subkon = item.max_rej_subkon; {{-- Direct mapping --}}
+
+                                                                                                    row.FD = 0;
+                                                                                                    row.act_rej = 0;
+                                                                                                    row.good_mc = 0;
+                                                                                                    row.rej_mc_dibebankan = 0;
+                                                                                                    row.totalQTY = 0;
+
                                                                                                     open = false;
                                                                                                     search = ''
+
+                                                                                                    updatePrices(workerId, rIdx);
                                                                                                 "
                                                                                                 class="w-full text-left px-4 py-3 text-xs font-semibold transition-colors flex items-center justify-between group"
                                                                                                 :class="row.id_barang == item
@@ -923,85 +950,149 @@
                                                                     </div>
 
                                                                     {{-- Grid Input: 4 Kolom untuk field produksi --}}
-                                                                    <div class="grid grid-cols-3 gap-3">
-                                                                        <div class="flex flex-col gap-1.5">
-                                                                            <label
-                                                                                class="text-[12px] font-black text-slate-400 uppercase tracking-widest">FD</label>
-                                                                            <input type="number"
-                                                                                :name="'data[' + workerId + '][' + rIdx +
-                                                                                    '][FD]'"
-                                                                                x-model.number="row.FD"
-                                                                                @input="updatePrices(workerId, rIdx)"
-                                                                                class="bg-slate-50 border-transparent rounded-xl px-3 py-2 text-xs font-bold focus:bg-white focus:ring-2 focus:ring-orange-100 outline-none transition-all">
+                                                                    <div class="space-y-4">
+                                                                        <!-- Baris Pertama: 3 Kolom -->
+                                                                        <div class="grid grid-cols-3 gap-3">
+                                                                            <!-- FD -->
+                                                                            <div class="flex flex-col gap-1.5">
+                                                                                <label class="text-[12px] font-black text-slate-400 uppercase tracking-widest">FD</label>
+                                                                                <input type="number" min="0"
+                                                                                    :name="'data[' + workerId + '][' + rIdx + '][FD]'"
+                                                                                    :disabled="!row.id_barang"
+                                                                                    x-model.number="row.FD"
+                                                                                    @input="updatePrices(workerId, rIdx)"
+                                                                                    class="bg-slate-50 border-transparent rounded-xl px-3 py-2 text-xs font-bold focus:bg-white focus:ring-2 focus:ring-slate-200 outline-none transition-all">
+                                                                            </div>
+
+                                                                            <!-- Good MC -->
+                                                                            <div class="flex flex-col gap-1.5">
+                                                                                <label class="text-[12px] font-black text-emerald-500 uppercase tracking-widest">Good MC</label>
+                                                                                <input type="number" min="0"
+                                                                                    :name="'data[' + workerId + '][' + rIdx + '][good_mc]'"
+                                                                                    :disabled="!row.id_barang"
+                                                                                    x-model.number="row.good_mc"
+                                                                                    @input="updatePrices(workerId, rIdx)"
+                                                                                    class="bg-slate-50 border-transparent rounded-xl px-3 py-2 text-xs font-bold focus:bg-white focus:ring-2 focus:ring-emerald-200 outline-none transition-all">
+                                                                            </div>
+
+                                                                            
+                                                                            <!-- Act/Rej -->
+                                                                            <div class="flex flex-col gap-1.5">
+                                                                                <label class="text-[12px] font-black text-slate-400 uppercase tracking-widest">Act/Rej</label>
+                                                                                <input type="number" min="0"
+                                                                                    :name="'data[' + workerId + '][' + rIdx + '][act_rej]'"
+                                                                                    :disabled="!row.id_barang"
+                                                                                    x-model.number="row.act_rej"
+                                                                                    @input="updatePrices(workerId, rIdx)"
+                                                                                    class="bg-slate-50 border-transparent rounded-xl px-3 py-2 text-xs font-bold focus:bg-white focus:ring-2 focus:ring-slate-200 outline-none transition-all">
+                                                                            </div>
                                                                         </div>
 
-                                                                        {{-- MODULAR: Act Rej Max --}}
-                                                                        <div class="flex flex-col gap-1.5">
-                                                                            <label
-                                                                                class="text-[12px] font-black text-slate-400 uppercase tracking-widest">Act/Rej</label>
-                                                                            <input type="number"
-                                                                                :name="'data[' + workerId + '][' + rIdx +
-                                                                                    '][act_rej]'"
-                                                                                x-model.number="row.act_rej"
-                                                                                @input="updatePrices(workerId, rIdx)"
-                                                                                class="bg-slate-50 border-transparent rounded-xl px-3 py-2 text-xs font-bold focus:bg-white focus:ring-2 focus:ring-orange-100 outline-none transition-all">
-                                                                        </div>
+                                                                        <!-- Baris Kedua: 2 Kolom (Dibuat Setara/Simetris) -->
+                                                                        <div class="grid grid-cols-2 gap-3">
+                                                                            <!-- Max Rej. Subkon -->
+                                                                            <div class="flex flex-col gap-1.5">
+                                                                                <label class="text-[12px] font-black text-gray-500 uppercase tracking-widest">
+                                                                                    Max Rej. Subkon ( <span x-text="row.max_rej_subkon"></span>% )
+                                                                                </label>
+                                                                                
+                                                                                <div class="relative flex items-center">
+                                                                                    {{-- Input ini akan otomatis menampilkan hasil Math.round dari updatePrices --}}
+                                                                                    <input 
+                                                                                        type="number" 
+                                                                                        @input="updatePrices(workerId, rIdx)"
+                                                                                        readonly
+                                                                                        :name="'data[' + workerId + '][' + rIdx + '][act_rej_max]'"
+                                                                                        x-model.number="row.act_rej_max"
+                                                                                        :value="row.act_rej_max"
+                                                                                        class="w-full bg-slate-100 border-transparent rounded-xl px-3 py-2 text-xs font-black text-slate-700 outline-none transition-all"
+                                                                                        placeholder="0"
+                                                                                    >
+                                                                                    <span class="absolute right-3 text-[10px] font-black text-slate-400 uppercase">Pcs</span>
+                                                                                </div>
+                                                                            </div>
 
-                                                                        {{-- MODULAR: Good MC --}}
-                                                                        <div class="flex flex-col gap-1.5">
-                                                                            <label
-                                                                                class="text-[12px] font-black text-emerald-500 uppercase tracking-widest">Good
-                                                                                MC</label>
-                                                                            <input type="number"
-                                                                                :name="'data[' + workerId + '][' + rIdx +
-                                                                                    '][good_mc]'"
-                                                                                x-model.number="row.good_mc"
-                                                                                @input="updatePrices(workerId, rIdx)"
-                                                                                class="bg-slate-50 border-transparent rounded-xl px-3 py-2 text-xs font-bold focus:bg-white focus:ring-2 focus:ring-emerald-50 outline-none transition-all">
+
+                                                                            <!-- Rej. MC Dibebankan -->
+                                                                            <div class="flex flex-col gap-1.5">
+                                                                                <label class="text-[12px] font-black text-red-500 uppercase tracking-widest">
+                                                                                    Rej. MC Dibebankan
+                                                                                </label>
+                                                                                <input 
+                                                                                    type="number" 
+                                                                                    @input="updatePrices(workerId, rIdx)"
+                                                                                    readonly
+                                                                                    {{-- Pastikan name sesuai dengan field di database, misal: rej_mc_dibebankan --}}
+                                                                                    :name="'data[' + workerId + '][' + rIdx + '][rej_mc_dibebankan]'"
+                                                                                    {{-- Hubungkan ke variabel hasil kalkulasi --}}
+                                                                                    x-model.number="row.rej_mc_dibebankan"
+                                                                                    class="bg-red-50 border-transparent rounded-xl px-3 py-2 text-xs font-black text-red-700 outline-none transition-all"
+                                                                                    placeholder="0"
+                                                                                >
+                                                                                {{-- Info tambahan untuk user --}}
+                                                                                <span class="text-[10px] text-slate-400 mt-1 italic" x-show="row.rej_mc_dibebankan > 0">
+                                                                                    *Melebihi batas toleransi <span x-text="row.act_rej_max"></span> Pcs
+                                                                                </span>
+                                                                            </div>
                                                                         </div>
                                                                     </div>
 
                                                                     {{-- 2. TOTAL QUANTITY DISPLAY (Matches the UI Vibe) --}}
-                                                                    <div
-                                                                        class="mt-4 p-4 rounded-2xl border-2 border-dashed border-orange-100 bg-orange-50/30 flex items-center justify-between">
-                                                                        <div class="flex items-center gap-3">
-                                                                            <div class="p-2 bg-orange-100 rounded-lg">
-                                                                                <svg class="w-4 h-4 text-orange-600"
-                                                                                    fill="none" viewBox="0 0 24 24"
-                                                                                    stroke="currentColor">
-                                                                                    <path stroke-linecap="round"
-                                                                                        stroke-linejoin="round"
-                                                                                        stroke-width="2.5"
-                                                                                        d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                                                                                </svg>
+                                                                    <div class="mt-4 p-4 rounded-2xl border-2 border-dashed border-slate-100 bg-slate-50/30">
+                                                                        <div class="grid grid-cols-2 gap-4 divide-x divide-slate-200">
+                                                                            
+                                                                            {{-- Sisi Kiri: Total Produksi --}}
+                                                                            <div class="flex items-center justify-between pr-4">
+                                                                                <div class="flex items-center gap-3">
+                                                                                    <div class="p-2 bg-orange-100 rounded-lg">
+                                                                                        <svg class="w-4 h-4 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                                                                        </svg>
+                                                                                    </div>
+                                                                                    <div>
+                                                                                        <p class="text-[10px] font-black text-orange-400 uppercase tracking-widest leading-none">Total Produksi</p>
+                                                                                        <p class="text-[11px] font-bold text-slate-400 mt-1">QTY Akumulasi</p>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="flex items-baseline gap-1">
+                                                                                    <span class="text-2xl font-black text-slate-700 tracking-tighter" 
+                                                                                        x-text="(parseInt(row.FD) || 0) + (parseInt(row.act_rej) || 0) + (parseInt(row.good_mc) || 0)">
+                                                                                    </span>
+                                                                                    <span class="text-[10px] font-black text-slate-400 uppercase">Pcs</span>
+                                                                                </div>
                                                                             </div>
-                                                                            <div>
-                                                                                <p
-                                                                                    class="text-[10px] font-black text-orange-400 uppercase tracking-widest leading-none">
-                                                                                    Total Produksi</p>
-                                                                                <p
-                                                                                    class="text-[11px] font-bold text-slate-500 mt-1">
-                                                                                    Akumulasi QTY Terinput</p>
+
+                                                                            {{-- Sisi Kanan: Total yang Dibayar --}}
+                                                                            <div class="flex items-center justify-between pl-4">
+                                                                                <div class="flex items-center gap-3">
+                                                                                    <div class="p-2 bg-emerald-100 rounded-lg">
+                                                                                        <svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                                        </svg>
+                                                                                    </div>
+                                                                                    <div>
+                                                                                        <p class="text-[10px] font-black text-emerald-500 uppercase tracking-widest leading-none">Total Bayar</p>
+                                                                                        <p class="text-[11px] font-bold text-slate-400 mt-1">Estimasi Pendapatan</p>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="flex items-baseline gap-1">
+                                                                                    <span class="text-[10px] font-black text-emerald-500 uppercase">Rp</span>
+                                                                                    <span class="text-2xl font-black text-emerald-600 tracking-tighter" 
+                                                                                        x-text="(row.good_mc + row.FD - row.rej_mc_dibebankan)  || 0">
+                                                                                    </span>
+                                                                                </div>
                                                                             </div>
                                                                         </div>
 
-                                                                        <div class="flex items-baseline gap-1">
-                                                                            <span
-                                                                                class="text-3xl font-black text-orange-600 tracking-tighter"
-                                                                                x-text="(parseInt(row.FD) || 0) + (parseInt(row.act_rej) || 0) + (parseInt(row.good_mc) || 0)">
-                                                                            </span>
-                                                                            <span
-                                                                                class="text-[10px] font-black text-orange-400 uppercase">Pcs</span>
-                                                                        </div>
-
-                                                                        {{-- Hidden input for form submission --}}
-                                                                        <input type="hidden"
-                                                                            :name="'data[' + workerId + '][' + rIdx +
-                                                                                '][totalQTY]'"
-                                                                            :value="(parseInt(row.FD) || 0) + (parseInt(row
-                                                                                .act_rej) || 0) + (parseInt(row
-                                                                                .good_mc) || 0)">
+                                                                        {{-- Hidden inputs for form submission --}}
+                                                                        <input type="hidden" :name="'data[' + workerId + '][' + rIdx + '][totalQTY]'" 
+                                                                            :value="(parseInt(row.FD) || 0) + (parseInt(row.act_rej) || 0) + (parseInt(row.good_mc) || 0)">
+                                                                        
+                                                                        <input type="hidden" :name="'data[' + workerId + '][' + rIdx + '][totalBayar]'" 
+                                                                            :value="((parseInt(row.good_mc) || 0) + (parseInt(row.FD) || 0) - (parseInt(row.rej_mc_dibebankan) || 0))">
                                                                     </div>
+
+                                                                    
 
                                                                     {{-- Baris Bawah: 3 Kolom (Reject MC & Hasil Akhir) --}}
                                                                     <div class="grid grid-cols-2 gap-3 mt-4">
@@ -1305,17 +1396,6 @@
                                                                 </div>
                                                             </div>
                                                         </td>
-
-                                                        {{-- Ganti bagian input catatan dengan ini --}}
-                                                        {{-- <td
-                                                            class="py-4 pr-6 bg-gray-50/50 rounded-r-2xl border-y border-r border-gray-100">
-                                                            <div class="flex items-center h-full">
-                                                                <input type="text" :name="'data[' + id + '][catatan]'"
-                                                                    x-model="rowCatatan[id]"
-                                                                    placeholder="Tambahkan alasan..."
-                                                                    class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-700 focus:ring-4 focus:ring-orange-100 focus:border-orange-500 transition-all placeholder:text-gray-300 shadow-sm border-none outline-none">
-                                                            </div>
-                                                        </td> --}}
                                                     </tr>
                                                 </template>
                                             </tbody>

@@ -21,6 +21,8 @@ return new class extends Migration
             $table->integer('FD');
             $table->integer('act_rej');
             $table->integer('good_mc');
+            $table->integer('max_rej_subkon');
+            $table->integer('rej_mc_beban');
 
             $table->integer('bayaranPerusahaan');
             $table->integer('bayaranItem');
