@@ -112,7 +112,7 @@
             <td align="center">{{ $row->rej_mc }}</td>
 
             <td align="center">{{ $row->good_mc }}</td>
-            <td align="center">{{ $row->total_display }}</td>
+            <td align="center">{{ $row->total_dibayar_pcs }}</td>
             <td align="center">{{ number_format($row->total_dibayar_pcs) }}</td>
             <td align="center">{{ number_format($row->unit_price) }}</td>
             <td align="right">{{ number_format($row->total_bayar) }}</td>
@@ -142,7 +142,7 @@
 
     <tr style="font-weight:bold;">
         <td colspan="5" align="center"><b>POT. BPJS KESEHATAN</b></td>
-        <td colspan="10" align="right"><b>{{ number_format($pot_lain) }}</b></td>
+        <td colspan="10" align="right"><b>{{ number_format($pot_kesehatan) }}</b></td>
     </tr>
 
     <tr style="font-weight:bold;">
@@ -152,12 +152,12 @@
 
     <tr style="font-weight:bold;">
         <td colspan="5" align="center"><b>TOTAL POT.(2)</b></td>
-        <td colspan="10" align="right"><b>{{ number_format($pot_lain) }}</b></td>
+        <td colspan="10" align="right"><b>{{ number_format($pot_lain + $pot_bpjs + $pot_kesehatan) }}</b></td>
     </tr>
 
         <tr style="font-weight:bold;">
         <td colspan="5" align="center"><b>TUNJANGAN(3)</b></td>
-        <td colspan="10" align="right"><b>{{ number_format($pot_lain) }}</b></td>
+        <td colspan="10" align="right"><b>{{ number_format($tunjangan) }}</b></td>
     </tr>
 
     <tr style="font-weight:bold;">

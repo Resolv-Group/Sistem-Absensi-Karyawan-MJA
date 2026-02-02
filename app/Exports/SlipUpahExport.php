@@ -4,11 +4,12 @@ namespace App\Exports;
 
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class SlipUpahExport implements FromView, WithColumnWidths
+class SlipUpahExport implements FromView, WithColumnWidths, WithColumnFormatting
 {
     public function __construct(
         public $data,
@@ -43,4 +44,12 @@ class SlipUpahExport implements FromView, WithColumnWidths
             'H' => 28,
         ];
     }
+
+    public function columnFormats(): array
+{
+    return [
+        // Kolom G atau H (sesuaikan posisi upah) diatur format ribuan
+        'G' => '#,##0', 
+    ];
+}
 }
