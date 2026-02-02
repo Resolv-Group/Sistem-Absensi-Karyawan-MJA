@@ -105,7 +105,7 @@ class BoronganController extends Controller
                     'borongan.*.nama_item' => 'required|string',
 
                     'borongan.*.satuan' => 'required|integer',
-                    'borongan.*.max_reject' => 'required|integer'
+                    'borongan.*.max_reject' => 'required|numeric|min:0'
                 ],
                 [
                     'id_unit.required' => 'ID Unit wajib diisi',

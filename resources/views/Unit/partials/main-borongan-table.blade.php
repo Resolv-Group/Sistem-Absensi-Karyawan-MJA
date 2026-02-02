@@ -20,7 +20,7 @@
 
     <td class="px-4 py-5 text-center">
         <span class="font-mono text-sm font-bold text-gray-900 tracking-tight">
-            {{ $b->max_rej_subkon }}
+            {{ $b->max_rej_subkon }}%
         </span>
     </td>
 

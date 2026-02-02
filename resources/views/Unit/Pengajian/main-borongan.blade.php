@@ -346,7 +346,7 @@
                                     Kategori</th>
                                 <th
                                     class="px-4 py-4 text-[11px] font-black text-gray-400 uppercase tracking-widest text-center">
-                                    Max Rej Subkon</th>
+                                    Max Rej Subkon(%)</th>
                                 <th
                                     class="px-4 py-4 text-[11px] font-black text-gray-400 uppercase tracking-widest text-right">
                                     Harga Client</th>
