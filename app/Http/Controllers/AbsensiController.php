@@ -153,6 +153,7 @@ class AbsensiController extends Controller
 
     function ViewBorongan(Request $request, $id_unit, $date)
     {
+        
         $unit = Unit::with(['namaMitra'])->findOrFail($id_unit);
 
         // 1. Sync Attendance Records (Tetap pertahankan ini agar record absensi utama tercipta)
@@ -160,6 +161,8 @@ class AbsensiController extends Controller
 
         $barangs = Borongan::where('id_unit', $id_unit)->orderBy('nama_item', 'asc')->get();
         $barangLookup = $barangs->keyBy('id');
+
+        // dd($barangs);
 
         // 2. Query Utama: Ambil PKWT + Pekerja + Absensi (pada tgl tsb) + detilBorongan
 
@@ -404,7 +407,6 @@ class AbsensiController extends Controller
 
     public function bulkAbsensiBoronganUpdate(Request $request)
     {
-        // dd($request->all());
         $validator = Validator::make(
             $request->all(),
             [
@@ -469,6 +471,12 @@ class AbsensiController extends Controller
                     if (!isset($row['bayaranItem'])) {
                         $missing['bayaranItem'] = 'bayaran item';
                     }
+                    if (!isset($row['act_rej_max'])) {
+                        $missing['act_rej_max'] = 'act rej max';
+                    }
+                    if (!isset($row['rej_mc_dibebankan'])) {
+                        $missing['rej_mc_dibebankan'] = 'rej mc dibebankan';
+                    }
                 }
 
                 if (!empty($missing)) {
@@ -529,6 +537,8 @@ class AbsensiController extends Controller
                         'FD' => 0,
                         'act_rej' => 0,
                         'good_mc' => 0,
+                        'max_rej_subkon' => 0,
+                        'rej_mc_beban' => 0,
                         'bayaranPerusahaan' => 0,
                         'bayaranItem' => 0,
                         'catatan' => $payload['catatan'] ?? null,
@@ -551,6 +561,8 @@ class AbsensiController extends Controller
                             'FD' => $row['FD'] ?? 0,
                             'act_rej' => $row['act_rej'] ?? 0,
                             'good_mc' => $row['good_mc'] ?? 0,
+                            'max_rej_subkon' => $row['act_rej_max'] ?? 0,
+                            'rej_mc_beban' => $row['rej_mc_dibebankan'] ?? 0,
                             'bayaranPerusahaan' => $row['bayaranPerusahaan'] ?? 0,
                             'bayaranItem' => $row['bayaranItem'] ?? 0,
                             'buktiSuratJalan' => $fileContent,

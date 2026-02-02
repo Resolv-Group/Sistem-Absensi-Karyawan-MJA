@@ -15,6 +15,8 @@ class Detil_Borongan extends Model
         'FD',
         'act_rej',
         'good_mc',
+        'max_rej_subkon',
+        'rej_mc_beban',
         'bayaranPerusahaan',
         'bayaranItem',
         'buktiSuratJalan',
