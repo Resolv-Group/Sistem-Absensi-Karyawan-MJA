@@ -15,7 +15,7 @@ class ShiftSeeder extends Seeder
     {
         DB::table('shift_absen')->insert([
             [
-                'id_unit'      => 6,
+                'id_unit'      => 1,
                 'nama'         => 'pagi',
                 'waktu_masuk'  => '07:00:00',
                 'waktu_keluar' => '15:00:00',
@@ -23,7 +23,7 @@ class ShiftSeeder extends Seeder
                 'updated_at'   => now(),
             ],
             [
-                'id_unit'      => 6,
+                'id_unit'      => 1,
                 'nama'         => 'siang',
                 'waktu_masuk'  => '15:00:00',
                 'waktu_keluar' => '23:00:00',
@@ -31,7 +31,7 @@ class ShiftSeeder extends Seeder
                 'updated_at'   => now(),
             ],
             [
-                'id_unit'      => 6,
+                'id_unit'      => 1,
                 'nama'         => 'malam',
                 'waktu_masuk'  => '23:00:00',
                 'waktu_keluar' => '07:00:00',
@@ -41,7 +41,7 @@ class ShiftSeeder extends Seeder
         ]);
         DB::table('shift_absen')->insert([
             [
-                'id_unit'      => 7,
+                'id_unit'      => 2,
                 'nama'         => 'pagi',
                 'waktu_masuk'  => '07:00:00',
                 'waktu_keluar' => '15:00:00',
@@ -49,7 +49,7 @@ class ShiftSeeder extends Seeder
                 'updated_at'   => now(),
             ],
             [
-                'id_unit'      => 7,
+                'id_unit'      => 2,
                 'nama'         => 'siang',
                 'waktu_masuk'  => '15:00:00',
                 'waktu_keluar' => '23:00:00',
@@ -57,7 +57,7 @@ class ShiftSeeder extends Seeder
                 'updated_at'   => now(),
             ],
             [
-                'id_unit'      => 7,
+                'id_unit'      => 2,
                 'nama'         => 'malam',
                 'waktu_masuk'  => '23:00:00',
                 'waktu_keluar' => '07:00:00',

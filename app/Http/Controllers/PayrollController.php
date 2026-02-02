@@ -198,6 +198,7 @@ class PayrollController extends Controller
     function ExportDetailBorongan(Request $request)
     {
         // dd($request->all());
+        $exclusionDates = $request->input('exclusion_date', []);
         $tanggal_awal  = Carbon::parse($request->tgl_awal);
         $tanggal_akhir = Carbon::parse($request->tgl_akhir);
 
@@ -206,6 +207,7 @@ class PayrollController extends Controller
         ])
         ->whereBetween('tgl_absensi', [$tanggal_awal, $tanggal_akhir])
         ->where('id_pekerja', $request->id_pekerja)
+        ->whereNotIn('tgl_absensi', $exclusionDates) 
         ->get();
 
         $periode = strtoupper(
@@ -247,13 +249,12 @@ class PayrollController extends Controller
                 $qty = $fd + $actRej + $goodMc;
 
                 // max reject subkon = qty * 1%
-                $maxRejectSubkon = (int) ceil($qty * 0.01);
 
-                // rej mc dibebankan = 0
-                $rejMc = 0;
+                $maxRejectSubkon = $detil->max_rej_subkon;
+                $rejMc = $detil->rej_mc_beban;
 
                 // total dibayar (rumus)
-                $totalDibayarRumus = $fd + $rejMc + $goodMc;
+                $totalDibayarRumus = $fd - $rejMc + $goodMc;
 
                 // total dibayar (pcs) → dibulatkan
                 $totalDibayarPcs = round($totalDibayarRumus);
@@ -286,6 +287,8 @@ class PayrollController extends Controller
                 ]);
             }
         }
+
+        // dd($data);
 
         $take_home_pay = $take_home_pay - $PKWT->bpjs_naker - $PKWT->bpjs_kesehatan - $request->potongan + $request->tunjangan;
 
@@ -343,6 +346,8 @@ class PayrollController extends Controller
             $activePkwt = ($pkwt instanceof \Illuminate\Support\Collection) ? $pkwt->first() : $pkwt;
 
             $upah_mentah = (float) ($item['upah'] ?? 0);
+            $clean_upah = str_replace('.', '', $upah_mentah);
+            $clean_upah = str_replace(',', '.', $clean_upah);
 
             return [
                 'no'                => $key + 1,
@@ -354,7 +359,7 @@ class PayrollController extends Controller
                 // Simpan versi angka murni untuk dihitung TOTAL
                 'upah_murni'        => $upah_mentah,
                 // Simpan versi format untuk TAMPILAN
-                'upah_tenaga_kerja' => number_format($upah_mentah, 0, ',', '.'),
+                'upah_tenaga_kerja' => number_format((float)$clean_upah, 0, ',', '.'),
             ];
         });
 

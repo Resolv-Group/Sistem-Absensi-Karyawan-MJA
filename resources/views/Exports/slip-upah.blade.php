@@ -58,7 +58,7 @@
             
             {{-- Upah --}}
             <td align="right" valign="middle" style="border:1px solid #000; font-family:'Times New Roman'; font-size:12px; padding-right: 5px;">
-                {{ $row['upah_tenaga_kerja'] }}
+                {{ str_replace('.', '', $row['upah_tenaga_kerja']) }}
             </td>
 
             {{-- Kolom Tanda Tangan Zig-Zag --}}
