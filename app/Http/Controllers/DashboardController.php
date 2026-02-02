@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Absensi;
+use App\Models\Detil_Borongan;
 use App\Models\Detil_Harian;
 use App\Models\MitraKerja;
 use App\Models\Pekerja;
@@ -70,13 +71,37 @@ class DashboardController extends Controller
                 ->limit(5)
                 ->get();
 
+            $boronganTerbaru = Detil_Borongan::with(['absensi.pekerja'])
+                ->whereHas('absensi', function($q) use ($today) {
+                    $q->whereDate('tgl_absensi', $today);
+                })
+                ->where('status_kehadiran', 1) // Ambil status Hadir (1) dan Cuti (2)
+                ->orderBy('updated_at', 'desc') // Menggunakan updated_at agar data terbaru (termasuk input cuti) muncul di atas
+                ->limit(5)
+                ->get();
+            // dd($boronganTerbaru);
+
             $today = now()->startOfDay();
             $thirtyDaysLater = now()->addDays(30)->endOfDay();
 
-            $urgentKontrak = PKWT::with('pekerja')
+            $urgentKontrak = PKWT::with('pekerja', 'unit')
                 ->whereBetween('tgl_akhir_pkwt', [$today, $thirtyDaysLater])
                 ->orderBy('tgl_akhir_pkwt', 'asc')
                 ->first();
+
+                $mitraMendekatiList = MitraKerja::where('status_aktif', 1)
+    ->whereNotNull('tgl_akhir_mou')
+    ->whereBetween('tgl_akhir_mou', [$today, $thirtyDaysLater])
+    ->orderBy('tgl_akhir_mou', 'asc')
+    ->get();
+
+$urgentMitra = $mitraMendekatiList->first();
+$totalMitraMendekati = $mitraMendekatiList->count();
+$othersMitra = $mitraMendekatiList->skip(1);
+
+$sisaHariMitra = $urgentMitra
+    ? Carbon::today()->diffInDays(Carbon::parse($urgentMitra->tgl_akhir_mou), false)
+    : 0;
 
             // 2. Hitung total kontrak yang memenuhi kriteria (untuk angka +X lainnya)
             $totalKontrakMendekati = PKWT::whereBetween('tgl_akhir_pkwt', [$today, $thirtyDaysLater])
@@ -111,9 +136,14 @@ class DashboardController extends Controller
                 'employeeChartData' => $monthlyData,
                 'selectedYear' => $year,
                 'kehadiranTerbaru' => $kehadiranTerbaru,
+                'boronganTerbaru' => $boronganTerbaru,
                 'penilaianTerbaru' => $penilaianTerbaru,
                 'penilaianPending' => $penilaianPending,
                 'urgentKontrak' => $urgentKontrak,
+                'urgentMitra' => $urgentMitra,
+                'totalMitraMendekati' => $totalMitraMendekati,
+                'sisaHariMitra' => $sisaHariMitra,
+                'othersMitra' => $othersMitra,
                 'totalKontrakMendekati' => $totalKontrakMendekati,
                 'absensiPendingCount' => $absensiPendingCount,
                 'othersKontrak' => $othersKontrak

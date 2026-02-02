@@ -256,7 +256,7 @@
                             Item Borongan</th>
                         <th class="px-4 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Kategori
                         </th>
-                        <th class="px-4 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Max Rej Subkon
+                        <th class="px-4 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider text-center">Max Rej Subkon (%)
                         </th>
                         <th class="px-4 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Harga Client
                         </th>

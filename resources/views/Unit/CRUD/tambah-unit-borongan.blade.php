@@ -346,15 +346,15 @@
 
                                 {{-- 3. Max Reject --}}
                                 <div>
-                                    <label class="block text-sm font-bold text-gray-700 mb-1">Max Rej Subkon</label>
+                                    <label class="block text-sm font-bold text-gray-700 mb-1">Max Rej Subkon (%)</label>
                                     <div class="relative">
                                         <input type="number"
                                             :name="`borongan[${index}][max_reject]`"
                                             x-model.number="row.max_reject"
                                             min="0"
-                                            step="1"
-                                            oninput="this.value = !!this.value && Math.abs(this.value) >= 0 ? Math.abs(Math.round(this.value)) : 0"
-                                            placeholder="0"
+                                            step="any"
+                                            oninput="if(this.value < 0) this.value = Math.abs(this.value)"
+                                            placeholder="0.00"
                                             class="w-full rounded-lg border-gray-300 bg-gray-50 text-gray-900 focus:bg-white focus:border-blue-500 focus:ring-blue-200 transition py-2.5 px-4 text-sm font-medium" />
                                     </div>
                                 </div>

@@ -33,8 +33,8 @@
             </span>
         </td>
 
-        <td class="px-4 py-5 align-top">
-            <span class="text-sm font-bold text-gray-900">{{ $b->max_rej_subkon}}</span>
+        <td class="px-4 py-5 align-top text-center">
+            <span class="text-sm font-bold text-gray-900">{{ $b->max_rej_subkon}}%</span>
         </td>
 
         <td class="px-4 py-5 align-top">
