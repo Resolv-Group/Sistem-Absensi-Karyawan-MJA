@@ -224,6 +224,8 @@ class PayrollController extends Controller
 
         $divisi = Divisi::where('id', $PKWT->divisi_id)->first();
 
+        $unit = Unit::where('id', $request->id_unit)->first();
+
         $data = collect();
 
         $take_home_pay = 0;
@@ -292,6 +294,8 @@ class PayrollController extends Controller
 
         $take_home_pay = $take_home_pay - $PKWT->bpjs_naker - $PKWT->bpjs_kesehatan - $request->potongan + $request->tunjangan;
 
+        $filename = "Summary_Upah_{$pekerja->nama}_{$unit->nama_unit}_{$periode}.xlsx";
+
         return Excel::download(
         new DetilBoronganExport(
             $data,
@@ -304,7 +308,7 @@ class PayrollController extends Controller
             $request->tunjangan,
             $take_home_pay
         ),
-        'summary_upah.xlsx'
+        $filename
     );
     }
 
@@ -376,6 +380,8 @@ class PayrollController extends Controller
 
         $admin = Staff::where('id', $administrator)->first();
 
+        $filename = "SlipUpah_{$Unit->nama_unit}_{$periode}.xlsx";
+
         return Excel::download(
             new SlipUpahExport(
                 $dataExport,
@@ -385,7 +391,7 @@ class PayrollController extends Controller
                 $namaPic->nama,
                 $periode
             ),
-            'SlipUpah-.xlsx'
+            $filename
         );
     }
     function ExportInvoiceBorongan(Request $request) {
@@ -429,6 +435,8 @@ class PayrollController extends Controller
         $display_pph            = number_format($pph, 0, ',', '.');
         $display_total_tagihan  = number_format($total_tagihan, 0, ',', '.');
 
+        $filename = "Invoice_{$Unit->nama_unit}_{$periode}.xlsx";
+        
         return Excel::download(
         new InvoiceBoronganExport(
             $request->no_resi,
@@ -445,7 +453,7 @@ class PayrollController extends Controller
             $display_total_tagihan,
             $Unit->umk
         ),
-        'summary_upah.xlsx'
+        $filename
         );
     }
 
@@ -483,6 +491,8 @@ class PayrollController extends Controller
 
         $terbilang = ucwords(terbilang($total_tagihan)). ' Rupiah';
 
+        $filename = "Kwitansi_{$Unit->nama_unit}_{$periode}.xlsx";
+
         return Excel::download(
             new KwitansiBoronganExport(
             $request->no_resi,
@@ -493,7 +503,7 @@ class PayrollController extends Controller
             $periode,
             $display_total_tagihan,
             ),
-            'KWITANSI-.xlsx'
+            $filename
         );
     }
 }
