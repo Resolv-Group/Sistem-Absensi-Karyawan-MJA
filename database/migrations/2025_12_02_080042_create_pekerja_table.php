@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -21,7 +22,7 @@ return new class extends Migration
             $table->string('email', 150)->nullable();
             $table->string('telp', 30)->nullable();
 
-            $table->binary('foto')->nullable();
+            // $table->binary('foto')->nullable();
             // $table->longBlob('dokumen')->nullable();
 
             $table->string('alamat', 255);
@@ -57,6 +58,8 @@ return new class extends Migration
 
             $table->timestamps();
         });
+
+        DB::statement('ALTER TABLE pekerja ADD foto MEDIUMBLOB NULL');
     }
 
     /**

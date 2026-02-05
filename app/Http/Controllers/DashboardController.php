@@ -39,96 +39,142 @@ class DashboardController extends Controller
             ->whereBetween('tgl_akhir_mou', [now(), now()->addDays(30)])
             ->count();
 
-            // --- TAMBAHKAN LOGIKA BARU DI SINI ---
-            $today = Carbon::today();
+        // --- TAMBAHKAN LOGIKA BARU DI SINI ---
+        $today = Carbon::today();
 
-            // 1. Hadir Hari Ini (Status 1)
-            $hadirHariIni = Detil_Harian::whereHas('absensi', function($q) use ($today) {
-                $q->whereDate('tgl_absensi', $today);
-            })->where('status_kehadiran', 1)->count();
+        // 1. Hadir Hari Ini (Status 1)
+        $hadirHariIni = Detil_Harian::whereHas('absensi', function ($q) use ($today) {
+            $q->whereDate('tgl_absensi', $today);
+        })
+            ->where('status_kehadiran', 1)
+            ->count();
 
-            // 2. Izin / Sakit Hari Ini (Status 2)
-            $izinSakitHariIni = Detil_Harian::whereHas('absensi', function($q) use ($today) {
-                $q->whereDate('tgl_absensi', $today);
-            })->where('status_kehadiran', 2)->count();
+        // 2. Izin / Sakit Hari Ini (Status 2)
+        $izinSakitHariIni = Detil_Harian::whereHas('absensi', function ($q) use ($today) {
+            $q->whereDate('tgl_absensi', $today);
+        })
+            ->where('status_kehadiran', 2)
+            ->count();
 
-            // 3. Terlambat Hari Ini
-            // Menghitung yang hadir (status 1) tapi waktu_masuk > jam masuk di tabel shift
-            $terlambatHariIni = Detil_Harian::whereHas('absensi', function($q) use ($today) {
-                $q->whereDate('tgl_absensi', $today);
-            })
+        // 3. Terlambat Hari Ini
+        // Menghitung yang hadir (status 1) tapi waktu_masuk > jam masuk di tabel shift
+        $terlambatHariIni = Detil_Harian::whereHas('absensi', function ($q) use ($today) {
+            $q->whereDate('tgl_absensi', $today);
+        })
             ->join('shift_absen', 'detil_harian.id_shift', '=', 'shift_absen.id')
             ->where('status_kehadiran', 1)
             ->whereColumn('detil_harian.waktu_masuk', '>', 'shift_absen.waktu_masuk')
             ->count();
 
-            $kehadiranTerbaru = Detil_Harian::with(['absensi.pekerja', 'shiftAbsen'])
-                ->whereHas('absensi', function($q) use ($today) {
-                    $q->whereDate('tgl_absensi', $today);
-                })
-                ->whereIn('status_kehadiran', [1, 2]) // Ambil status Hadir (1) dan Cuti (2)
-                ->orderBy('updated_at', 'desc') // Menggunakan updated_at agar data terbaru (termasuk input cuti) muncul di atas
-                ->limit(5)
-                ->get();
+        $kehadiranTerbaru = Detil_Harian::with(['absensi.pekerja', 'shiftAbsen'])
+            ->whereHas('absensi', function ($q) use ($today) {
+                $q->whereDate('tgl_absensi', $today);
+            })
+            ->whereIn('status_kehadiran', [1, 2]) // Ambil status Hadir (1) dan Cuti (2)
+            ->orderBy('updated_at', 'desc') // Menggunakan updated_at agar data terbaru (termasuk input cuti) muncul di atas
+            ->limit(5)
+            ->get();
 
-            $boronganTerbaru = Detil_Borongan::with(['absensi.pekerja'])
-                ->whereHas('absensi', function($q) use ($today) {
-                    $q->whereDate('tgl_absensi', $today);
-                })
-                ->where('status_kehadiran', 1) // Ambil status Hadir (1) dan Cuti (2)
-                ->orderBy('updated_at', 'desc') // Menggunakan updated_at agar data terbaru (termasuk input cuti) muncul di atas
-                ->limit(5)
-                ->get();
-            // dd($boronganTerbaru);
+        $boronganTerbaru = Detil_Borongan::with(['absensi.pekerja'])
+            ->whereHas('absensi', function ($q) use ($today) {
+                $q->whereDate('tgl_absensi', $today);
+            })
+            ->where('status_kehadiran', 1) // Ambil status Hadir (1) dan Cuti (2)
+            ->orderBy('updated_at', 'desc') // Menggunakan updated_at agar data terbaru (termasuk input cuti) muncul di atas
+            ->limit(5)
+            ->get();
+        // dd($boronganTerbaru);
 
-            $today = now()->startOfDay();
-            $thirtyDaysLater = now()->addDays(30)->endOfDay();
+        $today = now()->startOfDay();
+        $thirtyDaysLater = now()->addDays(30)->endOfDay();
 
-            $urgentKontrak = PKWT::with('pekerja', 'unit')
-                ->whereBetween('tgl_akhir_pkwt', [$today, $thirtyDaysLater])
-                ->orderBy('tgl_akhir_pkwt', 'asc')
-                ->first();
+        $urgentKontrak = PKWT::with('pekerja', 'unit')
+            ->whereBetween('tgl_akhir_pkwt', [$today, $thirtyDaysLater])
+            ->orderBy('tgl_akhir_pkwt', 'asc')
+            ->first();
 
-                $mitraMendekatiList = MitraKerja::where('status_aktif', 1)
-    ->whereNotNull('tgl_akhir_mou')
-    ->whereBetween('tgl_akhir_mou', [$today, $thirtyDaysLater])
-    ->orderBy('tgl_akhir_mou', 'asc')
+        // --- 1. PKWT EXPIRED (Sudah lewat tanggal tapi status_aktif masih 1) ---
+$expiredKontrakList = PKWT::with(['pekerja', 'unit'])
+    ->whereHas('pekerja', function($q) {
+        $q->where('status_aktif', 1);
+    })
+    ->where('tgl_akhir_pkwt', '<', $today)
+    ->orderBy('tgl_akhir_pkwt', 'asc')
     ->get();
 
-$urgentMitra = $mitraMendekatiList->first();
-$totalMitraMendekati = $mitraMendekatiList->count();
-$othersMitra = $mitraMendekatiList->skip(1);
+$urgentExpiredKontrak = $expiredKontrakList->first();
+$totalExpiredKontrak = $expiredKontrakList->count();
+$othersExpiredKontrak = $expiredKontrakList->skip(1);
+$lewatHariKontrak = $urgentExpiredKontrak ? abs(Carbon::today()->diffInDays(Carbon::parse($urgentExpiredKontrak->tgl_akhir_pkwt), false)) : 0;
 
-$sisaHariMitra = $urgentMitra
-    ? Carbon::today()->diffInDays(Carbon::parse($urgentMitra->tgl_akhir_mou), false)
-    : 0;
+// --- 2. PKWT AKAN BERAKHIR (Logika existing Anda) ---
+$kontrakMendekatiList = PKWT::with(['pekerja', 'unit'])
+    ->whereBetween('tgl_akhir_pkwt', [$today, $thirtyDaysLater])
+    ->orderBy('tgl_akhir_pkwt', 'asc')
+    ->get();
 
-            // 2. Hitung total kontrak yang memenuhi kriteria (untuk angka +X lainnya)
-            $totalKontrakMendekati = PKWT::whereBetween('tgl_akhir_pkwt', [$today, $thirtyDaysLater])
-                ->count();
+$urgentKontrak = $kontrakMendekatiList->first();
+$totalKontrakMendekati = $kontrakMendekatiList->count();
+$othersKontrak = $kontrakMendekatiList->skip(1);
+// Hitung sisa hari untuk yang urgent
+$sisaHari = $urgentKontrak ? Carbon::today()->diffInDays(Carbon::parse($urgentKontrak->tgl_akhir_pkwt), false) : 0;
 
-            // Ambil semua data kontrak yang mendekati (Misal limit 5 untuk performa)
-            $kontrakMendekatiList = PKWT::with('pekerja')
-                ->whereBetween('tgl_akhir_pkwt', [$today, $thirtyDaysLater])
-                ->orderBy('tgl_akhir_pkwt', 'asc')
-                ->get();
+        // 1. MITRA EXPIRED (Sudah lewat tapi masih aktif)
+        $mitraExpiredList = MitraKerja::where('status_aktif', 1)
+            ->whereNotNull('tgl_akhir_mou')
+            ->where('tgl_akhir_mou', '<', $today)
+            ->orderBy('tgl_akhir_mou', 'asc')
+            ->get();
 
-            $urgentKontrak = $kontrakMendekatiList->first();
-            $totalKontrakMendekati = $kontrakMendekatiList->count();
-            // Sisanya (untuk list dropdown)
-            $othersKontrak = $kontrakMendekatiList->skip(1);
+        $urgentExpiredMitra = $mitraExpiredList->first();
+        $totalExpiredMitra = $mitraExpiredList->count();
+        $othersExpiredMitra = $mitraExpiredList->skip(1);
 
-            $absensiPendingCount = Absensi::where('verifikasi', 0)->count();
+        // 2. MITRA MENDEKATI HABIS (Dalam 30 hari ke depan)
+        $mitraMendekatiList = MitraKerja::where('status_aktif', 1)
+            ->whereNotNull('tgl_akhir_mou')
+            ->whereBetween('tgl_akhir_mou', [$today, $thirtyDaysLater])
+            ->orderBy('tgl_akhir_mou', 'asc')
+            ->get();
 
-            $penilaianTerbaru = Penilaian_Pkwt::with(['pekerja', 'unit']) // Eager load relasi
+        $urgentMitra = $mitraMendekatiList->first();
+        $totalMitraMendekati = $mitraMendekatiList->count();
+        $othersMitra = $mitraMendekatiList->skip(1);
+
+        // --- HITUNG SISA HARI (Aman untuk UI) ---
+        $sisaHariMitra = $urgentMitra
+            ? Carbon::today()->diffInDays(Carbon::parse($urgentMitra->tgl_akhir_mou), false)
+            : 0;
+
+        $lewatHariMitra = $urgentExpiredMitra
+            ? abs(Carbon::today()->diffInDays(Carbon::parse($urgentExpiredMitra->tgl_akhir_mou), false))
+            : 0;
+
+        // 2. Hitung total kontrak yang memenuhi kriteria (untuk angka +X lainnya)
+        $totalKontrakMendekati = PKWT::whereBetween('tgl_akhir_pkwt', [$today, $thirtyDaysLater])->count();
+
+        // Ambil semua data kontrak yang mendekati (Misal limit 5 untuk performa)
+        $kontrakMendekatiList = PKWT::with('pekerja')
+            ->whereBetween('tgl_akhir_pkwt', [$today, $thirtyDaysLater])
+            ->orderBy('tgl_akhir_pkwt', 'asc')
+            ->get();
+
+        $urgentKontrak = $kontrakMendekatiList->first();
+        $totalKontrakMendekati = $kontrakMendekatiList->count();
+        // Sisanya (untuk list dropdown)
+        $othersKontrak = $kontrakMendekatiList->skip(1);
+
+        $absensiPendingCount = Absensi::where('verifikasi', 0)->count();
+
+        $penilaianTerbaru = Penilaian_Pkwt::with(['pekerja', 'unit']) // Eager load relasi
             ->orderBy('created_at', 'desc')
             ->limit(5)
             ->get();
 
-            $penilaianPending = Penilaian_Pkwt::with(['pekerja', 'unit'])
-                ->where('status_hrd', 0)
-                ->orderBy('created_at', 'desc')
-                ->get();
+        $penilaianPending = Penilaian_Pkwt::with(['pekerja', 'unit'])
+            ->where('status_hrd', 0)
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         return view(
             'dashboard',
@@ -140,22 +186,31 @@ $sisaHariMitra = $urgentMitra
                 'penilaianTerbaru' => $penilaianTerbaru,
                 'penilaianPending' => $penilaianPending,
                 'urgentKontrak' => $urgentKontrak,
+                'urgentExpiredKontrak' => $urgentExpiredKontrak,
+                'totalExpiredKontrak' => $totalExpiredKontrak,
+                'othersExpiredKontrak' => $othersExpiredKontrak,
+                'lewatHariKontrak' => $lewatHariKontrak,
+                'sisaHari' => $sisaHari,
                 'urgentMitra' => $urgentMitra,
                 'totalMitraMendekati' => $totalMitraMendekati,
                 'sisaHariMitra' => $sisaHariMitra,
                 'othersMitra' => $othersMitra,
+                'urgentExpiredMitra' => $urgentExpiredMitra,
+                'totalExpiredMitra' => $totalExpiredMitra,
+                'othersExpiredMitra' => $othersExpiredMitra,
+                'lewatHariMitra' => $lewatHariMitra,
                 'totalKontrakMendekati' => $totalKontrakMendekati,
                 'absensiPendingCount' => $absensiPendingCount,
-                'othersKontrak' => $othersKontrak
+                'othersKontrak' => $othersKontrak,
             ],
             compact(
                 'totalPekerja',
                 'totalMitra',
                 'pegawaiBulanIni',
                 'mitraMendekati',
-                'hadirHariIni',      // Pass ke View
-                'izinSakitHariIni',  // Pass ke View
-                'terlambatHariIni'   // Pass ke View
+                'hadirHariIni', // Pass ke View
+                'izinSakitHariIni', // Pass ke View
+                'terlambatHariIni', // Pass ke View
             ),
         );
     }
@@ -174,7 +229,6 @@ $sisaHariMitra = $urgentMitra
 
             // 3. Kembalikan ke halaman sebelumnya dengan pesan sukses
             return back()->with('success', 'Penilaian untuk ' . $penilaian->pekerja->nama . ' berhasil diverifikasi.');
-
         } catch (\Exception $e) {
             // Tangani jika terjadi error
             return back()->with('error', 'Gagal memverifikasi penilaian: ' . $e->getMessage());
