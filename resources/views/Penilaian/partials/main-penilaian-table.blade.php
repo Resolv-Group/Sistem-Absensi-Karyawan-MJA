@@ -64,7 +64,7 @@
                     @php $grade = $getGradeInfo($first->total); @endphp
 
                     {{-- Check if HRD has reviewed; if yes, use a DIV (locked), if no, use an A tag (editable) --}}
-                    @if ($first->status_hrd == 1)
+                    @if ($first->status_hrd > 0 && $first->status_staff > 0)
                         {{-- LOCKED VERSION: Cannot click, no hover effects --}}
                         <div
                             class="flex items-center justify-between bg-gray-50/50 border border-gray-100 rounded-[1.25rem] p-4 relative overflow-hidden cursor-not-allowed">
@@ -88,7 +88,7 @@
                             <p class="text-[11px] font-black text-gray-400 uppercase tracking-widest leading-none">
                                 Evaluasi Terakhir</p>
 
-                            @if ($first->status_hrd == 1)
+                            @if ($first->status_hrd > 0 && $first->status_staff > 0)
                                 <div
                                     class="flex items-center gap-1 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-100">
                                     <svg class="w-2.5 h-2.5 text-emerald-500" fill="none" viewBox="0 0 24 24"
@@ -127,7 +127,7 @@
                     </div>
                     {{-- SHARED CONTENT END --}}
 
-                    @if ($first->status_hrd == 1)
+                    @if ($first->status_hrd > 0 && $first->status_staff > 0)
             </div> {{-- Close DIV --}}
         @else
             </a> {{-- Close A --}}

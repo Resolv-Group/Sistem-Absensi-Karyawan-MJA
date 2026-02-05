@@ -17,6 +17,10 @@
         statusValue: '1',
         hrdStatuses: {{ json_encode($pkwtPekerja->mapWithKeys(fn($item) => [$item->id => ($item->penilaian->first()->status_hrd ?? 0)])) }},
 
+        staffStatuses: {{ json_encode($pkwtPekerja->mapWithKeys(fn($item) => [
+            $item->id => $item->penilaian->first()?->status_staff ?? 0 
+        ])) }},
+
         // Track the current page number
         currentPage: {{ $pkwtPekerja->currentPage() }},
 
@@ -278,7 +282,7 @@
                                             {{-- Tombol hanya muncul jika:
                                                 1. Ada item yang dipilih (length > 0)
                                                 2. SEMUA id di selectedItems memiliki status_hrd == 1 --}}
-                                            x-show="selectedItems.length > 0 && selectedItems.every(id => hrdStatuses[id] == 1)"
+                                            x-show="selectedItems.length > 0 && selectedItems.every(id => hrdStatuses[id] > 0 && staffStatuses[id] > 0)"
                                             x-transition:enter="transition ease-out duration-200"
                                             x-transition:enter-start="opacity-0 scale-95"
                                             x-transition:enter-end="opacity-100 scale-100"

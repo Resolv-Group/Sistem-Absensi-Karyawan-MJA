@@ -82,22 +82,12 @@ Route::middleware(['auth', 'role:hrd,akuntan,admin'])->group(function(){
     Route::post('/tambah-staff', [StaffController::class, 'tambahStaff'])->name('tambah.staff.post');
 });
 
-Route::middleware(['auth', 'role:hrd,admin'])->group(function(){
+Route::middleware(['auth', 'role:hrd,admin,head_supervisor'])->group(function(){
 
     Route::get('/staff/detail/{id}', [StaffController::class, 'viewDetailStaff'])->name('view.detail.staff');
     Route::get('/staff/ubah/{id}', [StaffController::class, 'ubahStaff'])->name('view.ubah.staff');
     Route::put('/staff/ubah/{id}', [StaffController::class, 'updateStaff'])->name('update.staff');
     Route::put('/staff/toggle-status/{id}', [StaffController::class, 'toggleStatus']);
-
-    //Payroll
-    Route::get('/payroll', [PayrollController::class, 'viewPayrollMain'])->name('view.payroll');
-
-    Route::get('/payroll/overview', [PayrollController::class, 'viewPayrollOverview'])->name('view.payroll.overview');
-    Route::post('/payroll/overview', [PayrollController::class, 'overviewPayroll'])->name('overview.payroll');
-    Route::get('/test/export-detail-borongan', [PayrollController::class, 'ExportDetailBorongan'] )->name('export.detail.borongan');
-    Route::get('/test/export-tanda-terima-borongan', [PayrollController::class, 'ExportTandaTerimaBorongan'] )->name('export.tanda-terima.borongan');
-    Route::get('/test/export-invoice-borongan', [PayrollController::class, 'ExportInvoiceBorongan'] )->name('export.invoice.borongan');
-    Route::get('/test/export-kwitansi-borongan', [PayrollController::class, 'ExportKwitansiBorongan'] )->name('export.kwitansi.borongan');
 
     //Pekerja
     Route::get('/daftar-pekerja', [PekerjaController::class, 'viewPekerjaMain'])->name('view.pekerja');
@@ -126,6 +116,17 @@ Route::middleware(['auth', 'role:hrd,admin'])->group(function(){
     Route::get('/unit', [UnitController::class, 'viewUnitMain'])->name('view.unit');
     Route::get('/unit/tambah', [UnitController::class, 'viewTambahUnit'])->name('view.tambah.unit');
     Route::POST('/tambah-unit', [UnitController::class, 'tambahUnit'])->name('tambah.unit.post');
+
+    Route::middleware(['role:hrd,admin'])->group(function(){
+        // Payroll
+        Route::get('/payroll', [PayrollController::class, 'viewPayrollMain'])->name('view.payroll');
+        Route::get('/payroll/overview', [PayrollController::class, 'viewPayrollOverview'])->name('view.payroll.overview');
+        Route::post('/payroll/overview', [PayrollController::class, 'overviewPayroll'])->name('overview.payroll');
+        Route::get('/test/export-detail-borongan', [PayrollController::class, 'ExportDetailBorongan'] )->name('export.detail.borongan');
+        Route::get('/test/export-tanda-terima-borongan', [PayrollController::class, 'ExportTandaTerimaBorongan'] )->name('export.tanda-terima.borongan');
+        Route::get('/test/export-invoice-borongan', [PayrollController::class, 'ExportInvoiceBorongan'] )->name('export.invoice.borongan');
+        Route::get('/test/export-kwitansi-borongan', [PayrollController::class, 'ExportKwitansiBorongan'] )->name('export.kwitansi.borongan');
+    });
 });
 
 Route::middleware(['auth', 'role:pic,admin'])->group(function(){
@@ -149,7 +150,7 @@ Route::middleware(['auth', 'role:pic,admin'])->group(function(){
     Route::post('/penilaian/unit/{unitId}', [PenilaianController::class, 'ExportExcel'])->name('export.excel');
 });
 
-Route::middleware(['auth', 'role:hrd,pic,admin'])->group(function(){
+Route::middleware(['auth', 'role:hrd,pic,admin,head_supervisor'])->group(function(){
     //Unit -> Main - Detail
     //Filtered
     Route::get('/unit/detail/{id}', [UnitController::class, 'viewDetailUnit'])->name('view.detail.unit');

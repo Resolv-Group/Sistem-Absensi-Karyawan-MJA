@@ -23,7 +23,7 @@ return new class extends Migration
             $table->integer('bidang_usaha_id');       // Bidang Usaha (bisa FK nanti)
 
             $table->string('telp_perusahaan', 20); // Telp Perusahaan
-
+            
             $table->boolean('status_aktif')->default(1); // Status Aktif
             $table->string('status_mou');          // Status MoU
             $table->string('status_pajak');        // Status Pajak
