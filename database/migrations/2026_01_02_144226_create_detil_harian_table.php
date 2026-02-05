@@ -15,12 +15,13 @@ return new class extends Migration
             $table->id();
 
             $table->integer('id_absensi');
-            $table->integer('id_shift')->default(0);
+
+            $table->decimal('jam_kerja_normal', 4, 1);
+            $table->decimal('jam_kerja_harian', 4, 1);
+            $table->decimal('overtime', 4, 1)->default(0);
+            $table->integer('hbn')->default(0);
             $table->integer('status_kehadiran')->default(0);
-
-            $table->time('waktu_masuk')->default('00:00:00');
-            $table->time('waktu_keluar')->default('00:00:00');
-
+            $table->integer('isPaid')->default(0);
             $table->char('catatan')->nullable();
 
             $table->integer('updated_by');

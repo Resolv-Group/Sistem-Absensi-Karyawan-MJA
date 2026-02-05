@@ -197,7 +197,7 @@
                 <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-start justify-between">
                     <div>
                         <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Terlambat</p>
-                        <h3 class="text-2xl font-bold text-gray-900 mt-1">{{ $terlambatHariIni }}</h3>
+                        <h3 class="text-2xl font-bold text-gray-900 mt-1">1231322131312</h3>
                         <span class="text-xs text-red-600 font-medium mt-1">Melebihi jam shift</span>
                     </div>
                     <div class="p-3 bg-red-50 text-red-600 rounded-lg">
@@ -213,10 +213,8 @@
             {{-- 5. SPLIT VIEW --}}
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-                {{-- LEFT: Tables --}}
                 <div class="lg:col-span-2 space-y-8">
-                    {{-- Kehadiran Terbaru Table --}}
-                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+                    {{-- <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
                         <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
                             <h3 class="text-lg font-bold text-gray-900">Kehadiran Terbaru (Harian) </h3>
                         </div>
@@ -307,7 +305,7 @@
                                 </tbody>
                             </table>
                         </div>
-                    </div>
+                    </div> --}}
 
                     <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
                         <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
@@ -1017,7 +1015,8 @@
                         </div>
                     </div>
                 </div> {{-- End Sidebar --}}
-            </div> {{-- End Split View --}}
+            </div>
+            {{-- End Split View --}}
 
         </div> {{-- End Container --}}
 

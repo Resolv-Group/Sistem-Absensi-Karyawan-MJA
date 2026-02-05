@@ -47,11 +47,14 @@
     {{-- Error Alert Section --}}
     @if ($errors->any())
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
-            <div class="bg-red-50 border border-red-100 rounded-[2rem] p-5 shadow-sm shadow-red-100/50 flex items-start gap-4">
+            <div
+                class="bg-red-50 border border-red-100 rounded-[2rem] p-5 shadow-sm shadow-red-100/50 flex items-start gap-4">
                 {{-- Icon Container --}}
-                <div class="flex-shrink-0 w-10 h-10 bg-white rounded-2xl shadow-sm border border-red-100 flex items-center justify-center">
+                <div
+                    class="flex-shrink-0 w-10 h-10 bg-white rounded-2xl shadow-sm border border-red-100 flex items-center justify-center">
                     <svg class="w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                 </div>
 
@@ -68,7 +71,8 @@
                 </div>
 
                 {{-- Close Button (Optional) --}}
-                <button onclick="this.parentElement.parentElement.remove()" class="text-red-400 hover:text-red-600 transition-colors">
+                <button onclick="this.parentElement.parentElement.remove()"
+                    class="text-red-400 hover:text-red-600 transition-colors">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -85,74 +89,99 @@
         searchQuery: '',
         filterStatus: '',
         filterVerifikasi: '',
-        statusValue: '1',
         workerMap: @js($workerMap),
-        shifts: @js($shiftList),
-        globalShift: '',
-        openShift: false,
-        rowShift: {},
-        rowMasuk: {},
-        rowKeluar: {},
 
-        // Track the current page number
+        // --- Input Jam Kerja State ---
+        rowJam: {},
+        rowHBN: {},
+        rowCatatan: {},
+        globalJam: '',
+        globalHBN: false,
+
+        // --- Status Absen State ---
+        rowStatus: {},
+        rowPaidLeave: {},
+        globalStatus: '2',
+
         currentPage: {{ $pkwtPekerja->currentPage() }},
-
         allIds: {{ json_encode($pkwtPekerja->pluck('id')) }},
 
-        globalMasuk: '08:00',
-        globalKeluar: '17:00',
-        globalStatus: '0', // default absen
-        rowStatus: {},
-        rowCatatan: {},
+        // Logic to calculate Overtime
+        calculateOvertime(id) {
+            const worker = this.workerMap[id];
+            if (!worker) return 0;
 
-        selectGlobalShift(s) {
-            this.globalShift = s.id;
-            // Otomatis isi jam global berdasarkan data shift yang dipilih
-            this.globalMasuk = s.waktu_masuk; // Pastikan nama kolom sesuai di DB
-            this.globalKeluar = s.waktu_keluar;
+            const normal = parseFloat(worker.pkwt_hari_kerja || 0);
+            const realita = parseFloat(this.rowJam[id] || 0);
+            const isHbn = this.rowHBN[id]; // Mengambil status checkbox HBN
+
+            let ot = 0;
+
+            if (isHbn) {
+                // Jika HBN dicentang, semua jam realita dihitung sebagai lembur
+                ot = realita;
+            } else {
+                // Jika hari normal, lembur = realita - normal
+                ot = realita - normal;
+            }
+
+            // Kembalikan 0 jika hasilnya negatif, dan format desimal jika perlu
+            const result = ot > 0 ? ot : 0;
+            return Number.isInteger(result) ? result : result.toFixed(1);
         },
 
-        selectRowShift(workerId, s) {
-            this.rowShift[workerId] = s.id;
-            this.rowMasuk[workerId] = s.waktu_masuk;
-            this.rowKeluar[workerId] = s.waktu_keluar;
-        },
-
-        applyGlobalTime() {
+        // Inside your main x-data object
+        initAbsenModal() {
             this.selectedItems.forEach(id => {
-                // 1. Apply Times to DOM inputs
-                const rowMasuk = document.getElementById('masuk-' + id);
-                const rowKeluar = document.getElementById('keluar-' + id);
-                if (rowMasuk) rowMasuk.value = this.globalMasuk;
-                if (rowKeluar) rowKeluar.value = this.globalKeluar;
+                const worker = this.workerMap[id];
+                if (worker) {
+                    // Jika ada data jam di DB, tampilkan. Jika null, kosongkan.
+                    this.rowJam[id] = worker.existing_jam !== null ? worker.existing_jam : '';
 
-                // 2. Apply Shift and Status to Alpine State
-                this.rowShift[id] = this.globalShift;
-                this.rowMasuk[id] = this.globalMasuk;
-                this.rowKeluar[id] = this.globalKeluar;
-                this.rowStatus[id] = this.globalStatus;
+                    // PAKSA KE BOOLEAN: Jika existing_hbn == 1 maka TRUE (Centang)
+                    this.rowHBN[id] = worker.existing_hbn == 1;
+
+                    this.rowCatatan[id] = worker.existing_catatan || '';
+                }
             });
+            this.showAbsenModal = true;
+        },
+
+        toggleHbnGlobal(id) {
+            // Get the new state of the checkbox that was just clicked
+            const newState = this.rowHBN[id];
+
+            // Apply this state to every worker currently in the modal
+            this.selectedItems.forEach(itemId => {
+                this.rowHBN[itemId] = newState;
+            });
+
+            // Optional: Sync the global header checkbox if you have one
+            this.globalHBN = newState;
         },
 
         initStatusModal() {
-            // Buat salinan objek baru untuk memicu reaktivitas
-            let newStatus = { ...this.rowStatus };
-            let newCatatan = { ...this.rowCatatan };
-
             this.selectedItems.forEach(id => {
-                // Set default ke '1' (Hadir) jika datanya belum ada
-                if (!newStatus[id]) newStatus[id] = '2';
-                if (!newCatatan[id]) newCatatan[id] = '';
-            });
+                const worker = this.workerMap[id];
+                if (worker) {
+                    this.rowStatus[id] = worker.existing_status || '0';
+                    this.rowCatatan[id] = worker.existing_catatan || '';
 
-            this.rowStatus = newStatus;
-            this.rowCatatan = newCatatan;
+                    // PERBAIKAN DI SINI:
+                    // Paksa menjadi true jika nilainya 1, dan false jika 0
+                    this.rowPaidLeave[id] = (worker.existing_paid == 1);
+                }
+            });
             this.showAbsenStatusModal = true;
         },
 
-        applyGlobalStatus() {
+        applyGlobalValues() {
             this.selectedItems.forEach(id => {
-                this.rowStatus[id] = this.globalStatus;
+                // Hanya timpa jika globalJam diisi
+                if (this.globalJam !== '') {
+                    this.rowJam[id] = this.globalJam;
+                }
+                this.rowHBN[id] = this.globalHBN;
             });
         },
 
@@ -161,29 +190,14 @@
         },
 
         async updateTable(targetUrl = null) {
-            let url;
-
-            if (targetUrl) {
-                // If called from Pagination Link
-                url = new URL(targetUrl);
-                // If no search is active, save this as our current 'base' page
-                if (!this.searchQuery && !this.filterVerifikasi && !this.filterStatus) {
-                    this.currentPage = url.searchParams.get('page') || 1;
-                }
-            } else {
-                // If called from Typing Search/Filter
-                url = new URL(window.location.href);
-
-                // Logic: If user is typing, we force page 1 to find results.
-                // If user cleared everything, we restore the saved currentPage.
+            let url = targetUrl ? new URL(targetUrl) : new URL(window.location.href);
+            if (!targetUrl) {
                 if (!this.searchQuery && !this.filterVerifikasi && !this.filterStatus) {
                     url.searchParams.set('page', this.currentPage);
                 } else {
                     url.searchParams.set('page', '1');
                 }
             }
-
-            // Apply all filters to the URL
             url.searchParams.set('search', this.searchQuery);
             url.searchParams.set('status', this.filterStatus);
             url.searchParams.set('statusVerif', this.filterVerifikasi);
@@ -191,17 +205,7 @@
             try {
                 const response = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
                 const html = await response.text();
-
                 document.getElementById('main-table-body').innerHTML = html;
-
-                // Update the pagination links at the bottom
-                const newPagination = document.getElementById('new-pagination-provider');
-                const paginationContainer = document.getElementById('search-pagination');
-                if (newPagination && paginationContainer) {
-                    paginationContainer.innerHTML = newPagination.innerHTML;
-                }
-
-                // Sync IDs for Bulk Actions
                 const provider = document.getElementById('new-ids-provider-full');
                 if (provider) this.allIds = JSON.parse(provider.dataset.ids);
             } catch (error) { console.error(error); }
@@ -211,10 +215,23 @@
             this.searchQuery = '';
             this.filterStatus = '';
             this.filterVerifikasi = '';
-            // This will trigger the $watch which calls updateTable()
-            // Our logic inside updateTable will see filters are empty and restore Page 2
         },
 
+        confirmSubmit(formRef) {
+            Swal.fire({
+                title: 'Simpan Data?',
+                text: 'Pastikan data sudah benar.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#2563EB',
+                confirmButtonText: 'Ya, Simpan',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.showLoading();
+                    this.$refs[formRef].submit();
+                }
+            });
+        }
     }" x-init="$watch('searchQuery', () => updateTable());
     $watch('filterStatus', () => updateTable());
     $watch('filterVerifikasi', () => updateTable());">
@@ -227,7 +244,8 @@
                 {{-- Surprise Element: Background Pattern Decoration --}}
                 <div class="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-blue-50 rounded-full blur-3xl opacity-40">
                 </div>
-                <div class="absolute bottom-0 left-0 -ml-16 -mb-16 w-64 h-64 bg-emerald-50 rounded-full blur-3xl opacity-40">
+                <div
+                    class="absolute bottom-0 left-0 -ml-16 -mb-16 w-64 h-64 bg-emerald-50 rounded-full blur-3xl opacity-40">
                 </div>
 
                 <div class="relative z-10">
@@ -376,7 +394,7 @@
                                 <div class="flex justify-between items-center mb-5">
                                     <h3 class="text-sm font-bold text-gray-800">Filter Data</h3>
                                     <button @click="resetFilters()"
-                                        class="text-xs font-medium text-gray-400 hover:text-red-500 hover:bg-red-50 px-2 py-1 rounded transition">
+                                        class="text-md font-medium text-gray-400 hover:text-red-500 hover:bg-red-50 px-2 py-1 rounded transition">
                                         Reset Filter
                                     </button>
                                 </div>
@@ -526,11 +544,11 @@
 
                                     <div class="flex items-center gap-2">
                                         <button type="button" @click="selectedItems = []"
-                                            class="px-3 py-2 text-xs font-bold text-gray-500 hover:text-gray-700 transition">Batal</button>
+                                            class="px-3 py-2 text-md font-bold text-gray-500 hover:text-gray-700 transition">Batal</button>
                                         <div class="h-6 w-px bg-gray-200 mx-1"></div>
 
                                         {{-- Trigger Modal Button --}}
-                                        <button @click="showAbsenModal = true"
+                                        <button @click="initAbsenModal()"
                                             class="flex items-center gap-1.5 px-4 py-2 bg-blue-50 text-blue-700 border border-blue-100 rounded-xl text-xs font-bold hover:bg-blue-600 hover:text-white transition-all">
                                             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
                                                 stroke="currentColor">
@@ -542,7 +560,7 @@
 
                                         {{-- Trigger Modal Button --}}
                                         <button @click="initStatusModal()"
-                                            class="flex items-center gap-1.5 px-4 py-2 bg-blue-50 text-blue-700 border border-blue-100 rounded-xl text-xs font-bold hover:bg-blue-600 hover:text-white transition-all">
+                                            class="flex items-center gap-1.5 px-4 py-2 bg-blue-50 text-cyan-700 border border-blue-100 rounded-xl text-xs font-bold hover:bg-cyan-600 hover:text-white transition-all">
                                             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
                                                 stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -594,8 +612,6 @@
                                                 </svg>
                                             </button>
                                         </div>
-
-                                        {{-- Quick Apply Row --}}
                                         <div
                                             class="mt-6 p-4 bg-blue-50/50 rounded-2xl border border-blue-100 flex flex-wrap items-center justify-between gap-4">
                                             <div class="flex items-center gap-3">
@@ -611,99 +627,25 @@
                                                     ke semua</span>
                                             </div>
 
-                                            <div class="flex items-center gap-4">
-                                                {{-- DYNAMIC SHIFT DROPDOWN --}}
-                                                <div class="relative">
-                                                    <button type="button" @click="openShift = !openShift"
-                                                        class="flex items-center gap-3 px-4 py-2 bg-white border border-blue-200 rounded-xl text-xs font-bold text-blue-700 shadow-sm hover:border-blue-400 transition-all outline-none">
-                                                        <div class="flex flex-col items-start leading-none">
-                                                            <span class="text-[10px] uppercase font-black"
-                                                                x-text="shifts.find(s => s.id == globalShift)?.nama || 'Pilih Shift'"></span>
-                                                            <template x-if="globalShift">
-                                                                <span class="text-[9px] text-blue-400 font-bold mt-0.5"
-                                                                    x-text="shifts.find(s => s.id == globalShift).waktu_masuk + ' - ' + shifts.find(s => s.id == globalShift).waktu_keluar"></span>
-                                                            </template>
-                                                        </div>
-                                                        <svg class="w-3.5 h-3.5 text-blue-400 transition-transform"
-                                                            :class="openShift ? 'rotate-180' : ''" fill="none"
-                                                            stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path d="M19 9l-7 7-7-7" stroke-width="3"
-                                                                stroke-linecap="round" stroke-linejoin="round" />
-                                                        </svg>
-                                                    </button>
-
-                                                    {{-- DROPDOWN LIST: Ubah ke top-full agar muncul di bawah --}}
-                                                    <div x-show="openShift" @click.outside="openShift = false"
-                                                        {{-- Perubahan di sini: top-full mt-2 dan z-index sangat tinggi --}}
-                                                        class="absolute top-full mt-2 left-0 w-52 bg-white rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.1)] border border-blue-50 overflow-hidden z-[150]"
-                                                        x-transition:enter="transition ease-out duration-200"
-                                                        x-transition:enter-start="opacity-0 -translate-y-2"
-                                                        x-transition:enter-end="opacity-100 translate-y-0" x-cloak>
-
-                                                        <div class="p-2 bg-blue-50/50 border-b border-blue-50">
-                                                            <p
-                                                                class="text-[9px] font-black text-blue-400 uppercase tracking-widest px-2">
-                                                                Opsi Shift</p>
-                                                        </div>
-
-                                                        <div class="max-h-60 overflow-y-auto custom-scrollbar">
-                                                            <template x-for="s in shifts" :key="s.id">
-                                                                <div @click="selectGlobalShift(s); openShift = false"
-                                                                    class="px-4 py-3 cursor-pointer transition-all flex items-center justify-between group border-b border-gray-50 last:border-none"
-                                                                    :class="globalShift == s.id ? 'bg-blue-600' :
-                                                                        'hover:bg-blue-50'">
-
-                                                                    <div class="flex flex-col gap-0.5">
-                                                                        {{-- Nama Shift --}}
-                                                                        <span
-                                                                            class="text-[11px] font-black uppercase tracking-tight"
-                                                                            :class="globalShift == s.id ? 'text-white' :
-                                                                                'text-slate-700 group-hover:text-blue-700'"
-                                                                            x-text="s.nama"></span>
-
-                                                                        {{-- Detail Waktu --}}
-                                                                        <div class="flex items-center gap-1.5">
-                                                                            <svg class="w-3 h-3"
-                                                                                :class="globalShift == s.id ? 'text-blue-200' :
-                                                                                    'text-slate-400'"
-                                                                                fill="none" viewBox="0 0 24 24"
-                                                                                stroke="currentColor">
-                                                                                <path stroke-linecap="round"
-                                                                                    stroke-linejoin="round"
-                                                                                    stroke-width="2"
-                                                                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                                            </svg>
-                                                                            <span class="text-[10px] font-bold"
-                                                                                :class="globalShift == s.id ? 'text-blue-100' :
-                                                                                    'text-slate-400'"
-                                                                                x-text="s.waktu_masuk + ' - ' + s.waktu_keluar"></span>
-                                                                        </div>
-                                                                    </div>
-
-                                                                    {{-- Checkmark Icon --}}
-                                                                    <div x-show="globalShift == s.id"
-                                                                        class="flex-shrink-0">
-                                                                        <svg class="w-4 h-4 text-white" fill="none"
-                                                                            viewBox="0 0 24 24" stroke="currentColor">
-                                                                            <path stroke-linecap="round"
-                                                                                stroke-linejoin="round" stroke-width="3"
-                                                                                d="M5 13l4 4L19 7" />
-                                                                        </svg>
-                                                                    </div>
-                                                                </div>
-                                                            </template>
-                                                        </div>
-
-                                                        <template x-if="!shifts || shifts.length === 0">
-                                                            <div
-                                                                class="px-4 py-4 text-center text-[10px] font-bold text-slate-400 italic">
-                                                                Tidak ada data shift
-                                                            </div>
-                                                        </template>
-                                                    </div>
+                                            <div class="flex items-center gap-6">
+                                                {{-- Global Jam Kerja --}}
+                                                <div class="flex items-center gap-2">
+                                                    <span class="text-[10px] font-bold text-blue-400 uppercase">Jam
+                                                        Kerja:</span>
+                                                    <input type="number" x-model="globalJam" placeholder="0"
+                                                        class="w-20 px-3 py-2 bg-white border border-blue-200 rounded-xl text-md font-bold text-blue-700 outline-none focus:ring-2 focus:ring-blue-100">
                                                 </div>
 
-                                                <button type="button" @click="applyGlobalTime()"
+                                                {{-- Global HBN --}}
+                                                <label class="flex items-center gap-2 cursor-pointer group">
+                                                    <input type="checkbox" x-model="globalHBN"
+                                                        class="w-4 h-4 rounded border-blue-300 text-blue-600 focus:ring-blue-500">
+                                                    <span
+                                                        class="text-[10px] font-bold text-blue-400 uppercase group-hover:text-blue-600 transition-colors">HBN
+                                                        (Libur)</span>
+                                                </label>
+
+                                                <button type="button" @click="applyGlobalValues()"
                                                     class="px-6 py-2.5 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-blue-700 transition shadow-lg shadow-blue-200 active:scale-95">
                                                     Terapkan
                                                 </button>
@@ -714,111 +656,102 @@
                                     {{-- Scrollable List Area --}}
                                     <form
                                         action="{{ route('absensi.bulk.update', ['id_unit' => $unit->id, 'date' => $date]) }}"
-                                        method="POST" x-ref="absenForm" x-data="absenFormHandler()" class="flex-1 overflow-y-auto custom-scrollbar bg-white">
+                                        method="POST" x-ref="absenForm" x-data="absenFormHandler()"
+                                        class="flex-1 overflow-y-auto custom-scrollbar bg-white">
                                         @csrf
                                         @method('PUT')
                                         <input type="hidden" name="date" value="{{ $date }}">
 
-                                        {{-- Header Row (Optional for clarity) --}}
+                                        {{-- Table Header --}}
                                         <div
-                                            class="px-10 py-3 bg-gray-50/50 border-b border-gray-100 hidden lg:flex items-center text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">
-                                            <div class="w-64">Informasi Pekerja</div>
-                                            <div class="w-48 px-4 text-center">Shift Kerja</div>
-                                            <div class="w-72 px-4 text-center">Waktu (Masuk - Keluar)</div>
+                                            class="px-10 py-4 bg-gray-50/80 border-b border-gray-100 hidden lg:flex items-center text-[11px] font-black text-gray-400 uppercase tracking-[0.15em]">
+                                            <div class="w-12 text-center">No.</div>
+                                            <div class="w-72">Informasi Pekerja</div>
+                                            <div class="w-24 text-center">Normal</div>
+                                            <div class="w-32 text-center">Jam Realita</div>
+                                            <div class="w-24 text-center">Overtime</div>
+                                            <div class="w-24 text-center">HBN</div>
                                             <div class="flex-1 px-4">Keterangan / Catatan</div>
                                         </div>
 
                                         <div class="divide-y divide-gray-100">
-                                            <template x-for="id in selectedItems" :key="id">
+                                            <template x-for="(id, index) in selectedItems" :key="id">
                                                 <div
                                                     class="group flex flex-col lg:flex-row lg:items-center px-10 py-4 hover:bg-blue-50/30 transition-all duration-300 gap-y-4 lg:gap-y-0">
 
-                                                    {{-- 1. Identity (Slim & Compact) --}}
-                                                    <div class="flex items-center gap-3 w-64 flex-shrink-0">
-                                                        <div
-                                                            class="w-9 h-9 rounded-xl bg-white shadow-sm border border-gray-100 flex items-center justify-center text-blue-600 text-[10px] font-black group-hover:bg-blue-600 group-hover:text-white transition-all">
-                                                            <span x-text="workerMap[id]?.initials"></span>
-                                                        </div>
+                                                    {{-- No. Column --}}
+                                                    <div class="w-12 flex-shrink-0 text-center">
+                                                        <span
+                                                            class="text-[11px] font-bold text-gray-300 group-hover:text-blue-400 transition-colors"
+                                                            x-text="index + 1 + '.'"></span>
+                                                    </div>
+
+                                                    {{-- 1. Identity Column --}}
+                                                    <div class="w-72 flex-shrink-0 flex items-center gap-3 pr-4">
+                                                        <div class="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-[10px] font-black text-gray-400 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300"
+                                                            x-text="workerMap[id]?.initials"></div>
                                                         <div class="min-w-0">
-                                                            <p class="text-xs font-bold text-gray-800 truncate"
+                                                            <p class="text-sm font-bold text-gray-800 truncate"
                                                                 x-text="workerMap[id]?.nama"></p>
-                                                            <p class="text-[9px] font-medium text-gray-400 tracking-tighter"
+                                                            <p class="text-[10px] font-medium text-gray-400 tracking-tight"
                                                                 x-text="workerMap[id]?.nik"></p>
                                                         </div>
                                                     </div>
 
-                                                    {{-- 2. Shift Dropdown (Subtle Pill Style) --}}
-                                                    <div class="w-full lg:w-48 px-0 lg:px-4" x-data="{ open: false }">
-                                                        <input type="hidden" :name="'data[' + id + '][id_shift]'"
-                                                            x-model="rowShift[id]">
-                                                        <div class="relative">
-                                                            <button type="button" @click="open = !open"
-                                                                class="w-full h-9 flex items-center justify-between px-3 bg-gray-50 border border-transparent hover:border-blue-200 hover:bg-white rounded-lg transition-all text-[11px] font-bold text-gray-600 focus:ring-2 focus:ring-blue-100">
-                                                                <span
-                                                                    x-text="shifts.find(s => s.id == rowShift[id])?.nama || 'Pilih Shift'"></span>
-                                                                <svg class="w-3 h-3 text-gray-400"
-                                                                    :class="open ? 'rotate-180' : ''" fill="none"
-                                                                    stroke="currentColor" viewBox="0 0 24 24">
-                                                                    <path d="M19 9l-7 7-7-7" stroke-width="3"
-                                                                        stroke-linecap="round" stroke-linejoin="round" />
-                                                                </svg>
-                                                            </button>
-
-                                                            <div x-show="open" @click.outside="open = false"
-                                                                class="absolute top-full mt-1 left-0 w-full bg-white rounded-xl shadow-2xl border border-gray-100 z-[120] overflow-hidden"
-                                                                x-cloak>
-                                                                <template x-for="s in shifts" :key="s.id">
-                                                                    <div @click="selectRowShift(id, s); open = false"
-                                                                        class="px-3 py-2 text-[10px] font-bold cursor-pointer hover:bg-blue-50 flex justify-between items-center"
-                                                                        :class="rowShift[id] == s.id ?
-                                                                            'text-blue-600 bg-blue-50/50' :
-                                                                            'text-gray-600'">
-                                                                        <span x-text="s.nama"></span>
-                                                                        <span class="text-[8px] opacity-40"
-                                                                            x-text="s.waktu_masuk"></span>
-                                                                    </div>
-                                                                </template>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    {{-- 3. Time Capsule (Expanded to fit time pickers) --}}
-                                                    <div class="w-full lg:w-72 px-0 lg:px-4 flex-shrink-0">
+                                                    {{-- 2. Jam Normal Column --}}
+                                                    <div class="w-24 flex-shrink-0 text-center">
                                                         <div
-                                                            class="flex items-center justify-between bg-white border border-gray-200 rounded-lg h-9 px-3 gap-2 focus-within:border-blue-400 transition-all shadow-sm">
-                                                            {{-- Masuk --}}
-                                                            <div class="flex items-center gap-2">
-                                                                <svg class="w-3 h-3 text-gray-300" fill="none"
-                                                                    stroke="currentColor" viewBox="0 0 24 24">
-                                                                    <path d="M12 8v4l3 3" stroke-width="2.5"
-                                                                        stroke-linecap="round" stroke-linejoin="round" />
-                                                                </svg>
-                                                                <input type="time" :name="'data[' + id + '][masuk]'"
-                                                                    x-model="rowMasuk[id]"
-                                                                    class="bg-transparent border-none p-0 text-[11px] font-bold text-gray-700 focus:ring-0 outline-none w-[85px]">
-                                                            </div>
+                                                            class="inline-block px-3 py-1 bg-gray-50 border border-gray-100 rounded-lg">
+                                                            <span class="text-xs font-black text-gray-500"
+                                                                x-text="(workerMap[id]?.pkwt_hari_kerja || 0) + ' /jam'"></span>
+                                                        </div>
+                                                        <input type="hidden" :name="'data[' + id + '][jam_normal]'"
+                                                            :value="workerMap[id]?.pkwt_hari_kerja || 0">
+                                                    </div>
 
-                                                            <span class="text-gray-200 font-black text-[10px]">TO</span>
-
-                                                            {{-- Keluar --}}
-                                                            <div class="flex items-center gap-2">
-                                                                <input type="time" :name="'data[' + id + '][keluar]'"
-                                                                    x-model="rowKeluar[id]"
-                                                                    class="bg-transparent border-none p-0 text-[11px] font-bold text-gray-700 focus:ring-0 outline-none w-[85px] text-right">
-                                                                <svg class="w-3 h-3 text-gray-300" fill="none"
-                                                                    stroke="currentColor" viewBox="0 0 24 24">
-                                                                    <path d="M12 8v4l3 3" stroke-width="2.5"
-                                                                        stroke-linecap="round" stroke-linejoin="round" />
-                                                                </svg>
-                                                            </div>
+                                                    {{-- 3. Jam Realita Column --}}
+                                                    <div class="w-32 flex-shrink-0 px-4">
+                                                        <div class="relative group/input flex items-center">
+                                                            <input type="number" step="0.5" min="0"
+                                                                :name="'data[' + id + '][jam_aktual]'" x-model="rowJam[id]"
+                                                                class="w-full h-9 pl-2 pr-10 text-center bg-white border border-gray-200 rounded-xl text-sm font-black text-blue-600 focus:ring-4 focus:ring-blue-50 focus:border-blue-400 outline-none transition-all">
+                                                            {{-- Label /jam di dalam input --}}
+                                                            <span
+                                                                class="absolute right-3 text-[10px] font-bold text-blue-300 pointer-events-none">/jam</span>
                                                         </div>
                                                     </div>
 
-                                                    {{-- 4. Catatan (Fills remaining space, less priority) --}}
-                                                    <div class="flex-1 px-0 lg:px-4 min-w-[150px]">
+                                                    {{-- 4. Overtime Column --}}
+                                                    <div class="w-24 flex-shrink-0 text-center">
+                                                        <span class="text-sm font-black transition-colors"
+                                                            :class="calculateOvertime(id) > 0 ? 'text-orange-500' :
+                                                                'text-gray-200'"
+                                                            x-text="'+' + calculateOvertime(id) + ' /jam'"></span>
+                                                        <input type="hidden" :name="'data[' + id + '][overtime]'"
+                                                            :value="calculateOvertime(id)">
+                                                    </div>
+
+                                                    {{-- 5. HBN Column --}}
+                                                    <div class="w-24 flex-shrink-0 flex justify-center">
+                                                        <div class="relative flex items-center justify-center">
+                                                            <input type="hidden" :name="'data[' + id + '][is_hbn]'" value="0">
+
+                                                            <input type="checkbox"
+                                                                :name="'data[' + id + '][is_hbn]'"
+                                                                value="1"
+                                                                x-model="rowHBN[id]"
+                                                                {{-- This is the key change: --}}
+                                                                @change="toggleHbnGlobal(id)"
+                                                                class="w-5 h-5 rounded-md border-gray-300 text-blue-600 focus:ring-blue-100 transition-all cursor-pointer shadow-sm">
+                                                        </div>
+                                                    </div>
+
+                                                    {{-- 6. Catatan Column --}}
+                                                    <div class="flex-1 min-w-[200px] px-4">
                                                         <input type="text" :name="'data[' + id + '][catatan]'"
-                                                            x-model="rowCatatan[id]" placeholder="Keterangan..."
-                                                            class="w-full h-9 bg-transparent border-b border-transparent hover:border-gray-100 focus:border-blue-300 focus:bg-gray-50/30 rounded-md px-3 text-[11px] font-medium text-gray-600 transition-all outline-none italic placeholder:text-gray-300">
+                                                            x-model="rowCatatan[id]"
+                                                            placeholder="Tambah catatan harian..."
+                                                            class="w-full h-9 bg-transparent border-b border-transparent hover:border-gray-100 focus:border-blue-400 focus:bg-blue-50/30 rounded-lg px-3 text-[11px] font-medium text-gray-600 transition-all outline-none italic placeholder:text-gray-300">
                                                     </div>
                                                 </div>
                                             </template>
@@ -881,9 +814,8 @@
                                     {{-- Scrollable Table Area --}}
                                     <form
                                         action="{{ route('absensi.bulk.update-status', ['id_unit' => $unit->id, 'date' => $date]) }}"
-                                        method="POST" x-ref="absenForm"
-                                        x-data="absenFormHandler()"
-                                        class="flex-1 overflow-y-auto custom-scrollbar bg-white p-10 pt-6">
+                                        method="POST" x-ref="absenForm" x-data="absenFormHandler()"
+                                        class="flex-1 overflow-y-auto custom-scrollbar bg-white p-8 pt-6">
                                         @csrf
                                         @method('PUT')
                                         <input type="hidden" name="date" value="{{ $date }}">
@@ -891,62 +823,57 @@
                                         <table class="w-full border-separate border-spacing-y-4">
                                             <thead>
                                                 <tr
-                                                    class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">
-                                                    <th class="text-left pb-2 pl-6">Informasi Pekerja</th>
-                                                    <th class="text-left pb-2 w-64">Tipe Absensi</th>
-                                                    <th class="text-left pb-2 pr-6">Catatan / Keterangan</th>
+                                                    class="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em]">
+                                                    <th class="w-12 text-center pb-2">No.</th>
+                                                    <th class="text-left pb-2 pl-4">Informasi Pekerja</th>
+                                                    <th class="text-left pb-2 w-56">Tipe Absensi</th>
+                                                    <th class="text-center pb-2 w-40">Cuti <br>Berbayar</th>
+                                                    <th class="text-left pb-2 pr-6">Catatan <br>/ Keterangan</th>
                                                 </tr>
                                             </thead>
+                                            </thead>
                                             <tbody>
-                                                <template x-for="id in selectedItems" :key="id">
+                                                <template x-for="(id, index) in selectedItems" :key="id">
                                                     <tr class="group">
-                                                        {{-- Side Label: Pekerja --}}
+                                                        {{-- 1. Nomor Urut --}}
                                                         <td
-                                                            class="py-4 pl-6 bg-gray-50/50 rounded-l-2xl border-y border-l border-gray-100">
-                                                            {{-- Left: Identity Section --}}
-                                                            <div
-                                                                class="flex items-center gap-4 min-w-0 flex-1 lg:flex-none lg:w-64">
-                                                                {{-- Avatar Circle (Keep as is) --}}
-                                                                <div
-                                                                    class="flex-shrink-0 w-12 h-12 rounded-2xl bg-white shadow-sm border border-gray-100 flex items-center justify-center text-blue-600 text-xs font-black group-hover:bg-blue-600 group-hover:text-white transition-all duration-500">
-                                                                    <span x-text="workerMap[id]?.initials"></span>
-                                                                </div>
+                                                            class="py-4 text-center bg-gray-50/50 rounded-l-2xl border-y border-l border-gray-100">
+                                                            <span class="text-xs font-black text-gray-300"
+                                                                x-text="index + 1 + '.'"></span>
+                                                        </td>
 
-                                                                {{-- Name & NIK Container --}}
-                                                                <div class="min-w-0"> {{-- This allows the children to truncate --}}
-                                                                    <p class="text-sm font-black text-gray-900 leading-tight truncate"
-                                                                        x-text="workerMap[id]?.nama"
-                                                                        :title="workerMap[id]?.nama">
-                                                                        {{-- Added :title so full name shows on hover --}}
-                                                                    </p>
-                                                                    <p class="text-[10px] font-bold text-gray-400 mt-0.5 tracking-widest truncate"
-                                                                        x-text="workerMap[id]?.nik">
-                                                                    </p>
-                                                                </div>
+                                                        {{-- 2. Informasi Pekerja --}}
+                                                        <td class="py-4 pl-4 bg-gray-50/50 border-y border-gray-100">
+                                                            <div class="min-w-0 w-64">
+                                                                <p class="text-sm font-black text-gray-900 leading-tight truncate"
+                                                                    x-text="workerMap[id]?.nama"
+                                                                    :title="workerMap[id]?.nama"></p>
+                                                                <p class="text-[10px] font-bold text-gray-400 mt-0.5 tracking-widest truncate"
+                                                                    x-text="workerMap[id]?.nik"></p>
                                                             </div>
                                                         </td>
 
-                                                        {{-- Alpine Dropdown (Balanced Height) --}}
-                                                        <td
-                                                            class="py-4 pl-0 pr-10 bg-gray-50/50 border-y border-gray-100 ">
+                                                        {{-- 3. Tipe Absensi (Dropdown) --}}
+                                                        <td class="py-4 px-2 bg-gray-50/50 border-y border-gray-100">
                                                             <div x-data="{
                                                                 open: false,
                                                                 list: [
-                                                                    { val: '2', label: 'Cuti' }
+                                                                    { val: '0', label: 'Absen' },
+                                                                    { val: '1', label: 'Izin' },
+                                                                    { val: '2', label: 'Cuti' },
+                                                                    { val: '3', label: 'Sakit' },
+                                                                    { val: '4', label: 'Rencana Cuti' },
                                                                 ]
                                                             }" class="relative">
-
-                                                                <input type="hidden" :name="'data[' + id + '][status_kehadiran]'"
+                                                                <input type="hidden"
+                                                                    :name="'data[' + id + '][status_kehadiran]'"
                                                                     x-model="rowStatus[id]">
 
                                                                 <div @click="open = !open" @click.outside="open = false"
-                                                                    class="flex items-center justify-between px-4 py-3 bg-white border border-gray-200 rounded-xl cursor-pointer hover:border-blue-400 transition-all shadow-sm">
-
-                                                                    {{-- Tambahkan fallback 'Hadir' jika find menghasilkan undefined --}}
+                                                                    class="flex items-center justify-between px-4 py-2.5 bg-white border border-gray-200 rounded-xl cursor-pointer hover:border-blue-400 transition-all shadow-sm">
                                                                     <span class="text-xs font-black text-gray-700"
                                                                         x-text="list.find(x => x.val == rowStatus[id])?.label || 'Hadir'">
                                                                     </span>
-
                                                                     <svg class="w-4 h-4 text-blue-500 transition-transform duration-300"
                                                                         :class="open ? 'rotate-180' : ''" fill="none"
                                                                         stroke="currentColor" viewBox="0 0 24 24">
@@ -971,15 +898,28 @@
                                                             </div>
                                                         </td>
 
-                                                        {{-- Ganti bagian input catatan dengan ini --}}
+                                                        {{-- 4. Cuti Berbayar (Checkbox) --}}
+                                                        <td
+                                                            class="py-4 bg-gray-50/50 border-y border-gray-100 text-center">
+                                                            <div class="flex items-center justify-center">
+                                                                <input type="hidden"
+                                                                    :name="'data[' + id + '][is_paid_leave]'"
+                                                                    value="0">
+                                                                <input type="checkbox"
+                                                                    :name="'data[' + id + '][is_paid_leave]'"
+                                                                    value="1" x-model="rowPaidLeave[id]"
+                                                                    class="w-5 h-5 rounded-lg border-gray-300 text-blue-600 focus:ring-blue-100 transition-all cursor-pointer shadow-sm">
+                                                            </div>
+                                                        </td>
+
+                                                        {{-- 5. Catatan --}}
                                                         <td
                                                             class="py-4 pr-6 bg-gray-50/50 rounded-r-2xl border-y border-r border-gray-100">
-                                                            <div class="flex items-center h-full">
+                                                            <div class="flex items-center">
                                                                 <input type="text" :name="'data[' + id + '][catatan]'"
                                                                     x-model="rowCatatan[id]"
-                                                                    placeholder="Tambahkan alasan..."
-                                                                    {{-- py-3 agar tingginya sama persis dengan dropdown --}}
-                                                                    class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-700 focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all placeholder:text-gray-300 shadow-sm border-none outline-none">
+                                                                    placeholder="Tambahkan keterangan..."
+                                                                    class="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-700 focus:ring-4 focus:ring-blue-50 focus:border-blue-400 transition-all placeholder:text-gray-300 shadow-sm outline-none">
                                                             </div>
                                                         </td>
                                                     </tr>
@@ -1009,23 +949,36 @@
                     <table class="w-full text-left">
                         <thead class="bg-gray-50/50 border-b border-gray-100">
                             <tr>
-                                <th class="pl-8 py-4 w-10"><input type="checkbox" @click="toggleAll()"
+                                <th class="pl-8 py-4 w-10">
+                                    <input type="checkbox" @click="toggleAll()"
                                         :checked="selectedItems.length === allIds.length && allIds.length > 0"
-                                        class="rounded border-gray-300 text-blue-600 focus:ring-blue-100"></th>
-                                <th class="px-4 py-4 text-[11px] font-black text-gray-400 uppercase tracking-widest">
-                                    Pekerja
+                                        class="rounded border-gray-300 text-blue-600 focus:ring-blue-100">
                                 </th>
                                 <th class="px-4 py-4 text-[11px] font-black text-gray-400 uppercase tracking-widest">
-                                    Jam Masuk
-                                    & Keluar</th>
-                                <th
-                                    class="px-4 py-4 text-[11px] font-black text-gray-400 uppercase tracking-widest text-center">
-                                    Status Absen</th>
-                                <th
-                                    class="px-4 py-4 text-[11px] font-black text-center text-gray-400 uppercase tracking-widest">
-                                    Status Verifikasi</th>
+                                    Profil Pekerja
+                                </th>
+                                <th class="px-4 py-4 text-[11px] font-black text-gray-400 uppercase tracking-widest text-center">
+                                    Durasi Kerja (Realita/Normal)
+                                </th>
+                                <th class="px-4 py-4 text-[11px] font-black text-gray-400 uppercase tracking-widest text-center">
+                                    Akumulasi OT
+                                </th>
+                                {{-- Kolom Baru --}}
+                                <th class="px-4 py-4 text-[11px] font-black text-gray-400 uppercase tracking-widest text-center">
+                                    HBN
+                                </th>
+                                <th class="px-4 py-4 text-[11px] font-black text-gray-400 uppercase tracking-widest text-center">
+                                    Cuti Berbayar
+                                </th>
+                                <th class="px-4 py-4 text-[11px] font-black text-gray-400 uppercase tracking-widest text-center">
+                                    Kondisi Absensi
+                                </th>
+                                <th class="px-4 py-4 text-[11px] font-black text-center text-gray-400 uppercase tracking-widest">
+                                    Validasi Data
+                                </th>
                                 <th class="px-4 py-4 text-[11px] font-black text-gray-400 uppercase tracking-widest">
-                                    Catatan</th>
+                                    Memo
+                                </th>
                             </tr>
                         </thead>
                         <tbody id="main-table-body" class="divide-y divide-gray-50">

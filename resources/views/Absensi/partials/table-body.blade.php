@@ -57,21 +57,40 @@
             <div class="text-[10px] text-gray-400 mt-1 uppercase tracking-wider">Orang</div>
         </td>
 
+
         @if (Auth::user()->staff?->jabatan === 'PIC')
             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                <div class="flex justify-end gap-2">
-                    <!-- Detail -->
-                    <a href="{{ $un->sistem_pengajian == 1
+                <div class="flex justify-end">
+                    @php
+                        // Logika Penentuan Tema
+                        $isHarian = $un->sistem_pengajian == 1;
+
+                        $themeClasses = $isHarian
+                            ? "bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-600 hover:text-white hover:border-blue-600 shadow-blue-100"
+                            : "bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-600 hover:text-white hover:border-orange-600 shadow-orange-100";
+
+                        $labelText = $isHarian ? "Kelola Absensi" : "Kelola Absensi";
+                    @endphp
+
+                    <a href="{{ $isHarian
                         ? route('view.absensi.harian', [$un->id, request('date') ?? now()->toDateString()])
                         : route('view.absensi.borongan', [$un->id, request('date') ?? now()->toDateString()]) }}"
-                        class="text-blue-600 hover:text-blue-900 border border-blue-200 hover:bg-blue-50
-                            rounded-lg p-2 transition"
-                        title="Detail">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z" />
-                        </svg>
+                        class="inline-flex items-center gap-2 px-4 py-2 border rounded-xl transition-all duration-200 group shadow-sm {{ $themeClasses }}">
+
+                        {{-- Icon Dinamis (Opsional: Ikon Harian vs Borongan bisa beda sedikit) --}}
+                        @if($isHarian)
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        @else
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                        @endif
+
+                        <span class="font-black uppercase text-[10px] tracking-widest">
+                            {{ $labelText }}
+                        </span>
                     </a>
                 </div>
             </td>
