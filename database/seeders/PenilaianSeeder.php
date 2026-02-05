@@ -17,7 +17,7 @@ class PenilaianSeeder extends Seeder
             [
                 'id_pekerja'      => 1,
                 'id_unit'         => 6,
-                'mk'  => 1,
+                'divisi'  => QA,
                 'absensi' => 80,
                 'pengetahuan' => 50,
                 'kualitas' => 55,
@@ -36,7 +36,7 @@ class PenilaianSeeder extends Seeder
             [
                 'id_pekerja'      => 2,
                 'id_unit'         => 6,
-                'mk'  => 1,
+                'divisi'  => QA,
                 'absensi' => 80,
                 'pengetahuan' => 50,
                 'kualitas' => 55,

@@ -202,14 +202,31 @@
                                         </div>
 
                                         {{-- 2. MK --}}
-                                        <div>
+                                        {{-- <div>
                                             <label
                                                 class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">MK</label>
                                             <div class="relative">
-                                                <input type="number" :name="`pekerja[${index}][mk]`"
-                                                    x-model.number="row.mk"
+                                                <input type="number" :name="`pekerja[${index}][divisi]`"
+                                                    x-model.number="row.divisi"
                                                     class="w-full rounded-xl border-gray-200 bg-gray-50 text-sm font-bold text-gray-900 focus:bg-white focus:border-blue-500 py-3 px-4"
                                                     placeholder="0">
+                                            </div>
+                                        </div> --}}
+
+                                        <div>
+                                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
+                                                Divisi
+                                            </label>
+                                            <div class="relative">
+                                                {{-- Gunakan readonly agar tidak bisa diketik --}}
+                                                {{-- Ubah x-model.number menjadi x-model saja karena divisi adalah String --}}
+                                                <input 
+                                                    type="text" 
+                                                    readonly
+                                                    :name="`pekerja[${index}][divisi_nama]`"
+                                                    x-model="row.divisi"
+                                                    class="w-full rounded-xl border-gray-200 bg-gray-100 text-sm font-bold text-gray-400 cursor-not-allowed py-3 px-4 shadow-inner"
+                                                    placeholder="Nama Divisi">
                                             </div>
                                         </div>
 
@@ -727,38 +744,39 @@
 @section('scripts')
     <script>
         window.oldRows = @js(
-    old('pekerja')
-        ? // Jika ada data 'old' dari session (setelah gagal validasi)
-        collect(old('pekerja'))->map(function ($item, $index) use ($pkwtList) {
-            // Cari data asli pekerja dari pkwtList untuk mendapatkan Nama & NIK
-            $original = $pkwtList->firstWhere('id_pekerja', $item['id_pekerja']);
-            return [
-                'id' => $item['id'] ?? ($original->id ?? null),
-                'workerId' => $item['id_pekerja'],
-                'absensi' => $item['absensi'] ?? '',
-                'pengetahuan' => $item['pengetahuan'] ?? '',
-                'kualitas' => $item['kualitas'] ?? '',
-                'sikap' => $item['sikap'] ?? '',
-                'mk' => $item['mk'] ?? 0,
-                'keterangan' => $item['keterangan'] ?? '',
-                'nama' => $original->pekerja->nama ?? 'Tidak Ditemukan',
-                'nik' => $original->pekerja->nik ?? '-',
-            ];
-        })
-        : $pkwtList->map(function ($item) {
-            return [
-                'id' => $item->id,
-                'workerId' => $item->id_pekerja,
-                'gaji' => $item->gaji_harian,
-                // Tambahkan field lain jika perlu
-                'tglMulai' => $item->tgl_mulai_pkwt,
-                'tglAkhir' => $item->tgl_akhir_pkwt,
-                // Kita simpan nama & nik untuk tampilan combobox readonly
-                'nama' => $item->pekerja->nama,
-                'nik' => $item->pekerja->nik,
-            ];
-        }),
-);
+            old('pekerja')
+                ? collect(old('pekerja'))->map(function ($item, $index) use ($pkwtList) {
+                    $original = $pkwtList->firstWhere('id_pekerja', $item['id_pekerja']);
+                    return [
+                        'id' => $item['id'] ?? ($original->id ?? null),
+                        'workerId' => $item['id_pekerja'],
+                        'absensi' => $item['absensi'] ?? '',
+                        'pengetahuan' => $item['pengetahuan'] ?? '',
+                        'kualitas' => $item['kualitas'] ?? '',
+                        'sikap' => $item['sikap'] ?? '',
+                        // Ambil kembali nama divisi jika validasi gagal
+                        'divisi' => $original->divisi->nama ?? 'Tidak Ada', 
+                        'keterangan' => $item['keterangan'] ?? '',
+                        'nama' => $original->pekerja->nama ?? 'Tidak Ditemukan',
+                        'nik' => $original->pekerja->nik ?? '-',
+                    ];
+                })
+                : $pkwtList->map(function ($item) {
+                    return [
+                        'id' => $item->id,
+                        'workerId' => $item->id_pekerja,
+                        'nama' => $item->pekerja->nama,
+                        'nik' => $item->pekerja->nik,
+                        // Pastikan ini mengambil properti 'nama' dari relasi divisi
+                        'divisi' => $item->divisi->nama ?? '-', 
+                        'absensi' => 0,
+                        'pengetahuan' => 0,
+                        'kualitas' => 0,
+                        'sikap' => 0,
+                        'totalPoin' => 0
+                    ];
+                }),
+        );
 
         function workerCombobox(row) {
             return {
@@ -777,6 +795,8 @@
                     if (row.nama && row.nik) {
                         this.search = `${row.nama} (${row.nik})`;
                     }
+
+                    
                 },
             }
         }

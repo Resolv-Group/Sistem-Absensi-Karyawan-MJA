@@ -39,7 +39,7 @@ class PenilaianExport implements FromView, WithStyles, WithColumnWidths, WithEve
             'B' => 25, 
             'C' => 4, 
             'D' => 6, 
-            'E' => 4, 
+            'E' => 12, 
             'P' => 16, 
         ];
     }
