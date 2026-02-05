@@ -84,8 +84,12 @@ class AbsensiController extends Controller
 
         $shiftList = Shift_Absen::where('id_unit', $id_unit)->get();
 
+        $dayName = strtolower(\Carbon\Carbon::parse($date)->format('D'));
+
         // 1. Sync Attendance Records (Tetap pertahankan ini agar record absensi utama tercipta)
-        $allPkwt = PKWT::with('pekerja')->where('id_unit', $id_unit)->get();
+        $allPkwt = PKWT::with('pekerja', 'hariKerja')->where('id_unit', $id_unit)->get();
+
+        $existingAbsensi = Absensi::where('id_unit', $id_unit)->where('tgl_absensi', $date)->with('detilHarian')->get()->keyBy('id_pekerja'); // This makes searching instant
 
         // 2. Query Utama: Ambil PKWT + Pekerja + Absensi (pada tgl tsb) + DetilHarian + status aktif PKWT
         $pkwtQuery = PKWT::with([
@@ -131,15 +135,32 @@ class AbsensiController extends Controller
         }
 
         // 5. Worker Map untuk Modal
-        $workerMap = $allPkwt->mapWithKeys(function ($item) {
+        $workerMap = $allPkwt->mapWithKeys(function ($item) use ($dayName, $existingAbsensi) {
+            $hariSesuai = $item->hariKerja->where('hari', $dayName)->first();
+
+            $jamNormal = $hariSesuai ? $hariSesuai->jam_kerja : 0;
+
+            $savedAbsensi = $existingAbsensi->get($item->id_pekerja);
+            $savedDetail = $savedAbsensi ? $savedAbsensi->detilHarian : null;
+
             return [
                 $item->id => [
                     'nama' => $item->pekerja->nama,
                     'nik' => $item->pekerja->nik,
                     'initials' => strtoupper(substr($item->pekerja->nama, 0, 2)),
+                    'pkwt_hari_kerja' => (float) $jamNormal,
+
+                    // Existing Values from saved attendance
+                    'existing_jam' => $savedDetail ? (float) $savedDetail->jam_kerja_harian : null,
+                    'existing_hbn' => $savedDetail ? (int) $savedDetail->hbn : 0,
+                    'existing_paid' => $savedDetail ? (int)$savedDetail->isPaid : 0,
+                    'existing_status' => $savedDetail ? (int)$savedDetail->status_kehadiran : 0,
+                    'existing_catatan' => $savedDetail ? $savedDetail->catatan : '',
                 ],
             ];
         });
+
+        // dd($date,$dayName, $workerMap);
 
         $totalHadir = Absensi::where('id_unit', $unit->id)
             ->where('tgl_absensi', $date)
@@ -153,7 +174,6 @@ class AbsensiController extends Controller
 
     function ViewBorongan(Request $request, $id_unit, $date)
     {
-        
         $unit = Unit::with(['namaMitra'])->findOrFail($id_unit);
 
         // 1. Sync Attendance Records (Tetap pertahankan ini agar record absensi utama tercipta)
@@ -253,33 +273,20 @@ class AbsensiController extends Controller
 
     public function bulkAbsensiUpdate(Request $request)
     {
+        // 1. Validasi
         $validator = Validator::make($request->all(), [
             'date' => 'required|date',
             'data' => 'required|array',
+            'data.*.jam_aktual' => 'required|numeric|min:0', // Pastikan jam diisi angka
         ]);
+
+        // Custom validation untuk pesan error yang lebih user-friendly
         $validator->after(function ($validator) use ($request) {
             foreach ($request->data as $pkwtId => $values) {
-                $missing = [];
-
-                if (empty($values['id_shift'])) {
-                    $missing[] = 'shift';
-                }
-                if (empty($values['masuk'])) {
-                    $missing[] = 'jam masuk';
-                }
-                if (empty($values['keluar'])) {
-                    $missing[] = 'jam keluar';
-                }
-
-                if (!empty($missing)) {
+                if (!isset($values['jam_aktual']) || $values['jam_aktual'] === '') {
                     $pkwt = PKWT::with('pekerja')->find($pkwtId);
                     $nama = $pkwt?->pekerja?->nama ?? "Pekerja #$pkwtId";
-
-                    // 🔥 Human readable list: koma + "dan"
-                    $last = array_pop($missing);
-                    $missingText = $missing ? implode(', ', $missing) . ' dan ' . $last : $last;
-
-                    $validator->errors()->add("data.$pkwtId", "Data presensi $nama belum lengkap. Mohon isi $missingText.");
+                    $validator->errors()->add("data.$pkwtId", "Jam kerja $nama belum diisi.");
                 }
             }
         });
@@ -299,6 +306,7 @@ class AbsensiController extends Controller
                     continue;
                 }
 
+                // Cari atau buat record Absensi (Parent)
                 $absensi = Absensi::firstOrCreate(
                     [
                         'id_pekerja' => $pkwt->id_pekerja,
@@ -306,43 +314,52 @@ class AbsensiController extends Controller
                         'tgl_absensi' => $date,
                     ],
                     [
-                        'id_pic' => Auth::user()->staff->id,
+                        'id_pic' => Auth::user()->staff->id ?? Auth::id(),
                         'tipe' => $pkwt->unit->sistem_pengajian,
                         'verifikasi' => 0,
                     ],
                 );
 
-                // RESET DETAIL
-                $absensi->detilHarian()->delete();
+                /**
+                 * UPDATE DETAIL HARIAN
+                 * Kita gunakan updateOrCreate agar jika data sudah ada, nilainya diperbarui.
+                 * Mapping kolom disesuaikan dengan input numerik Anda.
+                 */
+                $absensi->detilHarian()->updateOrCreate(
+                    ['id_absensi' => $absensi->id],
+                    [
+                        'status_kehadiran' => 1, // Status Hadir
+                        'jam_kerja_normal' => $values['jam_normal'] ?? 0,
+                        'jam_kerja_harian' => $values['jam_aktual'],
+                        'overtime' => $values['overtime'] ?? 0,
+                        'hbn' => $values['is_hbn'] ?? 0,
+                        'catatan' => $values['catatan'] ?? null,
+                        'updated_by' => Auth::id(),
+                        // Jika kolom DB Anda masih menggunakan id_shift, masuk, keluar:
+                        // 'id_shift' => null,
+                        // 'waktu_masuk' => null,
+                        // 'waktu_keluar' => null,
+                    ],
+                );
 
-                // HADIR ONLY
-                Detil_Harian::create([
-                    'id_absensi' => $absensi->id,
-                    'id_shift' => $values['id_shift'],
-                    'status_kehadiran' => 1,
-                    'waktu_masuk' => $values['masuk'],
-                    'waktu_keluar' => $values['keluar'],
-                    'catatan' => $values['catatan'] ?? null,
-                    'updated_by' => Auth::id(),
-                ]);
-
+                // Set ulang verifikasi ke 0 jika data diubah
                 $absensi->update(['verifikasi' => 0]);
             }
 
             DB::commit();
-            return back()->with('success', 'Presensi hadir berhasil disimpan.');
+            return back()->with('success', 'Data jam kerja berhasil disimpan.');
         } catch (\Throwable $e) {
             DB::rollBack();
-            return back()->with('error', $e->getMessage());
+            return back()->with('error', 'Gagal menyimpan data: ' . $e->getMessage());
         }
     }
 
     public function bulkAbsensiUpdateStatus(Request $request)
     {
+        // dd($request->all());
         $validator = Validator::make($request->all(), [
             'date' => 'required|date',
             'data' => 'required|array',
-            'data.*.status_kehadiran' => 'required|in:2', // cuti
         ]);
 
         if ($validator->fails()) {
@@ -355,7 +372,12 @@ class AbsensiController extends Controller
             $date = $request->date;
 
             foreach ($request->data as $pkwtId => $values) {
-                $pkwt = PKWT::with('unit')->find($pkwtId);
+                $pkwt = PKWT::with('unit', 'hariKerja')->find($pkwtId);
+
+                $dayName = strtolower(\Carbon\Carbon::parse($date)->format('D'));
+                $jamKerja = $pkwt->hariKerja->firstWhere('hari', $dayName)->jam_kerja ?? 0;
+
+                // dd($jamKerja);
                 if (!$pkwt) {
                     continue;
                 }
@@ -382,10 +404,12 @@ class AbsensiController extends Controller
                 Detil_Harian::updateOrCreate(
                     ['id_absensi' => $absensi->id],
                     [
-                        'id_shift' => 0,
+                        'jam_kerja_normal' => $jamKerja,
+                        'jam_kerja_harian' => 0,
+                        'overtime' => 0,
+                        'hbn' => 0,
                         'status_kehadiran' => $values['status_kehadiran'],
-                        'waktu_masuk' => '00:00:00',
-                        'waktu_keluar' => '00:00:00',
+                        'isPaid' => $values['is_paid_leave'],
                         'catatan' => $values['catatan'] ?? null,
                         'updated_by' => Auth::id(),
                     ],
@@ -413,14 +437,14 @@ class AbsensiController extends Controller
                 'date' => 'required|date',
                 'data' => 'required|array|min:1',
 
-                'data.*.*.buktiSuratJalan' => 'nullable|file|mimes:png,jpg,jpeg,pdf|max:2048'
+                'data.*.*.buktiSuratJalan' => 'nullable|file|mimes:png,jpg,jpeg,pdf|max:2048',
             ],
             [
                 'date.required' => 'Tanggal tidak boleh kosong.',
                 'data.required' => 'Data tidak boleh kosong.',
 
                 'data.*.*.buktiSuratJalan.mimes' => 'Bukti surat jalan harus bentuk PDF / JPG / PNG.',
-                'data.*.*.buktiSuratJalan.max'   => 'Ukuran bukti surat jalan maksimal 2MB.',
+                'data.*.*.buktiSuratJalan.max' => 'Ukuran bukti surat jalan maksimal 2MB.',
             ],
         );
 

@@ -1,8 +1,8 @@
 @forelse($pkwtPekerja as $u)
     @php
         $absensi = $u->pekerja->absensiPekerja->where('tgl_absensi', $date)->where('id_unit', $u->id_unit)->first();
-
         $detil = $absensi?->detilHarian;
+        $dataMap = $workerMap[$u->id] ?? null;
     @endphp
 
     <tr class="hover:bg-blue-50/30 transition-colors group cursor-pointer"
@@ -14,11 +14,11 @@
                 class="rounded border-gray-300 text-blue-600 focus:ring-blue-100">
         </td>
 
+        {{-- 1. Profil Pekerja --}}
         <td class="px-4 py-5">
             <div class="flex items-center gap-4">
-                {{-- Avatar Initials --}}
                 <div
-                    class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-black text-xs">
+                    class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-black text-xs group-hover:bg-blue-600 group-hover:text-white transition-all">
                     {{ strtoupper(substr($u->pekerja->nama, 0, 2)) }}
                 </div>
                 <div>
@@ -29,190 +29,250 @@
             </div>
         </td>
 
-        {{-- Ganti bagian <td> Jam Masuk & Keluar dengan ini --}}
-        <td class="px-4 py-5 text-left">
-            @if ($detil && $detil->status_kehadiran == 1)
-                <div class="flex items-center gap-4">
-
-                    {{-- Shift Info --}}
-                    <div>
-                        <p class="text-sm font-black text-gray-900 uppercase tracking-tight">
-                            {{ $detil->shiftAbsen->nama ?? 'Shift Tetap' }}
-                        </p>
-                        <p class="text-sm font-mono font-bold text-blue-500/80">
-                            {{ \Carbon\Carbon::parse($detil->waktu_masuk)->format('H:i') }}
-                            <span class="text-gray-300 mx-1">—</span>
-                            {{ \Carbon\Carbon::parse($detil->waktu_keluar)->format('H:i') }}
-                        </p>
-                    </div>
-                </div>
-            @else
-                {{-- Consistent Empty State --}}
-                <div class="flex items-center gap-4 opacity-30">
-                    <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
-                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636" />
-                        </svg>
-                    </div>
-                    <div>
-                        <p class="text-sm font-bold text-gray-400">OFF</p>
-                        <p class="text-[10px] font-black text-gray-300 uppercase tracking-widest">Tidak Hadir</p>
-                    </div>
-                </div>
-            @endif
-        </td>
-
+        {{-- 2. Durasi Kerja (Merged) --}}
         <td class="px-4 py-5 text-center">
             @if ($detil)
-                {{-- PERBAIKAN: Switch pada properti status_kehadiran --}}
-                @switch($detil->status_kehadiran)
-                    @case(1)
-                        <span
-                            class="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-[12px] font-black uppercase tracking-widest shadow-sm border border-emerald-200">Hadir</span>
-                    @break
+                <div class="flex flex-col">
+                    <span class="text-sm font-black {{ $detil->hbn == 1 ? 'text-indigo-600' : 'text-blue-600' }}">
+                        {{ $detil->jam_kerja_harian ?? 0 }}
 
-                    @case(2)
-                        <span
-                            class="px-3 py-1 bg-purple-100 text-purple-700 rounded-lg text-[12px] font-black uppercase tracking-widest shadow-sm border border-purple-200">Cuti</span>
-                    @break
+                        @if($detil->hbn == 0)
+                            {{-- Normal Day: Show the /7 Jam divisor --}}
+                            <span class="text-gray-400 font-bold text-xs">/ {{ $dataMap['pkwt_hari_kerja'] ?? 0 }} Jam</span>
+                        @else
+                            {{-- Holiday (HBN): Hide divisor, add holiday label --}}
+                            <span class="text-indigo-400 font-bold text-[10px] ml-1 uppercase tracking-tighter">/ Jam</span>
+                        @endif
+                    </span>
 
-                    @default
-                        <span class="text-[12px] font-bold text-gray-300 italic">Status Unknown</span>
-                @endswitch
+                    <span class="text-[9px] font-black uppercase tracking-tighter {{ $detil->hbn == 1 ? 'text-indigo-300' : 'text-gray-300' }}">
+                        {{ $detil->hbn == 1 ? 'Kerja Hari Libur' : 'Total Durasi' }}
+                    </span>
+                </div>
             @else
-                <span class="text-[12px] font-bold text-gray-300 italic uppercase tracking-widest">Belum Absen</span>
+                <span class="text-xs font-bold text-gray-300 italic">Belum Input</span>
             @endif
         </td>
 
+        {{-- 3. Akumulasi OT --}}
+        <td class="px-4 py-5 text-center">
+            @if ($detil && $detil->overtime > 0)
+                <span class="text-sm font-black text-orange-500">
+                    +{{ $detil->overtime }} <span class="text-[10px] font-bold">Jam</span>
+                </span>
+            @else
+                <span class="text-xs font-bold text-gray-200">-</span>
+            @endif
+        </td>
+
+        {{-- 5. HBN (Kolom Baru) --}}
+        <td class="px-4 py-5 text-center">
+            @if ($detil && $detil->hbn == 1)
+                <div class="flex justify-center" title="Hari Besar Nasional">
+                    <div
+                        class="flex items-center gap-1 px-2 py-1 bg-indigo-50 text-indigo-600 rounded-md border border-indigo-100 shadow-sm">
+                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path
+                                d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732l-3.354 1.935-1.18 4.455a1 1 0 01-1.933 0L9.854 12.8 6.5 10.866a1 1 0 010-1.732l3.354-1.935 1.18-4.455A1 1 0 0112 2z" />
+                        </svg>
+                        <span class="text-[9px] font-black uppercase">HBN</span>
+                    </div>
+                </div>
+            @else
+                <span class="text-[10px] font-bold text-gray-200">-</span>
+            @endif
+        </td>
+
+        {{-- 4. Cuti Berbayar (New Column) --}}
+        <td class="px-4 py-5 text-center">
+            @if ($detil && $detil->isPaid == 1)
+                <div class="flex justify-center">
+                    <div
+                        class="w-6 h-6 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center shadow-sm border border-emerald-200">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                    </div>
+                </div>
+            @else
+                <div class="flex justify-center opacity-20">
+                    <div
+                        class="w-6 h-6 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center border border-gray-200">
+                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </div>
+                </div>
+            @endif
+        </td>
+
+        {{-- 5. Kondisi Absensi --}}
+        <td class="px-4 py-5 text-center">
+            @if ($detil)
+                @php
+                    $colors = [
+                        0 => 'bg-red-50 text-red-600 border-red-100', // Absen
+                        1 => 'bg-emerald-50 text-emerald-600 border-emerald-100', // Hadir
+                        2 => 'bg-purple-50 text-purple-600 border-purple-100', // Cuti
+                        3 => 'bg-amber-50 text-amber-600 border-amber-100', // Sakit
+                        4 => 'bg-cyan-50 text-cyan-600 border-cyan-100', // Rencana Cuti
+                    ];
+
+                    $labels = [
+                        0 => 'Absen',
+                        1 => 'Hadir',
+                        2 => 'Cuti',
+                        3 => 'Sakit',
+                        4 => 'Rencana Cuti',
+                    ];
+
+                    $statusVal = $detil->status_kehadiran;
+
+                    // Logika Izin (Status 1 tapi jam 0)
+                    if ($statusVal == 1 && $detil->jam_kerja_harian <= 0) {
+                        $statusLabel = 'Izin';
+                        $statusColor = 'bg-blue-50 text-blue-600 border-blue-100';
+                    } else {
+                        $statusLabel = $labels[$statusVal] ?? 'Unknown';
+                        $statusColor = $colors[$statusVal] ?? 'bg-gray-50 text-gray-500 border-gray-100';
+                    }
+                @endphp
+
+                {{-- Gunakan inline-flex dan whitespace-nowrap agar teks tetap satu baris --}}
+                <span
+                    class="inline-flex items-center justify-center whitespace-nowrap px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest shadow-sm border {{ $statusColor }}">
+                    {{ $statusLabel }}
+                </span>
+            @else
+                <span class="text-[10px] font-bold text-gray-300 italic uppercase tracking-widest">Kosong</span>
+            @endif
+        </td>
+
+        {{-- 6. Validasi Data --}}
         <td class="px-4 py-5 text-center">
             @if ($absensi)
-                @switch($absensi->verifikasi)
-                    @case(1)
-                        <span
-                            class="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-[12px] font-black uppercase tracking-widest shadow-sm border border-emerald-200">Disetujui</span>
-                    @break
-
-                    @case(0)
-                        <span
-                            class="px-3 py-1 bg-amber-100 text-amber-700 rounded-lg text-[12px] font-black uppercase tracking-widest shadow-sm border border-amber-200">Menunggu
-                            Persetujuan</span>
-                    @break
-
-                    @default
-                        <span class="text-[12px] font-bold text-gray-300 italic">Status Diketahui</span>
-                @endswitch
+                @if ($absensi->verifikasi == 1)
+                    <div class="flex items-center justify-center gap-1 text-emerald-600">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" />
+                        </svg>
+                        <span class="text-[10px] font-black uppercase tracking-widest">Valid</span>
+                    </div>
+                @else
+                    <div class="flex items-center justify-center gap-1 text-amber-600">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                            stroke-width="2.5">
+                            <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span class="text-[10px] font-black uppercase tracking-widest">Review</span>
+                    </div>
+                @endif
             @else
-                <span class="text-[12px] font-bold text-gray-300 italic uppercase tracking-widest">Belum
-                    Terverifikasi</span>
+                <span class="text-[10px] font-black text-gray-200">-</span>
             @endif
         </td>
 
+        {{-- 7. Memo --}}
         <td class="px-4 py-5 align-top">
             <div class="mt-1">
                 @if ($detil && $detil->catatan)
-                    {{-- Wrapper dengan aksen garis vertikal orange --}}
                     <div class="flex flex-col min-w-0 border-l-2 border-orange-200 pl-3 py-0.5">
-                        {{-- Label Header Kecil --}}
-                        <span class="text-[9px] font-black text-slate-400 uppercase tracking-tighter">
-                            Keterangan
-                        </span>
-
-                        {{-- Isi Catatan --}}
-                        <p class="text-[11px] font-semibold text-slate-600 italic leading-tight break-words max-w-[180px]"
+                        <span class="text-[9px] font-black text-slate-400 uppercase tracking-tighter">Memo</span>
+                        <p class="text-[11px] font-semibold text-slate-600 italic leading-tight truncate max-w-[150px]"
                             title="{{ $detil->catatan }}">
                             {{ $detil->catatan }}
                         </p>
                     </div>
                 @else
-                    {{-- Tampilan jika kosong --}}
-                    <span class="text-[12px] font-bold text-slate-200 italic uppercase tracking-widest">-</span>
+                    <span class="text-[12px] font-bold text-slate-200 italic">-</span>
                 @endif
             </div>
         </td>
     </tr>
-    @empty
-        <tr>
-            <td colspan="6" class="px-6 py-32 text-center bg-white">
-                <div x-transition:enter="transition ease-out duration-500"
-                    x-transition:enter-start="opacity-0 translate-y-8" x-transition:enter-end="opacity-100 translate-y-0"
-                    class="flex flex-col items-center justify-center">
+@empty
+    <tr>
+        <td colspan="6" class="px-6 py-32 text-center bg-white">
+            <div x-transition:enter="transition ease-out duration-500"
+                x-transition:enter-start="opacity-0 translate-y-8" x-transition:enter-end="opacity-100 translate-y-0"
+                class="flex flex-col items-center justify-center">
 
-                    @if (request()->anyFilled(['search', 'status', 'statusVerif']))
-                        {{-- SKENARIO A: FILTER AKTIF TAPI TIDAK ADA HASIL --}}
-                        <div class="relative mb-10">
-                            {{-- Blue Glow --}}
-                            <div class="absolute inset-0 bg-blue-400 rounded-full blur-[50px] opacity-20 animate-pulse">
-                            </div>
-
-                            {{-- Animated Icon Card (Blue) --}}
-                            <div
-                                class="relative w-32 h-32 bg-gradient-to-br from-blue-500 to-blue-600 rounded-[2.5rem] shadow-2xl shadow-blue-200 flex items-center justify-center animate-float-harian-main">
-                                <svg class="w-16 h-16 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                </svg>
-
-                                {{-- Cross Badge --}}
-                                <div
-                                    class="absolute -top-2 -right-2 w-8 h-8 bg-red-500 rounded-full border-4 border-white flex items-center justify-center shadow-lg">
-                                    <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24"
-                                        stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                                            d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                </div>
-                            </div>
+                @if (request()->anyFilled(['search', 'status', 'statusVerif']))
+                    {{-- SKENARIO A: FILTER AKTIF TAPI TIDAK ADA HASIL --}}
+                    <div class="relative mb-10">
+                        {{-- Blue Glow --}}
+                        <div class="absolute inset-0 bg-blue-400 rounded-full blur-[50px] opacity-20 animate-pulse">
                         </div>
 
-                        <h3 class="text-2xl font-black text-gray-900 tracking-tight">Pekerja Tidak Ditemukan</h3>
-                        <p class="text-sm text-gray-500 max-w-[400px] mx-auto mt-3 leading-relaxed">
-                            Kami tidak menemukan pekerja di unit <span
-                                class="font-bold text-gray-800">{{ $unit->nama_unit }}</span> yang sesuai dengan kriteria
-                            pencarian Anda.
-                        </p>
+                        {{-- Animated Icon Card (Blue) --}}
+                        <div
+                            class="relative w-32 h-32 bg-gradient-to-br from-blue-500 to-blue-600 rounded-[2.5rem] shadow-2xl shadow-blue-200 flex items-center justify-center animate-float-harian-main">
+                            <svg class="w-16 h-16 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
 
-                        <div class="mt-10">
-                            <button type="button" @click="resetFilters()"
-                                class="inline-flex items-center gap-2 px-8 py-3.5 bg-white border-2 border-gray-100 text-gray-700 text-sm font-black rounded-2xl hover:bg-gray-50 hover:border-blue-200 transition-all active:scale-95 shadow-sm">
-                                <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                                </svg>
-                                Reset Semua Filter
-                            </button>
-                        </div>
-                    @else
-                        {{-- SKENARIO A: FILTER AKTIF TAPI TIDAK ADA HASIL --}}
-                        {{-- STATE: DATABASE KOSONG (Sekarang sudah Animasi & Konsisten) --}}
-                        <div class="relative mb-8">
-                            {{-- Pulse Glow Abu-abu --}}
-                            <div class="absolute inset-0 bg-gray-200 rounded-full blur-3xl opacity-50 animate-pulse"></div>
-
-                            {{-- Floating Card Abu-abu --}}
+                            {{-- Cross Badge --}}
                             <div
-                                class="relative w-24 h-24 bg-gradient-to-br from-gray-50 to-white rounded-3xl flex items-center justify-center border border-gray-100 shadow-xl animate-float-harian">
-                                <svg class="w-12 h-12 text-gray-300" fill="none" viewBox="0 0 24 24"
+                                class="absolute -top-2 -right-2 w-8 h-8 bg-red-500 rounded-full border-4 border-white flex items-center justify-center shadow-lg">
+                                <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24"
                                     stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                        d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                        d="M6 18L18 6M6 6l12 12" />
                                 </svg>
                             </div>
                         </div>
+                    </div>
 
-                        <h3 class="text-xl font-black text-gray-400 tracking-tight">Belum Ada Pekerja</h3>
-                        <p class="text-sm text-gray-400 max-w-[280px] mx-auto mt-3 leading-relaxed">
-                            Unit ini belum memiliki daftar pekerja harian yang terdaftar di sistem.
-                        </p>
-                    @endif
-                </div>
-            </td>
-        </tr>
-    @endforelse
+                    <h3 class="text-2xl font-black text-gray-900 tracking-tight">Pekerja Tidak Ditemukan</h3>
+                    <p class="text-sm text-gray-500 max-w-[400px] mx-auto mt-3 leading-relaxed">
+                        Kami tidak menemukan pekerja di unit <span
+                            class="font-bold text-gray-800">{{ $unit->nama_unit }}</span> yang sesuai dengan kriteria
+                        pencarian Anda.
+                    </p>
 
-    <div id="new-ids-provider-full" data-ids="{{ json_encode($pkwtPekerja->pluck('id')) }}" class="hidden"></div>
-    <div id="new-pagination-provider" class="hidden">
-        @if ($pkwtPekerja->hasPages())
-            {{ $pkwtPekerja->links('vendor.pagination.custom') }}
-        @endif
-    </div>
+                    <div class="mt-10">
+                        <button type="button" @click="resetFilters()"
+                            class="inline-flex items-center gap-2 px-8 py-3.5 bg-white border-2 border-gray-100 text-gray-700 text-sm font-black rounded-2xl hover:bg-gray-50 hover:border-blue-200 transition-all active:scale-95 shadow-sm">
+                            <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                            Reset Semua Filter
+                        </button>
+                    </div>
+                @else
+                    {{-- SKENARIO A: FILTER AKTIF TAPI TIDAK ADA HASIL --}}
+                    {{-- STATE: DATABASE KOSONG (Sekarang sudah Animasi & Konsisten) --}}
+                    <div class="relative mb-8">
+                        {{-- Pulse Glow Abu-abu --}}
+                        <div class="absolute inset-0 bg-gray-200 rounded-full blur-3xl opacity-50 animate-pulse"></div>
+
+                        {{-- Floating Card Abu-abu --}}
+                        <div
+                            class="relative w-24 h-24 bg-gradient-to-br from-gray-50 to-white rounded-3xl flex items-center justify-center border border-gray-100 shadow-xl animate-float-harian">
+                            <svg class="w-12 h-12 text-gray-300" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <h3 class="text-xl font-black text-gray-400 tracking-tight">Belum Ada Pekerja</h3>
+                    <p class="text-sm text-gray-400 max-w-[280px] mx-auto mt-3 leading-relaxed">
+                        Unit ini belum memiliki daftar pekerja harian yang terdaftar di sistem.
+                    </p>
+                @endif
+            </div>
+        </td>
+    </tr>
+@endforelse
+
+<div id="new-ids-provider-full" data-ids="{{ json_encode($pkwtPekerja->pluck('id')) }}" class="hidden"></div>
+<div id="new-pagination-provider" class="hidden">
+    @if ($pkwtPekerja->hasPages())
+        {{ $pkwtPekerja->links('vendor.pagination.custom') }}
+    @endif
+</div>

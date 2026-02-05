@@ -10,10 +10,12 @@ class Detil_Harian extends Model
 
     protected $fillable = [
         'id_absensi',
-        'id_shift',
+        'jam_kerja_normal',
+        'jam_kerja_harian',
+        'overtime',
+        'hbn',
         'status_kehadiran',
-        'waktu_masuk',
-        'waktu_keluar',
+        'isPaid',
         'catatan',
         'updated_by'
     ];

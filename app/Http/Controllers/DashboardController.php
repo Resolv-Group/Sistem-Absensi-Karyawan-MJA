@@ -59,13 +59,13 @@ class DashboardController extends Controller
 
         // 3. Terlambat Hari Ini
         // Menghitung yang hadir (status 1) tapi waktu_masuk > jam masuk di tabel shift
-        $terlambatHariIni = Detil_Harian::whereHas('absensi', function ($q) use ($today) {
-            $q->whereDate('tgl_absensi', $today);
-        })
-            ->join('shift_absen', 'detil_harian.id_shift', '=', 'shift_absen.id')
-            ->where('status_kehadiran', 1)
-            ->whereColumn('detil_harian.waktu_masuk', '>', 'shift_absen.waktu_masuk')
-            ->count();
+        // $terlambatHariIni = Detil_Harian::whereHas('absensi', function ($q) use ($today) {
+        //     $q->whereDate('tgl_absensi', $today);
+        // })
+        //     ->join('shift_absen', 'detil_harian.id_shift', '=', 'shift_absen.id')
+        //     ->where('status_kehadiran', 1)
+        //     ->whereColumn('detil_harian.waktu_masuk', '>', 'shift_absen.waktu_masuk')
+        //     ->count();
 
         $kehadiranTerbaru = Detil_Harian::with(['absensi.pekerja', 'shiftAbsen'])
             ->whereHas('absensi', function ($q) use ($today) {
@@ -95,37 +95,33 @@ class DashboardController extends Controller
             ->first();
 
         // --- 1. PKWT EXPIRED (Sudah lewat tanggal tapi status_aktif masih 1) ---
-$expiredKontrakList = PKWT::with(['pekerja', 'unit'])
-    ->whereHas('pekerja', function($q) {
-        $q->where('status_aktif', 1);
-    })
-    ->where('tgl_akhir_pkwt', '<', $today)
-    ->orderBy('tgl_akhir_pkwt', 'asc')
-    ->get();
+        $expiredKontrakList = PKWT::with(['pekerja', 'unit'])
+            ->whereHas('pekerja', function ($q) {
+                $q->where('status_aktif', 1);
+            })
+            ->where('tgl_akhir_pkwt', '<', $today)
+            ->orderBy('tgl_akhir_pkwt', 'asc')
+            ->get();
 
-$urgentExpiredKontrak = $expiredKontrakList->first();
-$totalExpiredKontrak = $expiredKontrakList->count();
-$othersExpiredKontrak = $expiredKontrakList->skip(1);
-$lewatHariKontrak = $urgentExpiredKontrak ? abs(Carbon::today()->diffInDays(Carbon::parse($urgentExpiredKontrak->tgl_akhir_pkwt), false)) : 0;
+        $urgentExpiredKontrak = $expiredKontrakList->first();
+        $totalExpiredKontrak = $expiredKontrakList->count();
+        $othersExpiredKontrak = $expiredKontrakList->skip(1);
+        $lewatHariKontrak = $urgentExpiredKontrak ? abs(Carbon::today()->diffInDays(Carbon::parse($urgentExpiredKontrak->tgl_akhir_pkwt), false)) : 0;
 
-// --- 2. PKWT AKAN BERAKHIR (Logika existing Anda) ---
-$kontrakMendekatiList = PKWT::with(['pekerja', 'unit'])
-    ->whereBetween('tgl_akhir_pkwt', [$today, $thirtyDaysLater])
-    ->orderBy('tgl_akhir_pkwt', 'asc')
-    ->get();
+        // --- 2. PKWT AKAN BERAKHIR (Logika existing Anda) ---
+        $kontrakMendekatiList = PKWT::with(['pekerja', 'unit'])
+            ->whereBetween('tgl_akhir_pkwt', [$today, $thirtyDaysLater])
+            ->orderBy('tgl_akhir_pkwt', 'asc')
+            ->get();
 
-$urgentKontrak = $kontrakMendekatiList->first();
-$totalKontrakMendekati = $kontrakMendekatiList->count();
-$othersKontrak = $kontrakMendekatiList->skip(1);
-// Hitung sisa hari untuk yang urgent
-$sisaHari = $urgentKontrak ? Carbon::today()->diffInDays(Carbon::parse($urgentKontrak->tgl_akhir_pkwt), false) : 0;
+        $urgentKontrak = $kontrakMendekatiList->first();
+        $totalKontrakMendekati = $kontrakMendekatiList->count();
+        $othersKontrak = $kontrakMendekatiList->skip(1);
+        // Hitung sisa hari untuk yang urgent
+        $sisaHari = $urgentKontrak ? Carbon::today()->diffInDays(Carbon::parse($urgentKontrak->tgl_akhir_pkwt), false) : 0;
 
         // 1. MITRA EXPIRED (Sudah lewat tapi masih aktif)
-        $mitraExpiredList = MitraKerja::where('status_aktif', 1)
-            ->whereNotNull('tgl_akhir_mou')
-            ->where('tgl_akhir_mou', '<', $today)
-            ->orderBy('tgl_akhir_mou', 'asc')
-            ->get();
+        $mitraExpiredList = MitraKerja::where('status_aktif', 1)->whereNotNull('tgl_akhir_mou')->where('tgl_akhir_mou', '<', $today)->orderBy('tgl_akhir_mou', 'asc')->get();
 
         $urgentExpiredMitra = $mitraExpiredList->first();
         $totalExpiredMitra = $mitraExpiredList->count();
@@ -143,13 +139,9 @@ $sisaHari = $urgentKontrak ? Carbon::today()->diffInDays(Carbon::parse($urgentKo
         $othersMitra = $mitraMendekatiList->skip(1);
 
         // --- HITUNG SISA HARI (Aman untuk UI) ---
-        $sisaHariMitra = $urgentMitra
-            ? Carbon::today()->diffInDays(Carbon::parse($urgentMitra->tgl_akhir_mou), false)
-            : 0;
+        $sisaHariMitra = $urgentMitra ? Carbon::today()->diffInDays(Carbon::parse($urgentMitra->tgl_akhir_mou), false) : 0;
 
-        $lewatHariMitra = $urgentExpiredMitra
-            ? abs(Carbon::today()->diffInDays(Carbon::parse($urgentExpiredMitra->tgl_akhir_mou), false))
-            : 0;
+        $lewatHariMitra = $urgentExpiredMitra ? abs(Carbon::today()->diffInDays(Carbon::parse($urgentExpiredMitra->tgl_akhir_mou), false)) : 0;
 
         // 2. Hitung total kontrak yang memenuhi kriteria (untuk angka +X lainnya)
         $totalKontrakMendekati = PKWT::whereBetween('tgl_akhir_pkwt', [$today, $thirtyDaysLater])->count();
@@ -211,7 +203,7 @@ $sisaHari = $urgentKontrak ? Carbon::today()->diffInDays(Carbon::parse($urgentKo
                 'mitraMendekati',
                 'hadirHariIni', // Pass ke View
                 'izinSakitHariIni', // Pass ke View
-                'terlambatHariIni', // Pass ke View
+                // 'terlambatHariIni', // Pass ke View
             ),
         );
     }
@@ -221,7 +213,7 @@ $sisaHari = $urgentKontrak ? Carbon::today()->diffInDays(Carbon::parse($urgentKo
         try {
             // 1. Cari data penilaian berdasarkan ID
             $penilaian = Penilaian_Pkwt::findOrFail($id);
-            
+
             $User = User::where('id', auth()->id())->first();
 
             // dd($User);
@@ -229,7 +221,7 @@ $sisaHari = $urgentKontrak ? Carbon::today()->diffInDays(Carbon::parse($urgentKo
             if ($User->role == 'head_supervisor') {
                 $penilaian->update([
                     'status_staff' => auth()->id(),
-                    'updated_by'   => auth()->id(), 
+                    'updated_by' => auth()->id(),
                 ]);
             } elseif ($User->role == 'hrd') {
                 $penilaian->update([
@@ -239,7 +231,6 @@ $sisaHari = $urgentKontrak ? Carbon::today()->diffInDays(Carbon::parse($urgentKo
             }
 
             // 2. Update status_hrd dan catat siapa yang mengupdate
-            
 
             // 3. Kembalikan ke halaman sebelumnya dengan pesan sukses
             return back()->with('success', 'Penilaian untuk ' . $penilaian->pekerja->nama . ' berhasil diverifikasi.');
