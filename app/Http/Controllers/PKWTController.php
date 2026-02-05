@@ -6,10 +6,13 @@ use App\Models\Divisi;
 use App\Models\JabatanPKWT;
 use App\Models\Pekerja;
 use App\Models\PKWT;
+use App\Models\PKWT_Hari_Kerja;
 use App\Models\Unit;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+
+use function Symfony\Component\Clock\now;
 
 class PKWTController extends Controller
 {
@@ -117,10 +120,13 @@ class PKWTController extends Controller
                     'pekerja.*.tgl_mulai_pkwt' => 'required|date',
                     'pekerja.*.tgl_akhir_pkwt' => 'required|date|after_or_equal:pekerja.*.tgl_mulai_pkwt',
 
-                    'pekerja.*.gaji_harian' => 'required|integer|min:0',
-                    'pekerja.*.gaji_overtime' => 'required|integer|min:0',
-                    'pekerja.*.bpjs_kesehatan' => 'required|integer|min:0',
-                    'pekerja.*.bpjs_naker' => 'required|integer|min:0',
+                    'pekerja.*.gaji_harian' => 'required|numeric|min:0',
+                    'pekerja.*.gaji_overtime' => 'required|numeric|min:0',
+                    'pekerja.*.bpjs_kesehatan' => 'required|numeric|min:0',
+                    'pekerja.*.bpjs_naker' => 'required|numeric|min:0',
+
+                    'pekerja.*.days' => 'required|array|size:7',
+                    'pekerja.*.days.*' => 'nullable|numeric|min:0|max:24',
 
                     'pekerja.*.dokumen_pkwt' => 'nullable|file|mimes:png,jpg,jpeg,pdf|max:2048',
                 ],
@@ -134,6 +140,10 @@ class PKWTController extends Controller
                     'pekerja.*.gaji_overtime.required' => 'Gaji Overtime harian wajib diisi',
                     'pekerja.*.bpjs_kesehatan.required' => 'BPJS Kesehatan wajib diisi',
                     'pekerja.*.bpjs_naker.required' => 'BPJS Naker wajib diisi',
+
+                    'pekerja.*.days.*.numeric' => 'Jam kerja harus berupa angka',
+                    'pekerja.*.days.*.min'     => 'Jam kerja tidak boleh kurang dari 0',
+                    'pekerja.*.days.*.max'     => 'Jam kerja tidak boleh lebih dari 24',
                 ],
             );
 
@@ -164,6 +174,15 @@ class PKWTController extends Controller
                     'dokumen_mime' => $dokumenMime,
                     'status_aktif' => 1,
                 ]);
+
+                foreach ($data['days'] as $hari => $jam) {
+                    // Gunakan Model PkwtHariKerja
+                    PKWT_Hari_Kerja::create([
+                        'pkwt_id'   => $pkwt->id, // Ambil ID PKWT yang baru saja dibuat di atas
+                        'hari'      => $hari,      // 'mon', 'tue', dst (sesuai key array)
+                        'jam_kerja' => $jam ?? 0,        // nilainya (0 - 24)
+                    ]);
+                }
             }
 
             DB::commit();
@@ -203,6 +222,7 @@ class PKWTController extends Controller
 
     public function updateUnitPekerja(Request $request, $unitId, $pkwtId)
     {
+
         try {
             DB::beginTransaction();
 
@@ -216,6 +236,8 @@ class PKWTController extends Controller
                 'pekerja.*.jabatan_id' => 'required|exists:jabatan_pkwt,id',
                 'pekerja.*.tgl_mulai_pkwt' => 'required|date',
                 'pekerja.*.tgl_akhir_pkwt' => 'required|date|after_or_equal:pekerja.*.tgl_mulai_pkwt',
+                'pekerja.*.days' => 'required|array|size:7',
+                'pekerja.*.days.*' => 'nullable|numeric|min:0|max:24',
                 'pekerja.*.dokumen_pkwt' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
             ]);
 
@@ -237,6 +259,19 @@ class PKWTController extends Controller
                 'tgl_mulai_pkwt' => $data['tgl_mulai_pkwt'],
                 'tgl_akhir_pkwt' => $data['tgl_akhir_pkwt'],
             ]);
+
+            foreach ($data['days'] as $hari => $jam) {
+                PKWT_Hari_Kerja::updateOrCreate(
+                    [
+                        'pkwt_id' => $pkwt->id, // Cari yang PKWT ID-nya ini
+                        'hari'    => $hari      // Dan harinya ini (mon, tue, dst)
+                    ],
+                    [
+                        'jam_kerja' => $jam ?? 0, // Update jam kerjanya
+                        'updated_at' => now()
+                    ]
+                );
+            }
 
             // =============================
             // DOKUMEN PKWT (OPTIONAL)
