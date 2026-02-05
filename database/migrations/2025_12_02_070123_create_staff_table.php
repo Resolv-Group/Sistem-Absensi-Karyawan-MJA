@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -16,7 +17,6 @@ return new class extends Migration
             $table->string('no_kk', 30)->nullable();
             $table->string('email', 150)->nullable();
             $table->string('telp', 30)->nullable();
-            $table->binary('foto')->nullable();
 
             $table->string('alamat', 255);
             $table->string('desa', 100);
@@ -56,6 +56,8 @@ return new class extends Migration
 
             $table->timestamps();
         });
+
+        DB::statement('ALTER TABLE staff ADD foto MEDIUMBLOB NULL');
     }
 
     public function down(): void {

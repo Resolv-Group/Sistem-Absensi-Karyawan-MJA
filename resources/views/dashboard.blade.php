@@ -760,12 +760,68 @@
                         </div>
 
                         <div class="space-y-3">
+                            {{-- ALERT 1: PKWT EXPIRED (KRITIS - MERAH TEGAS) --}}
+                            @if ($totalExpiredKontrak > 0)
+                                <div
+                                    class="flex items-start gap-3 p-3 bg-red-100 rounded-lg border border-red-200 mb-3 shadow-sm">
+                                    <div class="flex-shrink-0 mt-0.5 text-red-600">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="flex items-center justify-between mb-1">
+                                            <p class="text-sm font-black text-red-900">Kontrak Pegawai Expired</p>
+                                            @if ($totalExpiredKontrak > 1)
+                                                <div x-data="{ open: false }" class="relative" @mouseenter="open = true"
+                                                    @mouseleave="open = false">
+                                                    <span
+                                                        class="cursor-help px-1.5 py-0.5 bg-red-600 text-white text-[10px] font-black rounded-md uppercase tracking-tighter transition-colors hover:bg-red-700">
+                                                        +{{ $totalExpiredKontrak - 1 }} Lainnya
+                                                    </span>
+                                                    <div x-show="open" x-transition.opacity
+                                                        class="absolute right-0 mt-2 w-72 bg-white border border-red-100 shadow-xl rounded-2xl z-50 p-3"
+                                                        x-cloak>
+                                                        <p
+                                                            class="text-[9px] font-black text-red-400 uppercase tracking-widest mb-2 px-1 text-left">
+                                                            Daftar Expired (Masih Aktif)</p>
+                                                        <div class="space-y-1 max-h-48 overflow-y-auto custom-scrollbar">
+                                                            @foreach ($othersExpiredKontrak as $other)
+                                                                @php $diff = abs(\Carbon\Carbon::today()->diffInDays(\Carbon\Carbon::parse($other->tgl_akhir_pkwt), false)); @endphp
+                                                                <div
+                                                                    class="flex items-center justify-between p-2 rounded-xl hover:bg-red-50 gap-2">
+                                                                    <div class="flex flex-col min-w-0 text-left">
+                                                                        <span
+                                                                            class="text-[11px] font-bold text-gray-700 truncate capitalize">{{ $other->pekerja->nama }}</span>
+                                                                        <span
+                                                                            class="text-[9px] font-medium text-gray-400 uppercase">{{ $other->unit->nama_unit ?? 'No Unit' }}</span>
+                                                                    </div>
+                                                                    <span
+                                                                        class="shrink-0 text-[10px] font-black text-red-600 bg-red-100 px-2 py-0.5 rounded-lg">
+                                                                        {{ $diff > 30 ? '> 30 hari' : $diff . ' hari' }}
+                                                                    </span>
+                                                                </div>
+                                                            @endforeach
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endif
+                                        </div>
+                                        <p class="text-xs text-red-800">
+                                            Kontrak <strong>{{ $urgentExpiredKontrak->pekerja->nama }}</strong>
+                                            ({{ $urgentExpiredKontrak->unit->nama_unit ?? 'N/A' }})
+                                            sudah lewat <strong
+                                                class="decoration-2">{{ $lewatHariKontrak > 30 ? 'lebih dari 30' : $lewatHariKontrak }}
+                                                hari</strong>.
+                                        </p>
+                                    </div>
+                                </div>
+                            @endif
+
+                            {{-- ALERT 2: PKWT AKAN BERAKHIR (EXISTING - DISESUAIKAN) --}}
                             @if ($urgentKontrak)
-                                @php
-                                    $target = \Carbon\Carbon::parse($urgentKontrak->tgl_akhir_pkwt)->startOfDay();
-                                    $sisaHari = \Carbon\Carbon::today()->diffInDays($target, false);
-                                @endphp
-                                <div class="flex items-start gap-3 p-3 bg-red-50 rounded-lg border border-red-100">
+                                <div class="flex items-start gap-3 p-3 bg-red-50 rounded-lg border border-red-100 mb-3">
                                     <div class="flex-shrink-0 mt-0.5 text-red-600">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -780,42 +836,32 @@
                                                 <div x-data="{ open: false }" class="relative" @mouseenter="open = true"
                                                     @mouseleave="open = false">
                                                     <span
-                                                        class="cursor-help px-1.5 py-0.5 bg-red-200 text-red-800 text-[10px] font-black rounded-md uppercase tracking-tighter transition-colors hover:bg-red-300">+{{ $totalKontrakMendekati - 1 }}
-                                                        Lainnya</span>
+                                                        class="cursor-help px-1.5 py-0.5 bg-red-600 text-white text-[10px] font-black rounded-md uppercase tracking-tighter transition-colors hover:bg-red-700">
+                                                        +{{ $totalKontrakMendekati - 1 }} Lainnya
+                                                    </span>
 
                                                     <div x-show="open" x-transition.opacity
                                                         class="absolute right-0 mt-2 w-72 bg-white border border-red-100 shadow-xl rounded-2xl z-50 p-3"
                                                         x-cloak>
                                                         <p
-                                                            class="text-[9px] font-black text-red-400 uppercase tracking-widest mb-2 px-1">
+                                                            class="text-[9px] font-black text-red-400 uppercase tracking-widest mb-2 px-1 text-left">
                                                             Daftar Pegawai & Unit</p>
                                                         <div class="space-y-1 max-h-48 overflow-y-auto custom-scrollbar">
                                                             @foreach ($othersKontrak as $other)
+                                                                @php $diff = \Carbon\Carbon::today()->diffInDays(\Carbon\Carbon::parse($other->tgl_akhir_pkwt), false); @endphp
                                                                 <div
                                                                     class="flex items-center justify-between p-2 rounded-xl hover:bg-red-50 transition-colors gap-2">
-                                                                    <div class="flex flex-col min-w-0">
-                                                                        <!-- Nama Pegawai -->
+                                                                    <div class="flex flex-col min-w-0 text-left">
                                                                         <span
                                                                             class="text-[11px] font-bold text-gray-700 truncate capitalize">{{ $other->pekerja->nama }}</span>
-                                                                        <!-- Nama Unit -->
                                                                         <span
                                                                             class="text-[9px] font-medium text-gray-500 uppercase tracking-tight truncate">
                                                                             {{ $other->unit->nama_unit ?? 'No Unit' }}
                                                                         </span>
                                                                     </div>
-
-                                                                    <!-- Sisa Hari -->
                                                                     <span
                                                                         class="shrink-0 text-[10px] font-black text-red-600 bg-red-100/50 px-2 py-0.5 rounded-lg">
-                                                                        @php
-                                                                            $diff = \Carbon\Carbon::today()->diffInDays(
-                                                                                \Carbon\Carbon::parse(
-                                                                                    $other->tgl_akhir_pkwt,
-                                                                                ),
-                                                                                false,
-                                                                            );
-                                                                        @endphp
-                                                                        {{ $diff <= 0 ? 'Hari Ini' : $diff . ' hr' }}
+                                                                        {{ $diff > 30 ? '> 30 hari' : ($diff <= 0 ? 'Hari Ini' : $diff . ' hari') }}
                                                                     </span>
                                                                 </div>
                                                             @endforeach
@@ -824,76 +870,123 @@
                                                 </div>
                                             @endif
                                         </div>
-                                        <p class="text-xs text-red-700 mt-1">
+                                        <p class="text-xs text-red-700 mt-1 text-left">
                                             Kontrak <strong>{{ $urgentKontrak->pekerja->nama }}</strong> pada
                                             <span
                                                 class="bg-red-100 text-red-800 px-1 rounded text-[10px] font-bold uppercase tracking-wide">
                                                 {{ $urgentKontrak->unit->nama_unit ?? 'Unit Unknown' }}
                                             </span>
                                             berakhir dalam
-                                            <strong>{{ $sisaHari <= 0 ? 'Hari Ini' : $sisaHari . ' hari' }}</strong>.
+                                            <strong>{{ $sisaHari > 30 ? '> 30 hari' : ($sisaHari <= 0 ? 'Hari Ini' : $sisaHari . ' hari') }}</strong>.
                                         </p>
                                     </div>
                                 </div>
                             @endif
 
-                            @if ($totalMitraMendekati > 0)
-    <div class="flex items-start gap-3 p-3 bg-orange-50 rounded-lg border border-orange-100">
-        <!-- Icon -->
-        <div class="flex-shrink-0 mt-0.5 text-orange-600">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
-                </path>
-            </svg>
-        </div>
-
-        <div class="flex-grow">
-            <!-- Header Row: Title and Badge -->
-            <div class="flex items-center justify-between mb-1">
-                <p class="text-sm font-bold text-orange-900">Masa Mitra Kerja</p>
-
-                @if ($totalMitraMendekati > 1)
-                    <div x-data="{ open: false }" class="relative" @mouseenter="open = true" @mouseleave="open = false">
-                        <span class="cursor-help px-1.5 py-0.5 bg-orange-200 text-orange-800 text-[10px] font-black rounded-md uppercase tracking-tighter transition-colors hover:bg-orange-300">
-                            +{{ $totalMitraMendekati - 1 }} Lainnya
-                        </span>
-
-                        <!-- Dropdown (Positioned to the right) -->
-                        <div x-show="open" x-transition.opacity
-                            class="absolute right-0 mt-2 w-64 bg-white border border-orange-100 shadow-xl rounded-2xl z-50 p-3"
-                            x-cloak>
-                            <p class="text-[9px] font-black text-orange-400 uppercase tracking-widest mb-2 px-1">
-                                Daftar Mitra
-                            </p>
-                            <div class="space-y-1 max-h-48 overflow-y-auto custom-scrollbar">
-                                @foreach ($othersMitra as $other)
-                                    <div class="flex items-center justify-between p-2 rounded-xl hover:bg-orange-50 transition-colors">
-                                        <span class="text-[11px] font-bold text-gray-700 truncate w-32">
-                                            {{ $other->nama_mitra }}
-                                        </span>
-                                        <span class="text-[10px] font-black text-orange-600 bg-orange-100/50 px-2 py-0.5 rounded-lg">
-                                            @php
-                                                $diff = \Carbon\Carbon::today()->diffInDays(\Carbon\Carbon::parse($other->tgl_akhir_mou), false);
-                                            @endphp
-                                            {{ $diff <= 0 ? 'Hari Ini' : $diff . ' hari' }}
-                                        </span>
+                            {{-- ALERT 1: EXPIRED (CRITICAL - MERAH) --}}
+                            @if ($totalExpiredMitra > 0)
+                                <div class="flex items-start gap-3 p-3 bg-red-50 rounded-lg border border-red-100 mb-3">
+                                    <div class="flex-shrink-0 mt-0.5 text-red-600">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
                                     </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    </div>
-                @endif
-            </div>
+                                    <div class="flex-grow">
+                                        <div class="flex items-center justify-between mb-1">
+                                            <p class="text-sm font-bold text-red-900">Kontrak Mitra Expired</p>
+                                            @if ($totalExpiredMitra > 1)
+                                                <div x-data="{ open: false }" class="relative" @mouseenter="open = true"
+                                                    @mouseleave="open = false">
+                                                    <span
+                                                        class="cursor-help px-1.5 py-0.5 bg-red-600 text-white text-[10px] font-black rounded-md uppercase tracking-tighter transition-colors hover:bg-red-700">
+                                                        +{{ $totalExpiredMitra - 1 }} Lainnya
+                                                    </span>
+                                                    <div x-show="open" x-transition.opacity
+                                                        class="absolute right-0 mt-2 w-64 bg-white border border-red-100 shadow-xl rounded-2xl z-50 p-3"
+                                                        x-cloak>
+                                                        <p
+                                                            class="text-[9px] font-black text-red-400 uppercase tracking-widest mb-2 px-1">
+                                                            Daftar Expired</p>
+                                                        <div class="space-y-1 max-h-48 overflow-y-auto custom-scrollbar">
+                                                            @foreach ($othersExpiredMitra as $other)
+                                                                @php $diff = abs(\Carbon\Carbon::today()->diffInDays(\Carbon\Carbon::parse($other->tgl_akhir_mou), false)); @endphp
+                                                                <div
+                                                                    class="flex items-center justify-between p-2 rounded-xl hover:bg-red-50">
+                                                                    <span
+                                                                        class="text-[11px] font-bold text-gray-700 truncate w-32">{{ $other->nama_mitra }}</span>
+                                                                    <span
+                                                                        class="text-[10px] font-black text-red-600 bg-red-100 px-2 py-0.5 rounded-lg">
+                                                                        {{ $diff > 30 ? '> 30 hari' : $diff . ' hari' }}
+                                                                    </span>
+                                                                </div>
+                                                            @endforeach
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endif
+                                        </div>
+                                        <p class="text-xs text-red-700">
+                                            MOU <strong>{{ $urgentExpiredMitra->nama_mitra }}</strong> sudah lewat
+                                            <strong>{{ $lewatHariMitra > 30 ? 'lebih dari 30' : $lewatHariMitra }}
+                                                hari</strong>, namun status masih Aktif.
+                                        </p>
+                                    </div>
+                                </div>
+                            @endif
 
-            <!-- Description Text (Bottom) -->
-            <p class="text-xs text-orange-700">
-                Kontrak <strong>{{ $urgentMitra->nama_mitra }}</strong>
-                berakhir dalam <strong>{{ $sisaHariMitra <= 0 ? 'Hari Ini' : $sisaHariMitra . ' hari' }}</strong>.
-            </p>
-        </div>
-    </div>
-@endif
+                            {{-- ALERT 2: MENDEKATI HABIS (WARNING - ORANYE) --}}
+                            @if ($totalMitraMendekati > 0)
+                                <div class="flex items-start gap-3 p-3 bg-orange-50 rounded-lg border border-orange-100">
+                                    <div class="flex-shrink-0 mt-0.5 text-orange-600">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                            </path>
+                                        </svg>
+                                    </div>
+                                    <div class="flex-grow">
+                                        <div class="flex items-center justify-between mb-1">
+                                            <p class="text-sm font-bold text-orange-900">Masa Mitra Kerja</p>
+                                            @if ($totalMitraMendekati > 1)
+                                                <div x-data="{ open: false }" class="relative" @mouseenter="open = true"
+                                                    @mouseleave="open = false">
+                                                    <span
+                                                        class="cursor-help px-1.5 py-0.5 bg-red-600 text-white text-[10px] font-black rounded-md uppercase tracking-tighter transition-colors hover:bg-red-700">
+                                                        +{{ $totalMitraMendekati - 1 }} Lainnya
+                                                    </span>
+                                                    <div x-show="open" x-transition.opacity
+                                                        class="absolute right-0 mt-2 w-64 bg-white border border-orange-100 shadow-xl rounded-2xl z-50 p-3"
+                                                        x-cloak>
+                                                        <p
+                                                            class="text-[9px] font-black text-orange-400 uppercase tracking-widest mb-2 px-1">
+                                                            Daftar Mitra Mendekati</p>
+                                                        <div class="space-y-1 max-h-48 overflow-y-auto custom-scrollbar">
+                                                            @foreach ($othersMitra as $other)
+                                                                @php $diff = \Carbon\Carbon::today()->diffInDays(\Carbon\Carbon::parse($other->tgl_akhir_mou), false); @endphp
+                                                                <div
+                                                                    class="flex items-center justify-between p-2 rounded-xl hover:bg-orange-50">
+                                                                    <span
+                                                                        class="text-[11px] font-bold text-gray-700 truncate w-32 text-left">{{ $other->nama_mitra }}</span>
+                                                                    <span
+                                                                        class="text-[10px] font-black text-orange-600 bg-orange-100/50 px-2 py-0.5 rounded-lg">
+                                                                        {{ $diff > 30 ? '> 30 hari' : ($diff <= 0 ? 'Hari Ini' : $diff . ' hari') }}
+                                                                    </span>
+                                                                </div>
+                                                            @endforeach
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endif
+                                        </div>
+                                        <p class="text-xs text-orange-700">
+                                            Kontrak <strong>{{ $urgentMitra->nama_mitra }}</strong> berakhir dalam
+                                            <strong>{{ $sisaHariMitra > 30 ? 'lebih dari 30' : ($sisaHariMitra <= 0 ? 'Hari Ini' : $sisaHariMitra) }}
+                                                hari</strong>.
+                                        </p>
+                                    </div>
+                                </div>
+                            @endif
 
                             @if ($absensiPendingCount > 0)
                                 <div class="flex items-start gap-3 p-3 bg-yellow-50 rounded-lg border border-yellow-100">

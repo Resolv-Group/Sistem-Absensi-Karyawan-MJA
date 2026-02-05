@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -17,7 +18,7 @@ return new class extends Migration
             $table->string('nama_mitra');          // Nama Mitra
             $table->string('pimpinan');            // Pimpinan
             $table->string('alamat');              // Alamat
-            $table->binary('foto')->nullable();
+            $table->string('kota');
 
             $table->integer('bidang_usaha_id');       // Bidang Usaha (bisa FK nanti)
 
@@ -32,6 +33,8 @@ return new class extends Migration
 
             $table->timestamps();
         });
+
+        DB::statement('ALTER TABLE mitra_kerja ADD foto MEDIUMBLOB NULL');
     }
 
     /**

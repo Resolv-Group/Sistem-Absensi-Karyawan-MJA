@@ -111,6 +111,7 @@ class MitraKerjaController extends Controller
                 ],
                 [
                     'nama_mitra.required' => 'Nama mitra wajib diisi',
+                    'kota.required' => 'Kota wajib diisi',
                     'foto.image' => 'foto harus berupa gambar',
                     'foto.max' => 'Ukuran foto maksimal 2MB',
                 ],
@@ -194,6 +195,7 @@ class MitraKerjaController extends Controller
             ],
             [
                 'nama_mitra.required' => 'Nama mitra wajib diisi',
+                'kota.required' => 'Kota wajib diisi',
                 'foto.image' => 'foto harus berupa gambar',
                 'foto.max' => 'Ukuran foto maksimal 2MB',
             ],

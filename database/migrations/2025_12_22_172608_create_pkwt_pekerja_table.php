@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -26,18 +27,19 @@ return new class extends Migration
             $table->date('tgl_mulai_pkwt');
             $table->date('tgl_akhir_pkwt');
 
-            $table->binary('dokumen_pkwt')->long();
             $table->string('dokumen_mime', 100)->nullable();
 
             $table->integer('status_aktif')->default(1);
             $table->unsignedInteger('gaji_harian')->nullable();
             $table->unsignedInteger('gaji_overtime')->nullable();
-        
+
             $table->integer('bpjs_kesehatan')->default(0);
             $table->integer('bpjs_naker')->default(0);
 
             $table->timestamps();
         });
+
+        DB::statement('ALTER TABLE pkwt_pekerja ADD dokumen_pkwt MEDIUMBLOB');
     }
 
     /**

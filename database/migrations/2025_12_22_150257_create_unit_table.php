@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -20,8 +21,7 @@ return new class extends Migration
             $table->date('mulai_perjanjian');
             $table->date('akhir_perjanjian');
 
-            $table->binary('dokumen_mou')->nullable();
-
+            // $table->binary('dokumen_mou')->nullable();
 
             $table->char('nama_unit');
             $table->integer('persentase_management_fee');
@@ -33,6 +33,8 @@ return new class extends Migration
 
             $table->timestamps();
         });
+
+        DB::statement('ALTER TABLE unit ADD dokumen_mou MEDIUMBLOB NULL');
     }
 
     /**
