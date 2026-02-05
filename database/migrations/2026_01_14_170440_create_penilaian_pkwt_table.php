@@ -17,7 +17,7 @@ return new class extends Migration
             $table->integer('id_pekerja');
             $table->integer('id_unit');
 
-            $table->integer('mk');
+            $table->char('divisi');
             $table->integer('absensi');
             $table->integer('pengetahuan');
             $table->integer('kualitas');

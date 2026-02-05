@@ -201,15 +201,21 @@
                                             </div>
                                         </div>
 
-                                        {{-- 2. MK --}}
+                                        {{-- 2. Divisi --}}
                                         <div>
-                                            <label
-                                                class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">MK</label>
+                                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
+                                                Divisi
+                                            </label>
                                             <div class="relative">
-                                                <input type="number" :name="`pekerja[${index}][mk]`"
-                                                    x-model.number="row.mk"
-                                                    class="w-full rounded-xl border-gray-200 bg-gray-50 text-sm font-bold text-gray-900 focus:bg-white focus:border-blue-500 py-3 px-4"
-                                                    placeholder="0">
+                                                {{-- Gunakan readonly agar tidak bisa diketik --}}
+                                                {{-- Ubah x-model.number menjadi x-model saja karena divisi adalah String --}}
+                                                <input 
+                                                    type="text" 
+                                                    readonly
+                                                    :name="`pekerja[${index}][divisi_nama]`"
+                                                    x-model="row.divisi"
+                                                    class="w-full rounded-xl border-gray-200 bg-gray-100 text-sm font-bold text-gray-400 cursor-not-allowed py-3 px-4 shadow-inner"
+                                                    placeholder="Nama Divisi">
                                             </div>
                                         </div>
 
@@ -737,7 +743,7 @@
                         'pengetahuan' => $item['pengetahuan'] ?? '',
                         'kualitas' => $item['kualitas'] ?? '',
                         'sikap' => $item['sikap'] ?? '',
-                        'mk' => $item['mk'] ?? 0,
+                        'divisi' => $item['divisi'] ?? 0,
                         'keterangan' => $item['keterangan'] ?? '',
                         'totalPoin' => $item['total_skor'] ?? 0,
                         'nama' => $pkwt->pekerja->nama ?? '',
@@ -751,7 +757,7 @@
                     'pengetahuan' => $penilaian->pengetahuan,
                     'kualitas' => $penilaian->kualitas,
                     'sikap' => $penilaian->sikap,
-                    'mk' => $penilaian->mk,
+                    'divisi' => $penilaian->divisi,
                     'keterangan' => $penilaian->keterangan,
                     'totalPoin' => $penilaian->total,
                     'nama' => $pkwt->pekerja->nama ?? '',

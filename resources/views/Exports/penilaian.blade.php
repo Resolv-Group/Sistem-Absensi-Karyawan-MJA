@@ -44,7 +44,7 @@
             <th rowspan="3" align="center" valign="middle" style="border:1px solid #000; background:#FFC000; font-weight:bold;">NAMA</th>
             <th rowspan="3" align="center" valign="middle" style="border:1px solid #000; background:#FFC000; font-weight:bold;">L/P</th>
             <th rowspan="3" align="center" valign="middle" style="border:1px solid #000; background:#FFC000; font-weight:bold;">USIA</th>
-            <th rowspan="3" align="center" valign="middle" style="border:1px solid #000; background:#FFC000; font-weight:bold;">MK</th>
+            <th rowspan="3" align="center" valign="middle" style="border:1px solid #000; background:#FFC000; font-weight:bold;">DIVISI</th>
 
             <th rowspan="2" colspan="2" align="center" valign="middle" style="border:1px solid #000; background:#FFC000; font-weight:bold;">ABSENSI<br>KEHADIRAN</th>
             <th rowspan="2" colspan="2" align="center" valign="middle" style="border:1px solid #000; background:#FFC000; font-weight:bold;">PENGETAHUAN</th>
@@ -95,7 +95,7 @@
                 <td style="border:1px solid #000;">{{ $row->pekerja->nama ?? '-' }}</td>
                 <td align="center" style="border:1px solid #000;">{{ $kelamin }}</td>
                 <td align="center" style="border:1px solid #000;">{{ $usia }}</td>
-                <td align="center" style="border:1px solid #000;">{{ $row->mk ?? '0' }}</td>
+                <td align="center" style="border:1px solid #000;">{{ $divisi }}</td>
 
                 <td align="center" style="border:1px solid #000;">25%</td><td align="center" style="border:1px solid #000;">{{ $row->absensi ?? 0 }}</td>
                 <td align="center" style="border:1px solid #000;">25%</td><td align="center" style="border:1px solid #000;">{{ $row->pengetahuan ?? 0 }}</td>

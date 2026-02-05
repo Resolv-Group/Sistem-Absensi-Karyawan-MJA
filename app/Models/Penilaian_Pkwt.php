@@ -12,7 +12,7 @@ class Penilaian_Pkwt extends Model
         'id_unit',
         'id_pekerja',
 
-        'mk',
+        'divisi',
         'absensi',
         'pengetahuan',
         'kualitas',

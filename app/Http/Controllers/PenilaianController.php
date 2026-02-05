@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exports\PenilaianExport;
+use App\Models\Divisi;
 use App\Models\MitraKerja;
 use App\Models\Pekerja;
 use App\Models\Penilaian_Pkwt;
@@ -96,11 +97,24 @@ class PenilaianController extends Controller
         $ids = explode(',', $request->query('ids'));
 
         // 2. Query dengan VALIDASI GANDA: ID harus ada di list DAN id_unit harus cocok
-        $pkwtList = PKWT::with('pekerja')
+        $pkwtList = PKWT::with('pekerja', 'divisi')
             ->whereIn('id', $ids)
             ->where('id_unit', $id_unit) // KUNCI KEAMANAN: Harus dalam unit yang sama
             ->get();
 
+        if ($pkwtList->isNotEmpty()) {
+            // Ambil divisi_id dari data pertama dalam list
+            $idDivisi = $pkwtList->first()->divisi_id; 
+
+            // Ambil data divisinya
+            $divisi = Divisi::find($idDivisi); 
+        } else {
+            // Tangani jika list kosong
+            $divisi = null;
+        }
+
+        $divisi = Divisi::where('id', $idDivisi)->first();
+        
         // 3. PROTEKSI: Jika jumlah data yang didapat tidak sama dengan jumlah ID yang diminta,
         // berarti ada ID ilegal atau ID dari unit lain.
         if ($pkwtList->count() !== count($ids)) {
@@ -111,12 +125,13 @@ class PenilaianController extends Controller
         $unitSelected = Unit::with('namaMitra')->findOrFail($id_unit);
         $pekerjaList = Pekerja::select('id', 'nama', 'nik')->get();
 
-        return view('Penilaian.CRUD.tambah-penilaian', compact('unitSelected', 'pkwtList', 'pekerjaList'));
+        return view('Penilaian.CRUD.tambah-penilaian', compact('unitSelected', 'pkwtList', 'pekerjaList', 'divisi'));
     }
 
     //Validasi → transaksi → cek PKWT aktif → simpan penilaian → commit / rollback
     public function buatPenilaian(Request $request)
     {
+        // dd($request->all());
         // 1. Buat Validator
         $validator = Validator::make(
             $request->all(),
@@ -124,7 +139,7 @@ class PenilaianController extends Controller
                 'id_unit' => 'required|exists:unit,id',
                 'pekerja' => 'required|array|min:1',
                 'pekerja.*.id_pekerja' => 'required|exists:pekerja,id',
-                'pekerja.*.mk' => 'required|numeric',
+                'pekerja.*.divisi_nama' => 'required|string',
                 'pekerja.*.absensi' => 'required|numeric',
                 'pekerja.*.pengetahuan' => 'required|numeric',
                 'pekerja.*.kualitas' => 'required|numeric',
@@ -139,7 +154,7 @@ class PenilaianController extends Controller
             ],
             [
                 // Custom Attribute Names (Agar pesan error rapi)
-                'pekerja.*.mk' => 'Masa Kerja (MK)',
+                'pekerja.*.divisi_nama' => 'Divisi',
                 'pekerja.*.absensi' => 'Poin Absensi',
                 'pekerja.*.pengetahuan' => 'Poin Pengetahuan',
                 'pekerja.*.kualitas' => 'Poin Kualitas',
@@ -168,7 +183,7 @@ class PenilaianController extends Controller
                         'id_pekerja' => $data['id_pekerja'],
                         'id_unit' => $request->id_unit,
 
-                        'mk' => $data['mk'],
+                        'divisi' => $data['divisi_nama'],
                         'absensi' => $data['absensi'],
                         'pengetahuan' => $data['pengetahuan'],
                         'kualitas' => $data['kualitas'],
@@ -226,7 +241,9 @@ class PenilaianController extends Controller
         $supervisor = $pic->nama ?? '';
         $hrd = $hrdStaff->nama ?? '';     
 
-        return Excel::download(new PenilaianExport($data, $unit, $divisi, $supervisor, $hrd), 'PPK_Karyawan.xlsx');
+        $filename = "PPK_Karyawan_{$unit->nama_unit}.xlsx";
+
+        return Excel::download(new PenilaianExport($data, $unit, $divisi, $supervisor, $hrd), $filename);
     }
 
     //Validasi penilaian → ambil PKWT aktif → ambil unit → tampilkan form ubah
@@ -248,18 +265,19 @@ class PenilaianController extends Controller
     //Validasi → transaksi → cek penilaian → update data → reset status → commit / rollback
     function ubahPenilaian(Request $request, $id_penilaian, $id_unit, $id_pekerja)
     {
+        // dd($request->all());
         // 1. Validasi Input
         $validator = Validator::make(
             $request->all(),
             [
-                'pekerja.0.mk' => 'required|numeric',
+                'pekerja.0.divisi_nama' => 'required|string',
                 'pekerja.0.absensi' => 'required|numeric',
                 'pekerja.0.pengetahuan' => 'required|numeric',
                 'pekerja.0.kualitas' => 'required|numeric',
                 'pekerja.0.sikap' => 'required|numeric',
             ],
             [
-                'pekerja.0.mk.required' => 'Masa Kerja (MK) harus diisi!',
+                'pekerja.0.divisi_nama.required' => 'Divisi harus diisi!',
                 'pekerja.0.absensi.required' => 'Poin absensi harus diisi!',
                 'pekerja.0.pengetahuan.required' => 'Poin pengetahuan harus diisi!',
                 'pekerja.0.kualitas.required' => 'Poin kualitas harus diisi!',
@@ -285,7 +303,7 @@ class PenilaianController extends Controller
 
             // 4. Proses Update
             $penilaian->update([
-                'mk' => $data['mk'],
+                'divisi' => $data['divisi_nama'],
                 'absensi' => $data['absensi'],
                 'pengetahuan' => $data['pengetahuan'],
                 'kualitas' => $data['kualitas'],
