@@ -355,17 +355,54 @@
                         class="px-8 py-3.5 bg-white border border-slate-200 text-slate-600 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-slate-50 transition-all shadow-sm">
                         Save Draft
                     </a>
-                    @if($payrollData['sistem_pengajian'] == 1)
-                        <a href="#"
-                            class="group flex items-center gap-3 bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-3.5 rounded-xl font-black text-xs uppercase tracking-widest shadow-xl shadow-emerald-500/20 transition-all active:scale-95">
-                            Generate Payroll
-                            <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none"
-                                stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                                    d="M13 7l5 5-5 5M6 7l5 5-5 5" />
-                            </svg>
-                        </a>
-                    @endif
+                  @php
+                            // Siapkan array dasar
+                            $queryParameters = [
+                                'id_unit'   => $payrollData['unit_id'],
+                                'tgl_awal'  => $payrollData['tanggal_mulai'],
+                                'tgl_akhir' => $payrollData['tanggal_akhir'],
+                                'grand_total'  => $payrollData['grand_total'],
+                                'exclusion_date' => $item['potongan_dates'],
+                                'workers'   => [] // Inisialisasi array workers
+                            ];
+
+                            // Isi array workers secara berpasangan
+                            foreach ($payrollData['items'] as $index => $item) {
+                                $queryParameters['workers'][$index] = [
+                                    'id'   => $item['id_pekerja'],
+                                    'upah' => $item['net_salary'],
+                                    'exclusion_date'=> $item['potongan_dates'] ?? [],
+                                ];
+                            }
+
+                            $jsonWorkers = json_encode($queryParameters['workers']);
+                        @endphp 
+
+                        <form action="{{ route('export.rincian.upah.borongan') }}" method="POST" target="_blank" style="display:inline;">
+                            @csrf
+                            <input type="hidden" name="id_unit" value="{{ $queryParameters['id_unit'] }}">
+                            <input type="hidden" name="tgl_awal" value="{{ $queryParameters['tgl_awal'] }}">
+                            <input type="hidden" name="tgl_akhir" value="{{ $queryParameters['tgl_akhir'] }}">
+                            <input type="hidden" name="grand_total" value="{{ $queryParameters['grand_total'] }}">
+                            
+                            {{-- Kirim array workers sebagai JSON string --}}
+                            <input type="hidden" name="workers_json" value="{{ $jsonWorkers }}">
+
+                            <button type="submit" class="text-blue-600 hover:text-blue-800 underline bg-transparent border-0 p-0 cursor-pointer">
+                                Export Excel
+                            </button>
+                        </form>
+                    <a href="{{ route('export.rincian.upah.borongan', $queryParameters) }}"
+
+                        class="group flex items-center gap-3 bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-3.5 rounded-xl font-black text-xs uppercase tracking-widest shadow-xl shadow-emerald-500/20 transition-all active:scale-95">
+                        Generate Rincian Upah
+                        <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                d="M13 7l5 5-5 5M6 7l5 5-5 5" />
+                        </svg>
+                    </a>
+                    
                 </div>
             </div>
         </div>

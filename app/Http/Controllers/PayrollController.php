@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Exports\DetilBoronganExport;
 use App\Exports\InvoiceBoronganExport;
 use App\Exports\KwitansiBoronganExport;
+use App\Exports\RincianUpahExport;
 use App\Exports\SlipUpahExport;
 use App\Models\Absensi;
 use App\Models\BidangUsaha;
@@ -197,7 +198,8 @@ class PayrollController extends Controller
 
     function ExportDetailBorongan(Request $request)
     {
-        // dd($request->all());
+        dd($request->all());
+
         $exclusionDates = $request->input('exclusion_date', []);
         $tanggal_awal  = Carbon::parse($request->tgl_awal);
         $tanggal_akhir = Carbon::parse($request->tgl_akhir);
@@ -503,6 +505,110 @@ class PayrollController extends Controller
             $periode,
             $display_total_tagihan,
             ),
+            $filename
+        );
+    }
+
+    function ExportRincianUpahBorongan(Request $request) 
+    {
+        // 1. Decode JSON Workers dari Request
+        // Format JSON: [{"id":2,"upah":150000,"exclusion_date":[]}, ...]
+        $requestWorkers = json_decode($request->workers_json, true);
+
+        // Ambil semua ID untuk query database sekaligus (Eager Loading)
+        $workerIds = array_column($requestWorkers, 'id');
+
+        // 2. Ambil Data Identitas dari Database
+        // Pastikan meload relasi jabatan/divisi/kelamin jika diperlukan
+        $dbPekerja = Pekerja::with([
+            // 1. Load PKWT, tapi urutkan dari yang terbaru agar kita ambil kontrak aktif
+            'pkwt' => function($query) {
+                $query->latest('id'); // Atau latest('tgl_mulai_pkwt')
+            }, 
+            // 2. Load Jabatan & Divisi MELALUI PKWT
+            'pkwt.jabatan', 
+            'pkwt.divisi'
+        ]) 
+        ->whereIn('id', $workerIds)
+        ->get()
+        ->keyBy('id');
+
+        $realItems = [];
+
+        // 3. Looping Data Request (Agar urutan & nilai upahnya sesuai input)
+        foreach ($requestWorkers as $reqWorker) {
+            $id = $reqWorker['id'];
+    
+            if (!isset($dbPekerja[$id])) continue; 
+
+            $staffDb = $dbPekerja[$id];
+            $item = new \stdClass();
+
+            // A. IDENTITAS
+            $item->nama = $staffDb->nama;
+            $item->id_karyawan = $staffDb->id_pekerja ?? $staffDb->nik; 
+
+            // --- LOGIKA BARU MENGAMBIL JABATAN & DIVISI ---
+            
+            // 1. Ambil PKWT pertama (karena tadi sudah di-sort latest, maka first() adalah yang terbaru)
+            // Gunakan null safe operator (?->) jaga-jaga jika pekerja belum punya PKWT
+            $pkwtAktif = $staffDb->pkwt->first(); 
+
+            // 2. Ambil Jabatan & Divisi dari PKWT tersebut
+            $item->jabatan = $pkwtAktif?->jabatan?->nama ?? '-'; 
+            $item->divisi  = $pkwtAktif?->divisi?->nama  ?? '-';
+
+            // --- B. DATA GAJI (Dari Request JSON) ---
+            // Karena ini Borongan, kita asumsikan 'upah' dari JSON adalah Total yang diterima
+            // Anda bisa menyesuaikan logika ini jika 'upah' tersebut harus dipecah lagi
+            $upahBorongan = $reqWorker['upah']; 
+
+            // Set Upah Pokok / Hasil Kerja
+            $item->upah_pokok = $upahBorongan;
+            
+            // Set Komponen Lain ke 0 (Kecuali jika Anda punya logika hitung BPJS otomatis disini)
+            $item->lembur_jam = 0;
+            $item->lembur_rate = 0;
+            $item->lembur_hbn_rate = 0;
+            $item->total_lembur = 0;
+            $item->jumlah_1 = $item->upah_pokok; // Total Pendapatan
+
+            // --- C. POTONGAN (Opsional) ---
+            // Jika ingin menghitung BPJS otomatis berdasarkan $upahBorongan, masukkan rumus di sini
+            // Untuk sementara kita nol-kan agar sesuai dengan Grand Total di summary
+            $item->absen_hari = 0;
+            $item->potongan_hari = 0;
+            $item->absen_jam = 0;
+            $item->potongan_jam = 0;
+            
+            $item->bpjs_tk = 0;  // Masukkan logika calc BPJS jika ada
+            $item->bpjs_kes = 0; // Masukkan logika calc BPJS jika ada
+            $item->jumlah_2 = $item->bpjs_tk + $item->bpjs_kes; // Total Potongan
+
+            // --- D. TOTAL AKHIR ---
+            $item->take_home_pay = $item->jumlah_1 - $item->jumlah_2;
+
+            // Simpan info exclusion date jika nanti perlu ditampilkan di excel (opsional)
+            $item->exclusion_dates = $reqWorker['exclusion_date'];
+
+            $realItems[] = $item;
+        }
+
+        // 4. Bungkus jadi Collection
+        $formattedData = collect($realItems);
+
+        // 5. Tentukan Periode (Dari Request Tgl Awal & Akhir)
+        $start = Carbon::parse($request->tgl_awal);
+        $end   = Carbon::parse($request->tgl_akhir);
+        
+        // Format: 1 FEB 2026 - 5 FEB 2026
+        $periodeString = strtoupper($start->isoFormat('D MMM Y') . ' - ' . $end->isoFormat('D MMM Y'));
+        
+        // Nama File
+        $filename = "Rincian_Upah_Borongan_" . $start->format('d_m_Y') . ".xlsx";
+
+        return Excel::download(
+            new RincianUpahExport($formattedData, $periodeString),
             $filename
         );
     }
