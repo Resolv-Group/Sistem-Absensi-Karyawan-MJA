@@ -35,12 +35,13 @@ return new class extends Migration
 
             $table->unsignedTinyInteger('rt')->nullable();
             $table->unsignedTinyInteger('rw')->nullable();
-
+        
             $table->string('tempat_lahir', 100);
             $table->date('tgl_lahir');
             $table->date('tgl_bergabung');
             $table->date('tgl_resign')->nullable();
-            $table->string('kpj', 13);
+            $table->string('kpj',  11)->nullable();
+            $table->string('naker',  13)->nullable();
 
             $table->boolean('kelamin')->comment('1=laki,0=perempuan');
             $table->string('status_kawin', 50);

@@ -117,13 +117,13 @@
         </tr> 
         <tr> 
             <td colspan="5" style="border:1px solid #000;">Dibuat Oleh Supervisor</td> 
-            <td colspan="5" align="center" valign="middle" style="border:1px solid #000;">{{ $supervisor }}</td> 
+            <td colspan="5" align="center" valign="middle" style="border:1px solid #000;">{{ $pic }}</td> 
             <td colspan="3" style="border:1px solid #000;"></td> 
             <td colspan="3" style="border:1px solid #000;"></td> 
         </tr> 
         <tr> 
             <td colspan="5" style="border:1px solid #000;">Diketahui Oleh Staf Operasional</td> 
-            <td colspan="5" style="border:1px solid #000;"></td> 
+            <td colspan="5" align="center" valign="middle" style="border:1px solid #000;">{{ $supervisor }}</td> 
             <td colspan="3" style="border:1px solid #000;"></td> 
             <td colspan="3" style="border:1px solid #000;"></td> 
         </tr> 

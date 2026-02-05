@@ -206,7 +206,8 @@ class PekerjaController extends Controller
 
                     'email' => 'nullable|email',
                     'telp' => 'nullable|string|max:16',
-                    'kpj' => 'required|string|max:13',
+                    'kpj' => 'nullable|string|max:11',
+                    'naker' => 'nullable|string|max:13',
 
                     'nama_rek' => 'nullable|string',
                     'rekening' => 'nullable|string|max:30',
@@ -261,12 +262,10 @@ class PekerjaController extends Controller
                     'kota.required' => 'Kota wajib diisi.',
                     'kecamatan.required' => 'Kecamatan wajib diisi.',
                     'provinsi.required' => 'Provinsi wajib diisi.',
-                    'kpj.required' => 'KPJ wajib diisi.',
 
                     // Kontak
                     'email.email' => 'Format email tidak valid.',
                     'telp.max' => 'No telepon maksimal 16 karakter.',
-                    'kpj' => 'KPJ maksimal 13 karakter',
 
                     // Bank
                     'rekening.max' => 'No rekening maksimal 30 karakter.',
@@ -320,6 +319,7 @@ class PekerjaController extends Controller
                 'kota' => $request->kota,
                 'provinsi' => $request->provinsi,
                 'kpj' => $request->kpj,
+                'naker' => $request->naker,
 
                 'email' => $request->email,
                 'telp' => $request->telp,
@@ -396,7 +396,8 @@ class PekerjaController extends Controller
 
                 'nama_rek' => 'nullable|string',
                 'rekening' => 'nullable|string|max:30',
-                'kpj' => 'required|string|max:13',
+                'kpj' => 'nullable|string|max:11',
+                'naker' => 'nullable|string|max:13',
 
                 'nama_emergency' => 'required|string|max:255',
                 'telp_emergency' => 'required|string|max:16',
@@ -437,7 +438,6 @@ class PekerjaController extends Controller
                 'tgl_bergabung.date' => 'Tanggal bergabung tidak valid.',
 
                 'tgl_resign.date' => 'Tanggal resign tidak valid.',
-                'kpj.required' => 'KPJ wajib diisi.',
 
                 // Alamat
                 'alamat.required' => 'Alamat wajib diisi.',

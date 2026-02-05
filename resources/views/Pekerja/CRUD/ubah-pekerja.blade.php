@@ -145,20 +145,45 @@
                         </div>
 
                         {{-- kpj --}}
-                        <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-1">No.KPJ (BPJS)</label>
-                            <input type="text" name="kpj" maxlength="11" autocomplete="off"
-                                value="{{ old('kpj', $pekerja->kpj) }}"
-                                class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition"
-                                placeholder="11 Digit Angka">
-                        </div>
+                        <div class="sm:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-1">BPJS Ketenagakerjaan</label>
 
-                        <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-1">Nomor Kartu Keluarga</label>
-                            <input type="text" name="no_kk" maxlength="16" autocomplete="off"
-                                value="{{ old('no_kk', $pekerja->no_kk) }}"
-                                class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition"
-                                placeholder="16 Digit Angka">
+                                <input type="text" name="kpj" maxlength="11" autocomplete="off"
+                                    class="kpj-input w-full rounded-lg shadow-sm border
+                                    @error('kpj') border-red-500 bg-red-50 @else border-gray-500 bg-gray-50 @enderror
+                                    text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400
+                                    focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition"
+                                    placeholder="11 Digit Angka" value="{{ old('kpj', $pekerja->kpj) }}">
+
+                                @error('kpj')
+                                    <p class="error-nik text-red-600 text-xs mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-1">BPJS Kesehatan</label>
+                                <input type="text" name="naker" maxlength="13" autocomplete="off"
+                                    class="naker-input w-full rounded-lg shadow-sm border
+                                @error('naker') border-red-500 bg-red-50 @else border-gray-500 bg-gray-50 @enderror
+                                border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition"
+                                    placeholder="13 Digit Angka" value="{{ old('naker', $pekerja->naker) }}">
+                                @error('naker')
+                                    <p class="text-red-600 text-xs mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-1">Nomor Kartu Keluarga</label>
+                                <input type="text" name="no_kk" maxlength="16" autocomplete="off"
+                                    class="no_kk-input w-full rounded-lg shadow-sm border
+                                @error('no_kk') border-red-500 bg-red-50 @else border-gray-500 bg-gray-50 @enderror
+                                border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition"
+                                    placeholder="16 Digit Angka" value="{{ old('no_kk', $pekerja->no_kk) }}">
+                                @error('no_kk')
+                                    <p class="text-red-600 text-xs mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
                         </div>
 
                         {{-- Tempat Lahir --}}

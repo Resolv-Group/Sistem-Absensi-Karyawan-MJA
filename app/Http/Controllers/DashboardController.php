@@ -9,6 +9,7 @@ use App\Models\MitraKerja;
 use App\Models\Pekerja;
 use App\Models\Penilaian_Pkwt;
 use App\Models\PKWT;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -220,12 +221,25 @@ $sisaHari = $urgentKontrak ? Carbon::today()->diffInDays(Carbon::parse($urgentKo
         try {
             // 1. Cari data penilaian berdasarkan ID
             $penilaian = Penilaian_Pkwt::findOrFail($id);
+            
+            $User = User::where('id', auth()->id())->first();
+
+            // dd($User);
+
+            if ($User->role == 'head_supervisor') {
+                $penilaian->update([
+                    'status_staff' => auth()->id(),
+                    'updated_by'   => auth()->id(), 
+                ]);
+            } elseif ($User->role == 'hrd') {
+                $penilaian->update([
+                    'status_hrd' => auth()->id(),
+                    'updated_by' => auth()->id(),
+                ]);
+            }
 
             // 2. Update status_hrd dan catat siapa yang mengupdate
-            $penilaian->update([
-                'status_hrd' => 1,
-                'updated_by' => auth()->id(), // Mencatat ID user yang melakukan verifikasi
-            ]);
+            
 
             // 3. Kembalikan ke halaman sebelumnya dengan pesan sukses
             return back()->with('success', 'Penilaian untuk ' . $penilaian->pekerja->nama . ' berhasil diverifikasi.');

@@ -101,7 +101,8 @@ class AdminUserSeeder extends Seeder
                 // KONTAK
                 'email' => $faker->safeEmail,
                 'telp' => $faker->phoneNumber,
-                'kpj' => $faker->unique()->numerify('#############'),
+                'kpj' => $faker->unique()->numerify('###########'),
+                'naker' => $faker->unique()->numerify(string: '#############'),
 
                 // BANK
                 'rekening' => $faker->bankAccountNumber,
@@ -128,6 +129,7 @@ class AdminUserSeeder extends Seeder
             ['jabatan' => 'PIC', 'email' => 'pic@gmail.com', 'password' => 'pic123'],
             ['jabatan' => 'PIC', 'email' => 'pic2@gmail.com', 'password' => 'pic123'],
             ['jabatan' => 'Akuntan', 'email' => 'akuntan@gmail.com', 'password' => 'akuntan123'],
+            ['jabatan' => 'head_supervisor', 'email' => 'head@gmail.com', 'password' => 'head123'],
         ];
 
         foreach ($roles as $role) {

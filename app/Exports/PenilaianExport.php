@@ -16,6 +16,7 @@ class PenilaianExport implements FromView, WithStyles, WithColumnWidths, WithEve
         public $data,
         public $unit,
         public $divisi,
+        public $pic,
         public $supervisor,
         public $hrd,
     ) {}
@@ -63,6 +64,7 @@ class PenilaianExport implements FromView, WithStyles, WithColumnWidths, WithEve
             'data'   => $this->data,
             'unit'   => $this->unit,
             'divisi' => $this->divisi,
+            'pic' => $this->pic,
             'supervisor' => $this->supervisor,
             'hrd' => $this->hrd,
         ]);

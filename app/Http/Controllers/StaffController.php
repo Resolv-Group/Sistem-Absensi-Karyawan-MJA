@@ -306,31 +306,37 @@ class StaffController extends Controller
                 'PIC' => 'pic',
                 'Akuntan' => 'akuntan',
                 'HRD' => 'hrd',
-                'Staff' => 'staff',
-                'IT' => 'it',
-                'Supervisor' => 'supervisor',
-                'Manager' => 'manager',
-                'Direktur' => 'direktur'
+                'Head Supervisor' => 'head_supervisor'
             ];
+
+            // dd($request->jabatan);
 
             // Cek apakah jabatan masuk daftar role login
             if (array_key_exists($request->jabatan, $roleMapping)) {
-                $plainPassword = Carbon::parse($request->tgl_lahir)->format('d-m-Y');
 
-                $password = Hash::make($plainPassword);
+                $existingUser = User::where('email', $staff->email)->first();
+                
+                if (!$existingUser) {
+                    $plainPassword = Carbon::parse($request->tgl_lahir)->format('d-m-Y');
 
-                $user = User::create([
-                    'name' => $staff->nama,
-                    'email' => $staff->email,
-                    'password' => $password,
-                    'role' => $roleMapping[$request->jabatan],
-                    'staff_id' => $staff->id,
-                ]);
+                    $password = Hash::make($plainPassword);
+
+                    // dd($roleMapping[$request->jabatan]);
+
+                    $user = User::create([
+                        'name' => $staff->nama,
+                        'email' => $staff->email,
+                        'password' => $password,
+                        'role' => $roleMapping[$request->jabatan],
+                        'staff_id' => $staff->id,
+                    ]);
+                }
 
                 // (OPSIONAL) FLASH VIEW
                 session()->flash('akun_info', 'Akun dibuat! Username: ' . $user->email . ' | Password: ' . $plainPassword);
             }
-
+            
+            session()->flash('akun_info', 'Akun dibuat! Username: ' . $user->email . ' | Password: ' . $plainPassword);
             return redirect()
                 ->route('view.tambah.staff')
                 ->with('success', 'Data Staff ' . $staff->nama . ' berhasil ditambahkan.');

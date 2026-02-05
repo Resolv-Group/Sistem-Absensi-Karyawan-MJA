@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('password');
 
             // ROLE USER
-            $table->enum('role', ['pic', 'akuntan', 'hrd', 'admin', 'staff', 'it', 'supervisor', 'manager', 'direktur'])->default('pic');
+            $table->enum('role', ['pic', 'akuntan', 'hrd', 'admin', 'staff', 'head_supervisor'])->default('pic');
 
             // RELASI KE STAFF (BOLEH NULL JIKA ADMIN)
             $table->foreignId('staff_id')

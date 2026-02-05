@@ -64,6 +64,11 @@ class UnitSeeder extends Seeder
         ]);
 
         PicUnit::create([
+            'id_unit' => 1,
+            'id_pic' => 11,
+        ]);
+
+        PicUnit::create([
             'id_unit' => 2,
             'id_pic' => 8,
         ]);
@@ -71,6 +76,11 @@ class UnitSeeder extends Seeder
         PicUnit::create([
             'id_unit' => 2,
             'id_pic' => 9,
+        ]);
+
+        PicUnit::create([
+            'id_unit' => 2,
+            'id_pic' => 11,
         ]);
 
         $pekerjaIds = Pekerja::inRandomOrder()->limit(6)->pluck('id')->toArray();
