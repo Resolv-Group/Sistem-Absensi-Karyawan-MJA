@@ -1,6 +1,19 @@
 @extends('layout')
 
 @section('content')
+    <style>
+        /* Menghilangkan panah di Chrome, Safari, Edge, Opera */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Menghilangkan panah di Firefox */
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+    </style>
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
         {{-- HEADER --}}
@@ -31,8 +44,8 @@
             </div>
         @endif
 
-        <form action="{{ route('update.unit-pekerja', ['unitId' => $unitSelected->id, 'pekerjaId' =>$pkwt->id
-        ]) }}" method="POST" enctype="multipart/form-data" x-data="workerForm()" class="space-y-6">
+        <form action="{{ route('update.unit-pekerja', ['unitId' => $unitSelected->id, 'pekerjaId' => $pkwt->id]) }}"
+            method="POST" enctype="multipart/form-data" x-data="workerForm()" class="space-y-6">
             @csrf
             @method('put')
 
@@ -121,7 +134,8 @@
                                 </div>
 
                                 <div class="flex items-center gap-3">
-                                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Data Pekerja ke-<span x-text="index + 1"></span></span>
+                                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Data
+                                        Pekerja ke-<span x-text="index + 1"></span></span>
                                 </div>
 
                             </div>
@@ -231,32 +245,34 @@
 
                                 {{-- 4. Gaji Harian (Update ke Format Rupiah) --}}
                                 <div>
-                                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Gaji Harian</label>
+                                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Gaji
+                                        Harian</label>
                                     <div class="relative">
                                         {{-- Input Tampilan --}}
-                                        <input type="text"
-                                            :value="formatRupiah(row.gaji)"
-                                            @input="row.gaji = $event.target.value.replace(/\D/g, '')"
+                                        <input type="text" :value="formatRupiah(row.gaji)"
+                                            @input="row.gaji = Number($event.target.value.replace(/\D/g, ''))"
                                             class="w-full rounded-xl border-gray-200 bg-gray-50 text-sm font-bold text-gray-900 focus:bg-white focus:border-blue-500 py-3 px-4"
                                             placeholder="Rp 0">
 
                                         {{-- Hidden Input untuk kirim angka murni ke Controller --}}
-                                        <input type="hidden" :name="`pekerja[${index}][gaji_harian]`" :value="row.gaji">
+                                        <input type="hidden" :name="`pekerja[${index}][gaji_harian]`"
+                                            :value="row.gaji">
                                     </div>
                                 </div>
                                 {{-- 5. Gaji Harian (Update ke Format Rupiah) --}}
                                 <div>
-                                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Gaji Overtime (Lembur)</label>
+                                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Gaji
+                                        Overtime (Lembur) / Jam</label>
                                     <div class="relative">
                                         {{-- Input Tampilan --}}
-                                        <input type="text"
-                                            :value="formatRupiah(row.gajiOvertime)"
-                                            @input="row.gajiOvertime = $event.target.value.replace(/\D/g, '')"
+                                        <input type="text" :value="formatRupiah(row.gajiOvertime)"
+                                            @input="row.gajiOvertime = Number($event.target.value.replace(/\D/g, ''))"
                                             class="w-full rounded-xl border-gray-200 bg-gray-50 text-sm font-bold text-gray-900 focus:bg-white focus:border-blue-500 py-3 px-4"
                                             placeholder="Rp 0">
 
                                         {{-- Hidden Input untuk kirim angka murni ke Controller --}}
-                                        <input type="hidden" :name="`pekerja[${index}][gaji_overtime]`" :value="row.gajiOvertime">
+                                        <input type="hidden" :name="`pekerja[${index}][gaji_overtime]`"
+                                            :value="row.gajiOvertime">
                                     </div>
                                 </div>
 
@@ -266,7 +282,7 @@
                                         Kesehatan</label>
                                     <div class="relative">
                                         <input type="text" :value="formatRupiah(row.bpjsKesehatan)"
-                                            @input="row.bpjsKesehatan = $event.target.value.replace(/\D/g, '')"
+                                            @input="row.bpjsKesehatan = Number($event.target.value.replace(/\D/g, ''))"
                                             class="w-full rounded-xl border-gray-200 bg-gray-50 text-sm font-bold text-gray-900 focus:bg-white focus:border-blue-500 py-3 px-4"
                                             placeholder="Rp 0">
                                         {{-- Hidden input tetap ada untuk mengirim angka murni ke database --}}
@@ -281,7 +297,7 @@
                                         Ketenagakerjaan</label>
                                     <div class="relative">
                                         <input type="text" :value="formatRupiah(row.bpjsNaker)"
-                                            @input="row.bpjsNaker = $event.target.value.replace(/\D/g, '')"
+                                            @input="row.bpjsNaker = Number($event.target.value.replace(/\D/g, ''))"
                                             class="w-full rounded-xl border-gray-200 bg-gray-50 text-sm font-bold text-gray-900 focus:bg-white focus:border-blue-500 py-3 px-4"
                                             placeholder="Rp 0">
                                         <input type="hidden" :name="`pekerja[${index}][bpjs_naker]`"
@@ -293,8 +309,7 @@
                                 <div>
                                     <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Mulai
                                         PKWT</label>
-                                    <input type="date"
-                                        :name="`pekerja[${index}][tgl_mulai_pkwt]`"
+                                    <input type="date" :name="`pekerja[${index}][tgl_mulai_pkwt]`"
                                         x-model="row.tglMulai"
                                         class="w-full rounded-xl border-gray-200 bg-gray-50 text-sm py-3 px-4 text-gray-600 focus:bg-white focus:border-blue-500">
                                 </div>
@@ -302,16 +317,67 @@
                                 <div>
                                     <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Akhir
                                         PKWT</label>
-                                    <input type="date"
-                                        :name="`pekerja[${index}][tgl_akhir_pkwt]`"
+                                    <input type="date" :name="`pekerja[${index}][tgl_akhir_pkwt]`"
                                         x-model="row.tglAkhir"
                                         class="w-full rounded-xl border-gray-200 bg-gray-50 text-sm py-3 px-4 text-gray-600 focus:bg-white focus:border-blue-500">
+                                </div>
+
+                                <div class="sm:col-span-2 mt-4">
+                                    <div class="flex items-center justify-between mb-3 px-1">
+                                        <label
+                                            class="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">Alokasi
+                                            Jam Harian</label>
+                                        <div class="flex items-center gap-2">
+                                            <span
+                                                class="text-[10px] font-bold text-gray-300 uppercase tracking-widest">Total</span>
+                                            <span class="font-mono text-sm font-black text-gray-900"
+                                                x-text="(Object.values(row.days).reduce((a, b) => (parseFloat(a) || 0) + (parseFloat(b) || 0), 0)).toFixed(1)">
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex bg-gray-50/80 p-1 rounded-2xl border border-gray-100 overflow-hidden">
+                                        <template
+                                            x-for="(dayName, dayKey) in {mon:'M', tue:'T', wed:'W', thu:'T', fri:'F', sat:'S', sun:'S'}"
+                                            :key="dayKey">
+                                            <div class="flex-1 relative group/day">
+                                                <div
+                                                    class="absolute top-2.5 left-0 right-0 text-center pointer-events-none z-20">
+                                                    <span class="text-[9px] font-black tracking-tighter"
+                                                        :class="row.days[dayKey] !== '' && parseFloat(row.days[
+                                                            dayKey]) > 0 ? (dayKey === 'sun' ?
+                                                            'text-red-500' :
+                                                            'text-blue-500') : 'text-gray-300'"
+                                                        x-text="dayName"></span>
+                                                </div>
+
+                                                <input type="number"
+                                                    step="0.1"
+                                                    placeholder="0"
+                                                    :name="`pekerja[${index}][days][${dayKey}]`"
+                                                    :value="row.days[dayKey]"
+                                                    @input="validateDayInput($event, row, dayKey)"
+                                                    @blur="cleanupDayInput(row, dayKey)"
+                                                    class="w-full pt-7 pb-3 text-center text-base font-bold bg-transparent border-none outline-none ring-0 focus:ring-0 focus:outline-none placeholder:text-gray-200 z-10 relative transition-all"
+                                                    :class="row.days[dayKey] !== '' && row.days[dayKey] != 0 ? 'text-gray-900' : 'text-gray-400'"
+                                                />
+
+                                                <div
+                                                    class="absolute inset-0 rounded-xl transition-all duration-300 opacity-0 group-hover/day:opacity-100 group-focus-within/day:opacity-100 group-focus-within/day:bg-white group-focus-within/day:shadow-sm">
+                                                </div>
+                                                <div x-show="dayKey !== 'sun'"
+                                                    class="absolute right-0 top-4 bottom-4 w-px bg-gray-200/60 group-focus-within/day:opacity-0 transition-opacity">
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
                                 </div>
 
                                 {{-- 9. File Upload --}}
                                 <div class="sm:col-span-2" x-data="{ fileName: '' }">
                                     <label
-                                        class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Perbarui Dokumen
+                                        class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Perbarui
+                                        Dokumen
                                         PKWT</label>
                                     <div class="flex items-center gap-3">
                                         <label
@@ -408,6 +474,20 @@
             jabatanId: {{ $pkwt->jabatan_id }},
             tglMulai: '{{ $pkwt->tgl_mulai_pkwt }}',
             tglAkhir: '{{ $pkwt->tgl_akhir_pkwt }}',
+            days: (() => {
+                // Ambil data mentah dari PHP
+                const rawDays = @json($pkwt->hariKerja->pluck('jam_kerja', 'hari'));
+                const formatted = {};
+
+                // List hari untuk memastikan semua terisi
+                ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].forEach(day => {
+                    const val = rawDays[day];
+                    // Jika ada nilainya, ubah 7.0 -> 7. Jika kosong, buat string kosong ''
+                    formatted[day] = (val !== undefined && val !== null) ? parseFloat(val).toString() : '';
+                });
+
+                return formatted;
+            })(),
         }];
 
         function workerCombobox(row) {
@@ -448,8 +528,7 @@
         function workerForm() {
             return {
                 rows: window.oldRows && window.oldRows.length ?
-                    window.oldRows :
-                    [{
+                    window.oldRows : [{
                         id: Date.now(),
                         gaji: 0,
                         gajiOvertime: 0,
@@ -460,6 +539,15 @@
                         tglAkhir: '',
                         bpjsKesehatan: 0,
                         bpjsNaker: 0,
+                        days: {
+                            mon: '',
+                            tue: '',
+                            wed: '',
+                            thu: '',
+                            fri: '',
+                            sat: '',
+                            sun: ''
+                        }
                     }],
 
                 addRow() {
@@ -474,14 +562,51 @@
                         tglAkhir: '',
                         bpjsKesehatan: 0,
                         bpjsNaker: 0,
+                        days: {
+                            mon: '',
+                            tue: '',
+                            wed: '',
+                            thu: '',
+                            fri: '',
+                            sat: '',
+                            sun: ''
+                        }
                     });
                 },
                 get totalAllocation() {
                     return this.rows.reduce((sum, row) => sum + (parseInt(row.gaji) || 0), 0);
                 },
+                validateDayInput(e, row, dayKey) {
+                    let input = e.target;
+                    let val = input.value;
+
+                    if (val === '') {
+                        row.days[dayKey] = '';
+                        return;
+                    }
+
+                    let num = parseFloat(val);
+
+                    if (num > 24) {
+                        num = 24;
+                        input.value = 24;
+                    }
+                    if (num < 0) {
+                        num = 0;
+                        input.value = 0;
+                    }
+
+                    row.days[dayKey] = input.value;
+                },
+
+                cleanupDayInput(row, dayKey) {
+                    if (row.days[dayKey] !== '' && row.days[dayKey] !== null) {
+                        let n = parseFloat(row.days[dayKey]);
+                        row.days[dayKey] = isNaN(n) ? '' : parseFloat(n.toFixed(1)).toString();
+                    }
+                },
                 formatRupiah(amount) {
-                    // Jika kosong atau NaN, kembalikan Rp 0
-                    const value = amount ? amount : 0;
+                    const value = Number(amount) || 0;
                     return new Intl.NumberFormat('id-ID', {
                         style: 'currency',
                         currency: 'IDR',

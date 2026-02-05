@@ -1,6 +1,25 @@
 @extends('layout')
 
 @section('content')
+    <style>
+        /* Prevent default number input UI */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type=number] {
+            -moz-appearance: textfield;
+            font-family: inherit;
+        }
+
+        /* Chrome/Safari focus fix */
+        input:focus {
+            outline: none !important;
+            box-shadow: none !important;
+        }
+    </style>
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
         {{-- HEADER --}}
@@ -127,14 +146,16 @@
                                 </div>
 
                                 <div class="flex items-center gap-3">
-                                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Data Pekerja ke-<span x-text="index + 1"></span></span>
+                                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Data
+                                        Pekerja ke-<span x-text="index + 1"></span></span>
                                 </div>
 
                                 {{-- Tombol Hapus: Sekarang di posisi yang aman dan mudah diklik --}}
                                 <button type="button" @click="removeRow(index)"
                                     class="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-red-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all border border-transparent hover:border-red-100">
                                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                     </svg>
                                     Hapus
                                 </button>
@@ -268,32 +289,32 @@
                                     </label>
                                     <div class="relative">
                                         {{-- Input ini hanya untuk tampilan (display) --}}
-                                        <input type="text"
-                                            :value="formatRupiah(row.gaji)"
-                                            @input="row.gaji = $event.target.value.replace(/\D/g, '')"
+                                        <input type="text" :value="formatRupiah(row.gaji)"
+                                            @input="row.gaji = Number($event.target.value.replace(/\D/g, ''))"
                                             class="w-full rounded-xl border-gray-200 bg-gray-50 text-sm font-bold text-gray-900 focus:bg-white focus:border-blue-500 py-3 px-4"
                                             placeholder="Rp 0">
 
                                         {{-- Hidden input untuk mengirim angka murni ke Controller --}}
-                                        <input type="hidden" :name="`pekerja[${index}][gaji_harian]`" :value="row.gaji">
+                                        <input type="hidden" :name="`pekerja[${index}][gaji_harian]`"
+                                            :value="row.gaji">
                                     </div>
                                 </div>
 
                                 {{-- 5. Gaji Overtime (Lembur) --}}
-                                <div >
+                                <div>
                                     <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
-                                        Gaji Overtime (Lembur)
+                                        Gaji Overtime (Lembur) / Jam
                                     </label>
                                     <div class="relative">
                                         {{-- Input Tampilan --}}
-                                        <input type="text"
-                                            :value="formatRupiah(row.overtime)"
-                                            @input="row.overtime = $event.target.value.replace(/\D/g, '')"
+                                        <input type="text" :value="formatRupiah(row.overtime)"
+                                            @input="row.overtime = Number($event.target.value.replace(/\D/g, ''))"
                                             class="w-full rounded-xl border-gray-200 bg-gray-50 text-sm font-bold text-gray-900 focus:bg-white focus:border-blue-500 py-3 px-4"
                                             placeholder="Rp 0">
 
                                         {{-- Hidden input untuk mengirim angka murni ke database --}}
-                                        <input type="hidden" :name="`pekerja[${index}][gaji_overtime]`" :value="row.overtime">
+                                        <input type="hidden" :name="`pekerja[${index}][gaji_overtime]`"
+                                            :value="row.overtime">
                                     </div>
                                 </div>
 
@@ -303,7 +324,7 @@
                                         Kesehatan</label>
                                     <div class="relative">
                                         <input type="text" :value="formatRupiah(row.bpjsKesehatan)"
-                                            @input="row.bpjsKesehatan = $event.target.value.replace(/\D/g, '')"
+                                            @input="row.bpjsKesehatan = Number($event.target.value.replace(/\D/g, ''))"
                                             class="w-full rounded-xl border-gray-200 bg-gray-50 text-sm font-bold text-gray-900 focus:bg-white focus:border-blue-500 py-3 px-4"
                                             placeholder="Rp 0">
                                         {{-- Hidden input tetap ada untuk mengirim angka murni ke database --}}
@@ -318,7 +339,7 @@
                                         Ketenagakerjaan</label>
                                     <div class="relative">
                                         <input type="text" :value="formatRupiah(row.bpjsNaker)"
-                                            @input="row.bpjsNaker = $event.target.value.replace(/\D/g, '')"
+                                            @input="row.bpjsNaker = Number($event.target.value.replace(/\D/g, ''))"
                                             class="w-full rounded-xl border-gray-200 bg-gray-50 text-sm font-bold text-gray-900 focus:bg-white focus:border-blue-500 py-3 px-4"
                                             placeholder="Rp 0">
                                         <input type="hidden" :name="`pekerja[${index}][bpjs_naker]`"
@@ -341,6 +362,53 @@
                                         PKWT</label>
                                     <input type="date" :name="`pekerja[${index}][tgl_akhir_pkwt]`"
                                         class="w-full rounded-xl border-gray-200 bg-gray-50 text-sm py-3 px-4 text-gray-600 focus:bg-white focus:border-blue-500">
+                                </div>
+
+                                {{-- Weekly Schedule Input --}}
+                                <div class="sm:col-span-2 mt-4">
+                                    <div class="flex items-center justify-between mb-3 px-1">
+                                        <label
+                                            class="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">Alokasi
+                                            Jam Harian</label>
+                                        <div class="flex items-center gap-2">
+                                            <span
+                                                class="text-[10px] font-bold text-gray-300 uppercase tracking-widest">Total</span>
+                                            <span class="font-mono text-sm font-black text-gray-900"
+                                                x-text="(Object.values(row.days).reduce((a, b) => (parseFloat(a) || 0) + (parseFloat(b) || 0), 0)).toFixed(1)">
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex bg-gray-50/80 p-1 rounded-2xl border border-gray-100 overflow-hidden">
+                                        <template
+                                            x-for="(dayName, dayKey) in {mon:'M', tue:'T', wed:'W', thu:'T', fri:'F', sat:'S', sun:'S'}"
+                                            :key="dayKey">
+                                            <div class="flex-1 relative group/day">
+                                                <div
+                                                    class="absolute top-2.5 left-0 right-0 text-center pointer-events-none z-20">
+                                                    <span class="text-[9px] font-black tracking-tighter"
+                                                        :class="row.days[dayKey] !== '' && parseFloat(row.days[
+                                                            dayKey]) > 0 ? (dayKey === 'sun' ? 'text-red-500' :
+                                                                'text-blue-500') : 'text-gray-300'"
+                                                        x-text="dayName"></span>
+                                                </div>
+
+                                                <input type="number" step="0.1" placeholder="0"
+                                                    :name="`pekerja[${index}][days][${dayKey}]`" :value="row.days[dayKey]"
+                                                    @input="validateDayInput($event, row, dayKey)"
+                                                    @blur="cleanupDayInput(row, dayKey)"
+                                                    class="w-full pt-7 pb-3 text-center text-base font-bold bg-transparent border-none outline-none ring-0 focus:ring-0 focus:outline-none placeholder:text-gray-200 z-10 relative transition-all"
+                                                    :class="row.days[dayKey] !== '' ? 'text-gray-900' : 'text-gray-400'" />
+
+                                                <div
+                                                    class="absolute inset-0 rounded-xl transition-all duration-300 opacity-0 group-hover/day:opacity-100 group-focus-within/day:opacity-100 group-focus-within/day:bg-white group-focus-within/day:shadow-sm">
+                                                </div>
+                                                <div x-show="dayKey !== 'sun'"
+                                                    class="absolute right-0 top-4 bottom-4 w-px bg-gray-200/60 group-focus-within/day:opacity-0 transition-opacity">
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
                                 </div>
 
                                 {{-- 10. File Upload --}}
@@ -556,11 +624,57 @@
                         jabatanId: null,
                         bpjsKesehatan: 0,
                         bpjsNaker: 0,
+                        days: {
+                            mon: 0,
+                            tue: 0,
+                            wed: 0,
+                            thu: 0,
+                            fri: 0,
+                            sat: 0,
+                            sun: 0
+                        }
                     } // Added fields
                 ],
 
                 getSelectedWorkerIds() {
                     return this.rows.map(row => row.workerId).filter(id => id !== '');
+                },
+
+                validateDayInput(e, row, dayKey) {
+                    let input = e.target;
+                    let val = input.value;
+
+                    // 1. Allow empty for a clean UI
+                    if (val === '') {
+                        row.days[dayKey] = '';
+                        return;
+                    }
+
+                    // 2. Convert to float for numeric comparison
+                    let num = parseFloat(val);
+
+                    // 3. Strict Cap at 24
+                    if (num > 24) {
+                        num = 24;
+                        input.value = 24; // Force the physical input box to change
+                    }
+
+                    // 4. Strict Min at 0
+                    if (num < 0) {
+                        num = 0;
+                        input.value = 0;
+                    }
+
+                    // 5. Update Alpine data
+                    row.days[dayKey] = input.value;
+                },
+
+                cleanupDayInput(row, dayKey) {
+                    // Clean up trailing dots (e.g., "7." becomes "7") on blur
+                    if (row.days[dayKey] !== '') {
+                        let n = parseFloat(row.days[dayKey]);
+                        row.days[dayKey] = isNaN(n) ? '' : parseFloat(n.toFixed(1)).toString();
+                    }
                 },
 
                 addRow() {
@@ -573,6 +687,15 @@
                         jabatanId: '', // Initialize empty
                         bpjsKesehatan: 0,
                         bpjsNaker: 0,
+                        days: {
+                            mon: '',
+                            tue: '',
+                            wed: '',
+                            thu: '',
+                            fri: '',
+                            sat: '',
+                            sun: ''
+                        }
                     });
                 },
                 // ... (removeRow, totals, etc remain the same) ...
@@ -583,8 +706,7 @@
                     return this.rows.reduce((sum, row) => sum + (parseInt(row.gaji) || 0), 0);
                 },
                 formatRupiah(amount) {
-                    // Jika amount kosong atau bukan angka, anggap 0
-                    const value = amount ? amount : 0;
+                    const value = Number(amount) || 0;
                     return new Intl.NumberFormat('id-ID', {
                         style: 'currency',
                         currency: 'IDR',

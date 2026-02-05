@@ -13,15 +13,15 @@ class PKWT extends Model
     protected $table = 'pkwt_pekerja';
 
     protected $fillable = [
-        'id_pekerja', 
-        'id_unit', 
-        'divisi_id', 
-        'jabatan_id', 
-        'tgl_mulai_pkwt', 
-        'tgl_akhir_pkwt', 
-        'dokumen_pkwt', 
-        'dokumen_mime', 
-        'status_aktif', 
+        'id_pekerja',
+        'id_unit',
+        'divisi_id',
+        'jabatan_id',
+        'tgl_mulai_pkwt',
+        'tgl_akhir_pkwt',
+        'dokumen_pkwt',
+        'dokumen_mime',
+        'status_aktif',
         'gaji_harian',
         'gaji_overtime',
         'bpjs_kesehatan',
@@ -87,5 +87,11 @@ class PKWT extends Model
     public function jabatan()
     {
         return $this->belongsTo(JabatanPKWT::class);
+    }
+
+    public function hariKerja()
+    {
+        // pkwt_id adalah foreign key di tabel pkwt_hari_kerja
+        return $this->hasMany(PKWT_Hari_Kerja::class, 'pkwt_id');
     }
 }
