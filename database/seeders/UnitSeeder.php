@@ -10,6 +10,7 @@ use Faker\Factory as Faker;
 use App\Models\Unit;
 use App\Models\PicUnit;
 use App\Models\PKWT;
+use App\Models\PKWT_Hari_Kerja;
 
 class UnitSeeder extends Seeder
 {
@@ -95,7 +96,7 @@ class UnitSeeder extends Seeder
                 $tglMulai = $faker->dateTimeBetween('-6 months', 'now');
                 $tglAkhir = (clone $tglMulai)->modify('+1 year');
 
-                PKWT::create([
+                $pkwt = PKWT::create([
                     'id_pekerja'      => $pekerjaIds[$index],
                     'id_unit'         => $unitId,
                     'divisi_id'       => rand(1, 5),
@@ -108,11 +109,29 @@ class UnitSeeder extends Seeder
                     'gaji_harian'     => $unitId == 6
                         ? $faker->numberBetween(100000, 150000) // harian
                         : $faker->numberBetween(150000, 250000), // borongan
-                    
+
                     'gaji_overtime' => 100000,
                     'bpjs_kesehatan' => 0,
                     'bpjs_naker' => 0,
                 ]);
+
+                $hariList = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+
+                foreach ($hariList as $hari) {
+                    // Logic: Mon-Fri 8h, Sat 5h, Sun 0h (or customize as needed)
+                    $jam = 0;
+                    if (in_array($hari, ['mon', 'tue', 'wed', 'thu', 'fri'])) {
+                        $jam = 8.0;
+                    } elseif ($hari === 'sat') {
+                        $jam = 5.0;
+                    }
+
+                    PKWT_Hari_Kerja::create([
+                        'pkwt_id'   => $pkwt->id,
+                        'hari'      => $hari,
+                        'jam_kerja' => $jam,
+                    ]);
+                }
 
                 $index++;
             }
