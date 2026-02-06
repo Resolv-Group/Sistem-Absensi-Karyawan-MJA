@@ -276,32 +276,75 @@
                                     </div>
                                 </div>
 
-                                {{-- 6. Bpjs Kesehatan --}}
+                                {{-- HASIL BPJS KESEHATAN --}}
                                 <div>
-                                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">BPJS
-                                        Kesehatan</label>
+                                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">
+                                        Iuran BPJS Kes
+                                        <span x-show="row.kpj && row.kpj.trim() !== ''" class="text-green-500 text-[10px] ml-1">● Editable</span>
+                                    </label>
                                     <div class="relative">
-                                        <input type="text" :value="formatRupiah(row.bpjsKesehatan)"
+                                        <input
+                                            type="text"
+                                            {{-- Conditional readonly based on KPJ existence --}}
+                                            :readonly="!row.kpj || row.kpj.trim() === ''"
+                                            :value="formatRupiah(row.bpjsKesehatan)"
                                             @input="row.bpjsKesehatan = Number($event.target.value.replace(/\D/g, ''))"
-                                            class="w-full rounded-xl border-gray-200 bg-gray-50 text-sm font-bold text-gray-900 focus:bg-white focus:border-blue-500 py-3 px-4"
+                                            {{-- Dynamic classes based on KPJ and value --}}
+                                            :class="{
+                                                'bg-blue-50 text-blue-700 border-blue-200 cursor-text': row.kpj && row.kpj.trim() !== '' && row.bpjsKesehatan > 0,
+                                                'bg-white text-gray-700 border-gray-300 cursor-text hover:border-blue-400': row.kpj && row.kpj.trim() !== '' && row.bpjsKesehatan === 0,
+                                                'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed': !row.kpj || row.kpj.trim() === ''
+                                            }"
+                                            class="w-full rounded-xl border text-sm font-bold py-3 px-4 transition-colors focus:ring-2 focus:ring-blue-300 focus:outline-none"
                                             placeholder="Rp 0">
-                                        {{-- Hidden input tetap ada untuk mengirim angka murni ke database --}}
-                                        <input type="hidden" :name="`pekerja[${index}][bpjs_kesehatan]`"
-                                            :value="row.bpjsKesehatan">
+
+                                        <input type="hidden" :name="`pekerja[${index}][bpjs_kesehatan]`" :value="row.bpjsKesehatan">
+
+                                        {{-- Icon indicator --}}
+                                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                            <svg x-show="row.kpj && row.kpj.trim() !== ''" class="w-4 h-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                            </svg>
+                                            <svg x-show="!row.kpj || row.kpj.trim() === ''" class="w-4 h-4 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                            </svg>
+                                        </div>
                                     </div>
                                 </div>
 
-                                {{-- 7. Bpjs Ketenagakerjaan --}}
+                                {{-- HASIL BPJS NAKER --}}
                                 <div>
-                                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">BPJS
-                                        Ketenagakerjaan</label>
+                                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">
+                                        Iuran BPJS Naker
+                                        <span x-show="row.naker && row.naker.trim() !== ''" class="text-green-500 text-[10px] ml-1">● Editable</span>
+                                    </label>
                                     <div class="relative">
-                                        <input type="text" :value="formatRupiah(row.bpjsNaker)"
+                                        <input
+                                            type="text"
+                                            {{-- Conditional readonly based on Naker existence --}}
+                                            :readonly="!row.naker || row.naker.trim() === ''"
+                                            :value="formatRupiah(row.bpjsNaker)"
                                             @input="row.bpjsNaker = Number($event.target.value.replace(/\D/g, ''))"
-                                            class="w-full rounded-xl border-gray-200 bg-gray-50 text-sm font-bold text-gray-900 focus:bg-white focus:border-blue-500 py-3 px-4"
+                                            {{-- Dynamic classes based on Naker and value --}}
+                                            :class="{
+                                                'bg-blue-50 text-blue-700 border-blue-200 cursor-text': row.naker && row.naker.trim() !== '' && row.bpjsNaker > 0,
+                                                'bg-white text-gray-700 border-gray-300 cursor-text hover:border-blue-400': row.naker && row.naker.trim() !== '' && row.bpjsNaker === 0,
+                                                'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed': !row.naker || row.naker.trim() === ''
+                                            }"
+                                            class="w-full rounded-xl border text-sm font-bold py-3 px-4 transition-colors focus:ring-2 focus:ring-blue-300 focus:outline-none"
                                             placeholder="Rp 0">
-                                        <input type="hidden" :name="`pekerja[${index}][bpjs_naker]`"
-                                            :value="row.bpjsNaker">
+
+                                        <input type="hidden" :name="`pekerja[${index}][bpjs_naker]`" :value="row.bpjsNaker">
+
+                                        {{-- Icon indicator --}}
+                                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                            <svg x-show="row.naker && row.naker.trim() !== ''" class="w-4 h-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                            </svg>
+                                            <svg x-show="!row.naker || row.naker.trim() === ''" class="w-4 h-4 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                            </svg>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -474,18 +517,15 @@
             jabatanId: {{ $pkwt->jabatan_id }},
             tglMulai: '{{ $pkwt->tgl_mulai_pkwt }}',
             tglAkhir: '{{ $pkwt->tgl_akhir_pkwt }}',
+            kpj: '{{ $pkwt->pekerja->kpj ?? '' }}',
+            naker: '{{ $pkwt->pekerja->naker ?? '' }}',
             days: (() => {
-                // Ambil data mentah dari PHP
                 const rawDays = @json($pkwt->hariKerja->pluck('jam_kerja', 'hari'));
                 const formatted = {};
-
-                // List hari untuk memastikan semua terisi
                 ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].forEach(day => {
                     const val = rawDays[day];
-                    // Jika ada nilainya, ubah 7.0 -> 7. Jika kosong, buat string kosong ''
                     formatted[day] = (val !== undefined && val !== null) ? parseFloat(val).toString() : '';
                 });
-
                 return formatted;
             })(),
         }];
@@ -524,6 +564,12 @@
         window.jabatanData = @json($jabatanList);
         window.workersData = @json($pekerjaList ?? []);
 
+        window.unitInfo = {
+            umk: {{ $unitSelected->umk ?? 0 }},
+            pct_kesehatan: {{ $unitSelected->bpjs_kesehatan ?? 0 }},
+            pct_naker: {{ $unitSelected->bpjs_naker ?? 0 }}
+        };
+
         // 2. FORM LOGIC
         function workerForm() {
             return {
@@ -539,6 +585,8 @@
                         tglAkhir: '',
                         bpjsKesehatan: 0,
                         bpjsNaker: 0,
+                        kpj: '',
+                        naker: '',
                         days: {
                             mon: '',
                             tue: '',
@@ -549,6 +597,18 @@
                             sun: ''
                         }
                     }],
+                init() {
+                    // Recalculate BPJS for existing data in case UMK/percentages changed
+                    this.rows.forEach(row => {
+                        console.log('Row on init:', row);
+                        console.log('Row KPJ:', row.kpj);
+                        console.log('Row Naker:', row.naker);
+
+                        if (row.kpj || row.naker) {
+                            this.calculateBpjs(row);
+                        }
+                    });
+                },
 
                 addRow() {
                     this.rows.push({
@@ -576,6 +636,32 @@
                 get totalAllocation() {
                     return this.rows.reduce((sum, row) => sum + (parseInt(row.gaji) || 0), 0);
                 },
+
+                calculateBpjs(row) {
+                    const umk = Number(window.unitInfo.umk) || 0;
+                    const pctKesehatan = Number(window.unitInfo.pct_kesehatan) || 0;
+                    const pctNaker = Number(window.unitInfo.pct_naker) || 0;
+
+                    // Kalkulasi BPJS Kesehatan jika ada KPJ
+                    if (row.kpj && row.kpj.toString().trim() !== '') {
+                        row.bpjsKesehatan = Math.round(umk * (pctKesehatan / 100));
+                        console.log('✓ BPJS Kesehatan calculated:', row.bpjsKesehatan);
+                    } else {
+                        row.bpjsKesehatan = 0;
+                        console.log('✗ BPJS Kesehatan = 0 (no KPJ)');
+                    }
+
+                    // Kalkulasi BPJS Naker jika ada Naker
+                    if (row.naker && row.naker.toString().trim() !== '') {
+                        row.bpjsNaker = Math.round(umk * (pctNaker / 100));
+                        console.log('✓ BPJS Naker calculated:', row.bpjsNaker);
+                    } else {
+                        row.bpjsNaker = 0;
+                        console.log('✗ BPJS Naker = 0 (no Naker)');
+                    }
+
+                },
+
                 validateDayInput(e, row, dayKey) {
                     let input = e.target;
                     let val = input.value;

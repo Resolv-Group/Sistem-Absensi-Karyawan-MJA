@@ -22,8 +22,8 @@
                     </div>
                     {{-- Sub Text (Unit Name or ID) --}}
                     <div class="text-xs text-gray-500 mt-0.5 flex items-center gap-1">
-                        <span class="truncate max-w-[150px]"
-                            title="{{ $u->namaMitra->nama_mitra }}">MK: {{ $u->namaMitra->nama_mitra }}</span>
+                        <span class="truncate max-w-[150px]" title="{{ $u->namaMitra->nama_mitra }}">MK:
+                            {{ $u->namaMitra->nama_mitra }}</span>
                     </div>
                 </div>
             </div>
@@ -126,8 +126,8 @@
 
         {{-- 6. STAT (Total Workers) --}}
         <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-600 font-medium">
-        {{ $u->pkwt_count }}
-            
+            {{ $u->pkwt_count }}
+
 
         </td>
 
@@ -151,31 +151,58 @@
         {{-- 8. ACTIONS --}}
         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
             <div class="flex justify-end gap-2">
-                <!-- Edit -->
-                <a href="{{ route('view.ubah.unit', $u->id) }}"
-                    class="text-blue-600 hover:text-blue-900 border border-blue-200 hover:bg-blue-50
-               rounded-lg p-2 transition"
-                    title="Edit">
+                {{-- Tambah Pekerja --}}
+                <a href="{{ route('view.tambah.unit-pekerja', $u->id) }}"
+                    class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg transition-all hover:shadow-sm group"
+                    title="Tambah Pekerja">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M11 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-5M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                            d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-5-5a3 3 0 11-6 0 3 3 0 016 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                     </svg>
+                    <span class="hidden sm:inline">Pekerja</span>
                 </a>
 
-                <!-- Detail -->
-                <a href="{{ route('view.detail.unit', $u->id) }}"
-                    class="text-blue-600 hover:text-blue-900 border border-blue-200 hover:bg-blue-50
-               rounded-lg p-2 transition"
-                    title="Detail">
+                {{-- Tambah Borongan (hanya sistem_pengajian = 2) --}}
+                @if ($u->sistem_pengajian == 2)
+                    <a href="{{ route('view.tambah.unit-borongan', $u->id) }}"
+                        class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-purple-700 bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-lg transition-all hover:shadow-sm group"
+                        title="Tambah Borongan">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                        </svg>
+                        <span class="hidden sm:inline">Borongan</span>
+                    </a>
+                @endif
+
+                {{-- Edit --}}
+                <a href="{{ route('view.ubah.unit', $u->id) }}"
+                    class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg transition-all hover:shadow-sm group"
+                    title="Edit Unit">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z" />
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
                     </svg>
+                    <span class="hidden sm:inline">Edit</span>
+                </a>
+
+                {{-- Detail --}}
+                <a href="{{ route('view.detail.unit', $u->id) }}"
+                    class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-gray-700 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg transition-all hover:shadow-sm group"
+                    title="Lihat Detail">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    <span class="hidden sm:inline">Detail</span>
                 </a>
             </div>
-
         </td>
     </tr>
 @empty

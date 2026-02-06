@@ -27,7 +27,9 @@
                     <th class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">
                         Status
                     </th>
-                    <th class="relative px-6 py-3"><span class="sr-only">Actions</span></th>
+                    <th class="px-6 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider w-96">
+                        Actions
+                    </th>
                 </tr>
             </thead>
 
