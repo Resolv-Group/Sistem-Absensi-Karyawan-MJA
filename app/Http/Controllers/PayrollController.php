@@ -94,7 +94,11 @@ class PayrollController extends Controller
         $tanggalAkhir = $request->tanggal_akhir;
         $allAdjustments = $request->input('adjustments', []);
 
-        $periode = Carbon::parse($tanggalMulai)->translatedFormat('d') . '—' . Carbon::parse($tanggalAkhir)->translatedFormat('d M Y');
+        $isHarian = ($unit->sistem_pengajian == 1);
+
+        $periode = Carbon::parse($tanggalMulai)->translatedFormat('d')
+        . '—'
+        . Carbon::parse($tanggalAkhir)->translatedFormat('d M Y');
 
         // Ambil data pekerja yang dipilih
         $workers = Pekerja::whereIn('id', $paidWorkerIds)->get();
@@ -106,26 +110,29 @@ class PayrollController extends Controller
 
         $payrollData = [
             'unit_id' => $request->id_unit,
-            'unit_name' => $request->unit_name ?? 'Unit Borongan',
+            'unit_name' => $unit->nama_unit ?? 'Unit Tidak Ditemukan',
             'sistem_pengajian' => $unit->sistem_pengajian,
             'periode' => Carbon::parse($tanggalMulai)->translatedFormat('d') . ' — ' . Carbon::parse($tanggalAkhir)->translatedFormat('d M Y'),
             'total_pekerja' => $workers->count(),
             'tanggal_mulai' => $tanggalMulai,
             'tanggal_akhir' => $tanggalAkhir,
-            'items' => $workers->map(function ($w) use ($id_unit, $periode, $specificExclusions, $allAdjustments, $tanggalMulai, $tanggalAkhir) {
+            'items' => $workers->map(function($w) use ($id_unit, $isHarian, $periode, $specificExclusions, $allAdjustments, $tanggalMulai, $tanggalAkhir) {
+
                 // 1. Dapatkan list tanggal yang dikecualikan (potongan) untuk pekerja ini
                 $excludedDates = $specificExclusions->get($w->id) ? $specificExclusions->get($w->id)->pluck('date')->toArray() : [];
 
+                $relation = $isHarian ? 'detilHarian' : 'detilBorongan.borongan:id,harga_pekerja,nama_item';
+
                 // 2. Query ke tabel Absensi yang memiliki Detil Borongan
                 // Kita hitung record dalam range tanggal Mula-Selesai, dan TIDAK TERMASUK tanggal potongan
-                $absensiRecords = Absensi::with(['detilBorongan.borongan:id,harga_pekerja,nama_item'])
+                $absensiRecords = Absensi::with([$relation])
                     ->whereBetween('tgl_absensi', [$tanggalMulai, $tanggalAkhir])
                     ->where('id_unit', $id_unit)
                     ->where('id_pekerja', $w->id)
                     ->whereNotIn('tgl_absensi', $excludedDates)
                     ->get();
 
-                // dd($absensiRecords, $w->id);
+                // dump($absensiRecords);
                 $workerAdj = $allAdjustments[$w->id] ?? ['pembayaran_lain' => 0, 'tunjangan_bayaran' => 0];
 
                 $workerPembayaranLain = (int) ($workerAdj['pembayaran_lain'] ?? 0);
@@ -135,25 +142,79 @@ class PayrollController extends Controller
                 $tempQty = 0;
                 $totalGajiBorongan = 0;
 
+                //variable harian
+                $totalJamKerja = 0;
+                $totalOvertime = 0;
+                $totalHBN = 0;
+                $hasilGajiHarian = 0;
+
+                $pkwt = PKWT::where('id_pekerja', $w->id)
+                        ->where('id_unit', $id_unit)
+                        ->where('status_aktif', 1)
+                        ->first();
+                // dump($pkwt);
+
+                $gajiHarianPkwt   = $pkwt->gaji_harian ?? 0;
+                $gajiOvertimePkwt = $pkwt->gaji_overtime ?? 0;
+
                 foreach ($absensiRecords as $absensi) {
-                    foreach ($absensi->detilBorongan as $detil) {
-                        // Sesuai logika JS: totalQTY = FD + act_rej + good_mc
-                        $qtyPerBaris = ($detil->FD ?? 0) + ($detil->act_rej ?? 0) + ($detil->good_mc ?? 0);
-                        $totalQty += $qtyPerBaris;
-                        $tempQty += $qtyPerBaris;
+                    if($isHarian) {
+                        $detil = $absensi->detilHarian;
+                        if ($detil) {
+                            $totalJamKerja += (float) $detil->jam_kerja_harian;
+                            $totalOvertime += (float) $detil->overtime;
+                            $totalHBN      += (float) $detil->hbn;
 
-                        // Sesuai logika JS: bayaranItem = totalQTY * harga_pekerja
-                        // Kita asumsikan kolom 'bayaranItem' sudah tersimpan di DB saat presensi
-                        $totalGajiBorongan += $detil->bayaranItem ?? 0;
+                            // --- LOGIKA PERHITUNGAN GAJI ---
+                            $jamNormal = (float) ($detil->jam_kerja_normal); // Hindari division by zero
+                            $jamHarian = (float) $detil->jam_kerja_harian;
+                            $jamOT     = (float) $detil->overtime;
 
-                        $tempQty = 0;
+                            if ($detil->hbn == 1) {
+                                // JIKA HBN: Semua jam_kerja_harian dihitung sebagai OVERTIME
+                                // Rumus: jam_harian * gaji_overtime
+                                $gajiHariIni = ($jamHarian * $gajiOvertimePkwt);
+                                // dump('Gaji Harian (jamharian*gajiovertime) = ', $gajiHariIni);
+                            } else {
+                                // JIKA HARI NORMAL:
+                                // Rumus Reguler: jam_harian * gaji_harian
+                                $gajiReguler = $jamHarian * $gajiHarianPkwt;
+                                // dump('gajiReguler (jamHarian*gajiHarianPkwt) = ',$gajiReguler);
+
+                                // Rumus Overtime: jam_ot * gaji_overtime
+                                $gajiOT = $jamOT * $gajiOvertimePkwt;
+                                // dump('gajiOT (jamOT*gajiOvertimePkwt) = ',$gajiOT);
+                                $gajiHariIni = $gajiReguler + $gajiOT;
+                                // dump('gajiHariIni (gajiReguler*gajiOT) = ',$gajiHariIni);
+                            }
+
+                            $hasilGajiHarian += $gajiHariIni;
+                        }
+                    } else {
+                        foreach ($absensi->detilBorongan as $detil)
+                        {
+                            // Sesuai logika JS: totalQTY = FD + act_rej + good_mc
+                            $qtyPerBaris = ($detil->FD ?? 0) + ($detil->act_rej ?? 0) + ($detil->good_mc ?? 0);
+                            $totalQty += $qtyPerBaris;
+                            $tempQty += $qtyPerBaris;
+
+                            // Sesuai logika JS: bayaranItem = totalQTY * harga_pekerja
+                            // Kita asumsikan kolom 'bayaranItem' sudah tersimpan di DB saat presensi
+                            $totalGajiBorongan += ($detil->bayaranItem ?? 0);
+
+                            $tempQty = 0;
+                        }
                     }
                 }
 
-                // Gaji Bersih = Total Hasil Borongan + Penyesuaian Global
-                $netSalary = $totalGajiBorongan - $workerPembayaranLain + $workerTunjangan;
+                // dd($totalJamKerja, $totalOvertime, $totalHBN);
+
+                $netSalary = ($isHarian ? $hasilGajiHarian : $totalGajiBorongan) - $workerPembayaranLain + $workerTunjangan;
 
                 // dd($netSalary);
+
+                // dd($netSalary);
+
 
                 return [
                     'unit_id' => $id_unit,
@@ -165,6 +226,10 @@ class PayrollController extends Controller
                     'nik' => $w->nik,
                     'total_barang' => $totalQty,
                     'hasil_gaji_borongan' => $totalGajiBorongan,
+                    // Data Harian
+                    'total_jam_kerja' => $totalJamKerja,
+                    'total_overtime'  => $totalOvertime,
+                    'total_hbn'       => $totalHBN,
                     'potongan_count' => count($excludedDates),
                     'potongan_dates' => $excludedDates,
                     'net_salary' => $netSalary,
@@ -185,6 +250,10 @@ class PayrollController extends Controller
         return view('Payroll.overview-payroll', compact('payrollData', 'paidWorkerIds'));
     }
 
+    function ExportDetailHarian(Request $request){
+        dd($request->all());
+    }
+
     function ExportDetailBorongan(Request $request)
     {
         dd($request->all());
@@ -193,11 +262,13 @@ class PayrollController extends Controller
         $tanggal_awal = Carbon::parse($request->tgl_awal);
         $tanggal_akhir = Carbon::parse($request->tgl_akhir);
 
-        $absensiList = Absensi::with(['detilBorongan.borongan:id,harga_pekerja,nama_item'])
-            ->whereBetween('tgl_absensi', [$tanggal_awal, $tanggal_akhir])
-            ->where('id_pekerja', $request->id_pekerja)
-            ->whereNotIn('tgl_absensi', $exclusionDates)
-            ->get();
+        $absensiList = Absensi::with([
+            'detilBorongan.borongan:id,harga_pekerja,nama_item'
+        ])
+        ->whereBetween('tgl_absensi', [$tanggal_awal, $tanggal_akhir])
+        ->where('id_pekerja', $request->id_pekerja)
+        ->whereNotIn('tgl_absensi', $exclusionDates)
+        ->get();
 
         $periode = strtoupper($tanggal_awal->translatedFormat('d F Y') . ' ~ ' . $tanggal_akhir->translatedFormat('d F Y'));
 
@@ -428,7 +499,9 @@ class PayrollController extends Controller
         dd($request->all());
         // 1. Decode JSON Workers dari Request
         // Format JSON: [{"id":2,"upah":150000,"exclusion_date":[]}, ...]
-        $requestWorkers = json_decode($request->workers_json, true);
+        $requestWorkers = $request->workers;
+
+        // dd($requestWorkers);
 
         // Ambil semua ID untuk query database sekaligus (Eager Loading)
         $workerIds = array_column($requestWorkers, 'id');
@@ -508,7 +581,7 @@ class PayrollController extends Controller
             $item->take_home_pay = $item->jumlah_1 - $item->jumlah_2;
 
             // Simpan info exclusion date jika nanti perlu ditampilkan di excel (opsional)
-            $item->exclusion_dates = $reqWorker['exclusion_date'];
+            $item->exclusion_dates = $reqWorker['exclusion_date'] ?? [];
 
             $realItems[] = $item;
         }

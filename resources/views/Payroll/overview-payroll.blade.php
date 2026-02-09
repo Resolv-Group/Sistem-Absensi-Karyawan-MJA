@@ -41,23 +41,22 @@
                         @php
                             // Siapkan array dasar
                             $queryParameters = [
-                                'id_unit'   => $payrollData['unit_id'],
-                                'tgl_awal'  => $payrollData['tanggal_mulai'],
+                                'id_unit' => $payrollData['unit_id'],
+                                'tgl_awal' => $payrollData['tanggal_mulai'],
                                 'tgl_akhir' => $payrollData['tanggal_akhir'],
-                                'grand_total'  => $payrollData['grand_total'],
-                                'workers'   => [] // Inisialisasi array workers
+                                'grand_total' => $payrollData['grand_total'],
+                                'workers' => [], // Inisialisasi array workers
                             ];
 
                             // Isi array workers secara berpasangan
                             foreach ($payrollData['items'] as $index => $item) {
                                 $queryParameters['workers'][$index] = [
-                                    'id'   => $item['id_pekerja'],
-                                    'upah' => $item['net_salary']
+                                    'id' => $item['id_pekerja'],
+                                    'upah' => $item['net_salary'],
                                 ];
                             }
                         @endphp
-                        <a href="{{ route('export.tanda-terima.borongan', $queryParameters) }}"
-                            target="_blank"
+                        <a href="{{ route('export.tanda-terima.borongan', $queryParameters) }}" target="_blank"
                             class="flex flex-col items-center justify-center w-20 h-20 bg-slate-50 border border-slate-200 rounded-2xl hover:bg-white hover:border-emerald-500 group transition-all shadow-sm">
 
                             <svg class="w-5 h-5 text-slate-400 group-hover:text-emerald-600 transition-colors"
@@ -65,17 +64,18 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
-                            <span class="text-[9px] font-black uppercase tracking-tighter text-slate-500 mt-1">Tanda Terima</span>
+                            <span class="text-[9px] font-black uppercase tracking-tighter text-slate-500 mt-1">Tanda
+                                Terima</span>
                         </a>
 
                         {{-- Invoice --}}
                         @php
                             // Siapkan data dasar
                             $payloadInvoice = [
-                                'id_unit'  => $payrollData['unit_id'],
-                                'grand_total'  => $payrollData['grand_total'],
-                                'tanggal_mulai'  => $payrollData['tanggal_mulai'],
-                                'tanggal_akhir'  => $payrollData['tanggal_akhir'],
+                                'id_unit' => $payrollData['unit_id'],
+                                'grand_total' => $payrollData['grand_total'],
+                                'tanggal_mulai' => $payrollData['tanggal_mulai'],
+                                'tanggal_akhir' => $payrollData['tanggal_akhir'],
                             ];
 
                             // Loop data pekerja untuk membuat key: workers[0][id], workers[0][upah], dst.
@@ -84,7 +84,8 @@
                                 $payloadInvoice["workers[{$index}][upah]"] = $item['net_salary'];
                             }
                         @endphp
-                        <button @click="open('Invoice', '{{ route('export.invoice.borongan') }}', {{ json_encode($payloadInvoice) }})"
+                        <button
+                            @click="open('Invoice', '{{ route('export.invoice.borongan') }}', {{ json_encode($payloadInvoice) }})"
                             class="flex flex-col items-center justify-center w-20 h-20 bg-slate-50 border border-slate-200 rounded-2xl hover:bg-white hover:border-emerald-500 group transition-all shadow-sm">
                             <svg class="w-5 h-5 text-slate-400 group-hover:text-emerald-600 transition-colors"
                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -99,10 +100,10 @@
                         @php
                             // Siapkan data dasar
                             $payloadKwitansi = [
-                                'id_unit'  => $payrollData['unit_id'],
-                                'grand_total'  => $payrollData['grand_total'],
-                                'tanggal_mulai'  => $payrollData['tanggal_mulai'],
-                                'tanggal_akhir'  => $payrollData['tanggal_akhir'],
+                                'id_unit' => $payrollData['unit_id'],
+                                'grand_total' => $payrollData['grand_total'],
+                                'tanggal_mulai' => $payrollData['tanggal_mulai'],
+                                'tanggal_akhir' => $payrollData['tanggal_akhir'],
                             ];
 
                             // Loop data pekerja untuk membuat key: workers[0][id], workers[0][upah], dst.
@@ -111,7 +112,8 @@
                                 $payloadKwitansi["workers[{$index}][upah]"] = $item['net_salary'];
                             }
                         @endphp
-                        <button @click="open('Kwitansi', '{{ route('export.kwitansi.borongan') }}', {{ json_encode($payloadKwitansi) }})"
+                        <button
+                            @click="open('Kwitansi', '{{ route('export.kwitansi.borongan') }}', {{ json_encode($payloadKwitansi) }})"
                             class="flex flex-col items-center justify-center w-20 h-20 bg-slate-50 border border-slate-200 rounded-2xl hover:bg-white hover:border-emerald-500 group transition-all shadow-sm">
                             <svg class="w-5 h-5 text-slate-400 group-hover:text-emerald-600 transition-colors"
                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -133,7 +135,8 @@
                                 x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
                                 class="relative w-full max-w-sm bg-white rounded-[2rem] shadow-2xl overflow-hidden border border-slate-100">
 
-                                <form :action="actionUrl" method="get" enctype="multipart/form-data" target="_blank" class="p-8">
+                                <form :action="actionUrl" method="get" enctype="multipart/form-data" target="_blank"
+                                    class="p-8">
                                     @csrf
                                     @method('get')
 
@@ -248,15 +251,34 @@
             <div class="overflow-x-auto">
                 <table class="w-full text-left">
                     <thead>
-                        <tr
-                            class="text-xs font-black text-slate-400 uppercase tracking-widest border-b border-slate-50 bg-slate-50/20">
-                            <th class="px-8 py-5">Nama Pekerja</th>
-                            <th class="px-6 py-5">Total Barang</th>
-                            <th class="px-6 py-5 text-center">Hasil Gaji</th>
-                            <th class="px-6 py-5 text-right">Potongan</th>
-                            <th class="px-6 py-5 text-right">Tunjangan</th>
-                            <th class="px-8 py-5 text-right">Detail</th>
-                        </tr>
+                        @switch($payrollData['sistem_pengajian'])
+                            @case(1)
+                                <tr
+                                    class="text-xs font-black text-slate-400 uppercase tracking-widest border-b border-slate-50 bg-slate-50/20">
+                                    <th class="px-4 py-4 text-center">No.</th>
+                                    <th class="px-8 py-4 text-left">Nama Pekerja</th>
+                                    <th class="px-4 py-4 text-center">Total Jam kerja</th>
+                                    <th class="px-4 py-4 text-center">Total Overtime</th>
+                                    <th class="px-4 py-4 text-center">Total HBN</th>
+                                    <th class="px-6 py-4 text-center">Hasil Gaji</th>
+                                    <th class="px-6 py-4 text-right">Penyesuaian (Pot/Tunj)</th>
+                                    <th class="px-8 py-4 text-right">Detail</th>
+                                </tr>
+                            @break
+
+                            @case(2)
+                                <tr
+                                    class="text-xs font-black text-slate-400 uppercase tracking-widest border-b border-slate-50 bg-slate-50/20">
+                                    <th class="px-4 py-4 text-center">No.</th>
+                                    <th class="px-8 py-5 text-left">Nama Pekerja</th>
+                                    <th class="px-6 py-5">Total Barang</th>
+                                    <th class="px-6 py-5 text-center">Hasil Gaji</th>
+                                    <th class="px-6 py-5 text-right">Potongan</th>
+                                    <th class="px-6 py-5 text-right">Tunjangan</th>
+                                    <th class="px-8 py-5 text-right">Detail</th>
+                                </tr>
+                            @break
+                        @endswitch
                     </thead>
                     <tbody class="divide-y divide-slate-50 text-sm">
 
@@ -264,75 +286,182 @@
                             @php
                                 $netSalary = max(0, $item['net_salary']);
                             @endphp
-
                             <tr class="hover:bg-slate-50/50 transition-colors">
-                                <td class="px-8 py-6">
-                                    <div class="flex items-center gap-4">
-                                        <div
-                                            class="w-11 h-11 rounded-xl bg-slate-100 flex items-center justify-center text-xs font-black text-slate-500 border border-slate-200">
-                                            {{ strtoupper(substr($item['nama'], 0, 2)) }}
-                                        </div>
-                                        <div>
-                                            <p class="text-sm font-bold text-slate-800">{{ $item['nama'] }}</p>
-                                            <p class="text-[11px] font-bold text-slate-400 mt-0.5 uppercase">ID:
-                                                {{ $item['id_pekerja'] }}</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-6 ">
-                                    <p class="text-sm font-black text-slate-700">
-                                        {{ number_format($item['total_barang'], 0, ',', '.') }}
-                                        <span class="text-[10px] text-slate-400 uppercase tracking-widest ml-1">Pcs</span>
-                                    </p>
-                                </td>
-                                <td class="px-6 py-6 text-center">
-                                    @if ($item['total_barang'] === 0)
-                                        <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">
-                                            Tidak Ada Produksi
-                                        </span>
-                                    @else
-                                        <p class="text-xs font-bold text-slate-400 uppercase mb-1">Hasil Produksi:</p>
-                                        <p class="text-sm font-black text-slate-800">
-                                            Rp {{ number_format(max(0, $item['net_salary']), 0, ',', '.') }}
-                                        </p>
-                                    @endif
+                                @switch($payrollData['sistem_pengajian'])
+                                    @case(1)
+                                        <!-- No. Column -->
+                                        <td class="px-4 py-4 text-center">
+                                            <span class="text-xs font-bold text-slate-400">{{ $loop->iteration }}.</span>
+                                        </td>
 
-                                </td>
-                                <td class="px-8 py-6 text-center">
-                                    <div class="flex flex-col items-end">
-                                        <p class="text-base font-black text-orange-600 tracking-tight">
-                                            Rp {{ number_format($item['pembayaran_lain'], 0, ',', '.') }}
-                                        </p>
-                                    </div>
-                                </td>
-                                <td class="px-8 py-6 text-center">
-                                    <div class="flex flex-col items-end">
-                                        <p class="text-base font-black text-green-600 tracking-tight">
-                                            Rp {{ number_format($item['tunjangan'], 0, ',', '.') }}
-                                        </p>
-                                    </div>
-                                </td>
-                                <td class="px-8 py-5 text-right">
-                                    <a href="{{ route('export.detail.borongan', [
-                                        'id_unit' => $payrollData['unit_id'],
-                                        'id_pekerja' => $item['id_pekerja'],
-                                        'tgl_awal' => $payrollData['tanggal_mulai'],
-                                        'tgl_akhir' => $payrollData['tanggal_akhir'],
-                                        'potongan' => $item['pembayaran_lain'],
-                                        'tunjangan' => $item['tunjangan'],
-                                        'exclusion_date' => $item['potongan_dates'],
-                                    ]) }}"
-                                        target="_blank" {{-- buka di tab baru untuk slip gaji --}}
-                                        class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-xl font-bold text-[10px] uppercase tracking-widest hover:border-emerald-500 hover:text-emerald-600 transition-all shadow-sm active:scale-95 group">
+                                        <!-- Nama -->
+                                        <td class="px-8 py-6">
+                                            <div class="flex items-center gap-4">
+                                                <div>
+                                                    <p class="text-sm font-bold text-slate-800">{{ $item['nama'] }}</p>
+                                                    <p class="text-[11px] font-bold text-slate-400 mt-0.5 uppercase">NIK:
+                                                        {{ $item['nik'] }}</p>
+                                                </div>
+                                            </div>
+                                        </td>
 
-                                        <svg class="w-4 h-4 text-slate-400 group-hover:text-emerald-500 transition-colors"
-                                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                        </svg>
-                                        <span>Payslip</span>
-                                    </a>
-                                </td>
+                                        <!-- Total Jam Kerja -->
+                                        <td class="px-4 py-4 text-center border-x border-slate-50/50">
+                                            <div class="flex flex-col">
+                                                <span class="text-sm font-black text-slate-700">{{ $item['total_jam_kerja'] }}</span>
+                                                <span class="text-[11px] font-bold text-blue-500 uppercase">Jam</span>
+                                            </div>
+                                        </td>
+
+                                        <!-- Total Overtime -->
+                                        <td class="px-4 py-4 text-center">
+                                            <div class="flex flex-col">
+                                                <span class="text-sm font-black text-amber-600">{{ $item['total_overtime'] }}</span>
+                                                <span class="text-[11px] font-bold text-amber-500/80 uppercase">Jam OT</span>
+                                            </div>
+                                        </td>
+
+                                        <!-- Total HBN -->
+                                        <td class="px-4 py-4 text-center border-x border-slate-50/50">
+                                            <div class="flex flex-col">
+                                                <span class="text-sm font-black text-indigo-600">{{ $item['total_hbn'] }}</span>
+                                                <span class="text-[11px] font-bold text-indigo-500/80 uppercase">HBN</span>
+                                            </div>
+                                        </td>
+
+                                        <!-- Hasil Gaji -->
+                                        <td class="px-6 py-4 text-center">
+                                            <p class="text-sm font-black text-slate-800">
+                                                Rp {{ number_format(max(0, $item['net_salary']), 0, ',', '.') }}
+                                            </p>
+                                        </td>
+
+                                        <!-- Potongan / Tunjangan -->
+                                        <td class="px-6 py-4">
+                                            <div class="flex flex-col items-end gap-1.5">
+                                                <!-- Tunjangan -->
+                                                <div class="flex items-center gap-2">
+                                                    <span class="text-sm font-bold text-slate-700">
+                                                        {{ number_format($item['tunjangan'], 0, ',', '.') }}
+                                                    </span>
+                                                    <div
+                                                        class="w-5 h-5 rounded-md bg-emerald-100 flex items-center justify-center">
+                                                        <svg class="w-3 h-3 text-emerald-600" fill="none"
+                                                            stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                                                d="M12 4v16m8-8H4" />
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                                <!-- Potongan -->
+                                                <div class="flex items-center gap-2">
+                                                    <span class="text-sm font-bold text-rose-500">
+                                                        {{ number_format($item['pembayaran_lain'], 0, ',', '.') }}
+                                                    </span>
+                                                    <div class="w-5 h-5 rounded-md bg-rose-100 flex items-center justify-center">
+                                                        <svg class="w-3 h-3 text-rose-600" fill="none" stroke="currentColor"
+                                                            viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                                                d="M20 12H4" />
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+
+                                        <td class="px-8 py-5 text-right">
+                                            <a href="{{ route('export.detail.harian', [
+                                                'id_unit' => $payrollData['unit_id'],
+                                                'id_pekerja' => $item['id_pekerja'],
+                                                'tgl_awal' => $payrollData['tanggal_mulai'],
+                                                'tgl_akhir' => $payrollData['tanggal_akhir'],
+                                                'potongan' => $item['pembayaran_lain'],
+                                                'tunjangan' => $item['tunjangan'],
+                                                'exclusion_date' => $item['potongan_dates'],
+                                            ]) }}"
+                                                target="_blank" {{-- buka di tab baru untuk slip gaji --}}
+                                                class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-xl font-bold text-[10px] uppercase tracking-widest hover:border-emerald-500 hover:text-emerald-600 transition-all shadow-sm active:scale-95 group">
+
+                                                <svg class="w-4 h-4 text-slate-400 group-hover:text-emerald-500 transition-colors"
+                                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                </svg>
+                                                <span>Report</span>
+                                            </a>
+                                        </td>
+                                    @break
+
+                                    @case(2)
+                                        <!-- No. Column -->
+                                        <td class="px-4 py-4 text-center">
+                                            <span class="text-xs font-bold text-slate-400">{{ $loop->iteration }}.</span>
+                                        </td>
+                                        <td class="px-8 py-6">
+                                            <div class="flex items-center gap-4">
+                                                <div>
+                                                    <p class="text-sm font-bold text-slate-800">{{ $item['nama'] }}</p>
+                                                    <p class="text-[11px] font-bold text-slate-400 mt-0.5 uppercase">NIK:
+                                                        {{ $item['nik'] }}</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-6 ">
+                                            <p class="text-sm font-black text-slate-700">
+                                                {{ number_format($item['total_barang'], 0, ',', '.') }}
+                                                <span class="text-[10px] text-slate-400 uppercase tracking-widest ml-1">Pcs</span>
+                                            </p>
+                                        </td>
+                                        <td class="px-6 py-6 text-center">
+                                            @if ($item['total_barang'] === 0)
+                                                <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                                                    Tidak Ada Produksi
+                                                </span>
+                                            @else
+                                                <p class="text-xs font-bold text-slate-400 uppercase mb-1">Hasil Produksi:</p>
+                                                <p class="text-sm font-black text-slate-800">
+                                                    Rp {{ number_format(max(0, $item['net_salary']), 0, ',', '.') }}
+                                                </p>
+                                            @endif
+
+                                        </td>
+                                        <td class="px-8 py-6 text-center">
+                                            <div class="flex flex-col items-end">
+                                                <p class="text-base font-black text-orange-600 tracking-tight">
+                                                    Rp {{ number_format($item['pembayaran_lain'], 0, ',', '.') }}
+                                                </p>
+                                            </div>
+                                        </td>
+                                        <td class="px-8 py-6 text-center">
+                                            <div class="flex flex-col items-end">
+                                                <p class="text-base font-black text-green-600 tracking-tight">
+                                                    Rp {{ number_format($item['tunjangan'], 0, ',', '.') }}
+                                                </p>
+                                            </div>
+                                        </td>
+                                        <td class="px-8 py-5 text-right">
+                                            <a href="{{ route('export.detail.borongan', [
+                                                'id_unit' => $payrollData['unit_id'],
+                                                'id_pekerja' => $item['id_pekerja'],
+                                                'tgl_awal' => $payrollData['tanggal_mulai'],
+                                                'tgl_akhir' => $payrollData['tanggal_akhir'],
+                                                'potongan' => $item['pembayaran_lain'],
+                                                'tunjangan' => $item['tunjangan'],
+                                                'exclusion_date' => $item['potongan_dates'],
+                                            ]) }}"
+                                                target="_blank" {{-- buka di tab baru untuk slip gaji --}}
+                                                class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-xl font-bold text-[10px] uppercase tracking-widest hover:border-emerald-500 hover:text-emerald-600 transition-all shadow-sm active:scale-95 group">
+
+                                                <svg class="w-4 h-4 text-slate-400 group-hover:text-emerald-500 transition-colors"
+                                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                </svg>
+                                                <span>Report</span>
+                                            </a>
+                                        </td>
+                                    @break
+                                @endswitch
                             </tr>
                         @endforeach
                     </tbody>
@@ -355,54 +484,94 @@
                         class="px-8 py-3.5 bg-white border border-slate-200 text-slate-600 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-slate-50 transition-all shadow-sm">
                         Save Draft
                     </a>
-                  @php
-                            // Siapkan array dasar
-                            $queryParameters = [
-                                'id_unit'   => $payrollData['unit_id'],
-                                'tgl_awal'  => $payrollData['tanggal_mulai'],
-                                'tgl_akhir' => $payrollData['tanggal_akhir'],
-                                'grand_total'  => $payrollData['grand_total'],
-                                'exclusion_date' => $item['potongan_dates'],
-                                'workers'   => [] // Inisialisasi array workers
-                            ];
+                    @php
+                        // Siapkan array dasar
+                        $queryParameters = [
+                            'id_unit' => $payrollData['unit_id'],
+                            'tgl_awal' => $payrollData['tanggal_mulai'],
+                            'tgl_akhir' => $payrollData['tanggal_akhir'],
+                            'grand_total' => $payrollData['grand_total'],
+                            'exclusion_date' => $item['potongan_dates'],
+                            'workers' => [], // Inisialisasi array workers
+                        ];
 
-                            // Isi array workers secara berpasangan
+                        if($payrollData['sistem_pengajian'] == 1)
+                        {
                             foreach ($payrollData['items'] as $index => $item) {
                                 $queryParameters['workers'][$index] = [
-                                    'id'   => $item['id_pekerja'],
+                                    'id' => $item['id_pekerja'],
+                                    'jam_kerja' => $item['total_jam_kerja'],
+                                    'overtime' => $item['total_overtime'],
+                                    'hbn' => $item['total_hbn'],
                                     'upah' => $item['net_salary'],
-                                    'exclusion_date'=> $item['potongan_dates'] ?? [],
+                                    'exclusion_date' => $item['potongan_dates'] ?? [],
+                                    'potongan' => $item['pembayaran_lain'],
+                                    'tunjangan' => $item['tunjangan']
                                 ];
                             }
+                        }
 
-                            $jsonWorkers = json_encode($queryParameters['workers']);
-                        @endphp 
+                        if($payrollData['sistem_pengajian'] == 2)
+                        {
+                             // Isi array workers secara berpasangan
+                            foreach ($payrollData['items'] as $index => $item) {
+                                $queryParameters['workers'][$index] = [
+                                    'id' => $item['id_pekerja'],
+                                    'upah' => $item['net_salary'],
+                                    'exclusion_date' => $item['potongan_dates'] ?? [],
+                                    'potongan' => $item['pembayaran_lain'],
+                                    'tunjangan' => $item['tunjangan']
+                                ];
+                            }
+                        }
 
-                        <form action="{{ route('export.rincian.upah.borongan') }}" method="POST" target="_blank" style="display:inline;">
-                            @csrf
-                            <input type="hidden" name="id_unit" value="{{ $queryParameters['id_unit'] }}">
-                            <input type="hidden" name="tgl_awal" value="{{ $queryParameters['tgl_awal'] }}">
-                            <input type="hidden" name="tgl_akhir" value="{{ $queryParameters['tgl_akhir'] }}">
-                            <input type="hidden" name="grand_total" value="{{ $queryParameters['grand_total'] }}">
-                            
-                            {{-- Kirim array workers sebagai JSON string --}}
-                            <input type="hidden" name="workers_json" value="{{ $jsonWorkers }}">
+                        $jsonWorkers = json_encode($queryParameters['workers']);
+                    @endphp
 
-                            <button type="submit" class="text-blue-600 hover:text-blue-800 underline bg-transparent border-0 p-0 cursor-pointer">
-                                Export Excel
-                            </button>
-                        </form>
-                    <a href="{{ route('export.rincian.upah.borongan', $queryParameters) }}"
+                    {{-- <form action="{{ route('export.rincian.upah.borongan') }}" method="POST" target="_blank"
+                        style="display:inline;">
+                        @csrf
+                        <input type="hidden" name="id_unit" value="{{ $queryParameters['id_unit'] }}">
+                        <input type="hidden" name="tgl_awal" value="{{ $queryParameters['tgl_awal'] }}">
+                        <input type="hidden" name="tgl_akhir" value="{{ $queryParameters['tgl_akhir'] }}">
+                        <input type="hidden" name="grand_total" value="{{ $queryParameters['grand_total'] }}">
 
-                        class="group flex items-center gap-3 bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-3.5 rounded-xl font-black text-xs uppercase tracking-widest shadow-xl shadow-emerald-500/20 transition-all active:scale-95">
-                        Generate Rincian Upah
-                        <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none"
-                            stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                                d="M13 7l5 5-5 5M6 7l5 5-5 5" />
-                        </svg>
-                    </a>
-                    
+                        <input type="hidden" name="workers_json" value="{{ $jsonWorkers }}">
+
+                        <button type="submit"
+                            class="text-blue-600 hover:text-blue-800 underline bg-transparent border-0 p-0 cursor-pointer">
+                            Export Excel
+                        </button>
+                    </form> --}}
+                    @switch($payrollData['sistem_pengajian'])
+                        @case(1)
+
+                            <a href="{{ route('export.rincian.upah.harian', $queryParameters) }}" target="_blank"
+                                class="group flex items-center gap-3 bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-3.5 rounded-xl font-black text-xs uppercase tracking-widest shadow-xl shadow-emerald-500/20 transition-all active:scale-95">
+                                Generate Rincian Upah
+                                <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                        d="M13 7l5 5-5 5M6 7l5 5-5 5" />
+                                </svg>
+                            </a>
+
+                        @break
+
+                        @case(2)
+                            <a href="{{ route('export.rincian.upah.borongan', $queryParameters) }}" target="_blank"
+                                class="group flex items-center gap-3 bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-3.5 rounded-xl font-black text-xs uppercase tracking-widest shadow-xl shadow-emerald-500/20 transition-all active:scale-95">
+                                Generate Rincian Upah
+                                <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                        d="M13 7l5 5-5 5M6 7l5 5-5 5" />
+                                </svg>
+                            </a>
+                        @break
+                    @endswitch
+
+
                 </div>
             </div>
         </div>
