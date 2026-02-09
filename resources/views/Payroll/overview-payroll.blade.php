@@ -375,6 +375,9 @@
                                                 'id_pekerja' => $item['id_pekerja'],
                                                 'tgl_awal' => $payrollData['tanggal_mulai'],
                                                 'tgl_akhir' => $payrollData['tanggal_akhir'],
+                                                'jam_kerja' => $item['total_jam_kerja'];
+                                                'overtime' => $item['total_overtime'];
+                                                'hbn' => $item['total_hbn'];
                                                 'potongan' => $item['pembayaran_lain'],
                                                 'tunjangan' => $item['tunjangan'],
                                                 'exclusion_date' => $item['potongan_dates'],
@@ -484,94 +487,57 @@
                         class="px-8 py-3.5 bg-white border border-slate-200 text-slate-600 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-slate-50 transition-all shadow-sm">
                         Save Draft
                     </a>
+
                     @php
-                        // Siapkan array dasar
-                        $queryParameters = [
-                            'id_unit' => $payrollData['unit_id'],
-                            'tgl_awal' => $payrollData['tanggal_mulai'],
-                            'tgl_akhir' => $payrollData['tanggal_akhir'],
-                            'grand_total' => $payrollData['grand_total'],
-                            'exclusion_date' => $item['potongan_dates'],
-                            'workers' => [], // Inisialisasi array workers
-                        ];
+                        // Prepare the workers array based on the system
+                        $workers = [];
+                        foreach ($payrollData['items'] as $item) {
+                            $workerData = [
+                                'id' => $item['id_pekerja'],
+                                'upah' => $item['net_salary'],
+                                'exclusion_date' => $item['potongan_dates'] ?? [],
+                                'potongan' => $item['pembayaran_lain'],
+                                'tunjangan' => $item['tunjangan']
+                            ];
 
-                        if($payrollData['sistem_pengajian'] == 1)
-                        {
-                            foreach ($payrollData['items'] as $index => $item) {
-                                $queryParameters['workers'][$index] = [
-                                    'id' => $item['id_pekerja'],
-                                    'jam_kerja' => $item['total_jam_kerja'],
-                                    'overtime' => $item['total_overtime'],
-                                    'hbn' => $item['total_hbn'],
-                                    'upah' => $item['net_salary'],
-                                    'exclusion_date' => $item['potongan_dates'] ?? [],
-                                    'potongan' => $item['pembayaran_lain'],
-                                    'tunjangan' => $item['tunjangan']
-                                ];
+                            // Add extra fields for Harian (System 1)
+                            if($payrollData['sistem_pengajian'] == 1) {
+                                $workerData['jam_kerja'] = $item['total_jam_kerja'];
+                                $workerData['overtime'] = $item['total_overtime'];
+                                $workerData['hbn'] = $item['total_hbn'];
                             }
+
+                            $workers[] = $workerData;
                         }
 
-                        if($payrollData['sistem_pengajian'] == 2)
-                        {
-                             // Isi array workers secara berpasangan
-                            foreach ($payrollData['items'] as $index => $item) {
-                                $queryParameters['workers'][$index] = [
-                                    'id' => $item['id_pekerja'],
-                                    'upah' => $item['net_salary'],
-                                    'exclusion_date' => $item['potongan_dates'] ?? [],
-                                    'potongan' => $item['pembayaran_lain'],
-                                    'tunjangan' => $item['tunjangan']
-                                ];
-                            }
-                        }
-
-                        $jsonWorkers = json_encode($queryParameters['workers']);
+                        // Determine the route based on system
+                        $route = ($payrollData['sistem_pengajian'] == 1)
+                                ? route('export.rincian.upah.harian')
+                                : route('export.rincian.upah.borongan');
                     @endphp
 
-                    {{-- <form action="{{ route('export.rincian.upah.borongan') }}" method="POST" target="_blank"
-                        style="display:inline;">
+                    {{-- Single Form for both systems --}}
+                    <form action="{{ $route }}" method="POST" target="_blank">
                         @csrf
-                        <input type="hidden" name="id_unit" value="{{ $queryParameters['id_unit'] }}">
-                        <input type="hidden" name="tgl_awal" value="{{ $queryParameters['tgl_awal'] }}">
-                        <input type="hidden" name="tgl_akhir" value="{{ $queryParameters['tgl_akhir'] }}">
-                        <input type="hidden" name="grand_total" value="{{ $queryParameters['grand_total'] }}">
+                        {{-- Basic Metadata --}}
+                        <input type="hidden" name="id_unit" value="{{ $payrollData['unit_id'] }}">
+                        <input type="hidden" name="tgl_awal" value="{{ $payrollData['tanggal_mulai'] }}">
+                        <input type="hidden" name="tgl_akhir" value="{{ $payrollData['tanggal_akhir'] }}">
+                        <input type="hidden" name="grand_total" value="{{ $payrollData['grand_total'] }}">
 
-                        <input type="hidden" name="workers_json" value="{{ $jsonWorkers }}">
+                        {{-- Send the whole workers array as a JSON string --}}
+                        <input type="hidden" name="workers_json" value="{{ json_encode($workers) }}">
 
                         <button type="submit"
-                            class="text-blue-600 hover:text-blue-800 underline bg-transparent border-0 p-0 cursor-pointer">
-                            Export Excel
+                            class="group flex items-center gap-3 bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-3.5 rounded-xl font-black text-xs uppercase tracking-widest shadow-xl shadow-emerald-500/20 transition-all active:scale-95">
+                            Generate Rincian Upah
+                            <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                    d="M13 7l5 5-5 5M6 7l5 5-5 5" />
+                            </svg>
                         </button>
-                    </form> --}}
-                    @switch($payrollData['sistem_pengajian'])
-                        @case(1)
-
-                            <a href="{{ route('export.rincian.upah.harian', $queryParameters) }}" target="_blank"
-                                class="group flex items-center gap-3 bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-3.5 rounded-xl font-black text-xs uppercase tracking-widest shadow-xl shadow-emerald-500/20 transition-all active:scale-95">
-                                Generate Rincian Upah
-                                <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none"
-                                    stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                                        d="M13 7l5 5-5 5M6 7l5 5-5 5" />
-                                </svg>
-                            </a>
-
-                        @break
-
-                        @case(2)
-                            <a href="{{ route('export.rincian.upah.borongan', $queryParameters) }}" target="_blank"
-                                class="group flex items-center gap-3 bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-3.5 rounded-xl font-black text-xs uppercase tracking-widest shadow-xl shadow-emerald-500/20 transition-all active:scale-95">
-                                Generate Rincian Upah
-                                <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none"
-                                    stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                                        d="M13 7l5 5-5 5M6 7l5 5-5 5" />
-                                </svg>
-                            </a>
-                        @break
-                    @endswitch
-
-
+                    </form>
                 </div>
             </div>
         </div>

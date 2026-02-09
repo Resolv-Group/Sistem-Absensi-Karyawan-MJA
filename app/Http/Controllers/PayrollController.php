@@ -582,7 +582,7 @@ class PayrollController extends Controller
         // dd($request->all());
         // 1. Decode JSON Workers dari Request
         // Format JSON: [{"id":2,"upah":150000,"exclusion_date":[]}, ...]
-        $requestWorkers = $request->workers;
+        $requestWorkers = json_decode($request->workers_json, true);
 
         // dd($requestWorkers);
 
