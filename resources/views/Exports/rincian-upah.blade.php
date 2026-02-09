@@ -77,9 +77,9 @@
             @foreach($group as $item)
                 <td colspan="4" style="border-left: 1px solid #000000;">UPAH LEMBUR</td>
                 <td colspan="2" style="border: 1px solid #000000; text-align: center;">{{ $item->lembur_jam }}</td>
-                <td style="border: 1px solid #000000; text-align: right;">{{ number_format($item->lembur_rate, 0, ',', '.') }}</td>
+                <td style="border: 1px solid #000000; text-align: right;">{{ number_format($item->lembur_rate) }}</td>
                 <td style="text-align: center;">=</td>
-                <td style="border-right: 1px solid #000000; text-align: right;">{{ number_format($item->total_lembur ?? 0, 0, ',', '.') }}</td>
+                <td style="border-right: 1px solid #000000; text-align: right;">{{ number_format($item->total_lembur_biasa ?? 0, 0, ',', '.') }}</td>
                 <td></td>
             @endforeach
         </tr>
@@ -88,10 +88,10 @@
         <tr>
             @foreach($group as $item)
                 <td colspan="4" style="border-left: 1px solid #000000;">UPAH LEMBUR HBN</td>
-                <td colspan="2" style="border: 1px solid #000000; text-align: center;">0</td>
-                <td style="border: 1px solid #000000; text-align: right;">{{ number_format($item->lembur_hbn_rate, 0, ',', '.') }}</td>
+                <td colspan="2" style="border: 1px solid #000000; text-align: center;">{{ $item->lembur_hbn_jam }}</td>
+                <td style="border: 1px solid #000000; text-align: right;">{{ number_format($item->lembur_hbn_rate) }}</td>
                 <td style="text-align: center;">=</td>
-                <td style="border-right: 1px solid #000000; text-align: right;">-</td>
+                <td style="border-right: 1px solid #000000; text-align: right;">{{ number_format($item->total_lembur_hbn) }}</td>
                 <td></td>
             @endforeach
         </tr>
@@ -115,7 +115,7 @@
                 <td colspan="2" style="border: 1px solid #000000; text-align: center;">0</td>
                 <td style="border: 1px solid #000000; text-align: center;">-</td>
                 <td style="text-align: center;">=</td>
-                <td style="border-right: 1px solid #000000; text-align: right;">-</td>
+                <td style="border-right: 1px solid #000000; text-align: right;">{{ number_format($item->tunjangan ?? 0) }}</td>
                 <td></td>
             @endforeach
         </tr>
@@ -164,7 +164,7 @@
             @foreach($group as $item)
                 <td colspan="4" style="border-left: 1px solid #000000;">ABSENSI / HARI</td>
                 <td colspan="2" style="border: 1px solid #000000; text-align: center;">{{ $item->absen_hari ?? 0 }}</td>
-                <td style="border: 1px solid #000000; text-align: right;">180.000</td>
+                <td style="border: 1px solid #000000; text-align: right;">{{ number_format($item->potongan_hari_rate ?? 0) }}</td>
                 <td style="text-align: center;">=</td>
                 <td style="border-right: 1px solid #000000; text-align: right;">{{ number_format($item->potongan_hari ?? 0, 0, ',', '.') }}</td>
                 <td></td>
@@ -176,7 +176,7 @@
             @foreach($group as $item)
                 <td colspan="4" style="border-left: 1px solid #000000;">ABSENSI / JAM</td>
                 <td colspan="2" style="border: 1px solid #000000; text-align: center;">{{ $item->absen_jam ?? 0 }}</td>
-                <td style="border: 1px solid #000000; text-align: right;">26.012</td>
+                <td style="border: 1px solid #000000; text-align: right;">{{ number_format($item->potongan_jam_rate ?? 0)}}</td>
                 <td style="text-align: center;">=</td>
                 <td style="border-right: 1px solid #000000; text-align: right;">{{ number_format($item->potongan_jam ?? 0, 0, ',', '.') }}</td>
                 <td></td>
@@ -218,7 +218,7 @@
             @foreach($group as $item)
                 <td colspan="7" style="border-left: 1px solid #000000;">LAIN - LAIN</td>
                 <td style="text-align: center;">=</td>
-                <td style="border-right: 1px solid #000000; text-align: right;">(0)</td>
+                <td style="border-right: 1px solid #000000; text-align: right;">{{ number_format($item->potonganLain ?? 0)}}</td>
                 <td></td>
             @endforeach
         </tr>

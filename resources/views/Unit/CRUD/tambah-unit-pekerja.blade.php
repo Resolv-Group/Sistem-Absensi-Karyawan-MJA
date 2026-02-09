@@ -331,7 +331,7 @@
                                         <input type="hidden" :name="`pekerja[${index}][bpjs_kesehatan]`"
                                             :value="row.bpjsKesehatan">
                                     </div>
-                                </div>
+                                </div>  
 
                                 {{-- 7. Bpjs Ketenagakerjaan --}}
                                 <div>

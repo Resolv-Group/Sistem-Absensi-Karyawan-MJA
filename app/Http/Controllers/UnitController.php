@@ -461,8 +461,7 @@ class UnitController extends Controller
 
             // dd($unit);
             DB::commit();
-
-            return redirect()->route('view.unit')->with('success', 'Data unit berhasil diperbarui.');
+            return redirect()->route('view.detail.unit', $unit->id)->with('success', 'Data unit berhasil diperbarui.');
         } catch (QueryException $e) {
             DB::rollBack();
             return back()
