@@ -20,23 +20,35 @@ class DailyReportHarianExport implements FromView, ShouldAutoSize, WithStyles, W
     protected $grandTotal;
     protected $unitName;
     protected $totalDays;
+    protected $tglAwal;
+    protected $tglAkhir;
+    protected $attendanceMap;
+    protected $unit;
 
-    public function __construct($data, $periode, $grandTotal, $unitName, $totalDays)
+    public function __construct($data, $periode, $grandTotal, $unitName, $totalDays, $tglAwal, $tglAkhir, $attendanceMap, $unit)
     {
         $this->data = $data;
         $this->periode = $periode;
         $this->grandTotal = $grandTotal;
         $this->unitName = $unitName;
         $this->totalDays = $totalDays;
+        $this->tglAwal = $tglAwal;
+        $this->tglAkhir = $tglAkhir;
+        $this->attendanceMap = $attendanceMap;
+        $this->unit = $unit;
     }
 
     public function view(): View
     {
-        return view('Exports.daily-report-borongan', [
+        return view('Exports.daily-report-harian', [
             'items' => $this->data,
             'periode' => $this->periode,
             'grand_total' => $this->grandTotal,
-            'unit_name' => $this->unitName
+            'unit_name' => $this->unitName,
+            'tglAwal' => $this->tglAwal,
+            'tglAkhir' => $this->tglAkhir,
+            'attendanceMap' => $this->attendanceMap,
+            'unit' => $this->unit
         ]);
     }
 

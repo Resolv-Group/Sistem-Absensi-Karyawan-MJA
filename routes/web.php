@@ -129,7 +129,7 @@ Route::middleware(['auth', 'role:hrd,admin,head_supervisor'])->group(function(){
         Route::get('/test/export-kwitansi-borongan', [PayrollController::class, 'ExportKwitansiBorongan'] )->name('export.kwitansi.borongan');
         Route::post('/test/export-rincian-upah-borongan', [PayrollController::class, 'ExportRincianUpahBorongan'] )->name('export.rincian.upah.borongan');
         Route::get('/test/export-rincian-upah-harian', [PayrollController::class, 'ExportRincianUpahHarian'] )->name('export.rincian.upah.harian');
-        Route::get('/test/export-daily-report-harian', [PayrollController::class, 'ExportDailyReportHarian'] )->name('export.daily.report.harian');
+        Route::post('/test/export-daily-report-harian', [PayrollController::class, 'ExportDailyReportHarian'] )->name('export.daily.report.harian');
     });
 });
 
