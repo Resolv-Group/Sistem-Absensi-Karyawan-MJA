@@ -68,7 +68,7 @@
         <td colspan="3" style="font-family:'Garamond'; font-weight:bold; font-size:10px;">Telah terima dari</td>
         <td>:</td>
         <td></td>
-        <td colspan="9" style="font-family:'Cambria'; font-weight:bold;">{{ $nama_unit }}</td>
+        <td colspan="9" style="font-family:'Cambria'; font-weight:bold;">{{ $MitraKerja }}</td>
     </tr>
 
     <tr>
@@ -96,7 +96,7 @@
     <tr>
         <td colspan="5"></td>
         <td colspan="11" style="font-family:'Cambria'; font-weight:bold;">
-            {{ $MitraKerja }}   
+             {{ $nama_unit }}
         </td>
     </tr>
 

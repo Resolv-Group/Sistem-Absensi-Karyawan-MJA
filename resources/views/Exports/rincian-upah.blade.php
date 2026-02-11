@@ -79,7 +79,7 @@
                 <td colspan="2" style="border: 1px solid #000000; text-align: center;">{{ $item->lembur_jam }}</td>
                 <td style="border: 1px solid #000000; text-align: right;">{{ number_format($item->lembur_rate) }}</td>
                 <td style="text-align: center;">=</td>
-                <td style="border-right: 1px solid #000000; text-align: right;">{{ number_format($item->total_lembur_biasa ) }}</td>
+                <td style="border-right: 1px solid #000000; text-align: right;">{{ number_format($item->total_lembur_biasa ) ?? '-' }}</td>
                 <td></td>
             @endforeach
         </tr>
@@ -134,7 +134,7 @@
             @foreach($group as $item)
                 <td colspan="7" style="border-left: 1px solid #000000; font-weight: bold; font-style: italic; text-align: center;">JUMLAH 1</td>
                 <td></td>
-                <td style="border-right: 1px solid #000000; font-weight: bold; text-align: right;">{{ number_format($item->jumlah_1, 0, ',', '.') ?? '-'}}</td>
+                <td style="border-right: 1px solid #000000; font-weight: bold; text-align: right;">{{ number_format($item->jumlah_1) ?? '-'}}</td>
                 <td></td>
             @endforeach
         </tr>
@@ -188,7 +188,7 @@
             @foreach($group as $item)
                 <td colspan="7" style="border-left: 1px solid #000000;">BPJS KETENAGAKERJAAN</td>
                 <td style="text-align: center;">=</td>
-                <td style="border-right: 1px solid #000000; text-align: right;">({{ number_format($item->bpjs_tk ?? 0, 0, ',', '.') ?? '-'}})</td>
+                <td style="border-right: 1px solid #000000; text-align: right;">({{ number_format($item->bpjs_tk ?? 0) ?? '-'}})</td>
                 <td></td>
             @endforeach
         </tr>
@@ -198,7 +198,7 @@
             @foreach($group as $item)
                 <td colspan="7" style="border-left: 1px solid #000000;">BPJS KESEHATAN</td>
                 <td style="text-align: center;">=</td>
-                <td style="border-right: 1px solid #000000; text-align: right;">({{ number_format($item->bpjs_kes ?? 0, 0, ',', '.') ?? '-' }})</td>
+                <td style="border-right: 1px solid #000000; text-align: right;">({{ number_format($item->bpjs_kes ?? 0) ?? '-' }})</td>
                 <td></td>
             @endforeach
         </tr>
@@ -237,7 +237,7 @@
             @foreach($group as $item)
                 <td colspan="7" style="border-left: 1px solid #000000; font-weight: bold; font-style: italic; text-align: center;">JUMLAH 2</td>
                 <td></td>
-                <td style="border-right: 1px solid #000000; font-weight: bold; text-align: right;">({{ number_format($item->jumlah_2 ?? 0, 0, ',', '.') ?? '-' }})</td>
+                <td style="border-right: 1px solid #000000; font-weight: bold; text-align: right;">({{ number_format($item->jumlah_2 ?? 0) ?? '-' }})</td>
                 <td></td>
             @endforeach
         </tr>
@@ -251,7 +251,7 @@
             @foreach($group as $item)
                 <td colspan="8" style="border: 1px solid #000000; font-weight: bold; font-size: 12pt;">TAKE HOME PAY</td>
                 <td style="border: 1px solid #000000; font-weight: bold; font-size: 12pt; text-align: right;">
-                    {{ number_format($item->take_home_pay, 0, ',', '.') }}
+                    {{ number_format($item->take_home_pay) }}
                 </td>
                 <td></td>
             @endforeach

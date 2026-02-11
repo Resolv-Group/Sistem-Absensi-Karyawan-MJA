@@ -483,12 +483,9 @@ class PayrollController extends Controller
 
     function ExportRincianUpahBorongan(Request $request)
     {
-        // dd($request->all());
         // 1. Decode JSON Workers dari Request
         // Format JSON: [{"id":2,"upah":150000,"exclusion_date":[]}, ...]
         $requestWorkers = json_decode($request->workers_json, true);
-
-        // dd($requestWorkers);
 
         // Ambil semua ID untuk query database sekaligus (Eager Loading)
         $workerIds = array_column($requestWorkers, 'id');
@@ -550,7 +547,9 @@ class PayrollController extends Controller
             $item->lembur_rate = 0;
             $item->lembur_hbn_rate = 0;
             $item->total_lembur = 0;
-            $item->jumlah_1 = $item->upah_pokok; // Total Pendapatan
+            $item->tunjangan = $reqWorker['tunjangan'];
+
+            $item->jumlah_1 = $item->upah_pokok + $item->tunjangan; // Total Pendapatan
 
             // --- C. POTONGAN (Opsional) ---
             // Jika ingin menghitung BPJS otomatis berdasarkan $upahBorongan, masukkan rumus di sini
@@ -560,9 +559,18 @@ class PayrollController extends Controller
             $item->absen_jam = 0;
             $item->potongan_jam = 0;
 
+            
+            $item->potonganLain = $reqWorker['potongan'];
+        
+            //Tidak ada di borongan
+            $item->total_lembur_biasa = 0;
+            $item->lembur_hbn_jam = 0;
+            $item->total_lembur_hbn = 0;
+
             $item->bpjs_tk = $pkwtAktif?->bpjs_naker ?? 0; // Masukkan logika calc BPJS jika ada
             $item->bpjs_kes = $pkwtAktif?->bpjs_kesehatan ?? 0; // Masukkan logika calc BPJS jika ada
-            $item->jumlah_2 = $item->bpjs_tk + $item->bpjs_kes; // Total Potongan
+
+            $item->jumlah_2 = $item->bpjs_tk + $item->bpjs_kes + $item->potonganLain; // Total Potongan
 
             // --- D. TOTAL AKHIR ---
             $item->take_home_pay = $item->jumlah_1 - $item->jumlah_2;

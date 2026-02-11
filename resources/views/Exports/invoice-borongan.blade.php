@@ -65,7 +65,7 @@ use Carbon\Carbon;
     </tr>
     <tr>
         <td style="font-weight:bold;">Kepada :</td>
-        <td colspan="9" style="font-weight:bold;">{{ $nama_unit }}</td>
+        <td colspan="9" style="font-weight:bold;">{{ $nama_mitra }}</td>
     </tr>
     <tr>
         <td style="font-weight:bold;">d / a :</td>
@@ -87,7 +87,7 @@ use Carbon\Carbon;
     </tr>
 
     <tr>
-        <td colspan="10" style="font-weight:bold;">{{ $nama_mitra }}</td>
+        <td colspan="10" style="font-weight:bold;">{{ $nama_unit }}</td>
     </tr>
 
 
