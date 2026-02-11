@@ -262,7 +262,6 @@
                                     <th class="px-4 py-4 text-center">Total HBN</th>
                                     <th class="px-6 py-4 text-center">Hasil Gaji</th>
                                     <th class="px-6 py-4 text-right">Penyesuaian (Pot/Tunj)</th>
-                                    <th class="px-8 py-4 text-right">Detail</th>
                                 </tr>
                             @break
 
@@ -325,14 +324,14 @@
                                         <td class="px-4 py-4 text-center border-x border-slate-50/50">
                                             <div class="flex flex-col">
                                                 <span class="text-sm font-black text-indigo-600">{{ $item['total_hbn'] }}</span>
-                                                <span class="text-[11px] font-bold text-indigo-500/80 uppercase">HBN</span>
+                                                <span class="text-[11px] font-bold text-indigo-500/80 uppercase">Jam HBN</span>
                                             </div>
                                         </td>
 
                                         <!-- Hasil Gaji -->
                                         <td class="px-6 py-4 text-center">
                                             <p class="text-sm font-black text-slate-800">
-                                                Rp {{ number_format(max(0, $item['net_salary']), 0, ',', '.') }}
+                                                Rp.{{ number_format(max(0, $item['net_salary']), 0, ',', '.') }}
                                             </p>
                                         </td>
 
@@ -367,31 +366,6 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                        </td>
-
-                                        <td class="px-8 py-5 text-right">
-                                            <a href="{{ route('export.detail.harian', [
-                                                'id_unit' => $payrollData['unit_id'],
-                                                'id_pekerja' => $item['id_pekerja'],
-                                                'tgl_awal' => $payrollData['tanggal_mulai'],
-                                                'tgl_akhir' => $payrollData['tanggal_akhir'],
-                                                'jam_kerja' => $item['total_jam_kerja'];
-                                                'overtime' => $item['total_overtime'];
-                                                'hbn' => $item['total_hbn'];
-                                                'potongan' => $item['pembayaran_lain'],
-                                                'tunjangan' => $item['tunjangan'],
-                                                'exclusion_date' => $item['potongan_dates'],
-                                            ]) }}"
-                                                target="_blank" {{-- buka di tab baru untuk slip gaji --}}
-                                                class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-xl font-bold text-[10px] uppercase tracking-widest hover:border-emerald-500 hover:text-emerald-600 transition-all shadow-sm active:scale-95 group">
-
-                                                <svg class="w-4 h-4 text-slate-400 group-hover:text-emerald-500 transition-colors"
-                                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                                </svg>
-                                                <span>Report</span>
-                                            </a>
                                         </td>
                                     @break
 
@@ -482,101 +456,74 @@
                     Kembali Edit
                 </a>
 
+                @php
+                    // 1. Siapkan data workers (Sama seperti sebelumnya)
+                    $workers = [];
+                    foreach ($payrollData['items'] as $item) {
+                        $workerData = [
+                            'id' => $item['id_pekerja'],
+                            'upah' => $item['net_salary'],
+                            'exclusion_date' => $item['potongan_dates'] ?? [],
+                            'potongan' => $item['pembayaran_lain'],
+                            'tunjangan' => $item['tunjangan']
+                        ];
+
+                        if($payrollData['sistem_pengajian'] == 1) {
+                            $workerData['jam_kerja'] = $item['total_jam_kerja'];
+                            $workerData['overtime'] = $item['total_overtime'];
+                            $workerData['hbn'] = $item['total_hbn'];
+                        }
+                        $workers[] = $workerData;
+                    }
+                    $jsonWorkers = json_encode($workers);
+                @endphp
+
                 <div class="flex gap-3">
+                    {{-- Tombol Save Draft tetap di luar form jika tipenya hanya link/anchor --}}
                     <a href="#"
                         class="px-8 py-3.5 bg-white border border-slate-200 text-slate-600 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-slate-50 transition-all shadow-sm">
                         Save Draft
                     </a>
 
-                    @php
-                        // Prepare the workers array based on the system
-                        $workers = [];
-                        foreach ($payrollData['items'] as $item) {
-                            $workerData = [
-                                'id' => $item['id_pekerja'],
-                                'upah' => $item['net_salary'],
-                                'exclusion_date' => $item['potongan_dates'] ?? [],
-                                'potongan' => $item['pembayaran_lain'],
-                                'tunjangan' => $item['tunjangan']
-                            ];
-
-                            // Add extra fields for Harian (System 1)
-                            if($payrollData['sistem_pengajian'] == 1) {
-                                $workerData['jam_kerja'] = $item['total_jam_kerja'];
-                                $workerData['overtime'] = $item['total_overtime'];
-                                $workerData['hbn'] = $item['total_hbn'];
-                            }
-
-                            $workers[] = $workerData;
-                        }
-
-                        // Determine the route based on system
-                        $route = ($payrollData['sistem_pengajian'] == 1)
-                                ? route('export.rincian.upah.harian')
-                                : route('export.rincian.upah.borongan');
-                    @endphp
-
-                    {{-- Single Form for both systems --}}
-                    <form action="{{ $route }}" method="POST" target="_blank">
+                    {{-- Form Utama dengan target _blank --}}
+                    <form method="POST" target="_blank" class="flex gap-3">
                         @csrf
-                        {{-- Basic Metadata --}}
+                        {{-- Data Hidden yang dibutuhkan oleh semua report --}}
                         <input type="hidden" name="id_unit" value="{{ $payrollData['unit_id'] }}">
                         <input type="hidden" name="tgl_awal" value="{{ $payrollData['tanggal_mulai'] }}">
                         <input type="hidden" name="tgl_akhir" value="{{ $payrollData['tanggal_akhir'] }}">
                         <input type="hidden" name="grand_total" value="{{ $payrollData['grand_total'] }}">
+                        <input type="hidden" name="workers_json" value="{{ $jsonWorkers }}">
 
-                        {{-- Send the whole workers array as a JSON string --}}
-                        <input type="hidden" name="workers_json" value="{{ json_encode($workers) }}">
-
-                        <button type="submit"
-                            class="group flex items-center gap-3 bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-3.5 rounded-xl font-black text-xs uppercase tracking-widest shadow-xl shadow-emerald-500/20 transition-all active:scale-95">
-                            Generate Rincian Upah
-                            <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none"
-                                stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                                    d="M13 7l5 5-5 5M6 7l5 5-5 5" />
-                            </svg>
-                        </button>
-                    </form> --}}
-                    @switch($payrollData['sistem_pengajian'])
-                        @case(1)
-
-                            <a href="{{ route('export.rincian.upah.harian', $queryParameters) }}" target="_blank"
+                        @if($payrollData['sistem_pengajian'] == 1)
+                            {{-- BUTTONS UNTUK HARIAN --}}
+                            <button type="submit" formaction="{{ route('export.rincian.upah.harian') }}"
                                 class="group flex items-center gap-3 bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-3.5 rounded-xl font-black text-xs uppercase tracking-widest shadow-xl shadow-emerald-500/20 transition-all active:scale-95">
                                 Generate Rincian Upah
-                                <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none"
-                                    stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                                        d="M13 7l5 5-5 5M6 7l5 5-5 5" />
+                                <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7l5 5-5 5M6 7l5 5-5 5" />
                                 </svg>
-                            </a>
+                            </button>
 
-                            <a href="{{ route('export.detail.harian', $queryParameters) }}" target="_blank"
-                                class="group flex items-center gap-3 bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-3.5 rounded-xl font-black text-xs uppercase tracking-widest shadow-xl shadow-emerald-500/20 transition-all active:scale-95">
+                            <button type="submit" formaction="{{ route('export.detail.harian') }}"
+                                class="group flex items-center gap-3 bg-blue-600 hover:bg-blue-500 text-white px-8 py-3.5 rounded-xl font-black text-xs uppercase tracking-widest shadow-xl shadow-blue-500/20 transition-all active:scale-95">
                                 Generate Report Harian
-                                <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none"
-                                    stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                                        d="M13 7l5 5-5 5M6 7l5 5-5 5" />
+                                <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 17v-2a4 4 0 014-4h4m0 0l-4-4m4 4l-4 4" />
                                 </svg>
-                            </a>
+                            </button>
 
-                        @break
-
-                        @case(2)
-                            <a href="{{ route('export.rincian.upah.borongan', $queryParameters) }}" target="_blank"
+                        @else
+                            {{-- BUTTON UNTUK BORONGAN --}}
+                            <button type="submit" formaction="{{ route('export.rincian.upah.borongan') }}"
                                 class="group flex items-center gap-3 bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-3.5 rounded-xl font-black text-xs uppercase tracking-widest shadow-xl shadow-emerald-500/20 transition-all active:scale-95">
                                 Generate Rincian Upah
-                                <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none"
-                                    stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                                        d="M13 7l5 5-5 5M6 7l5 5-5 5" />
+                                <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7l5 5-5 5M6 7l5 5-5 5" />
                                 </svg>
-                            </a>
-                        @break
-                    @endswitch
-
-
+                            </button>
+                        @endif
+                    </form>
                 </div>
             </div>
         </div>

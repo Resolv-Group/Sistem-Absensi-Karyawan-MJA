@@ -122,7 +122,7 @@ Route::middleware(['auth', 'role:hrd,admin,head_supervisor'])->group(function(){
         Route::get('/payroll', [PayrollController::class, 'viewPayrollMain'])->name('view.payroll');
         Route::get('/payroll/overview', [PayrollController::class, 'viewPayrollOverview'])->name('view.payroll.overview');
         Route::post('/payroll/overview', [PayrollController::class, 'overviewPayroll'])->name('overview.payroll');
-        Route::get('/test/export-detail-harian', [PayrollController::class, 'ExportDetailHarian'] )->name('export.detail.harian');
+        Route::post('/export-detail-harian', [PayrollController::class, 'ExportDetailHarian'] )->name('export.detail.harian');
         Route::get('/test/export-detail-borongan', [PayrollController::class, 'ExportDetailBorongan'] )->name('export.detail.borongan');
         Route::get('/test/export-tanda-terima-borongan', [PayrollController::class, 'ExportTandaTerimaBorongan'] )->name('export.tanda-terima.borongan');
         Route::get('/test/export-invoice-borongan', [PayrollController::class, 'ExportInvoiceBorongan'] )->name('export.invoice.borongan');
@@ -132,6 +132,7 @@ Route::middleware(['auth', 'role:hrd,admin,head_supervisor'])->group(function(){
         Route::post('/export-daily-report-harian', [PayrollController::class, 'ExportDailyReportHarian'] )->name('export.daily.report.harian');
 
     });
+});
 
 Route::middleware(['auth', 'role:pic,admin'])->group(function(){
     //Absensi

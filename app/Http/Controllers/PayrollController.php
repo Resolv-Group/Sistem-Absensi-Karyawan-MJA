@@ -483,7 +483,7 @@ class PayrollController extends Controller
 
     function ExportRincianUpahBorongan(Request $request)
     {
-        dd($request->all());
+        // dd($request->all());
         // 1. Decode JSON Workers dari Request
         // Format JSON: [{"id":2,"upah":150000,"exclusion_date":[]}, ...]
         $requestWorkers = json_decode($request->workers_json, true);
@@ -510,7 +510,7 @@ class PayrollController extends Controller
 
         $realItems = [];
 
-        dd($dbPekerja);
+        // dd($dbPekerja);
 
         // 3. Looping Data Request (Agar urutan & nilai upahnya sesuai input)
         foreach ($requestWorkers as $reqWorker) {
@@ -593,8 +593,9 @@ class PayrollController extends Controller
 
     public function ExportRincianUpahHarian(Request $request)
     {
+        // dd($request->all());
         // 2. Decode Input
-        $workersInput = $request->workers;
+        $workersInput = json_decode($request->workers_json, true);
         $workerIds = array_column($workersInput, 'id');
 
         // 3. Ambil Data Master (Pekerja + PKWT)
@@ -717,8 +718,9 @@ class PayrollController extends Controller
 
     public function ExportDetailHarian(Request $request)
     {
+        // dd($request->all());
         // 1. Ambil data dari request
-        $workersInput = $request->workers;
+        $workersInput = json_decode($request->workers_json, true);
         $idUnit = $request->id_unit;
         // Format tanggal untuk Query Database
         $tglAwal = \Carbon\Carbon::parse($request->tgl_awal)->format('Y-m-d');
@@ -740,7 +742,7 @@ class PayrollController extends Controller
         // ---------------------------------------------------------
         // [BAGIAN 3] AMBIL DATA ABSENSI & BUAT MAPPING (DILAKUKAN SEKALI SAJA)
         // ---------------------------------------------------------
-        
+
         // A. Query Database
         $absensiData = Absensi::with('detilHarian')
             ->whereIn('id_pekerja', $workerIds)
@@ -751,16 +753,16 @@ class PayrollController extends Controller
         $attendanceMap = [];
         foreach ($absensiData as $abs) {
             $tgl = \Carbon\Carbon::parse($abs->tgl_absensi)->format('Y-m-d');
-            
+
             // Pastikan ID menjadi integer agar kunci array konsisten
             $idPekerja = (int) $abs->id_pekerja;
-            
+
             // Ambil jam kerja (pastikan nama relasi 'detilHarian' benar sesuai model)
             $attendanceMap[$idPekerja][$tgl] = $abs->detilHarian->jam_kerja_harian ?? null;
         }
-        
+
         // DEBUG: Cek isi map sebelum lanjut (Hapus jika sudah benar)
-        // dd($attendanceMap); 
+        // dd($attendanceMap);
 
         // ---------------------------------------------------------
         // [BAGIAN 4] LOOPING DATA PEKERJA UNTUK ROW EXCEL
@@ -785,22 +787,22 @@ class PayrollController extends Controller
 
             // --- A. IDENTITAS ---
             // PENTING: Simpan ID Asli untuk kunci pencarian di Blade nanti
-            $item->id_original = $staffDb->id; 
-            
+            $item->id_original = $staffDb->id;
+
             $item->nama = $staffDb->nama;
             $item->id_karyawan = $staffDb->id_pekerja ?? $staffDb->nik;
             $item->jabatan = $pkwtAktif?->jabatan?->nama ?? '-';
             $item->divisi = $pkwtAktif?->divisi?->nama ?? '-';
-            $item->checkman = 'TRUE'; 
+            $item->checkman = 'TRUE';
             $item->no_rekening = $staffDb->rekening ?? '-';
 
             // --- B. RATE / TARIF ---
             $item->rate_pokok = $pkwtAktif?->gaji_harian ?? 0;
             $item->rate_lembur = $pkwtAktif?->gaji_overtime ?? 0;
-            $item->rate_hbn = ($pkwtAktif?->gaji_overtime ?? 0) * 1.5; 
-            
-            $item->tunjangan = (float) ($input['tunjangan'] ?? 0);  
-            $item->insentif = (float) ($input['insentif'] ?? 0);  
+            $item->rate_hbn = ($pkwtAktif?->gaji_overtime ?? 0) * 1.5;
+
+            $item->tunjangan = (float) ($input['tunjangan'] ?? 0);
+            $item->insentif = (float) ($input['insentif'] ?? 0);
 
             // --- C. INPUT JAM & UPAH ---
             $item->jam_kerja = (float) ($input['jam_kerja'] ?? 0);
@@ -819,12 +821,12 @@ class PayrollController extends Controller
             $item->uang_tunjangan = 0;
 
             $item->jml_uang_tunjangan = (float) ($input['tunjangan'] ?? 0);
-            $item->upah_insentif = 0; 
+            $item->upah_insentif = 0;
             $item->jml_uang_insentif = 0;
 
             // --- D. POTONGAN ABSENSI ---
             $item->pot_absen_per_hari = $item->rate_pokok;
-            $item->jml_pot_absen_hari = 0; 
+            $item->jml_pot_absen_hari = 0;
             $item->pot_absen_per_jam = $pkwtAktif?->gaji_overtime ?? 0;
             $item->jml_pot_absen_jam = 0;
 
@@ -836,7 +838,7 @@ class PayrollController extends Controller
             // --- F. POTONGAN WAJIB ---
             $item->bpjs_tk = $pkwtAktif?->bpjs_naker ?? 0;
             $item->bpjs_kes = $pkwtAktif?->bpjs_kesehatan ?? 0;
-            $item->biaya_admin = 2000; 
+            $item->biaya_admin = 2000;
             $item->potongan_lain = (float) ($input['potongan'] ?? 0);
             $item->biaya_klaim = 0;
 
@@ -846,7 +848,7 @@ class PayrollController extends Controller
 
             // ERROR SEBELUMNYA DI SINI:
             // Kode mapping absensi dihapus dari sini karena sudah dilakukan di atas (Bagian 3)
-            
+
             $realItems[] = $item;
         }
 
@@ -866,11 +868,11 @@ class PayrollController extends Controller
 
         // Sertakan $attendanceMap ke dalam Export Class
         return Excel::download(new DailyReportHarianExport(
-            $formattedData, 
-            $periodeString, 
-            $grandTotal, 
-            $unitName, 
-            $totalDays, 
+            $formattedData,
+            $periodeString,
+            $grandTotal,
+            $unitName,
+            $totalDays,
             $tglAwal, // string Y-m-d
             $tglAkhir, // string Y-m-d
             $attendanceMap, // Array Mapping
