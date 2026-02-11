@@ -101,7 +101,7 @@
         // --- Status Absen State ---
         rowStatus: {},
         rowPaidLeave: {},
-        globalStatus: '2',
+        globalStatus: '1',
 
         currentPage: {{ $pkwtPekerja->currentPage() }},
         allIds: {{ json_encode($pkwtPekerja->pluck('id')) }},
@@ -406,7 +406,7 @@
                                         open: false,
                                         list: [{ val: '', label: 'Semua Status' },
                                             { val: '1', label: 'Hadir' },
-                                            { val: '2', label: 'Cuti' },
+                                            { val: '3', label: 'Cuti' },
                                         ]
                                     }" class="relative">
                                         <label
@@ -858,11 +858,11 @@
                                                             <div x-data="{
                                                                 open: false,
                                                                 list: [
-                                                                    { val: '0', label: 'Absen' },
-                                                                    { val: '1', label: 'Izin' },
-                                                                    { val: '2', label: 'Cuti' },
-                                                                    { val: '3', label: 'Sakit' },
-                                                                    { val: '4', label: 'Rencana Cuti' },
+                                                                    { val: '2', label: 'Izin' },
+                                                                    { val: '3', label: 'Cuti' },
+                                                                    { val: '4', label: 'Sakit' },
+                                                                    { val: '5', label: 'Rencana Cuti' },
+                                                                    { val: '6', label: 'Absen' },
                                                                 ]
                                                             }" class="relative">
                                                                 <input type="hidden"
