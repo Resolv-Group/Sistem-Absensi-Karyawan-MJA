@@ -153,8 +153,8 @@ class AbsensiController extends Controller
                     // Existing Values from saved attendance
                     'existing_jam' => $savedDetail ? (float) $savedDetail->jam_kerja_harian : null,
                     'existing_hbn' => $savedDetail ? (int) $savedDetail->hbn : 0,
-                    'existing_paid' => $savedDetail ? (int)$savedDetail->isPaid : 0,
-                    'existing_status' => $savedDetail ? (int)$savedDetail->status_kehadiran : 0,
+                    'existing_paid' => $savedDetail ? (int) $savedDetail->isPaid : 0,
+                    'existing_status' => $savedDetail ? (int) $savedDetail->status_kehadiran : 0,
                     'existing_catatan' => $savedDetail ? $savedDetail->catatan : '',
                 ],
             ];
@@ -299,6 +299,7 @@ class AbsensiController extends Controller
 
         try {
             $date = $request->date;
+            $errors = [];
 
             foreach ($request->data as $pkwtId => $values) {
                 $pkwt = PKWT::with('unit')->find($pkwtId);
@@ -306,43 +307,67 @@ class AbsensiController extends Controller
                     continue;
                 }
 
-                // Cari atau buat record Absensi (Parent)
-                $absensi = Absensi::firstOrCreate(
-                    [
-                        'id_pekerja' => $pkwt->id_pekerja,
-                        'id_unit' => $pkwt->id_unit,
-                        'tgl_absensi' => $date,
-                    ],
-                    [
-                        'id_pic' => Auth::user()->staff->id ?? Auth::id(),
-                        'tipe' => $pkwt->unit->sistem_pengajian,
-                        'verifikasi' => 0,
-                    ],
-                );
+                $absensi = Absensi::where([
+                    'id_pekerja' => $pkwt->id_pekerja,
+                    'id_unit' => $pkwt->id_unit,
+                    'tgl_absensi' => $date,
+                ])->first();
+
+                // 2. Jika Absensi belum ada, kita buat Parent-nya
+                if (!$absensi) {
+                    // 1. Dapatkan atau Buat Parent Absensi
+                    $absensi = Absensi::firstOrCreate(
+                        ['id_pekerja' => $pkwt->id_pekerja, 'id_unit' => $pkwt->id_unit, 'tgl_absensi' => $date],
+                        ['id_pic' => Auth::user()->staff->id ?? Auth::id(), 'tipe' => $pkwt->unit->sistem_pengajian, 'verifikasi' => 0]
+                    );
+                }
+
+                $detil = $absensi->detilHarian;
+                $statusTerlarang = [5, 6]; // 5: Rencana Cuti, 6: Absen
+                $statusDilindungi = [2, 3, 4]; // 2: Izin, 3: Cuti, 4: Sakit
+
+                // 2. Siapkan data jam yang akan disimpan
+                $dataToSave = [
+                    'jam_kerja_normal' => $values['jam_normal'] ?? 0,
+                    'jam_kerja_harian' => $values['jam_aktual'] ?? 0,
+                    'overtime' => $values['overtime'] ?? 0,
+                    'hbn' => $values['is_hbn'] ?? 0,
+                    'catatan' => $values['catatan'] ?? null,
+                    'updated_by' => Auth::id(),
+                ];
 
                 /**
-                 * UPDATE DETAIL HARIAN
-                 * Kita gunakan updateOrCreate agar jika data sudah ada, nilainya diperbarui.
-                 * Mapping kolom disesuaikan dengan input numerik Anda.
+                 * LOGIKA BARU:
                  */
-                $absensi->detilHarian()->updateOrCreate(
-                    ['id_absensi' => $absensi->id],
-                    [
-                        'status_kehadiran' => 1, // Status Hadir
-                        'jam_kerja_normal' => $values['jam_normal'] ?? 0,
-                        'jam_kerja_harian' => $values['jam_aktual'],
-                        'overtime' => $values['overtime'] ?? 0,
-                        'hbn' => $values['is_hbn'] ?? 0,
-                        'catatan' => $values['catatan'] ?? null,
-                        'updated_by' => Auth::id(),
-                        // Jika kolom DB Anda masih menggunakan id_shift, masuk, keluar:
-                        // 'id_shift' => null,
-                        // 'waktu_masuk' => null,
-                        // 'waktu_keluar' => null,
-                    ],
-                );
+                // KONDISI 1: JIKA STATUS TERLARANG (5 atau 6)
+                if ($detil && in_array($detil->status_kehadiran, $statusTerlarang)) {
+                    $statusLabel = $detil->status_kehadiran == 5 ? 'Rencana Cuti' : 'Absen';
+                    return back()->with('error', "Gagal! Pekerja [{$pkwt->pekerja->nama}] berstatus {$statusLabel}. Ubah status kehadiran secara manual terlebih dahulu sebelum mengisi jam.")->withInput();
+                }
 
-                // Set ulang verifikasi ke 0 jika data diubah
+                // KONDISI 2: JIKA STATUS IZIN/CUTI/SAKIT (2, 3, 4)
+                if ($detil && in_array($detil->status_kehadiran, $statusDilindungi)) {
+
+                    if ($detil->isPaid == 1) {
+                        // Izin Dibayar: Hanya update jam, status asli tetap (Izin/Cuti/Sakit)
+                        $detil->update($dataToSave);
+                    } else {
+                        // Izin Tidak Dibayar: Karena ada input jam, ubah jadi HADIR (1)
+                        $dataToSave['status_kehadiran'] = 1;
+                        $detil->update($dataToSave);
+                    }
+
+                } else {
+                    // KONDISI 3: INPUT NORMAL (Data Baru, Status 0, atau Status 1)
+                    $dataToSave['status_kehadiran'] = 1; // Pastikan jadi Hadir
+
+                    $absensi->detilHarian()->updateOrCreate(
+                        ['id_absensi' => $absensi->id],
+                        $dataToSave
+                    );
+                }
+
+                // Reset verifikasi
                 $absensi->update(['verifikasi' => 0]);
             }
 
@@ -356,7 +381,6 @@ class AbsensiController extends Controller
 
     public function bulkAbsensiUpdateStatus(Request $request)
     {
-        // dd($request->all());
         $validator = Validator::make($request->all(), [
             'date' => 'required|date',
             'data' => 'required|array',

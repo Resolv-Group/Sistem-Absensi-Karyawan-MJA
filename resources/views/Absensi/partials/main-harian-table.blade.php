@@ -111,19 +111,21 @@
             @if ($detil)
                 @php
                     $colors = [
-                        0 => 'bg-red-50 text-red-600 border-red-100', // Absen
                         1 => 'bg-emerald-50 text-emerald-600 border-emerald-100', // Hadir
-                        2 => 'bg-purple-50 text-purple-600 border-purple-100', // Cuti
-                        3 => 'bg-amber-50 text-amber-600 border-amber-100', // Sakit
-                        4 => 'bg-cyan-50 text-cyan-600 border-cyan-100', // Rencana Cuti
+                        2 => 'bg-blue-50 text-blue-600 border-blue-100',         // Izin
+                        3 => 'bg-purple-50 text-purple-600 border-purple-100',  // Cuti
+                        4 => 'bg-amber-50 text-amber-600 border-amber-100',     // Sakit
+                        5 => 'bg-cyan-50 text-cyan-600 border-cyan-100',        // Rencana Cuti
+                        6 => 'bg-red-50 text-red-600 border-red-100',           // Absen
                     ];
 
                     $labels = [
-                        0 => 'Absen',
                         1 => 'Hadir',
-                        2 => 'Cuti',
-                        3 => 'Sakit',
-                        4 => 'Rencana Cuti',
+                        2 => 'Izin',
+                        3 => 'Cuti',
+                        4 => 'Sakit',
+                        5 => 'Rencana Cuti',
+                        6 => 'Absen',
                     ];
 
                     $statusVal = $detil->status_kehadiran;
