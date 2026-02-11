@@ -537,7 +537,46 @@
                                     d="M13 7l5 5-5 5M6 7l5 5-5 5" />
                             </svg>
                         </button>
-                    </form>
+                    </form> --}}
+                    @switch($payrollData['sistem_pengajian'])
+                        @case(1)
+
+                            <a href="{{ route('export.rincian.upah.harian', $queryParameters) }}" target="_blank"
+                                class="group flex items-center gap-3 bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-3.5 rounded-xl font-black text-xs uppercase tracking-widest shadow-xl shadow-emerald-500/20 transition-all active:scale-95">
+                                Generate Rincian Upah
+                                <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                        d="M13 7l5 5-5 5M6 7l5 5-5 5" />
+                                </svg>
+                            </a>
+
+                            <a href="{{ route('export.detail.harian', $queryParameters) }}" target="_blank"
+                                class="group flex items-center gap-3 bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-3.5 rounded-xl font-black text-xs uppercase tracking-widest shadow-xl shadow-emerald-500/20 transition-all active:scale-95">
+                                Generate Report Harian
+                                <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                        d="M13 7l5 5-5 5M6 7l5 5-5 5" />
+                                </svg>
+                            </a>
+
+                        @break
+
+                        @case(2)
+                            <a href="{{ route('export.rincian.upah.borongan', $queryParameters) }}" target="_blank"
+                                class="group flex items-center gap-3 bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-3.5 rounded-xl font-black text-xs uppercase tracking-widest shadow-xl shadow-emerald-500/20 transition-all active:scale-95">
+                                Generate Rincian Upah
+                                <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                        d="M13 7l5 5-5 5M6 7l5 5-5 5" />
+                                </svg>
+                            </a>
+                        @break
+                    @endswitch
+
+
                 </div>
             </div>
         </div>

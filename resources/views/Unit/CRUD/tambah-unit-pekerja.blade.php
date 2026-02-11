@@ -365,7 +365,7 @@
                                             </svg>
                                         </div>
                                     </div>
-                                </div>
+                                </div>  
 
                                 {{-- HASIL BPJS NAKER --}}
                                 <div>

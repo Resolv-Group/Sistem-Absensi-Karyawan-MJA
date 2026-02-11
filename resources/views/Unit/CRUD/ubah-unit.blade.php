@@ -535,7 +535,7 @@
 
             {{-- FOOTER --}}
             <div class="bg-gray-50/50 px-8 py-6 border-t border-gray-100 flex items-center justify-end gap-3">
-                <a href="{{ route('view.unit') }}"
+                <a href="{{ route('view.detail.unit', $unit->id) }}
                     class="px-5 py-2.5 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 hover:text-gray-800 transition shadow-sm">
                     Batal
                 </a>

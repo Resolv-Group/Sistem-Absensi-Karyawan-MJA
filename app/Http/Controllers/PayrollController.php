@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\DailyReportHarianExport;
 use App\Exports\DetilBoronganExport;
 use App\Exports\InvoiceBoronganExport;
 use App\Exports\KwitansiBoronganExport;
@@ -93,22 +94,17 @@ class PayrollController extends Controller
         $tanggalAkhir = $request->tanggal_akhir;
         $allAdjustments = $request->input('adjustments', []);
 
-        $isHarian = ($unit->sistem_pengajian == 1);
+        $isHarian = $unit->sistem_pengajian == 1;
 
-        $periode = Carbon::parse($tanggalMulai)->translatedFormat('d')
-        . '—'
-        . Carbon::parse($tanggalAkhir)->translatedFormat('d M Y');
+        $periode = Carbon::parse($tanggalMulai)->translatedFormat('d') . '—' . Carbon::parse($tanggalAkhir)->translatedFormat('d M Y');
 
         // Ambil data pekerja yang dipilih
-        $workers = Pekerja::whereIn('id', $paidWorkerIds)
-                    ->get();
+        $workers = Pekerja::whereIn('id', $paidWorkerIds)->get();
 
         // Olah data potongan tanggal (Step 3) dari modal
-        $specificExclusions = collect($request->input('specific_workers', []))
-            ->filter(fn($item) => !empty($item['id']) && !empty($item['date']))
-            ->groupBy('id');
+        $specificExclusions = collect($request->input('specific_workers', []))->filter(fn($item) => !empty($item['id']) && !empty($item['date']))->groupBy('id');
 
-            // dump($specificExclusions);
+        // dump($specificExclusions);
 
         $payrollData = [
             'unit_id' => $request->id_unit,
@@ -118,12 +114,9 @@ class PayrollController extends Controller
             'total_pekerja' => $workers->count(),
             'tanggal_mulai' => $tanggalMulai,
             'tanggal_akhir' => $tanggalAkhir,
-            'items' => $workers->map(function($w) use ($id_unit, $isHarian, $periode, $specificExclusions, $allAdjustments, $tanggalMulai, $tanggalAkhir) {
-
+            'items' => $workers->map(function ($w) use ($id_unit, $isHarian, $periode, $specificExclusions, $allAdjustments, $tanggalMulai, $tanggalAkhir) {
                 // 1. Dapatkan list tanggal yang dikecualikan (potongan) untuk pekerja ini
-                $excludedDates = $specificExclusions->get($w->id)
-                    ? $specificExclusions->get($w->id)->pluck('date')->toArray()
-                    : [];
+                $excludedDates = $specificExclusions->get($w->id) ? $specificExclusions->get($w->id)->pluck('date')->toArray() : [];
 
                 $relation = $isHarian ? 'detilHarian' : 'detilBorongan.borongan:id,harga_pekerja,nama_item';
 
@@ -152,32 +145,30 @@ class PayrollController extends Controller
                 $totalHBN = 0;
                 $hasilGajiHarian = 0;
 
-                $pkwt = PKWT::where('id_pekerja', $w->id)
-                        ->where('id_unit', $id_unit)
-                        ->where('status_aktif', 1)
-                        ->first();
+                $pkwt = PKWT::where('id_pekerja', $w->id)->where('id_unit', $id_unit)->where('status_aktif', 1)->first();
                 // dump($pkwt);
 
-                $gajiHarianPkwt   = $pkwt->gaji_harian ?? 0;
+                $gajiHarianPkwt = $pkwt->gaji_harian ?? 0;
                 $gajiOvertimePkwt = $pkwt->gaji_overtime ?? 0;
 
                 foreach ($absensiRecords as $absensi) {
-                    if($isHarian) {
+                    if ($isHarian) {
                         $detil = $absensi->detilHarian;
                         if ($detil) {
                             $totalJamKerja += (float) $detil->jam_kerja_harian;
                             $totalOvertime += (float) $detil->overtime;
-                            $totalHBN      += (float) $detil->hbn;
 
                             // --- LOGIKA PERHITUNGAN GAJI ---
-                            $jamNormal = (float) ($detil->jam_kerja_normal); // Hindari division by zero
+                            $jamNormal = (float) $detil->jam_kerja_normal; // Hindari division by zero
                             $jamHarian = (float) $detil->jam_kerja_harian;
-                            $jamOT     = (float) $detil->overtime;
+                            $jamOT = (float) $detil->overtime;
 
                             if ($detil->hbn == 1) {
                                 // JIKA HBN: Semua jam_kerja_harian dihitung sebagai OVERTIME
                                 // Rumus: jam_harian * gaji_overtime
-                                $gajiHariIni = ($jamHarian * $gajiOvertimePkwt);
+                                $gajiHariIni = $jamHarian * ($gajiOvertimePkwt * 1.5);
+
+                                $totalHBN += (float) $detil->overtime;
                                 // dump('Gaji Harian (jamharian*gajiovertime) = ', $gajiHariIni);
                             } else {
                                 // JIKA HARI NORMAL:
@@ -195,8 +186,7 @@ class PayrollController extends Controller
                             $hasilGajiHarian += $gajiHariIni;
                         }
                     } else {
-                        foreach ($absensi->detilBorongan as $detil)
-                        {
+                        foreach ($absensi->detilBorongan as $detil) {
                             // Sesuai logika JS: totalQTY = FD + act_rej + good_mc
                             $qtyPerBaris = ($detil->FD ?? 0) + ($detil->act_rej ?? 0) + ($detil->good_mc ?? 0);
                             $totalQty += $qtyPerBaris;
@@ -204,7 +194,7 @@ class PayrollController extends Controller
 
                             // Sesuai logika JS: bayaranItem = totalQTY * harga_pekerja
                             // Kita asumsikan kolom 'bayaranItem' sudah tersimpan di DB saat presensi
-                            $totalGajiBorongan += ($detil->bayaranItem ?? 0);
+                            $totalGajiBorongan += $detil->bayaranItem ?? 0;
 
                             $tempQty = 0;
                         }
@@ -219,9 +209,8 @@ class PayrollController extends Controller
 
                 // dd($netSalary);
 
-
                 return [
-                    'unit_id'   => $id_unit,
+                    'unit_id' => $id_unit,
                     'unit_name' => $unit?->nama_unit ?? '-',
                     'sistem_pengajian' => $unit?->sistem_pengajian ?? '1',
                     'id_pekerja' => $w->id,
@@ -232,59 +221,45 @@ class PayrollController extends Controller
                     'hasil_gaji_borongan' => $totalGajiBorongan,
                     // Data Harian
                     'total_jam_kerja' => $totalJamKerja,
-                    'total_overtime'  => $totalOvertime,
-                    'total_hbn'       => $totalHBN,
+                    'total_overtime' => $totalOvertime,
+                    'total_hbn' => $totalHBN,
                     'potongan_count' => count($excludedDates),
                     'potongan_dates' => $excludedDates,
                     'net_salary' => $netSalary,
                     'pembayaran_lain' => $workerPembayaranLain,
                     'tunjangan' => $workerTunjangan,
                     'tanggal_mulai' => $tanggalMulai,
-                    'tanggal_akhir' => $tanggalAkhir
+                    'tanggal_akhir' => $tanggalAkhir,
                 ];
             }),
         ];
 
         $payrollData['grand_total'] = collect($payrollData['items'])->sum('net_salary');
 
-        $payrollData['total_potongan_hari'] = collect($payrollData['items'])
-            ->sum('potongan_count');
+        $payrollData['total_potongan_hari'] = collect($payrollData['items'])->sum('potongan_count');
 
-        $payrollData['total_penyesuaian'] = collect($payrollData['items'])
-            ->sum(fn ($item) => (int)$item['tunjangan'] - (int)$item['pembayaran_lain']);
+        $payrollData['total_penyesuaian'] = collect($payrollData['items'])->sum(fn($item) => (int) $item['tunjangan'] - (int) $item['pembayaran_lain']);
 
         return view('Payroll.overview-payroll', compact('payrollData', 'paidWorkerIds'));
     }
 
-    function ExportDetailHarian(Request $request){
-        dd($request->all());
-    }
-
     function ExportDetailBorongan(Request $request)
     {
-        dd($request->all());
+        // dd($request->all());
 
         $exclusionDates = $request->input('exclusion_date', []);
-        $tanggal_awal  = Carbon::parse($request->tgl_awal);
+        $tanggal_awal = Carbon::parse($request->tgl_awal);
         $tanggal_akhir = Carbon::parse($request->tgl_akhir);
 
-        $absensiList = Absensi::with([
-            'detilBorongan.borongan:id,harga_pekerja,nama_item'
-        ])
-        ->whereBetween('tgl_absensi', [$tanggal_awal, $tanggal_akhir])
-        ->where('id_pekerja', $request->id_pekerja)
-        ->whereNotIn('tgl_absensi', $exclusionDates)
-        ->get();
+        $absensiList = Absensi::with(['detilBorongan.borongan:id,harga_pekerja,nama_item'])
+            ->whereBetween('tgl_absensi', [$tanggal_awal, $tanggal_akhir])
+            ->where('id_pekerja', $request->id_pekerja)
+            ->whereNotIn('tgl_absensi', $exclusionDates)
+            ->get();
 
-        $periode = strtoupper(
-    $tanggal_awal->translatedFormat('d F Y') .
-            ' ~ ' .
-            $tanggal_akhir->translatedFormat('d F Y')
-        );
+        $periode = strtoupper($tanggal_awal->translatedFormat('d F Y') . ' ~ ' . $tanggal_akhir->translatedFormat('d F Y'));
 
-        $PKWT = PKWT::where('id_pekerja', $request->id_pekerja)
-            ->where('id_unit', $request->id_unit)
-            ->first();
+        $PKWT = PKWT::where('id_pekerja', $request->id_pekerja)->where('id_unit', $request->id_unit)->first();
 
         $pekerja = Pekerja::where('id', $request->id_pekerja)->first();
 
@@ -298,13 +273,8 @@ class PayrollController extends Controller
 
         foreach ($absensiList as $absensi) {
             foreach ($absensi->detilBorongan as $detil) {
-
                 // SKIP kalau detil borongan kosong
-                if (
-                    $detil->fd == 0 &&
-                    $detil->act_rej == 0 &&
-                    $detil->good_mc == 0
-                ) {
+                if ($detil->fd == 0 && $detil->act_rej == 0 && $detil->good_mc == 0) {
                     continue;
                 }
 
@@ -334,25 +304,27 @@ class PayrollController extends Controller
                 $totalBayarRp = $totalDibayarPcs * $unitPrice;
 
                 // ===== PUSH KE DATA =====
-                $data->push((object) [
-                    'tanggal' => Carbon::parse($absensi->tgl_absensi)->format('d-M-y'),
-                    'item_name' => $detil->borongan->nama_item ?? '-',
+                $data->push(
+                    (object) [
+                        'tanggal' => Carbon::parse($absensi->tgl_absensi)->format('d-M-y'),
+                        'item_name' => $detil->borongan->nama_item ?? '-',
 
-                    'qty' => $qty,
+                        'qty' => $qty,
 
-                    'fd' => $fd,
-                    'max_reject_subkon' => $maxRejectSubkon,
-                    'act_reject_subkon' => $actRej,
-                    'rej_mc' => $rejMc,
+                        'fd' => $fd,
+                        'max_reject_subkon' => $maxRejectSubkon,
+                        'act_reject_subkon' => $actRej,
+                        'rej_mc' => $rejMc,
 
-                    'good_mc' => $goodMc,
-                    'total_display' => $qty,
+                        'good_mc' => $goodMc,
+                        'total_display' => $qty,
 
-                    'total_dibayar_pcs' => $totalDibayarPcs,
-                    'unit_price' => $unitPrice,
-                    'total_bayar' => $totalBayarRp,
-                    $take_home_pay += $totalBayarRp
-                ]);
+                        'total_dibayar_pcs' => $totalDibayarPcs,
+                        'unit_price' => $unitPrice,
+                        'total_bayar' => $totalBayarRp,
+                        ($take_home_pay += $totalBayarRp),
+                    ],
+                );
             }
         }
 
@@ -362,42 +334,29 @@ class PayrollController extends Controller
 
         $filename = "Summary_Upah_{$pekerja->nama}_{$unit->nama_unit}_{$periode}.xlsx";
 
-        return Excel::download(
-        new DetilBoronganExport(
-            $data,
-            $periode,
-            $pekerja->nama,
-            $divisi->nama,
-            $PKWT->bpjs_naker,
-            $PKWT->bpjs_kesehatan,
-            $request->potongan,
-            $request->tunjangan,
-            $take_home_pay
-        ),
-        $filename
-    );
+        return Excel::download(new DetilBoronganExport($data, $periode, $pekerja->nama, $divisi->nama, $PKWT->bpjs_naker, $PKWT->bpjs_kesehatan, $request->potongan, $request->tunjangan, $take_home_pay), $filename);
     }
 
-    function ExportTandaTerimaBorongan(Request $request) {
+    function ExportTandaTerimaBorongan(Request $request)
+    {
         // dd($request->all());
 
         $start = \Carbon\Carbon::parse($request->tanggal_mulai);
-        $end   = \Carbon\Carbon::parse($request->tanggal_akhir);
+        $end = \Carbon\Carbon::parse($request->tanggal_akhir);
 
         // Pastikan locale Indonesia
         \Carbon\Carbon::setLocale('id');
 
         $periode =
-        $start->format('d') .
-        ' ' .
-        strtoupper($start->translatedFormat('M')) . // 'M' untuk singkatan 3 huruf (SEPT)
-        ' - ' .
-        $end->format('d') .
-        ' ' .
-        strtoupper($end->translatedFormat('M')) .    // 'M' untuk singkatan 3 huruf (OKT)
-        ' ' .
-        $end->format('Y');
-
+            $start->format('d') .
+            ' ' .
+            strtoupper($start->translatedFormat('M')) . // 'M' untuk singkatan 3 huruf (SEPT)
+            ' - ' .
+            $end->format('d') .
+            ' ' .
+            strtoupper($end->translatedFormat('M')) . // 'M' untuk singkatan 3 huruf (OKT)
+            ' ' .
+            $end->format('Y');
 
         $Unit = Unit::where('id_unit', $request->id_unit)->first();
 
@@ -413,23 +372,23 @@ class PayrollController extends Controller
             $worker = $workerMaster->get($item['id']);
 
             $pkwt = $worker->pkwt;
-            $activePkwt = ($pkwt instanceof \Illuminate\Support\Collection) ? $pkwt->first() : $pkwt;
+            $activePkwt = $pkwt instanceof \Illuminate\Support\Collection ? $pkwt->first() : $pkwt;
 
             $upah_mentah = (float) ($item['upah'] ?? 0);
             $clean_upah = str_replace('.', '', $upah_mentah);
             $clean_upah = str_replace(',', '.', $clean_upah);
 
             return [
-                'no'                => $key + 1,
-                'id'                => $worker->id_pekerja,
-                'nama'              => $worker->nama ?? '-',
-                'posisi'            => optional(optional($activePkwt)->jabatan)->nama ?? '-',
-                'divisi'            => optional(optional($activePkwt)->divisi)->nama ?? '-',
-                'no_rek'            => $worker->rekening ?? '-',
+                'no' => $key + 1,
+                'id' => $worker->id_pekerja,
+                'nama' => $worker->nama ?? '-',
+                'posisi' => optional(optional($activePkwt)->jabatan)->nama ?? '-',
+                'divisi' => optional(optional($activePkwt)->divisi)->nama ?? '-',
+                'no_rek' => $worker->rekening ?? '-',
                 // Simpan versi angka murni untuk dihitung TOTAL
-                'upah_murni'        => $upah_mentah,
+                'upah_murni' => $upah_mentah,
                 // Simpan versi format untuk TAMPILAN
-                'upah_tenaga_kerja' => number_format((float)$clean_upah, 0, ',', '.'),
+                'upah_tenaga_kerja' => number_format((float) $clean_upah, 0, ',', '.'),
             ];
         });
 
@@ -442,40 +401,23 @@ class PayrollController extends Controller
         $pic = PicUnit::where('id_unit', $request->id_unit)->first();
         $namaPic = Staff::where('id', $pic->id_pic)->first();
 
-        $administrator =  Auth::user()->staff->id;
+        $administrator = Auth::user()->staff->id;
 
         $admin = Staff::where('id', $administrator)->first();
 
         $filename = "SlipUpah_{$Unit->nama_unit}_{$periode}.xlsx";
 
-        return Excel::download(
-            new SlipUpahExport(
-                $dataExport,
-                $Unit->nama_unit,
-                $display_total,
-                $admin->nama,
-                $namaPic->nama,
-                $periode
-            ),
-            $filename
-        );
+        return Excel::download(new SlipUpahExport($dataExport, $Unit->nama_unit, $display_total, $admin->nama, $namaPic->nama, $periode), $filename);
     }
-    function ExportInvoiceBorongan(Request $request) {
-
+    function ExportInvoiceBorongan(Request $request)
+    {
         $start = \Carbon\Carbon::parse($request->tanggal_mulai);
-        $end   = \Carbon\Carbon::parse($request->tanggal_akhir);
+        $end = \Carbon\Carbon::parse($request->tanggal_akhir);
 
         // Pastikan locale Indonesia
         \Carbon\Carbon::setLocale('id');
 
-        $periode =
-            $start->format('d') .
-            ' - ' .
-            $end->format('d') .
-            ' ' .
-            strtoupper($start->translatedFormat('F')) .
-            ' ' .
-            $start->format('Y');
+        $periode = $start->format('d') . ' - ' . $end->format('d') . ' ' . strtoupper($start->translatedFormat('F')) . ' ' . $start->format('Y');
 
         $a = $request->grand_total;
 
@@ -485,45 +427,29 @@ class PayrollController extends Controller
 
         $Bidang = BidangUsaha::where('id', $MitraKerja->bidang_usaha_id)->first();
 
-        $management_fee = round($a * 6 / 100);
-        $ppn            = round($management_fee * 11 / 100);
-        $pph            = round($management_fee * 2 / 100);
+        $management_fee = round(($a * 6) / 100);
+        $ppn = round(($management_fee * 11) / 100);
+        $pph = round(($management_fee * 2) / 100);
 
         // Total tagihan dijumlahkan dari hasil yang sudah dibulatkan
-        $total_tagihan  = $a + $management_fee + $ppn - $pph;
+        $total_tagihan = $a + $management_fee + $ppn - $pph;
 
-        $terbilang = ucwords(terbilang($total_tagihan)). ' Rupiah';
+        $terbilang = ucwords(terbilang($total_tagihan)) . ' Rupiah';
 
         // Menambahkan format titik (number_format)
-        $display_a              = number_format($a, 0, ',', '.');
+        $display_a = number_format($a, 0, ',', '.');
         $display_management_fee = number_format($management_fee, 0, ',', '.');
-        $display_ppn            = number_format($ppn, 0, ',', '.');
-        $display_pph            = number_format($pph, 0, ',', '.');
-        $display_total_tagihan  = number_format($total_tagihan, 0, ',', '.');
+        $display_ppn = number_format($ppn, 0, ',', '.');
+        $display_pph = number_format($pph, 0, ',', '.');
+        $display_total_tagihan = number_format($total_tagihan, 0, ',', '.');
 
         $filename = "Invoice_{$Unit->nama_unit}_{$periode}.xlsx";
 
-        return Excel::download(
-        new InvoiceBoronganExport(
-            $request->no_resi,
-            $Unit->nama_unit,
-            $MitraKerja->alamat,
-            $Bidang->nama,
-            $MitraKerja->nama_mitra,
-            $display_a,
-            $terbilang,
-            $periode,
-            $display_management_fee,
-            $display_ppn,
-            $display_pph,
-            $display_total_tagihan,
-            $Unit->umk
-        ),
-        $filename
-        );
+        return Excel::download(new InvoiceBoronganExport($request->no_resi, $Unit->nama_unit, $MitraKerja->alamat, $Bidang->nama, $MitraKerja->nama_mitra, $display_a, $terbilang, $periode, $display_management_fee, $display_ppn, $display_pph, $display_total_tagihan, $Unit->umk), $filename);
     }
 
-    function ExportKwitansiBorongan(Request $request) {
+    function ExportKwitansiBorongan(Request $request)
+    {
         // dd($request->all());
 
         $Unit = Unit::where('id_unit', $request->id_unit)->first();
@@ -533,53 +459,31 @@ class PayrollController extends Controller
         $Bidang = BidangUsaha::where('id', $MitraKerja->bidang_usaha_id)->first();
 
         $start = \Carbon\Carbon::parse($request->tanggal_mulai);
-        $end   = \Carbon\Carbon::parse($request->tanggal_akhir);
+        $end = \Carbon\Carbon::parse($request->tanggal_akhir);
 
         // Pastikan locale Indonesia
         \Carbon\Carbon::setLocale('id');
 
-        $periode =
-            $start->format('d') .
-            ' - ' .
-            $end->format('d') .
-            ' ' .
-            strtoupper($start->translatedFormat('F')) .
-            ' ' .
-            $start->format('Y');
+        $periode = $start->format('d') . ' - ' . $end->format('d') . ' ' . strtoupper($start->translatedFormat('F')) . ' ' . $start->format('Y');
 
-        $management_fee = round($request->grand_total * 6 / 100);
-        $ppn            = round($management_fee * 11 / 100);
-        $pph            = round($management_fee * 2 / 100);
+        $management_fee = round(($request->grand_total * 6) / 100);
+        $ppn = round(($management_fee * 11) / 100);
+        $pph = round(($management_fee * 2) / 100);
 
         // Total tagihan dijumlahkan dari hasil yang sudah dibulatkan
-        $total_tagihan  = $request->grand_total + $management_fee + $ppn - $pph;
-        $display_total_tagihan  = number_format($total_tagihan, 0, ',', '.');
+        $total_tagihan = $request->grand_total + $management_fee + $ppn - $pph;
+        $display_total_tagihan = number_format($total_tagihan, 0, ',', '.');
 
-        $terbilang = ucwords(terbilang($total_tagihan)). ' Rupiah';
+        $terbilang = ucwords(terbilang($total_tagihan)) . ' Rupiah';
 
         $filename = "Kwitansi_{$Unit->nama_unit}_{$periode}.xlsx";
 
-        return Excel::download(
-            new KwitansiBoronganExport(
-            $request->no_resi,
-            $Unit->nama_unit,
-            $terbilang,
-            $Bidang->nama,
-            $MitraKerja->nama_mitra,
-            $periode,
-            $display_total_tagihan,
-            ),
-            $filename
-        );
-    }
-
-    function ExportRincianUpahHarian(Request $request) {
-        // dd($request->all());
+        return Excel::download(new KwitansiBoronganExport($request->no_resi, $Unit->nama_unit, $terbilang, $Bidang->nama, $MitraKerja->nama_mitra, $periode, $display_total_tagihan), $filename);
     }
 
     function ExportRincianUpahBorongan(Request $request)
     {
-        // dd($request->all());
+        dd($request->all());
         // 1. Decode JSON Workers dari Request
         // Format JSON: [{"id":2,"upah":150000,"exclusion_date":[]}, ...]
         $requestWorkers = json_decode($request->workers_json, true);
@@ -593,24 +497,28 @@ class PayrollController extends Controller
         // Pastikan meload relasi jabatan/divisi/kelamin jika diperlukan
         $dbPekerja = Pekerja::with([
             // 1. Load PKWT, tapi urutkan dari yang terbaru agar kita ambil kontrak aktif
-            'pkwt' => function($query) {
+            'pkwt' => function ($query) {
                 $query->latest('id'); // Atau latest('tgl_mulai_pkwt')
             },
             // 2. Load Jabatan & Divisi MELALUI PKWT
             'pkwt.jabatan',
-            'pkwt.divisi'
+            'pkwt.divisi',
         ])
-        ->whereIn('id', $workerIds)
-        ->get()
-        ->keyBy('id');
+            ->whereIn('id', $workerIds)
+            ->get()
+            ->keyBy('id');
 
         $realItems = [];
+
+        dd($dbPekerja);
 
         // 3. Looping Data Request (Agar urutan & nilai upahnya sesuai input)
         foreach ($requestWorkers as $reqWorker) {
             $id = $reqWorker['id'];
 
-            if (!isset($dbPekerja[$id])) continue;
+            if (!isset($dbPekerja[$id])) {
+                continue;
+            }
 
             $staffDb = $dbPekerja[$id];
             $item = new \stdClass();
@@ -627,7 +535,7 @@ class PayrollController extends Controller
 
             // 2. Ambil Jabatan & Divisi dari PKWT tersebut
             $item->jabatan = $pkwtAktif?->jabatan?->nama ?? '-';
-            $item->divisi  = $pkwtAktif?->divisi?->nama  ?? '-';
+            $item->divisi = $pkwtAktif?->divisi?->nama ?? '-';
 
             // --- B. DATA GAJI (Dari Request JSON) ---
             // Karena ini Borongan, kita asumsikan 'upah' dari JSON adalah Total yang diterima
@@ -652,8 +560,8 @@ class PayrollController extends Controller
             $item->absen_jam = 0;
             $item->potongan_jam = 0;
 
-            $item->bpjs_tk = 0;  // Masukkan logika calc BPJS jika ada
-            $item->bpjs_kes = 0; // Masukkan logika calc BPJS jika ada
+            $item->bpjs_tk = $pkwtAktif?->bpjs_naker ?? 0; // Masukkan logika calc BPJS jika ada
+            $item->bpjs_kes = $pkwtAktif?->bpjs_kesehatan ?? 0; // Masukkan logika calc BPJS jika ada
             $item->jumlah_2 = $item->bpjs_tk + $item->bpjs_kes; // Total Potongan
 
             // --- D. TOTAL AKHIR ---
@@ -665,22 +573,308 @@ class PayrollController extends Controller
             $realItems[] = $item;
         }
 
+        // dd($realItems);
+
         // 4. Bungkus jadi Collection
         $formattedData = collect($realItems);
 
         // 5. Tentukan Periode (Dari Request Tgl Awal & Akhir)
         $start = Carbon::parse($request->tgl_awal);
-        $end   = Carbon::parse($request->tgl_akhir);
+        $end = Carbon::parse($request->tgl_akhir);
 
         // Format: 1 FEB 2026 - 5 FEB 2026
         $periodeString = strtoupper($start->isoFormat('D MMM Y') . ' - ' . $end->isoFormat('D MMM Y'));
 
         // Nama File
-        $filename = "Rincian_Upah_Borongan_" . $start->format('d_m_Y') . ".xlsx";
+        $filename = 'Rincian_Upah_Borongan_' . $start->format('d_m_Y') . '.xlsx';
 
-        return Excel::download(
-            new RincianUpahExport($formattedData, $periodeString),
-            $filename
-        );
+        return Excel::download(new RincianUpahExport($formattedData, $periodeString), $filename);
+    }
+
+    public function ExportRincianUpahHarian(Request $request)
+    {
+        // 2. Decode Input
+        $workersInput = $request->workers;
+        $workerIds = array_column($workersInput, 'id');
+
+        // 3. Ambil Data Master (Pekerja + PKWT)
+        $dbPekerja = Pekerja::with([
+            'pkwt' => function ($query) {
+                $query->latest('id'); // Ambil kontrak terakhir
+            },
+            'pkwt.jabatan',
+            'pkwt.divisi',
+        ])
+            ->whereIn('id', $workerIds)
+            ->get()
+            ->keyBy('id');
+
+        // dd($request->all());
+
+        $realItems = [];
+
+        // 4. Loop & Kalkulasi
+        foreach ($workersInput as $input) {
+            $id = $input['id'];
+
+            // Skip jika ID tidak ada di DB
+            if (!isset($dbPekerja[$id])) {
+                continue;
+            }
+
+            $staffDb = $dbPekerja[$id];
+            $pkwtAktif = $staffDb->pkwt->first();
+
+            // Object item untuk Export
+            $item = new \stdClass();
+
+            // --- A. IDENTITAS ---
+            $item->nama = $staffDb->nama;
+            $item->id_karyawan = $staffDb->id_pekerja ?? $staffDb->nik;
+            $item->jabatan = $pkwtAktif?->jabatan?->nama ?? '-';
+            $item->divisi = $pkwtAktif?->divisi?->nama ?? '-';
+
+            // --- B. RATE (TARIF) DARI DB ---
+            // Asumsi: gaji_harian di DB adalah rate per jam/hari sesuai input 'total_jam_kerja'
+            $ratePokok = $pkwtAktif?->gaji_harian ?? 0;
+            $rateLembur = $pkwtAktif?->gaji_overtime ?? 0;
+
+            // dump($ratePokok, $rateLembur);
+
+            // Asumsi: HBN rate biasanya 2x lembur atau ada kolom sendiri.
+            // Jika tidak ada kolom khusus, kita pakai logika 2 * rate lembur.
+            // Silakan sesuaikan: $pkwtAktif?->gaji_overtime_hbn
+            $rateHbn = ($pkwtAktif?->gaji_overtime ?? 0) * 1.5;
+
+            // --- C. KALKULASI PENDAPATAN ---
+
+            // 1. Upah Pokok
+            $item->upah_pokok = (($input['jam_kerja'] ?? 0) - ($input['hbn'] ?? 0)) * $ratePokok;
+
+            // 2. Lembur Biasa
+            $item->lembur_jam = ($input['overtime'] ?? 0) - ($input['hbn'] ?? 0);
+            $item->lembur_rate = $rateLembur;
+            $item->total_lembur_biasa = $item->lembur_jam * $item->lembur_rate;
+
+            // 3. Lembur HBN
+            $item->lembur_hbn_jam = $input['hbn'] ?? 0;
+            $item->lembur_hbn_rate = $rateHbn;
+            $item->total_lembur_hbn = $item->lembur_hbn_jam * $item->lembur_hbn_rate;
+
+            // 4. Tunjangan (Dari Input)
+            $item->tunjangan = $input['tunjangan'] ?? 0;
+
+            // TOTAL PENDAPATAN (Jumlah 1)
+            // Gabungkan total lembur biasa & HBN ke variabel total_lembur agar kompatibel dengan export sebelumnya
+            $item->total_lembur = $item->total_lembur_biasa + $item->total_lembur_hbn;
+
+            $item->jumlah_1 = $item->upah_pokok + $item->total_lembur + $item->tunjangan;
+
+            // --- D. KALKULASI POTONGAN ---
+
+            // Potongan BPJS dari DB PKWT
+            $item->absen_hari = 0;
+            $item->potongan_hari_rate = $pkwtAktif?->gaji_harian;
+            $item->potongan_hari = $item->absen_hari * $item->potongan_hari_rate;
+
+            $item->absen_jam = 0;
+            $item->potongan_jam_rate = $pkwtAktif?->gaji_overtime;
+            $item->potongan_jam = $item->absen_jam * $item->potongan_jam_rate;
+
+            $item->bpjs_tk = $pkwtAktif?->bpjs_naker ?? 0;
+            $item->bpjs_kes = $pkwtAktif?->bpjs_kesehatan ?? 0;
+
+            // Potongan Lain (Dari Input, misal kasbon)
+            $item->potonganLain = $input['potongan'] ?? 0;
+
+            // TOTAL POTONGAN (Jumlah 2)
+            $item->jumlah_2 = $item->bpjs_tk + $item->bpjs_kes + $item->potonganLain;
+
+            // --- E. HASIL AKHIR ---
+            $item->take_home_pay = $item->jumlah_1 - $item->jumlah_2;
+
+            // Data pelengkap
+            $item->exclusion_dates = $input['exclusion_date'] ?? [];
+
+            $realItems[] = $item;
+        }
+
+        // 5. Finalisasi & Download
+        $formattedData = collect($realItems);
+
+        // dd($formattedData);
+
+        $start = Carbon::parse($request->tgl_awal);
+        $end = Carbon::parse($request->tgl_akhir);
+        $periodeString = strtoupper($start->isoFormat('D MMM Y') . ' - ' . $end->isoFormat('D MMM Y'));
+
+        $filename = 'Rincian_Upah_Harian_' . $start->format('d_m_Y') . '.xlsx';
+
+        // Menggunakan Export Class yang sama (RincianUpahExport)
+        // Asalkan Class tersebut bisa membaca properti $item->upah_pokok, dll.
+        return Excel::download(new RincianUpahExport($formattedData, $periodeString), $filename);
+    }
+
+    public function ExportDetailHarian(Request $request)
+    {
+        // 1. Ambil data dari request
+        $workersInput = $request->workers;
+        $idUnit = $request->id_unit;
+        // Format tanggal untuk Query Database
+        $tglAwal = \Carbon\Carbon::parse($request->tgl_awal)->format('Y-m-d');
+        $tglAkhir = \Carbon\Carbon::parse($request->tgl_akhir)->format('Y-m-d');
+
+        // 2. Persiapkan data Master Pekerja dari Database
+        $workerIds = collect($workersInput)->pluck('id')->toArray();
+        $dbPekerja = Pekerja::with([
+            'pkwt' => function ($query) {
+                $query->latest('id'); // Ambil kontrak terbaru
+            },
+            'pkwt.jabatan',
+            'pkwt.divisi',
+        ])
+        ->whereIn('id', $workerIds)
+        ->get()
+        ->keyBy('id');
+
+        // ---------------------------------------------------------
+        // [BAGIAN 3] AMBIL DATA ABSENSI & BUAT MAPPING (DILAKUKAN SEKALI SAJA)
+        // ---------------------------------------------------------
+        
+        // A. Query Database
+        $absensiData = Absensi::with('detilHarian')
+            ->whereIn('id_pekerja', $workerIds)
+            ->whereBetween('tgl_absensi', [$tglAwal, $tglAkhir])
+            ->get();
+
+        // B. Buat Mapping Array
+        $attendanceMap = [];
+        foreach ($absensiData as $abs) {
+            $tgl = \Carbon\Carbon::parse($abs->tgl_absensi)->format('Y-m-d');
+            
+            // Pastikan ID menjadi integer agar kunci array konsisten
+            $idPekerja = (int) $abs->id_pekerja;
+            
+            // Ambil jam kerja (pastikan nama relasi 'detilHarian' benar sesuai model)
+            $attendanceMap[$idPekerja][$tgl] = $abs->detilHarian->jam_kerja_harian ?? null;
+        }
+        
+        // DEBUG: Cek isi map sebelum lanjut (Hapus jika sudah benar)
+        // dd($attendanceMap); 
+
+        // ---------------------------------------------------------
+        // [BAGIAN 4] LOOPING DATA PEKERJA UNTUK ROW EXCEL
+        // ---------------------------------------------------------
+
+        // Ambil info Unit untuk nama unit
+        $unit = Unit::find($idUnit);
+        $unitName = $unit ? $unit->nama_unit : 'UNIT TIDAK DIKETAHUI';
+
+        $realItems = [];
+
+        foreach ($workersInput as $input) {
+            $id = $input['id'];
+            if (!isset($dbPekerja[$id])) {
+                continue;
+            }
+
+            $staffDb = $dbPekerja[$id];
+            $pkwtAktif = $staffDb->pkwt->first();
+
+            $item = new \stdClass();
+
+            // --- A. IDENTITAS ---
+            // PENTING: Simpan ID Asli untuk kunci pencarian di Blade nanti
+            $item->id_original = $staffDb->id; 
+            
+            $item->nama = $staffDb->nama;
+            $item->id_karyawan = $staffDb->id_pekerja ?? $staffDb->nik;
+            $item->jabatan = $pkwtAktif?->jabatan?->nama ?? '-';
+            $item->divisi = $pkwtAktif?->divisi?->nama ?? '-';
+            $item->checkman = 'TRUE'; 
+            $item->no_rekening = $staffDb->rekening ?? '-';
+
+            // --- B. RATE / TARIF ---
+            $item->rate_pokok = $pkwtAktif?->gaji_harian ?? 0;
+            $item->rate_lembur = $pkwtAktif?->gaji_overtime ?? 0;
+            $item->rate_hbn = ($pkwtAktif?->gaji_overtime ?? 0) * 1.5; 
+            
+            $item->tunjangan = (float) ($input['tunjangan'] ?? 0);  
+            $item->insentif = (float) ($input['insentif'] ?? 0);  
+
+            // --- C. INPUT JAM & UPAH ---
+            $item->jam_kerja = (float) ($input['jam_kerja'] ?? 0);
+            $item->jam_lembur = (float) ($input['overtime'] ?? 0);
+            $item->jam_hbn = (float) ($input['hbn'] ?? 0);
+
+            $item->jml_pokok_upah = (float) ($input['upah'] ?? 0);
+            $item->jml_uang_lembur = $item->jam_lembur * $item->rate_lembur;
+            $item->jml_uang_lembur_hbn = $item->jam_hbn * $item->rate_hbn;
+
+            $item->total_pokok = (float) ($input['upah'] ?? 0);
+            $item->total_lembur_biasa = $item->jam_lembur * $item->rate_lembur;
+            $item->total_lembur_hbn = $item->jam_lembur * $item->rate_lembur; // Note: Rumus ini sepertinya typo di kode asli Anda (lembur biasa vs hbn), tapi saya biarkan sesuai aslinya.
+
+            $item->jam_lembur_hbn = (float) ($input['hbn'] ?? 0);
+            $item->uang_tunjangan = 0;
+
+            $item->jml_uang_tunjangan = (float) ($input['tunjangan'] ?? 0);
+            $item->upah_insentif = 0; 
+            $item->jml_uang_insentif = 0;
+
+            // --- D. POTONGAN ABSENSI ---
+            $item->pot_absen_per_hari = $item->rate_pokok;
+            $item->jml_pot_absen_hari = 0; 
+            $item->pot_absen_per_jam = $pkwtAktif?->gaji_overtime ?? 0;
+            $item->jml_pot_absen_jam = 0;
+
+            // --- E. TOTAL UPAH KOTOR ---
+            $pendapatan_total = $item->jml_pokok_upah + $item->jml_uang_lembur + $item->jml_uang_lembur_hbn + $item->jml_uang_insentif + $item->jml_uang_tunjangan;
+            $potongan_absen = $item->jml_pot_absen_hari + $item->jml_pot_absen_jam;
+            $item->total_upah_kotor = $pendapatan_total - $potongan_absen;
+
+            // --- F. POTONGAN WAJIB ---
+            $item->bpjs_tk = $pkwtAktif?->bpjs_naker ?? 0;
+            $item->bpjs_kes = $pkwtAktif?->bpjs_kesehatan ?? 0;
+            $item->biaya_admin = 2000; 
+            $item->potongan_lain = (float) ($input['potongan'] ?? 0);
+            $item->biaya_klaim = 0;
+
+            // --- G. HASIL AKHIR ---
+            $total_potongan_all = $item->bpjs_tk + $item->bpjs_kes + $item->biaya_admin + $item->potongan_lain + $item->biaya_klaim;
+            $item->thp = $item->total_upah_kotor - $total_potongan_all;
+
+            // ERROR SEBELUMNYA DI SINI:
+            // Kode mapping absensi dihapus dari sini karena sudah dilakukan di atas (Bagian 3)
+            
+            $realItems[] = $item;
+        }
+
+        // 5. Finalisasi Data untuk Export
+        $formattedData = collect($realItems);
+        $grandTotal = $formattedData->sum('thp');
+
+        // 6. Hitung Periode & Total Days untuk Header Excel
+        $start = \Carbon\Carbon::parse($tglAwal)->startOfDay();
+        $end = \Carbon\Carbon::parse($tglAkhir)->startOfDay();
+        $periodeString = strtoupper($start->isoFormat('D MMMM Y') . ' - ' . $end->isoFormat('D MMMM Y'));
+
+        $totalDays = (int) round($start->diffInDays($end)) + 1;
+        $filename = 'Detail_Upah_Harian_' . $unitName . '_' . now()->format('Ymd_His') . '.xlsx';
+
+        // dd($attendanceMap);
+
+        // Sertakan $attendanceMap ke dalam Export Class
+        return Excel::download(new DailyReportHarianExport(
+            $formattedData, 
+            $periodeString, 
+            $grandTotal, 
+            $unitName, 
+            $totalDays, 
+            $tglAwal, // string Y-m-d
+            $tglAkhir, // string Y-m-d
+            $attendanceMap, // Array Mapping
+            $unit
+        ), $filename);
     }
 }
