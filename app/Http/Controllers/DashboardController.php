@@ -57,31 +57,51 @@ class DashboardController extends Controller
             ->where('status_kehadiran', 2)
             ->count();
 
-        // 3. Terlambat Hari Ini
-        // Menghitung yang hadir (status 1) tapi waktu_masuk > jam masuk di tabel shift
-        // $terlambatHariIni = Detil_Harian::whereHas('absensi', function ($q) use ($today) {
-        //     $q->whereDate('tgl_absensi', $today);
-        // })
-        //     ->join('shift_absen', 'detil_harian.id_shift', '=', 'shift_absen.id')
-        //     ->where('status_kehadiran', 1)
-        //     ->whereColumn('detil_harian.waktu_masuk', '>', 'shift_absen.waktu_masuk')
-        //     ->count();
+        // 3. Overtime Hari Ini
+        $overtimeHariIni = Detil_Harian::whereHas('absensi', function ($q) use ($today) {
+            $q->whereDate('tgl_absensi', $today);
+        })
+        ->where('overtime', '>', 0)
+        ->count();
 
-        $kehadiranTerbaru = Detil_Harian::with(['absensi.pekerja', 'shiftAbsen'])
+        // Count total attendance for the header badge
+        $totalAbsensiHarian = Detil_Harian::whereHas('absensi', function ($q) use ($today) {
+            $q->whereDate('tgl_absensi', $today);
+        })->count();
+
+        $kehadiranTerbaru = Detil_Harian::with(['absensi.pekerja', 'absensi.unit'])
             ->whereHas('absensi', function ($q) use ($today) {
                 $q->whereDate('tgl_absensi', $today);
             })
-            ->whereIn('status_kehadiran', [1, 2]) // Ambil status Hadir (1) dan Cuti (2)
-            ->orderBy('updated_at', 'desc') // Menggunakan updated_at agar data terbaru (termasuk input cuti) muncul di atas
+            // Including statuses: 1 (Hadir), 2 (Izin), 3 (Cuti), 4 (Sakit), 5 (Rencana Cuti), 6 (Absen)
+            ->whereIn('status_kehadiran', [1, 2, 3, 4, 5, 6])
+            ->orderBy('updated_at', 'desc')
             ->limit(5)
             ->get();
 
-        $boronganTerbaru = Detil_Borongan::with(['absensi.pekerja'])
-            ->whereHas('absensi', function ($q) use ($today) {
+        // Count total attendance for the header badge
+        $totalAbsensiBorongan = Detil_Borongan::whereHas('absensi', function ($q) use ($today) {
                 $q->whereDate('tgl_absensi', $today);
             })
-            ->where('status_kehadiran', 1) // Ambil status Hadir (1) dan Cuti (2)
-            ->orderBy('updated_at', 'desc') // Menggunakan updated_at agar data terbaru (termasuk input cuti) muncul di atas
+            ->join('absensi', 'detil_borongan.id_absensi', '=', 'absensi.id')
+            ->distinct('absensi.id_pekerja')
+            ->count('absensi.id_pekerja');
+
+        $boronganTerbaru = Detil_Borongan::query()
+            ->join('absensi', 'detil_borongan.id_absensi', '=', 'absensi.id')
+            ->join('pekerja', 'absensi.id_pekerja', '=', 'pekerja.id') // Ganti 'pekerjas' jika nama tabel pekerja berbeda
+            ->join('unit', 'absensi.id_unit', '=', 'unit.id_unit')    // Ganti 'units' jika nama tabel unit berbeda
+            ->whereDate('absensi.tgl_absensi', $today)
+            ->select(
+                'pekerja.nama as nama_pekerja',
+                'pekerja.nik as nik_pekerja',
+                'unit.nama_unit as nama_unit',
+                \DB::raw('SUM(detil_borongan.FD + detil_borongan.good_mc + detil_borongan.act_rej) as total_sum_qty'),
+                \DB::raw('MAX(detil_borongan.status_kehadiran) as status_kehadiran'),
+                \DB::raw('MAX(detil_borongan.updated_at) as last_entry_at')
+            )
+            ->groupBy('pekerja.id', 'pekerja.nama', 'pekerja.nik', 'unit.id_unit', 'unit.nama_unit')
+            ->orderBy('last_entry_at', 'desc')
             ->limit(5)
             ->get();
         // dd($boronganTerbaru);
@@ -174,7 +194,9 @@ class DashboardController extends Controller
             [
                 'employeeChartData' => $monthlyData,
                 'selectedYear' => $year,
+                'totalAbsensiHarian' => $totalAbsensiHarian,
                 'kehadiranTerbaru' => $kehadiranTerbaru,
+                'totalAbsensiBorongan' => $totalAbsensiBorongan,
                 'boronganTerbaru' => $boronganTerbaru,
                 'penilaianTerbaru' => $penilaianTerbaru,
                 'penilaianPending' => $penilaianPending,
@@ -195,6 +217,7 @@ class DashboardController extends Controller
                 'totalKontrakMendekati' => $totalKontrakMendekati,
                 'absensiPendingCount' => $absensiPendingCount,
                 'othersKontrak' => $othersKontrak,
+                'overtimeHariIni' => $overtimeHariIni,
             ],
             compact(
                 'totalPekerja',
@@ -203,7 +226,6 @@ class DashboardController extends Controller
                 'mitraMendekati',
                 'hadirHariIni', // Pass ke View
                 'izinSakitHariIni', // Pass ke View
-                // 'terlambatHariIni', // Pass ke View
             ),
         );
     }
