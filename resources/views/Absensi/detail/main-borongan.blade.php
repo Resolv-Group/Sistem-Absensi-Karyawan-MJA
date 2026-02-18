@@ -192,7 +192,7 @@
 
         globalMasuk: '08:00',
         globalKeluar: '17:00',
-        globalStatus: '0', // default absen
+        globalStatus: '6', // default absen
         rowStatus: {},
         rowCatatan: {},
 
@@ -577,51 +577,73 @@
                             </div>
 
                             {{-- Floating Action Bar --}}
-                            <div x-show="selectedItems.length > 0" x-transition:enter="transition ease-out duration-300"
+                            <div x-show="selectedItems.length > 0"
+                                x-transition:enter="transition ease-out duration-300"
                                 x-transition:enter-start="opacity-0 translate-y-10"
                                 x-transition:enter-end="opacity-100 translate-y-0"
                                 x-transition:leave="transition ease-in duration-200"
                                 x-transition:leave-start="opacity-100 translate-y-0"
                                 x-transition:leave-end="opacity-0 translate-y-10"
-                                class="fixed bottom-8 left-1/2 -translate-x-1/2 z-40 w-[95%] max-w-3xl"x-cloak>
+                                class="fixed bottom-8 left-1/2 -translate-x-1/2 z-[60] w-[95%] max-w-4xl" x-cloak>
 
-                                <div
-                                    class="bg-white/80 backdrop-blur-md border border-orange-100 shadow-[0_8px_30px_rgb(0,0,0,0.12)] rounded-2xl px-5 py-3 flex items-center justify-between">
-                                    <div class="flex items-center gap-3">
-                                        <span
-                                            class="relative flex items-center justify-center bg-orange-600 text-white text-[12px] font-black h-6 w-6 rounded-full shadow-sm"
-                                            x-text="selectedItems.length"></span>
+                                <div class="bg-white/70 backdrop-blur-xl border border-white/80 shadow-[0_20px_50px_rgba(0,0,0,0.1)] rounded-[2rem] px-6 py-4 flex items-center justify-between">
+
+                                    <!-- Left Side: Selection Count & Reset -->
+                                    <div class="flex items-center gap-4">
+                                        <div class="relative">
+                                            <div class="bg-orange-600 text-white text-[11px] font-black h-8 w-8 rounded-xl shadow-lg shadow-orange-200 flex items-center justify-center">
+                                                <span x-text="selectedItems.length"></span>
+                                            </div>
+                                            <div class="absolute -top-1 -right-1 flex h-3 w-3">
+                                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                                                <span class="relative inline-flex rounded-full h-3 w-3 bg-orange-500"></span>
+                                            </div>
+                                        </div>
                                         <div class="flex flex-col">
-                                            <span class="text-sm font-bold text-gray-900 leading-none">Pekerja
-                                                Dipilih</span>
+                                            <span class="text-sm font-black text-slate-800 leading-none">Pekerja Dipilih</span>
+                                            <button type="button" @click="selectedItems = []" class="text-[10px] font-bold text-slate-400 hover:text-rose-500 uppercase tracking-widest mt-1 transition-colors text-left outline-none">
+                                                Batalkan Semua
+                                            </button>
                                         </div>
                                     </div>
 
+                                    <!-- Right Side: Semantic Actions Group -->
                                     <div class="flex items-center gap-2">
-                                        <button type="button" @click="selectedItems = []"
-                                            class="px-3 py-2 text-xs font-bold text-gray-500 hover:text-gray-700 transition">Batal</button>
-                                        <div class="h-6 w-px bg-gray-200 mx-1"></div>
 
-                                        {{-- Trigger Modal Button --}}
+                                        <!-- 1. Absen (Primary Orange) -->
                                         <button @click="showAbsenModal = true"
-                                            class="flex items-center gap-1.5 px-4 py-2 bg-orange-50 text-orange-700 border border-orange-100 rounded-xl text-xs font-bold hover:bg-orange-600 hover:text-white transition-all">
-                                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
-                                                stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            class="group flex items-center gap-2 px-4 py-2.5 bg-orange-50 hover:bg-orange-600 border border-orange-100 text-orange-700 hover:text-white rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all active:scale-95 shadow-sm">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                             </svg>
                                             Absen
                                         </button>
 
-                                        {{-- Trigger Modal Button --}}
-                                        <button @click="initStatusModal()"
-                                            class="flex items-center gap-1.5 px-4 py-2 bg-orange-50 text-orange-700 border border-orange-100 rounded-xl text-xs font-bold hover:bg-orange-600 hover:text-white transition-all">
-                                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
-                                                stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        <!-- 2. Tunjangan (Emerald) -->
+                                        <button class="group flex items-center gap-2 px-4 py-2.5 bg-emerald-50 hover:bg-emerald-600 border border-emerald-100 text-emerald-700 hover:text-white rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all active:scale-95 shadow-sm">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                                             </svg>
-                                            Status Absen
+                                            Tunjangan
+                                        </button>
+
+                                        <!-- 3. Potongan (Rose) -->
+                                        <button class="group flex items-center gap-2 px-4 py-2.5 bg-rose-50 hover:bg-rose-600 border border-rose-100 text-rose-700 hover:text-white rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all active:scale-95 shadow-sm">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M18 12H6" />
+                                            </svg>
+                                            Potongan
+                                        </button>
+
+                                        <div class="h-8 w-px bg-slate-200 mx-2"></div>
+
+                                        <!-- 4. Status Absen (Indigo) -->
+                                        <button @click="initStatusModal()"
+                                            class="group flex items-center gap-2 px-4 py-2.5 bg-indigo-50 hover:bg-indigo-600 border border-indigo-100 text-indigo-700 hover:text-white rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all active:scale-95 shadow-sm">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                                            </svg>
+                                            Status
                                         </button>
                                     </div>
                                 </div>
@@ -975,7 +997,7 @@
                                                                                     class="bg-slate-50 border-transparent rounded-xl px-3 py-2 text-xs font-bold focus:bg-white focus:ring-2 focus:ring-emerald-200 outline-none transition-all">
                                                                             </div>
 
-                                                                            
+
                                                                             <!-- Act/Rej -->
                                                                             <div class="flex flex-col gap-1.5">
                                                                                 <label class="text-[12px] font-black text-slate-400 uppercase tracking-widest">Act/Rej</label>
@@ -995,11 +1017,11 @@
                                                                                 <label class="text-[12px] font-black text-gray-500 uppercase tracking-widest">
                                                                                     Max Rej. Subkon ( <span x-text="row.max_rej_subkon"></span>% )
                                                                                 </label>
-                                                                                
+
                                                                                 <div class="relative flex items-center">
                                                                                     {{-- Input ini akan otomatis menampilkan hasil Math.round dari updatePrices --}}
-                                                                                    <input 
-                                                                                        type="number" 
+                                                                                    <input
+                                                                                        type="number"
                                                                                         @input="updatePrices(workerId, rIdx)"
                                                                                         readonly
                                                                                         :name="'data[' + workerId + '][' + rIdx + '][act_rej_max]'"
@@ -1018,8 +1040,8 @@
                                                                                 <label class="text-[12px] font-black text-red-500 uppercase tracking-widest">
                                                                                     Rej. MC Dibebankan
                                                                                 </label>
-                                                                                <input 
-                                                                                    type="number" 
+                                                                                <input
+                                                                                    type="number"
                                                                                     @input="updatePrices(workerId, rIdx)"
                                                                                     readonly
                                                                                     {{-- Pastikan name sesuai dengan field di database, misal: rej_mc_dibebankan --}}
@@ -1029,7 +1051,7 @@
                                                                                     class="bg-red-50 border-transparent rounded-xl px-3 py-2 text-xs font-black text-red-700 outline-none transition-all"
                                                                                     placeholder="0"
                                                                                 >
-                                                                                
+
                                                                                 {{-- Info tambahan untuk user --}}
                                                                                 <span class="text-[10px] text-slate-400 mt-1 italic" x-show="row.rej_mc_dibebankan > 0">
                                                                                     *Melebihi batas toleransi <span x-text="row.act_rej_max"></span> Pcs
@@ -1041,7 +1063,7 @@
                                                                     {{-- 2. TOTAL QUANTITY DISPLAY (Matches the UI Vibe) --}}
                                                                     <div class="mt-4 p-4 rounded-2xl border-2 border-dashed border-slate-100 bg-slate-50/30">
                                                                         <div class="grid grid-cols-2 gap-4 divide-x divide-slate-200">
-                                                                            
+
                                                                             {{-- Sisi Kiri: Total Produksi --}}
                                                                             <div class="flex items-center justify-between pr-4">
                                                                                 <div class="flex items-center gap-3">
@@ -1056,7 +1078,7 @@
                                                                                     </div>
                                                                                 </div>
                                                                                 <div class="flex items-baseline gap-1">
-                                                                                    <span class="text-2xl font-black text-slate-700 tracking-tighter" 
+                                                                                    <span class="text-2xl font-black text-slate-700 tracking-tighter"
                                                                                         x-text="(parseInt(row.FD) || 0) + (parseInt(row.act_rej) || 0) + (parseInt(row.good_mc) || 0)">
                                                                                     </span>
                                                                                     <span class="text-[10px] font-black text-slate-400 uppercase">Pcs</span>
@@ -1077,7 +1099,7 @@
                                                                                     </div>
                                                                                 </div>
                                                                                 <div class="flex items-baseline gap-1">
-                                                                                    <span class="text-2xl font-black text-emerald-600 tracking-tighter" 
+                                                                                    <span class="text-2xl font-black text-emerald-600 tracking-tighter"
                                                                                         x-text="(row.good_mc + row.FD - row.rej_mc_dibebankan)  || 0">
                                                                                     </span>
                                                                                     <span class="text-[10px] font-black text-emerald-500 uppercase">Pcs</span>
@@ -1086,14 +1108,14 @@
                                                                         </div>
 
                                                                         {{-- Hidden inputs for form submission --}}
-                                                                        <input type="hidden" :name="'data[' + workerId + '][' + rIdx + '][totalQTY]'" 
+                                                                        <input type="hidden" :name="'data[' + workerId + '][' + rIdx + '][totalQTY]'"
                                                                             :value="(parseInt(row.FD) || 0) + (parseInt(row.act_rej) || 0) + (parseInt(row.good_mc) || 0)">
-                                                                        
-                                                                        <input type="hidden" :name="'data[' + workerId + '][' + rIdx + '][totalBayar]'" 
+
+                                                                        <input type="hidden" :name="'data[' + workerId + '][' + rIdx + '][totalBayar]'"
                                                                             :value="((parseInt(row.good_mc) || 0) + (parseInt(row.FD) || 0) - (parseInt(row.rej_mc_dibebankan) || 0))">
                                                                     </div>
 
-                                                                    
+
 
                                                                     {{-- Baris Bawah: 3 Kolom (Reject MC & Hasil Akhir) --}}
                                                                     <div class="grid grid-cols-2 gap-3 mt-4">
@@ -1359,7 +1381,11 @@
                                                             <div x-data="{
                                                                 open: false,
                                                                 list: [
-                                                                    { val: '2', label: 'Cuti' }
+                                                                    { val: '2', label: 'Izin' },
+                                                                    { val: '3', label: 'Cuti' },
+                                                                    { val: '4', label: 'Sakit' },
+                                                                    { val: '5', label: 'Rencana Cuti' },
+                                                                    { val: '6', label: 'Absen' },
                                                                 ]
                                                             }" class="relative">
 
@@ -1369,9 +1395,9 @@
                                                                 <div @click="open = !open" @click.outside="open = false"
                                                                     class="flex items-center justify-between px-4 py-3 bg-white border border-gray-200 rounded-xl cursor-pointer hover:border-orange-400 transition-all shadow-sm">
 
-                                                                    {{-- Tambahkan fallback 'Hadir' jika find menghasilkan undefined --}}
-                                                                    <span class="text-xs font-black text-gray-700"
-                                                                        x-text="list.find(x => x.val == rowStatus[id])?.label || 'Hadir'">
+                                                                    <span class="text-xs font-black"
+                                                                        :class="rowStatus[id] == 1 ? 'text-blue-600' : 'text-gray-700'"
+                                                                        x-text="rowStatus[id] == 1 ? 'Hadir (Ubah ke...)' : (list.find(x => x.val == rowStatus[id])?.label || 'Pilih Status')">
                                                                     </span>
 
                                                                     <svg class="w-4 h-4 text-orange-500 transition-transform duration-300"
@@ -1394,6 +1420,11 @@
                                                                             <span x-text="item.label"></span>
                                                                         </div>
                                                                     </template>
+                                                                </div>
+                                                                <div x-show="rowStatus[id] == 1" class="mt-1">
+                                                                    <span class="text-[9px] font-bold text-amber-600 uppercase tracking-tighter">
+                                                                        ⚠️ Saat ini berstatus Hadir
+                                                                    </span>
                                                                 </div>
                                                             </div>
                                                         </td>
@@ -1486,6 +1517,19 @@
     function absenFormHandler() {
         return {
             confirmSubmit() {
+
+                const hasStatusHadir = this.selectedItems.some(id => this.rowStatus[id] == 1);
+
+                    if (hasStatusHadir) {
+                        Swal.fire({
+                            title: 'Gagal!',
+                            text: 'Terdapat pekerja dengan status "Hadir". Silakan pilih tipe absensi terlebih dahulu.',
+                            icon: 'error',
+                            confirmButtonColor: '#EF4444',
+                        });
+                        return; // Berhenti di sini, jangan submit
+                    }
+
                 Swal.fire({
                     title: 'Simpan Data Absensi?',
                     text: 'Pastikan semua data sudah benar sebelum disimpan.',

@@ -163,9 +163,10 @@ class PayrollController extends Controller
                             $jamHarian = (float) $detil->jam_kerja_harian;
                             $jamOT = (float) $detil->overtime;
 
+                            //todo:: logika baru buat jam telat
                             if ($detil->hbn == 1) {
                                 // JIKA HBN: Semua jam_kerja_harian dihitung sebagai OVERTIME
-                                // Rumus: jam_harian * gaji_overtime
+                                // Rumus: jam_harian * (gaji_overtime * 1.5)
                                 $gajiHariIni = $jamHarian * ($gajiOvertimePkwt * 1.5);
 
                                 $totalHBN += (float) $detil->overtime;
@@ -559,9 +560,9 @@ class PayrollController extends Controller
             $item->absen_jam = 0;
             $item->potongan_jam = 0;
 
-            
+
             $item->potonganLain = $reqWorker['potongan'];
-        
+
             //Tidak ada di borongan
             $item->total_lembur_biasa = 0;
             $item->lembur_hbn_jam = 0;

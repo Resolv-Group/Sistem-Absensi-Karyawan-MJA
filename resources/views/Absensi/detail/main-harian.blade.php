@@ -101,7 +101,7 @@
         // --- Status Absen State ---
         rowStatus: {},
         rowPaidLeave: {},
-        globalStatus: '1',
+        globalStatus: '2',
 
         currentPage: {{ $pkwtPekerja->currentPage() }},
         allIds: {{ json_encode($pkwtPekerja->pluck('id')) }},
@@ -164,7 +164,13 @@
             this.selectedItems.forEach(id => {
                 const worker = this.workerMap[id];
                 if (worker) {
-                    this.rowStatus[id] = worker.existing_status || '0';
+                    let currentStatus = worker.existing_status;
+
+                    // Jika statusnya adalah 1 (Hadir), kita set default ke '2' (Izin)
+                    // atau tetap biarkan tapi handle labelnya di UI.
+                    // Di sini kita biarkan nilainya apa adanya, tapi kita handle di label.
+
+                    this.rowStatus[id] = currentStatus || '6';
                     this.rowCatatan[id] = worker.existing_catatan || '';
 
                     // PERBAIKAN DI SINI:
@@ -522,56 +528,77 @@
                             </div>
 
                             {{-- Floating Action Bar --}}
-                            <div x-show="selectedItems.length > 0" x-transition:enter="transition ease-out duration-300"
+                            <div x-show="selectedItems.length > 0"
+                                x-transition:enter="transition ease-out duration-300"
                                 x-transition:enter-start="opacity-0 translate-y-10"
                                 x-transition:enter-end="opacity-100 translate-y-0"
                                 x-transition:leave="transition ease-in duration-200"
                                 x-transition:leave-start="opacity-100 translate-y-0"
                                 x-transition:leave-end="opacity-0 translate-y-10"
-                                class="fixed bottom-8 left-1/2 -translate-x-1/2 z-40 w-[95%] max-w-3xl"x-cloak>
+                                class="fixed bottom-8 left-1/2 -translate-x-1/2 z-40 w-[95%] max-w-4xl" x-cloak>
 
-                                <div
-                                    class="bg-white/80 backdrop-blur-md border border-blue-100 shadow-[0_8px_30px_rgb(0,0,0,0.12)] rounded-2xl px-5 py-3 flex items-center justify-between">
-                                    <div class="flex items-center gap-3">
-                                        <span
-                                            class="relative flex items-center justify-center bg-blue-600 text-white text-[11px] font-black h-6 w-6 rounded-full shadow-sm"
-                                            x-text="selectedItems.length"></span>
+                                <div class="bg-white/90 backdrop-blur-xl border border-slate-200 shadow-[0_20px_50px_rgba(0,0,0,0.1)] rounded-3xl px-6 py-4 flex items-center justify-between">
+
+                                    <!-- Left Side: Selection Info -->
+                                    <div class="flex items-center gap-4">
+                                        <div class="relative">
+                                            <div class="bg-white/90 text-slate-800  text-[11px] font-black h-8 w-8 rounded-xl shadow-lg flex items-center justify-center">
+                                                <span x-text="selectedItems.length"></span>
+                                            </div>
+                                            <div class="absolute -top-1 -right-1 flex h-3 w-3">
+                                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                                                <span class="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
+                                            </div>
+                                        </div>
                                         <div class="flex flex-col">
-                                            <span class="text-sm font-bold text-gray-900 leading-none">Pekerja
-                                                Dipilih</span>
+                                            <span class="text-sm font-black text-slate-800 leading-none">Pekerja Terpilih</span>
+                                            <button type="button" @click="selectedItems = []" class="text-[10px] font-bold text-slate-400 hover:text-rose-500 uppercase tracking-widest mt-1 transition-colors text-left outline-none">
+                                                Batalkan Semua
+                                            </button>
                                         </div>
                                     </div>
 
+                                    <!-- Right Side: Action Buttons -->
                                     <div class="flex items-center gap-2">
-                                        <button type="button" @click="selectedItems = []"
-                                            class="px-3 py-2 text-md font-bold text-gray-500 hover:text-gray-700 transition">Batal</button>
-                                        <div class="h-6 w-px bg-gray-200 mx-1"></div>
 
-                                        {{-- Trigger Modal Button --}}
+                                        <!-- 1. Absen (Blue) -->
                                         <button @click="initAbsenModal()"
-                                            class="flex items-center gap-1.5 px-4 py-2 bg-blue-50 text-blue-700 border border-blue-100 rounded-xl text-xs font-bold hover:bg-blue-600 hover:text-white transition-all">
-                                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
-                                                stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            class="group flex items-center gap-2 px-4 py-2.5 bg-blue-50 hover:bg-blue-600 border border-blue-100 text-blue-600 hover:text-white rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all active:scale-95 shadow-sm">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                             </svg>
                                             Absen
                                         </button>
 
-                                        {{-- Trigger Modal Button --}}
-                                        <button @click="initStatusModal()"
-                                            class="flex items-center gap-1.5 px-4 py-2 bg-blue-50 text-cyan-700 border border-blue-100 rounded-xl text-xs font-bold hover:bg-cyan-600 hover:text-white transition-all">
-                                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
-                                                stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        <!-- 2. Tunjangan (Emerald) -->
+                                        <button class="group flex items-center gap-2 px-4 py-2.5 bg-emerald-50 hover:bg-emerald-600 border border-emerald-100 text-emerald-600 hover:text-white rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all active:scale-95 shadow-sm">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                                             </svg>
-                                            Status Absen
+                                            Tunjangan
+                                        </button>
+
+                                        <!-- 3. Potongan (Rose) -->
+                                        <button class="group flex items-center gap-2 px-4 py-2.5 bg-rose-50 hover:bg-rose-600 border border-rose-100 text-rose-600 hover:text-white rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all active:scale-95 shadow-sm">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M18 12H6" />
+                                            </svg>
+                                            Potongan
+                                        </button>
+
+                                        <div class="h-8 w-px bg-slate-200 mx-2"></div>
+
+                                        <!-- 4. Status Absen (Indigo) -->
+                                        <button @click="initStatusModal()"
+                                            class="group flex items-center gap-2 px-4 py-2.5 bg-indigo-50 hover:bg-indigo-600 border border-indigo-100 text-indigo-600 hover:text-white rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all active:scale-95 shadow-sm">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                                            </svg>
+                                            Status
                                         </button>
                                     </div>
                                 </div>
                             </div>
-
                             <!-- MODAL: INPUT JAM KERJA -->
                             <div x-show="showAbsenModal"
                                 class="fixed inset-0 z-[100] flex items-center justify-center p-6 sm:p-6" x-cloak>
@@ -831,7 +858,6 @@
                                                     <th class="text-left pb-2 pr-6">Catatan <br>/ Keterangan</th>
                                                 </tr>
                                             </thead>
-                                            </thead>
                                             <tbody>
                                                 <template x-for="(id, index) in selectedItems" :key="id">
                                                     <tr class="group">
@@ -871,8 +897,9 @@
 
                                                                 <div @click="open = !open" @click.outside="open = false"
                                                                     class="flex items-center justify-between px-4 py-2.5 bg-white border border-gray-200 rounded-xl cursor-pointer hover:border-blue-400 transition-all shadow-sm">
-                                                                    <span class="text-xs font-black text-gray-700"
-                                                                        x-text="list.find(x => x.val == rowStatus[id])?.label || 'Hadir'">
+                                                                    <span class="text-xs font-black"
+                                                                        :class="rowStatus[id] == 1 ? 'text-blue-600' : 'text-gray-700'"
+                                                                        x-text="rowStatus[id] == 1 ? 'Hadir (Ubah ke...)' : (list.find(x => x.val == rowStatus[id])?.label || 'Pilih Status')">
                                                                     </span>
                                                                     <svg class="w-4 h-4 text-blue-500 transition-transform duration-300"
                                                                         :class="open ? 'rotate-180' : ''" fill="none"
@@ -894,6 +921,11 @@
                                                                             <span x-text="item.label"></span>
                                                                         </div>
                                                                     </template>
+                                                                </div>
+                                                                <div x-show="rowStatus[id] == 1" class="mt-1">
+                                                                    <span class="text-[9px] font-bold text-amber-600 uppercase tracking-tighter">
+                                                                        ⚠️ Saat ini berstatus Hadir
+                                                                    </span>
                                                                 </div>
                                                             </div>
                                                         </td>
@@ -958,12 +990,11 @@
                                     Profil Pekerja
                                 </th>
                                 <th class="px-4 py-4 text-[11px] font-black text-gray-400 uppercase tracking-widest text-center">
-                                    Durasi Kerja (Realita/Normal)
+                                    Durasi Kerja
                                 </th>
                                 <th class="px-4 py-4 text-[11px] font-black text-gray-400 uppercase tracking-widest text-center">
-                                    Akumulasi OT
+                                    Overtime
                                 </th>
-                                {{-- Kolom Baru --}}
                                 <th class="px-4 py-4 text-[11px] font-black text-gray-400 uppercase tracking-widest text-center">
                                     HBN
                                 </th>
@@ -1023,6 +1054,19 @@
         function absenFormHandler() {
             return {
                 confirmSubmit() {
+
+                    const hasStatusHadir = this.selectedItems.some(id => this.rowStatus[id] == 1);
+
+                    if (hasStatusHadir) {
+                        Swal.fire({
+                            title: 'Gagal!',
+                            text: 'Terdapat pekerja dengan status "Hadir". Silakan pilih tipe absensi terlebih dahulu.',
+                            icon: 'error',
+                            confirmButtonColor: '#EF4444',
+                        });
+                        return; // Berhenti di sini, jangan submit
+                    }
+
                     Swal.fire({
                         title: 'Simpan Data Absensi?',
                         text: 'Pastikan semua data sudah benar sebelum disimpan.',
