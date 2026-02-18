@@ -348,8 +348,7 @@
                             <div class="flex items-center justify-between p-4 bg-white border border-gray-100 rounded-[1.5rem] hover:border-emerald-300 transition-all group shadow-sm">
 
                                 {{-- Hidden input asli untuk dikirim ke Backend --}}
-                                <input type="hidden" :name="'tunjangan[' + index + '][nama]'" :value="t.nama">
-                                <input type="hidden" :name="'tunjangan[' + index + '][value]'" :value="t.value">
+                                <input type="hidden" name="tunjangan" :value="tunjanganJson">
 
                                 <div class="flex items-center gap-5 flex-1">
                                     <div class="h-10 w-10 rounded-xl bg-gray-50 text-gray-400 flex items-center justify-center font-black text-xs" x-text="index + 1"></div>
@@ -838,6 +837,18 @@
             let rawValue = e.target.value.replace(/\D/g, '');
             this.tunjanganList[index].value = rawValue;
             e.target.value = this.formatDisplay(rawValue); // Timpa tampilan input langsung
+        },
+
+        get tunjanganJson() {
+            let result = {};
+            this.tunjanganList.forEach(item => {
+                if (item.nama.trim() !== '') {
+                    // Ubah nama menjadi snake_case untuk key (opsional)
+                    let key = item.nama.toLowerCase().replace(/\s+/g, '_');
+                    result[key] = parseInt(item.value) || 0;
+                }
+            });
+            return JSON.stringify(result);
         },
 
         addTunjangan() {

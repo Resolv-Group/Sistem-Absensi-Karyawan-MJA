@@ -88,7 +88,6 @@ class UnitController extends Controller
 
     function tambahUnit(Request $request)
     {
-        // dd($request->all());
         try {
             $request->validate(
                 [
@@ -106,9 +105,7 @@ class UnitController extends Controller
 
                     'pic_ids' => 'required|array|min:1',
                     'pic_ids.*' => 'exists:staff,id',
-                    'tunjangan' => 'required|array|min:1',
-                    'tunjangan.*.nama' => 'required|string',
-                    'tunjangan.*.value' => 'required|numeric|min:0',
+                    'tunjangan' => 'required|json',
                 ],
                 [
                     'id_unit.required' => 'ID Unit wajib diisi',
@@ -132,13 +129,10 @@ class UnitController extends Controller
                     'sistem_pengajian.required' => 'Sistem pengajian wajib dipilih',
 
                     'pic_ids.required' => 'PIC wajib dipilih minimal 1',
-                    'tunjangan.required' => 'Tunjangan wajib ditambahkan minimal 1',
-                    'tunjangan.*.nama.required' => 'Nama tunjangan tidak boleh kosong',
-                    'tunjangan.*.value.required' => 'Nilai tunjangan wajib diisi',
+                    'tunjangan.json' => 'Format data tunjangan tidak valid.',
                 ],
             );
 
-            // dd($request->all());
 
             // ✅ Upload dokumen
             $dokumen = null;
@@ -162,6 +156,7 @@ class UnitController extends Controller
                 'dokumen_mou' => $dokumen,
 
                 'status_aktif' => 1,
+                'tunjangan' => json_decode($request->tunjangan, true),
             ]);
 
             // dd($unit);
@@ -171,17 +166,6 @@ class UnitController extends Controller
                 DB::table('pic_unit')->insert([
                     'id_unit' => $unit->id, // atau $unit->id_unit
                     'id_pic' => $picId,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-            }
-
-            foreach ($request->shifts as $shiftData) {
-                DB::table('shift_absen')->insert([
-                    'id_unit' => $unit->id,
-                    'nama' => $shiftData['nama'],
-                    'waktu_masuk' => $shiftData['waktu_masuk'],
-                    'waktu_keluar' => $shiftData['waktu_keluar'],
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
@@ -400,6 +384,8 @@ class UnitController extends Controller
                     'pic_ids' => 'required|array|min:1',
                     'pic_ids.*' => 'exists:staff,id',
 
+                    'tunjangan' => 'required|json',
+
                     // FILE OPTIONAL
                     'dokumen_mou' => 'nullable|file|mimes:png,jpg,jpeg,pdf|max:2048',
                 ],
@@ -412,6 +398,8 @@ class UnitController extends Controller
                     'bpjs_naker.required' => 'BPJS Naker fee wajib diisi',
                     'dokumen_mou.mimes' => 'Dokumen harus PDF / JPG / PNG.',
                     'dokumen_mou.max' => 'Ukuran dokumen maksimal 2MB.',
+                    'tunjangan.required' => 'Tunjangan wajib diisi.',
+                    'tunjangan.json' => 'Format tunjangan tidak valid.',
                 ],
             );
 
@@ -442,6 +430,7 @@ class UnitController extends Controller
                 'umk' => $validated['umk'],
                 'mulai_perjanjian' => $validated['mulai_perjanjian'],
                 'akhir_perjanjian' => $validated['akhir_perjanjian'],
+                'tunjangan' => json_decode($validated['tunjangan'], true),
             ]);
 
             // ===============================

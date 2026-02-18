@@ -7,7 +7,6 @@ use App\Models\Borongan;
 use App\Models\Detil_Borongan;
 use App\Models\Detil_Harian;
 use App\Models\PKWT;
-use App\Models\Shift_Absen;
 use App\Models\Unit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -82,7 +81,6 @@ class AbsensiController extends Controller
     {
         $unit = Unit::with(['namaMitra'])->findOrFail($id_unit);
 
-        $shiftList = Shift_Absen::where('id_unit', $id_unit)->get();
 
         $dayName = strtolower(\Carbon\Carbon::parse($date)->format('D'));
 
@@ -169,7 +167,7 @@ class AbsensiController extends Controller
             })
             ->count();
 
-        return view('Absensi.detail.main-harian', compact('unit', 'date', 'workerMap', 'pkwtPekerja', 'totalHadir', 'shiftList'));
+        return view('Absensi.detail.main-harian', compact('unit', 'date', 'workerMap', 'pkwtPekerja', 'totalHadir'));
     }
 
     function ViewBorongan(Request $request, $id_unit, $date)
