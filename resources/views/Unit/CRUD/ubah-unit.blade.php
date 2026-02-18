@@ -285,6 +285,90 @@
                 {{-- Divider --}}
                 <div class="h-px bg-gray-100 w-full"></div>
 
+                <!-- Masukkan data tunjangan dari model ke sini -->
+<div x-data="tunjanganManager(@js($unit->tunjangan))">
+
+    {{-- Hidden input tunggal untuk seluruh data tunjangan (DI LUAR LOOP) --}}
+    <input type="hidden" name="tunjangan" :value="tunjanganJson">
+
+    {{-- HEADER --}}
+    <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center gap-3">
+            <div class="h-10 w-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100 shadow-sm">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </div>
+            <h2 class="text-lg font-black text-gray-900">Update Tunjangan</h2>
+        </div>
+    </div>
+
+    {{-- INPUT SECTION --}}
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end bg-gray-50/50 p-6 rounded-[2rem] border border-gray-100 mb-8">
+        <div class="md:col-span-7">
+            <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Tambah Kategori Baru</label>
+            <input type="text" x-model="newTunjangan.nama" placeholder="Nama Tunjangan..."
+                class="w-full rounded-2xl border-gray-200 bg-white focus:border-emerald-500 transition py-3 px-5 text-sm font-bold shadow-sm">
+        </div>
+
+        <div class="md:col-span-4">
+            <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Nilai (Rp)</label>
+            <div class="relative">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-400">Rp</span>
+                <input type="text" :value="newTunjangan.display" @input="handleNewInput($event)" placeholder="0"
+                    class="w-full rounded-2xl border-gray-200 bg-white focus:border-emerald-500 transition py-3 pl-10 pr-4 text-sm font-black text-gray-700 shadow-sm">
+            </div>
+        </div>
+
+        <div class="md:col-span-1">
+            <button type="button" @click="addTunjangan()"
+                class="w-full h-[48px] flex items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl transition shadow-lg shadow-emerald-200 active:scale-95">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    {{-- LIST PREVIEW --}}
+    <div class="space-y-3">
+        <template x-for="(t, index) in tunjanganList" :key="index">
+            <div class="flex items-center justify-between p-4 bg-white border border-gray-100 rounded-[1.5rem] hover:border-emerald-300 transition-all group shadow-sm">
+
+                <div class="flex items-center gap-5 flex-1">
+                    <div class="h-10 w-10 rounded-xl bg-gray-50 text-gray-400 flex items-center justify-center font-black text-xs" x-text="index + 1"></div>
+
+                    <div class="flex-1 grid grid-cols-2 gap-4">
+                        {{-- Edit Nama --}}
+                        <input type="text" x-model="t.nama" class="bg-transparent border-none p-0 text-sm font-black text-gray-900 focus:ring-0">
+
+                        {{-- Edit Nilai --}}
+                        <div class="flex items-center gap-1">
+                            <span class="text-xs font-bold text-emerald-500">Rp</span>
+                            <input type="text"
+                                :value="formatDisplay(t.value)"
+                                @input="handleListInput($event, index)"
+                                class="bg-transparent border-none p-0 text-sm font-black text-emerald-600 focus:ring-0 w-full">
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Remove Button --}}
+                <button type="button" @click="removeTunjangan(index)" class="p-2.5 text-gray-300 hover:text-rose-500 transition-all">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                </button>
+            </div>
+        </template>
+    </div>
+</div>
+
+                {{-- Divider --}}
+                <div class="h-px bg-gray-100 w-full"></div>
+
+
+
                 {{-- SECTION 2: KONTRAK & LEGALITAS --}}
                 <div>
                     <div class="flex items-center gap-3 mb-6">
@@ -683,5 +767,72 @@
                 }
             }
         }
+
+        function tunjanganManager(initialData = null) {
+    // Transformasi data dari {"score": 5000} menjadi [{nama: 'score', value: 5000}]
+    let startingList = [];
+    if (initialData) {
+        startingList = Object.keys(initialData).map(key => {
+            return {
+                nama: key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' '), // Format agar rapi (Score, Driver)
+                value: initialData[key]
+            };
+        });
+    } else {
+        // Default jika data unit belum punya tunjangan
+        startingList = [
+            { nama: 'Score', value: 0 },
+            { nama: 'Jarak', value: 0 },
+            { nama: 'Driver', value: 0 }
+        ];
+    }
+
+    return {
+        tunjanganList: startingList,
+        newTunjangan: { nama: '', value: '', display: '' },
+
+        formatDisplay(val) {
+            if (!val && val !== 0) return '';
+            return new Intl.NumberFormat('id-ID').format(val);
+        },
+
+        handleNewInput(e) {
+            let rawValue = e.target.value.replace(/\D/g, '');
+            this.newTunjangan.value = rawValue;
+            this.newTunjangan.display = this.formatDisplay(rawValue);
+        },
+
+        handleListInput(e, index) {
+            let rawValue = e.target.value.replace(/\D/g, '');
+            this.tunjanganList[index].value = rawValue;
+            e.target.value = this.formatDisplay(rawValue);
+        },
+
+        addTunjangan() {
+            if (this.newTunjangan.nama.trim() === '' || !this.newTunjangan.value) return;
+            this.tunjanganList.push({
+                nama: this.newTunjangan.nama,
+                value: parseInt(this.newTunjangan.value)
+            });
+            this.newTunjangan = { nama: '', value: '', display: '' };
+        },
+
+        removeTunjangan(index) {
+            this.tunjanganList.splice(index, 1);
+        },
+
+        // Mengubah array kembali ke format JSON {"score": 5000} untuk dikirim ke backend
+        get tunjanganJson() {
+            let result = {};
+            this.tunjanganList.forEach(item => {
+                if (item.nama.trim() !== '') {
+                    let key = item.nama.toLowerCase().replace(/\s+/g, '_');
+                    result[key] = parseInt(item.value) || 0;
+                }
+            });
+            return JSON.stringify(result);
+        }
+    }
+}
     </script>
 @endsection

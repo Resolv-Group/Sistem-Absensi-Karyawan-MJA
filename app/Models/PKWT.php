@@ -26,10 +26,11 @@ class PKWT extends Model
         'gaji_overtime',
         'bpjs_kesehatan',
         'bpjs_naker',
+        'tunjangan',
     ];
 
     protected $casts = [
-        'tunjangan' => 'array',
+        'tunjangan' => 'json',
     ];
 
     public function pekerja()

@@ -7,7 +7,6 @@ use App\Models\Borongan;
 use App\Models\Detil_Borongan;
 use App\Models\Detil_Harian;
 use App\Models\PKWT;
-use App\Models\Shift_Absen;
 use App\Models\Unit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -81,7 +80,6 @@ class AbsensiController extends Controller
     public function ViewHarian(Request $request, $id_unit, $date)
     {
         $unit = Unit::with(['namaMitra'])->findOrFail($id_unit);
-
         $dayName = strtolower(\Carbon\Carbon::parse($date)->format('D'));
 
         // 1. Sync Attendance Records (Tetap pertahankan ini agar record absensi utama tercipta)

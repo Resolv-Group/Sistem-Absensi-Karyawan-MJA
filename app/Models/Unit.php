@@ -24,13 +24,14 @@ class Unit extends Model
         'umk',
         'bpjs_naker',
         'bpjs_kesehatan',
-        'status_aktif'
+        'status_aktif',
+        'tunjangan'
     ];
 
     protected $casts = [
         'mulai_perjanjian' => 'date',
         'akhir_perjanjian' => 'date',
-        'tunjangan' => 'array',
+        'tunjangan' => 'json',
     ];
 
     public function namaMitra()
@@ -101,7 +102,7 @@ class Unit extends Model
         ->distinct('id_absensi')
         ->count('id_absensi');
 
-        // dd($this->id);         
+        // dd($this->id);
 
         // dd(
         //     Detil_Borongan::whereHas('absensi', fn ($q) =>

@@ -124,6 +124,8 @@ class PKWTController extends Controller
                     'pekerja.*.bpjs_kesehatan' => 'required|numeric|min:0',
                     'pekerja.*.bpjs_naker' => 'required|numeric|min:0',
 
+                    'pekerja.*.tunjangan' => 'required|json',
+
                     'pekerja.*.days' => 'required|array|size:7',
                     'pekerja.*.days.*' => 'nullable|numeric|min:0|max:24',
 
@@ -139,6 +141,13 @@ class PKWTController extends Controller
                     'pekerja.*.gaji_overtime.required' => 'Gaji Overtime harian wajib diisi',
                     'pekerja.*.bpjs_kesehatan.required' => 'BPJS Kesehatan wajib diisi',
                     'pekerja.*.bpjs_naker.required' => 'BPJS Naker wajib diisi',
+
+                    'pekerja.*.tunjangan.required' => 'Tunjangan wajib diisi',
+                    'pekerja.*.tunjangan.json' => 'Format tunjangan tidak valid',
+
+                    'pekerja.*.tgl_mulai_pkwt.required' => 'Tanggal mulai PKWT wajib diisi',
+                    'pekerja.*.tgl_mulai_pkwt.date' => 'Tanggal mulai PKWT harus berupa tanggal yang valid',
+                    'pekerja.*.tgl_akhir_pkwt.required' => 'Tanggal akhir PKWT wajib diisi',
 
                     'pekerja.*.days.*.numeric' => 'Jam kerja harus berupa angka',
                     'pekerja.*.days.*.min'     => 'Jam kerja tidak boleh kurang dari 0',
@@ -169,6 +178,7 @@ class PKWTController extends Controller
                     'gaji_overtime' => $data['gaji_overtime'],
                     'bpjs_kesehatan' => $data['bpjs_kesehatan'],
                     'bpjs_naker' => $data['bpjs_naker'],
+                    'tunjangan' => json_decode($data['tunjangan'], true),
                     'dokumen_pkwt' => $dokumen,
                     'dokumen_mime' => $dokumenMime,
                     'status_aktif' => 1,
@@ -223,7 +233,6 @@ class PKWTController extends Controller
 
     public function updateUnitPekerja(Request $request, $unitId, $pkwtId)
     {
-
         try {
             DB::beginTransaction();
 
@@ -237,6 +246,7 @@ class PKWTController extends Controller
                 'pekerja.*.jabatan_id' => 'required|exists:jabatan_pkwt,id',
                 'pekerja.*.tgl_mulai_pkwt' => 'required|date',
                 'pekerja.*.tgl_akhir_pkwt' => 'required|date|after_or_equal:pekerja.*.tgl_mulai_pkwt',
+                'pekerja.*.tunjangan' => 'required|json',
                 'pekerja.*.days' => 'required|array|size:7',
                 'pekerja.*.days.*' => 'nullable|numeric|min:0|max:24',
                 'pekerja.*.dokumen_pkwt' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
@@ -259,6 +269,7 @@ class PKWTController extends Controller
                 'jabatan_id' => $data['jabatan_id'],
                 'tgl_mulai_pkwt' => $data['tgl_mulai_pkwt'],
                 'tgl_akhir_pkwt' => $data['tgl_akhir_pkwt'],
+                'tunjangan' => json_decode($data['tunjangan'], true),
             ]);
 
             foreach ($data['days'] as $hari => $jam) {

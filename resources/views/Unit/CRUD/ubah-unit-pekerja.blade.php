@@ -365,6 +365,46 @@
                                         class="w-full rounded-xl border-gray-200 bg-gray-50 text-sm py-3 px-4 text-gray-600 focus:bg-white focus:border-blue-500">
                                 </div>
 
+                                <!-- TEMPATKAN INI DI DALAM TEMPLATE WORKER ROW -->
+<div class="sm:col-span-2 mt-2 p-5 bg-emerald-50/50 rounded-2xl border border-emerald-100/50">
+    <div class="flex items-center gap-2 mb-4">
+        <div class="p-1.5 bg-emerald-100 text-emerald-600 rounded-lg">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+        </div>
+        <h4 class="text-[11px] font-black text-emerald-700 uppercase tracking-[0.2em]">Tunjangan Spesifik Unit</h4>
+    </div>
+
+    {{-- Hidden Input Utama: Mengirim data sebagai String JSON murni ke Laravel --}}
+    <input type="hidden"
+           :name="`pekerja[${index}][tunjangan]`"
+           :value="JSON.stringify(row.tunjangan || {})">
+
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <template x-for="(val, key) in (row.tunjangan || {})" :key="key">
+            <div class="space-y-1.5">
+                <label class="block text-[10px] font-bold text-emerald-600 uppercase tracking-wider ml-1"
+                       x-text="key.replace(/_/g, ' ')"></label>
+                <div class="relative">
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-emerald-400">Rp</span>
+
+                    {{-- Input Tampilan: TIDAK memiliki atribut 'name' agar tidak terkirim secara terpisah --}}
+                    <input type="text"
+                        :value="formatRupiah(row.tunjangan[key]).replace('Rp', '').trim()"
+                        @input="row.tunjangan[key] = Number($event.target.value.replace(/\D/g, ''))"
+                        class="w-full pl-8 pr-3 py-2 text-sm font-black text-slate-700 bg-white border border-emerald-100 rounded-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all shadow-sm"
+                        placeholder="0">
+                </div>
+            </div>
+        </template>
+
+        <div x-show="Object.keys(row.tunjangan || {}).length === 0" class="sm:col-span-3 text-center py-2">
+            <p class="text-xs text-emerald-400 italic font-medium">Unit ini tidak memiliki konfigurasi tunjangan.</p>
+        </div>
+    </div>
+</div>
+
                                 <div class="sm:col-span-2 mt-4">
                                     <div class="flex items-center justify-between mb-3 px-1">
                                         <label
@@ -528,6 +568,7 @@
                 });
                 return formatted;
             })(),
+            tunjangan: @js($pkwt->tunjangan ?? []),
         }];
 
         function workerCombobox(row) {
@@ -567,11 +608,17 @@
         window.unitInfo = {
             umk: {{ $unitSelected->umk ?? 0 }},
             pct_kesehatan: {{ $unitSelected->bpjs_kesehatan ?? 0 }},
-            pct_naker: {{ $unitSelected->bpjs_naker ?? 0 }}
+            pct_naker: {{ $unitSelected->bpjs_naker ?? 0 }},
+            tunjanganConfig: @js($unitSelected->tunjangan ?? []),
         };
 
         // 2. FORM LOGIC
         function workerForm() {
+            const config = window.unitInfo.tunjanganConfig || {};
+            let initialTunjangan = {};
+            Object.keys(config).forEach(key => {
+                initialTunjangan[key] = config[key];
+            });
             return {
                 rows: window.oldRows && window.oldRows.length ?
                     window.oldRows : [{
@@ -595,41 +642,14 @@
                             fri: '',
                             sat: '',
                             sun: ''
-                        }
+                        },
+                        tunjangan: initialTunjangan,
                     }],
                 init() {
                     // Recalculate BPJS for existing data in case UMK/percentages changed
                     this.rows.forEach(row => {
-                        console.log('Row on init:', row);
-                        console.log('Row KPJ:', row.kpj);
-                        console.log('Row Naker:', row.naker);
-
                         if (row.kpj || row.naker) {
                             this.calculateBpjs(row);
-                        }
-                    });
-                },
-
-                addRow() {
-                    this.rows.push({
-                        id: Date.now(),
-                        gaji: 0,
-                        gajiOvertime: 0,
-                        workerId: '',
-                        divisiId: null,
-                        jabatanId: null,
-                        tglMulai: '',
-                        tglAkhir: '',
-                        bpjsKesehatan: 0,
-                        bpjsNaker: 0,
-                        days: {
-                            mon: '',
-                            tue: '',
-                            wed: '',
-                            thu: '',
-                            fri: '',
-                            sat: '',
-                            sun: ''
                         }
                     });
                 },
@@ -645,19 +665,19 @@
                     // Kalkulasi BPJS Kesehatan jika ada KPJ
                     if (row.kpj && row.kpj.toString().trim() !== '') {
                         row.bpjsKesehatan = Math.round(umk * (pctKesehatan / 100));
-                        console.log('✓ BPJS Kesehatan calculated:', row.bpjsKesehatan);
+                        // console.log('✓ BPJS Kesehatan calculated:', row.bpjsKesehatan);
                     } else {
                         row.bpjsKesehatan = 0;
-                        console.log('✗ BPJS Kesehatan = 0 (no KPJ)');
+                        // console.log('✗ BPJS Kesehatan = 0 (no KPJ)');
                     }
 
                     // Kalkulasi BPJS Naker jika ada Naker
                     if (row.naker && row.naker.toString().trim() !== '') {
                         row.bpjsNaker = Math.round(umk * (pctNaker / 100));
-                        console.log('✓ BPJS Naker calculated:', row.bpjsNaker);
+                        // console.log('✓ BPJS Naker calculated:', row.bpjsNaker);
                     } else {
                         row.bpjsNaker = 0;
-                        console.log('✗ BPJS Naker = 0 (no Naker)');
+                        // console.log('✗ BPJS Naker = 0 (no Naker)');
                     }
 
                 },

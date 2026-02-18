@@ -121,7 +121,7 @@
 
             {{-- CARD 2: ALOKASI PEKERJA (Redesigned) --}}
             <div class="bg-white rounded-2xl shadow-sm border border-gray-200">
-                <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                <div class="p-6 border-b border-gray-100 flex justify-between items-center">
                     <h3 class="font-bold text-gray-900">Daftar Pekerja & Kontrak</h3>
                     <button type="button" @click="addRow()"
                         class="text-xs font-bold text-blue-600 bg-white hover:bg-blue-50 px-3 py-1.5 rounded-lg transition flex items-center gap-1 border border-gray-200 shadow-sm">
@@ -170,30 +170,29 @@
                                     <input type="hidden" :name="`pekerja[${index}][id_pekerja]`" x-model="selectedId">
 
                                     <div class="relative">
-    <input type="text"
-        x-model="search"
-        @focus="open = true"
-        @click.outside="close()"
-        placeholder="Cari nama atau NIK..."
-        class="w-full pl-4 pr-20 py-3 text-sm font-medium text-gray-800 bg-gray-50 rounded-xl border-gray-200 focus:bg-white focus:border-blue-500 transition cursor-pointer">
+                                        <input type="text" x-model="search" @focus="open = true"
+                                            @click.outside="close()" placeholder="Cari nama atau NIK..."
+                                            class="w-full pl-4 pr-20 py-3 text-sm font-medium text-gray-800 bg-gray-50 rounded-xl border-gray-200 focus:bg-white focus:border-blue-500 transition cursor-pointer">
 
-    {{-- Clear Button --}}
-    <button
-        type="button"
-        x-show="selectedId"
-        @click.stop="selectedId = null; row.workerId = ''; search = ''; row.kpj = ''; row.naker = ''; row.bpjsKesehatan = 0; row.bpjsNaker = 0;"
-        class="absolute inset-y-0 right-10 flex items-center pr-2 text-gray-400 hover:text-red-500 transition">
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-    </button>
+                                        {{-- Clear Button --}}
+                                        <button type="button" x-show="selectedId"
+                                            @click.stop="selectedId = null; row.workerId = ''; search = ''; row.kpj = ''; row.naker = ''; row.bpjsKesehatan = 0; row.bpjsNaker = 0;"
+                                            class="absolute inset-y-0 right-10 flex items-center pr-2 text-gray-400 hover:text-red-500 transition">
+                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                                                stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
 
-    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-        </svg>
-    </div>
-</div>
+                                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M19 9l-7 7-7-7" />
+                                            </svg>
+                                        </div>
+                                    </div>
 
                                     <ul x-show="open" x-transition.opacity
                                         class="absolute z-50 w-full mt-1 bg-white border border-gray-100 rounded-xl shadow-xl max-h-56 overflow-y-auto py-1">
@@ -335,69 +334,85 @@
                                 <div>
                                     <label class="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">
                                         Iuran BPJS Kes
-                                        <span x-show="row.kpj && row.kpj.trim() !== ''" class="text-green-500 text-[10px] ml-1">● Editable</span>
+                                        <span x-show="row.kpj && row.kpj.trim() !== ''"
+                                            class="text-green-500 text-[10px] ml-1">● Editable</span>
                                     </label>
                                     <div class="relative">
-                                        <input
-                                            type="text"
-                                            {{-- Conditional readonly based on KPJ existence --}}
+                                        <input type="text" {{-- Conditional readonly based on KPJ existence --}}
                                             :readonly="!row.kpj || row.kpj.trim() === ''"
                                             :value="formatRupiah(row.bpjsKesehatan)"
                                             @input="row.bpjsKesehatan = Number($event.target.value.replace(/\D/g, ''))"
                                             {{-- Dynamic classes based on KPJ and value --}}
                                             :class="{
-                                                'bg-blue-50 text-blue-700 border-blue-200 cursor-text': row.kpj && row.kpj.trim() !== '' && row.bpjsKesehatan > 0,
-                                                'bg-white text-gray-700 border-gray-300 cursor-text hover:border-blue-400': row.kpj && row.kpj.trim() !== '' && row.bpjsKesehatan === 0,
-                                                'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed': !row.kpj || row.kpj.trim() === ''
+                                                'bg-blue-50 text-blue-700 border-blue-200 cursor-text': row.kpj && row
+                                                    .kpj.trim() !== '' && row.bpjsKesehatan > 0,
+                                                'bg-white text-gray-700 border-gray-300 cursor-text hover:border-blue-400': row
+                                                    .kpj && row.kpj.trim() !== '' && row.bpjsKesehatan === 0,
+                                                'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed': !row
+                                                    .kpj || row.kpj.trim() === ''
                                             }"
                                             class="w-full rounded-xl border text-sm font-bold py-3 px-4 transition-colors focus:ring-2 focus:ring-blue-300 focus:outline-none"
                                             placeholder="Rp 0">
 
-                                        <input type="hidden" :name="`pekerja[${index}][bpjs_kesehatan]`" :value="row.bpjsKesehatan">
+                                        <input type="hidden" :name="`pekerja[${index}][bpjs_kesehatan]`"
+                                            :value="row.bpjsKesehatan">
 
                                         {{-- Optional: Icon indicator --}}
                                         <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                            <svg x-show="row.kpj && row.kpj.trim() !== ''" class="w-4 h-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                            <svg x-show="row.kpj && row.kpj.trim() !== ''" class="w-4 h-4 text-green-500"
+                                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                             </svg>
-                                            <svg x-show="!row.kpj || row.kpj.trim() === ''" class="w-4 h-4 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                            <svg x-show="!row.kpj || row.kpj.trim() === ''" class="w-4 h-4 text-gray-300"
+                                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                                             </svg>
                                         </div>
                                     </div>
-                                </div>  
+                                </div>
 
                                 {{-- HASIL BPJS NAKER --}}
                                 <div>
                                     <label class="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">
                                         Iuran BPJS Naker
-                                        <span x-show="row.naker && row.naker.trim() !== ''" class="text-green-500 text-[10px] ml-1">● Editable</span>
+                                        <span x-show="row.naker && row.naker.trim() !== ''"
+                                            class="text-green-500 text-[10px] ml-1">● Editable</span>
                                     </label>
                                     <div class="relative">
-                                        <input
-                                            type="text"
-                                            {{-- Conditional readonly based on Naker existence --}}
+                                        <input type="text" {{-- Conditional readonly based on Naker existence --}}
                                             :readonly="!row.naker || row.naker.trim() === ''"
                                             :value="formatRupiah(row.bpjsNaker)"
                                             @input="row.bpjsNaker = Number($event.target.value.replace(/\D/g, ''))"
                                             {{-- Dynamic classes based on Naker and value --}}
                                             :class="{
-                                                'bg-blue-50 text-blue-700 border-blue-200 cursor-text': row.naker && row.naker.trim() !== '' && row.bpjsNaker > 0,
-                                                'bg-white text-gray-700 border-gray-300 cursor-text hover:border-blue-400': row.naker && row.naker.trim() !== '' && row.bpjsNaker === 0,
-                                                'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed': !row.naker || row.naker.trim() === ''
+                                                'bg-blue-50 text-blue-700 border-blue-200 cursor-text': row.naker && row
+                                                    .naker.trim() !== '' && row.bpjsNaker > 0,
+                                                'bg-white text-gray-700 border-gray-300 cursor-text hover:border-blue-400': row
+                                                    .naker && row.naker.trim() !== '' && row.bpjsNaker === 0,
+                                                'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed': !row
+                                                    .naker || row.naker.trim() === ''
                                             }"
                                             class="w-full rounded-xl border text-sm font-bold py-3 px-4 transition-colors focus:ring-2 focus:ring-blue-300 focus:outline-none"
                                             placeholder="Rp 0">
 
-                                        <input type="hidden" :name="`pekerja[${index}][bpjs_naker]`" :value="row.bpjsNaker">
+                                        <input type="hidden" :name="`pekerja[${index}][bpjs_naker]`"
+                                            :value="row.bpjsNaker">
 
                                         {{-- Optional: Icon indicator --}}
                                         <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                            <svg x-show="row.naker && row.naker.trim() !== ''" class="w-4 h-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                            <svg x-show="row.naker && row.naker.trim() !== ''"
+                                                class="w-4 h-4 text-green-500" fill="none" viewBox="0 0 24 24"
+                                                stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                             </svg>
-                                            <svg x-show="!row.naker || row.naker.trim() === ''" class="w-4 h-4 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                            <svg x-show="!row.naker || row.naker.trim() === ''"
+                                                class="w-4 h-4 text-gray-300" fill="none" viewBox="0 0 24 24"
+                                                stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                                             </svg>
                                         </div>
                                     </div>
@@ -419,6 +434,46 @@
                                     <input type="date" :name="`pekerja[${index}][tgl_akhir_pkwt]`"
                                         class="w-full rounded-xl border-gray-200 bg-gray-50 text-sm py-3 px-4 text-gray-600 focus:bg-white focus:border-blue-500">
                                 </div>
+
+                                <!-- TEMPATKAN INI DI DALAM TEMPLATE WORKER ROW -->
+<div class="sm:col-span-2 mt-2 p-5 bg-emerald-50/50 rounded-2xl border border-emerald-100/50">
+    <div class="flex items-center gap-2 mb-4">
+        <div class="p-1.5 bg-emerald-100 text-emerald-600 rounded-lg">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+        </div>
+        <h4 class="text-[11px] font-black text-emerald-700 uppercase tracking-[0.2em]">Tunjangan Spesifik Unit</h4>
+    </div>
+
+    {{-- Hidden Input Utama: Mengirim data sebagai String JSON murni ke Laravel --}}
+    <input type="hidden"
+           :name="`pekerja[${index}][tunjangan]`"
+           :value="JSON.stringify(row.tunjangan || {})">
+
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <template x-for="(val, key) in (row.tunjangan || {})" :key="key">
+            <div class="space-y-1.5">
+                <label class="block text-[10px] font-bold text-emerald-600 uppercase tracking-wider ml-1"
+                       x-text="key.replace(/_/g, ' ')"></label>
+                <div class="relative">
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-emerald-400">Rp</span>
+
+                    {{-- Input Tampilan: TIDAK memiliki atribut 'name' agar tidak terkirim secara terpisah --}}
+                    <input type="text"
+                        :value="formatRupiah(row.tunjangan[key]).replace('Rp', '').trim()"
+                        @input="row.tunjangan[key] = Number($event.target.value.replace(/\D/g, ''))"
+                        class="w-full pl-8 pr-3 py-2 text-sm font-black text-slate-700 bg-white border border-emerald-100 rounded-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all shadow-sm"
+                        placeholder="0">
+                </div>
+            </div>
+        </template>
+
+        <div x-show="Object.keys(row.tunjangan || {}).length === 0" class="sm:col-span-3 text-center py-2">
+            <p class="text-xs text-emerald-400 italic font-medium">Unit ini tidak memiliki konfigurasi tunjangan.</p>
+        </div>
+    </div>
+</div>
 
                                 {{-- Weekly Schedule Input --}}
                                 <div class="sm:col-span-2 mt-4">
@@ -444,8 +499,9 @@
                                                     class="absolute top-2.5 left-0 right-0 text-center pointer-events-none z-20">
                                                     <span class="text-[10px] font-black tracking-tighter"
                                                         :class="row.days[dayKey] !== '' && parseFloat(row.days[
-                                                            dayKey]) > 0 ? (dayKey === 'sun' ? 'text-red-500' :
-                                                                'text-blue-500') : 'text-gray-300'"
+                                                            dayKey]) > 0 ? (dayKey === 'sun' ?
+                                                            'text-red-500' :
+                                                            'text-blue-500') : 'text-gray-300'"
                                                         x-text="dayName"></span>
                                                 </div>
 
@@ -639,7 +695,7 @@
                 },
 
                 select(p) {
-                    console.log('Selected worker:', p);
+                    // console.log('Selected worker:', p);
 
                     this.selectedId = p.id;
                     row.workerId = p.id;
@@ -673,11 +729,17 @@
         window.unitInfo = {
             umk: {{ $unitSelected->umk ?? 0 }}, // Pastikan ini angka (integer/float)
             pct_kesehatan: {{ $unitSelected->bpjs_kesehatan ?? 0 }}, // Contoh: 1 (untuk 1%)
-            pct_naker: {{ $unitSelected->bpjs_naker ?? 0 }} // Contoh: 2 (untuk 2%)
+            pct_naker: {{ $unitSelected->bpjs_naker ?? 0 }}, // Contoh: 2 (untuk 2%)
+            tunjanganConfig: @js($unitSelected->tunjangan ?? []),
         };
 
         // 2. FORM LOGIC
         function workerForm() {
+            const config = window.unitInfo.tunjanganConfig || {};
+            let initialTunjangan = {};
+            Object.keys(config).forEach(key => {
+                initialTunjangan[key] = config[key];
+            });
             return {
                 rows: [{
                         id: 1,
@@ -698,7 +760,8 @@
                             fri: 0,
                             sat: 0,
                             sun: 0
-                        }
+                        },
+                        tunjangan: initialTunjangan,
                     } // Added fields
                 ],
 
@@ -755,7 +818,16 @@
                         naker: '',
                         bpjsKesehatan: 0,
                         bpjsNaker: 0,
-                        days: { mon:'', tue:'', wed:'', thu:'', fri:'', sat:'', sun:'' }
+                        days: {
+                            mon: '',
+                            tue: '',
+                            wed: '',
+                            thu: '',
+                            fri: '',
+                            sat: '',
+                            sun: ''
+                        },
+                        tunjangan: initialTunjangan,
                     };
 
                     this.calculateBpjs(row);
