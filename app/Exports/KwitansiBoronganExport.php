@@ -23,6 +23,8 @@ class KwitansiBoronganExport implements FromView, WithStyles, WithColumnWidths, 
         public $MitraKerja,
         public $periode,
         public $total_tagihan,
+        public $nama,
+        public $jabatan,
     ) {}
 
     public function view(): View
@@ -35,6 +37,8 @@ class KwitansiBoronganExport implements FromView, WithStyles, WithColumnWidths, 
             'MitraKerja' => $this->MitraKerja,
             'periode' => $this->periode,
             'total_tagihan' => $this->total_tagihan,
+            'nama' => $this->nama,
+            'jabatan' => $this->jabatan,
         ]);
     }
 

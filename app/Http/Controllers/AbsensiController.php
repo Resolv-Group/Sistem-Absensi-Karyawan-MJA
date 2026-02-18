@@ -82,8 +82,6 @@ class AbsensiController extends Controller
     {
         $unit = Unit::with(['namaMitra'])->findOrFail($id_unit);
 
-        $shiftList = Shift_Absen::where('id_unit', $id_unit)->get();
-
         $dayName = strtolower(\Carbon\Carbon::parse($date)->format('D'));
 
         // 1. Sync Attendance Records (Tetap pertahankan ini agar record absensi utama tercipta)
@@ -169,7 +167,7 @@ class AbsensiController extends Controller
             })
             ->count();
 
-        return view('Absensi.detail.main-harian', compact('unit', 'date', 'workerMap', 'pkwtPekerja', 'totalHadir', 'shiftList'));
+        return view('Absensi.detail.main-harian', compact('unit', 'date', 'workerMap', 'pkwtPekerja', 'totalHadir'));
     }
 
     function ViewBorongan(Request $request, $id_unit, $date)

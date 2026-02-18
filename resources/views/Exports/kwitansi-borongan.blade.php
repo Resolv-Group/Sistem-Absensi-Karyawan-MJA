@@ -152,12 +152,12 @@
         <td colspan="4"  align="center" valign="middle" style="font-family:'Bauhaus 93'; font-weight:bold; background-color:#F2DCDB; font-size:16px;">Rp.</td>
         <td align="center" valign="middle" style="font-family:'Arial Rounded MT Bold'; font-weight:bold; background-color:#F2DCDB; font-size:18px;">{{ $total_tagihan }}</td>
         <td></td>
-        <td colspan="7"  align="center" valign="middle" style="font-family:'Cambria'; font-weight:bold; text-decoration:underline;">MOHAMMAD TAUFIQ, S.Kom.</td>
+        <td colspan="7"  align="center" valign="middle" style="font-family:'Cambria'; font-weight:bold; text-decoration:underline;">{{ $nama }}</td>
     </tr>
 
     <tr>
         <td colspan="9"></td>
-        <td colspan="7" align="center" valign="middle" style="font-family:'Cambria';">DIREKTUR</td>
+        <td colspan="7" align="center" valign="middle" style="font-family:'Cambria';">{{ $jabatan }}</td>
     </tr>
 
     <tr></tr>

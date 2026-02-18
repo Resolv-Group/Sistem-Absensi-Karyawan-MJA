@@ -29,6 +29,8 @@ class InvoiceBoronganExport implements FromView, WithStyles, WithColumnWidths, W
         public $pph,
         public $total_tagihan,
         public $umk,
+        public $nama,
+        public $jabatan
     ) {}
 
     public function view(): View
@@ -47,6 +49,8 @@ class InvoiceBoronganExport implements FromView, WithStyles, WithColumnWidths, W
             'pph' => $this->pph,
             'total_tagihan' => $this->total_tagihan,
             'umk' => $this->umk,
+            'nama' => $this->nama,
+            'jabatan' => $this->jabatan,
         ]);
     }
     public function columnWidths(): array

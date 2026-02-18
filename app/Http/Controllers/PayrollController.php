@@ -162,6 +162,9 @@ class PayrollController extends Controller
                             $jamNormal = (float) $detil->jam_kerja_normal; // Hindari division by zero
                             $jamHarian = (float) $detil->jam_kerja_harian;
                             $jamOT = (float) $detil->overtime;
+                            $gajiReguler = 0;
+                            $gajiHariIni = 0;
+                            $statusDilindungi = [2,3,4];
 
                             //todo:: logika baru buat jam telat
                             if ($detil->hbn == 1) {
@@ -171,12 +174,23 @@ class PayrollController extends Controller
 
                                 $totalHBN += (float) $detil->overtime;
                                 // dump('Gaji Harian (jamharian*gajiovertime) = ', $gajiHariIni);
-                            } else {
+                            } elseif(in_array($detil->status_kehadiran,$statusDilindungi) && $detil->isPaid == 1)
+                            {
+                                $gajiHariIni += ($jamHarian/$jamNormal) * $gajiHarianPkwt;
+                                
+                            }
+                            else {
                                 // JIKA HARI NORMAL:
                                 // Rumus Reguler: jam_harian * gaji_harian
-                                $gajiReguler = $jamHarian * $gajiHarianPkwt;
-                                // dump('gajiReguler (jamHarian*gajiHarianPkwt) = ',$gajiReguler);
+                                if($jamHarian >= $jamNormal)
+                                {
+                                    $gajiReguler += $gajiHarianPkwt;
 
+                                }elseif($jamNormal > $jamHarian)                      
+                                {
+                                    $gajiReguler += $gajiHarianPkwt - ( ($jamNormal - $jamHarian) * $gajiOvertimePkwt );
+
+                                }
                                 // Rumus Overtime: jam_ot * gaji_overtime
                                 $gajiOT = $jamOT * $gajiOvertimePkwt;
                                 // dump('gajiOT (jamOT*gajiOvertimePkwt) = ',$gajiOT);
@@ -412,6 +426,7 @@ class PayrollController extends Controller
     }
     function ExportInvoiceBorongan(Request $request)
     {
+        $jabatan = $request->jabatan ?? '';
         $start = \Carbon\Carbon::parse($request->tanggal_mulai);
         $end = \Carbon\Carbon::parse($request->tanggal_akhir);
 
@@ -446,12 +461,13 @@ class PayrollController extends Controller
 
         $filename = "Invoice_{$Unit->nama_unit}_{$periode}.xlsx";
 
-        return Excel::download(new InvoiceBoronganExport($request->no_resi, $Unit->nama_unit, $MitraKerja->alamat, $Bidang->nama, $MitraKerja->nama_mitra, $display_a, $terbilang, $periode, $display_management_fee, $display_ppn, $display_pph, $display_total_tagihan, $Unit->umk), $filename);
+        return Excel::download(new InvoiceBoronganExport($request->no_resi, $Unit->nama_unit, $MitraKerja->alamat, $Bidang->nama, $MitraKerja->nama_mitra, $display_a, $terbilang, $periode, $display_management_fee, $display_ppn, $display_pph, $display_total_tagihan, $Unit->umk, $request->nama_resi,$jabatan), $filename);
     }
 
     function ExportKwitansiBorongan(Request $request)
     {
         // dd($request->all());
+        $jabatan = $request->jabatan ?? '';
 
         $Unit = Unit::where('id_unit', $request->id_unit)->first();
 
@@ -479,7 +495,7 @@ class PayrollController extends Controller
 
         $filename = "Kwitansi_{$Unit->nama_unit}_{$periode}.xlsx";
 
-        return Excel::download(new KwitansiBoronganExport($request->no_resi, $Unit->nama_unit, $terbilang, $Bidang->nama, $MitraKerja->nama_mitra, $periode, $display_total_tagihan), $filename);
+        return Excel::download(new KwitansiBoronganExport($request->no_resi, $Unit->nama_unit, $terbilang, $Bidang->nama, $MitraKerja->nama_mitra, $periode, $display_total_tagihan, $request->nama_resi, $jabatan), $filename);
     }
 
     function ExportRincianUpahBorongan(Request $request)
