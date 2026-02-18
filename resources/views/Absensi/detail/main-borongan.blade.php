@@ -1381,11 +1381,7 @@
                                                             <div x-data="{
                                                                 open: false,
                                                                 list: [
-                                                                    { val: '2', label: 'Izin' },
-                                                                    { val: '3', label: 'Cuti' },
-                                                                    { val: '4', label: 'Sakit' },
-                                                                    { val: '5', label: 'Rencana Cuti' },
-                                                                    { val: '6', label: 'Absen' },
+                                                                    { val: '2', label: 'Cuti' }
                                                                 ]
                                                             }" class="relative">
 
