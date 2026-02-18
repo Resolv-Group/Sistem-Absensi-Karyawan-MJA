@@ -36,6 +36,8 @@ return new class extends Migration
             $table->integer('bpjs_kesehatan')->default(0);
             $table->integer('bpjs_naker')->default(0);
 
+            $table->json('tunjangan')->nullable();
+
             $table->timestamps();
         });
 
