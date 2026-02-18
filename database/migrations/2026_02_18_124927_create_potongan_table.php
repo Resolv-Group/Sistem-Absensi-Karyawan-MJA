@@ -11,14 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('shift_absen', function (Blueprint $table) {
+        Schema::create('potongan', function (Blueprint $table) {
             $table->id();
-
+            $table->integer('id_pkwt');
             $table->integer('id_unit');
-            $table->char('nama');
-            $table->time('waktu_masuk')->default('00:00:00');
-            $table->time('waktu_keluar')->default('00:00:00');
 
+            $table->char('kategori');
+            $table->integer('total');
+            $table->char('keterangan');
+
+            $table->integer(column: 'updated_by');
+            $table->integer(column: 'created_by');
             $table->timestamps();
         });
     }
@@ -28,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('shift_absen');
+        Schema::dropIfExists('potongan');
     }
 };

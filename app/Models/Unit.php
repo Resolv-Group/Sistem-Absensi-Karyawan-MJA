@@ -30,6 +30,7 @@ class Unit extends Model
     protected $casts = [
         'mulai_perjanjian' => 'date',
         'akhir_perjanjian' => 'date',
+        'tunjangan' => 'array',
     ];
 
     public function namaMitra()
