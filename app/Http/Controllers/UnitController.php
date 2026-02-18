@@ -222,7 +222,6 @@ class UnitController extends Controller
         }
 
         $unit = Unit::with(['picUnit.staff', 'namaMitra'])->findOrFail($id);
-        $shifts = Shift_Absen::select('id', 'nama', 'waktu_masuk', 'waktu_keluar')->where('id_unit', $id)->get();
 
         if ($request->ajax()) {
             // --- HANDLE BORONGAN AJAX ---
@@ -298,7 +297,7 @@ class UnitController extends Controller
         $boronganKategori = Kategori::all();
         $jabatan = JabatanPKWT::all();
 
-        return view('Unit.detail-unit', compact('unit', 'historiUnit', 'pekerja', 'pkwtPekerja', 'borongan', 'divisions', 'boronganKategori', 'jabatan', 'shifts'));
+        return view('Unit.detail-unit', compact('unit', 'historiUnit', 'pekerja', 'pkwtPekerja', 'borongan', 'divisions', 'boronganKategori', 'jabatan'));
     }
 
     public function showDokumenMOU($id, Request $request)
