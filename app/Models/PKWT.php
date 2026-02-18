@@ -28,6 +28,10 @@ class PKWT extends Model
         'bpjs_naker',
     ];
 
+    protected $casts = [
+        'tunjangan' => 'array',
+    ];
+
     public function pekerja()
     {
         return $this->belongsTo(Pekerja::class, 'id_pekerja', 'id');

@@ -31,6 +31,8 @@ return new class extends Migration
             $table->integer('bpjs_naker');
             $table->integer('status_aktif')->default(1);
 
+            $table->json('tunjangan')->nullable();
+
             $table->timestamps();
         });
 
