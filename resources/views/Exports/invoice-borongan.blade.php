@@ -195,11 +195,11 @@ use Carbon\Carbon;
     <tr>
         <td colspan="7"></td>
         <td colspan="3" align="center" style="font-weight:bold">
-            MUHAMMAD TAUFIQ, S. Kom.
+            {{ $nama }}
         </td>
     </tr>
     <tr>
         <td colspan="7"></td>
-        <td colspan="3" align="center">DIREKTUR</td>
+        <td colspan="3" align="center">{{ $jabatan }}</td>
     </tr>
 </table>

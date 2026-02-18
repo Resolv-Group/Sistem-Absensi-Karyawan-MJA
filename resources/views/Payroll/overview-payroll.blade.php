@@ -167,20 +167,40 @@
                                             dokumen ini.</p>
                                     </div>
 
-                                    <div class="space-y-4">
-                                        <div>
-                                            <label
-                                                class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Nomor
-                                                Resi / No. Ref</label>
-                                            <input type="text" name="no_resi" required
-                                                placeholder="Silahkan masukkan No Resi Disini.."
-                                                class="w-full px-5 py-3.5 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-emerald-500/10 focus:bg-white transition-all duration-200">
-
-                                            <p class="mt-2 text-[10px] text-slate-400 italic font-medium ml-1">
-                                                * Contoh: 021 RD / MJA - BISI / INVOICE / XI / 2025
-                                            </p>
-                                        </div>
+                                    <div class="space-y-5">
+                                    <!-- Group 1: Nomor Resi -->
+                                    <div>
+                                        <label for="no_resi" class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">
+                                            Nomor Resi / No. Ref
+                                        </label>
+                                        <input type="text" id="no_resi" name="no_resi" required
+                                            placeholder="Silahkan masukkan No Resi Disini.."
+                                            class="w-full px-5 py-3.5 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-emerald-500/10 focus:bg-white transition-all duration-200">
+                                        <p class="mt-2 text-[10px] text-slate-400 italic font-medium ml-1">
+                                            * Contoh: 021 RD / MJA - BISI / INVOICE / XI / 2025
+                                        </p>
                                     </div>
+
+                                    <!-- Group 2: Nama Penanggungjawab -->
+                                    <div>
+                                        <label for="nama_resi" class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">
+                                            Penanggungjawab
+                                        </label>
+                                        <input type="text" id="nama_resi" name="nama_resi" required
+                                            placeholder="Silahkan masukkan nama disini.."
+                                            class="w-full px-5 py-3.5 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-emerald-500/10 focus:bg-white transition-all duration-200">
+                                    </div>
+
+                                    <!-- Group 3: Jabatan -->
+                                    <div>
+                                        <label for="jabatan" class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">
+                                            Jabatan
+                                        </label>
+                                        <input type="text" id="jabatan" name="jabatan" 
+                                            placeholder="Silahkan masukkan jabatan disini.."
+                                            class="w-full px-5 py-3.5 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-emerald-500/10 focus:bg-white transition-all duration-200">
+                                    </div>
+                                </div>
 
                                     <div class="grid grid-cols-2 gap-3 mt-8">
                                         <button type="button" @click="show = false"

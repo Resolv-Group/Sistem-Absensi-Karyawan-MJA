@@ -83,14 +83,21 @@
         <th colspan="{{ $totalDays }}" align="center" valign="middle"
             style="background-color: #FCE4D6; border: 1px solid #000;">Tanggal</th>
 
-        {{-- 2. LOOPING TANGGAL (ANGKA: 21, 22, 23...) --}}
 
-        {{-- Jika ada kolom Total Upah di kanan, tambahkan disini --}}
-        {{-- <th rowspan="2" width="15" ...>TOTAL UPAH</th> --}}
+        <td colspan="22"></td>
+        <th colspan="{{ $totalDays }}" align="center" valign="middle"
+            style="background-color: #FCE4D6; border: 1px solid #000;">Tanggal Tidak Masuk Kerja</th>
     </tr>
 
     <tr>
         <td colspan="10"></td>
+        @foreach ($periodDates as $date)
+            <th width="4"
+                style="background-color: #FCE4D6; border: 1px solid #000; text-align: center; font-weight: bold; vertical-align: middle;">
+                {{ $date->format('d') }} {{-- Akan muncul 01, 02, 03... --}}
+            </th>
+        @endforeach
+        <td colspan="22"></td>
         @foreach ($periodDates as $date)
             <th width="4"
                 style="background-color: #FCE4D6; border: 1px solid #000; text-align: center; font-weight: bold; vertical-align: middle;">
@@ -121,6 +128,21 @@
             </th>
         @endforeach
 
+        <td colspan="22"></td>
+        {{-- LOOPING HARI --}}
+        @foreach ($periodDates as $date)
+            @php
+                // Menggunakan format 'ddd' untuk singkatan 3 huruf (Min, Sen, Sel...)
+                $dayName = $date->isoFormat('ddd'); 
+                
+                // Cek Minggu: dayOfWeek di Carbon adalah 0 untuk Minggu
+                $isSunday = $date->dayOfWeek === \Carbon\Carbon::SUNDAY;
+                $fontColor = $isSunday ? '#FF0000' : '#000000';
+            @endphp
+            <th style="background-color: #FCE4D6; border: 1px solid #000; text-align: center; vertical-align: middle; font-size: 8pt; color: {{ $fontColor }};">
+                {{ $dayName }}
+            </th>
+        @endforeach
         {{-- (Kolom Kanan Kosong karena sudah kena Rowspan di atas) --}}
     </tr>
     <tr>
@@ -130,10 +152,38 @@
                 0
             </th>
         @endforeach
+
+        <td colspan="22"></td>
+        @foreach ($periodDates as $date)
+            <th align="center" valign="middle" style="background-color: #FCE4D6; border: 1px solid #000;">
+                0
+            </th>
+        @endforeach
     </tr>
     <tr>
         <td colspan="9"></td>
         <td align="center" valign="middle" style="background-color: #FCE4D6; border: 1px solid #000;">Total Jam</td>
+        @foreach ($periodDates as $date)
+            @php
+                $fmtDate = $date->format('Y-m-d');
+                $dailySum = 0;
+
+                // Loop seluruh data absensi untuk menjumlahkan jam pada tanggal ini
+                if (isset($attendanceMap)) {
+                    foreach ($attendanceMap as $workerData) {
+                        // Tambahkan jam kerja jika ada, default 0
+                        $dailySum += $workerData[$fmtDate] ?? 0;
+                    }
+                }
+            @endphp
+
+            <th align="center" valign="middle" style="background-color: #FCE4D6; border: 1px solid #000;">
+                {{-- Tampilkan hasil penjumlahan --}}
+                {{ $dailySum > 0 ? (float)$dailySum : 0 }}
+            </th>
+        @endforeach
+
+        <td colspan="22"></td>
         @foreach ($periodDates as $date)
             @php
                 $fmtDate = $date->format('Y-m-d');
@@ -394,6 +444,13 @@
 
                 {{-- NO REKENING --}}
                 <td style="text-align: left; border: 1px solid #000;">{{ $item->no_rekening }}</td>
+
+                <td></td>
+
+                @foreach ($periodDates as $date)
+                    <td style="border: 1px solid #000;"></td>
+                @endforeach
+                
             </tr>
         @endforeach
     </tbody>

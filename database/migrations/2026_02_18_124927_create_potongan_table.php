@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->integer('id_pkwt');
             $table->integer('id_unit');
+            $table->integer('id_absensi');
 
             $table->char('kategori');
             $table->integer('total');
