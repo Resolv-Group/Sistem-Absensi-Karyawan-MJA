@@ -106,10 +106,9 @@ class UnitController extends Controller
 
                     'pic_ids' => 'required|array|min:1',
                     'pic_ids.*' => 'exists:staff,id',
-                    'shifts' => 'required|array|min:1',
-                    'shifts.*.nama' => 'required|string',
-                    'shifts.*.waktu_masuk' => 'required',
-                    'shifts.*.waktu_keluar' => 'required',
+                    'tunjangan' => 'required|array|min:1',
+                    'tunjangan.*.nama' => 'required|string',
+                    'tunjangan.*.value' => 'required|numeric|min:0',
                 ],
                 [
                     'id_unit.required' => 'ID Unit wajib diisi',
@@ -133,8 +132,9 @@ class UnitController extends Controller
                     'sistem_pengajian.required' => 'Sistem pengajian wajib dipilih',
 
                     'pic_ids.required' => 'PIC wajib dipilih minimal 1',
-                    'shifts.required' => 'Shift wajib ditambahkan minimal 1',
-                    'shifts.*.nama.required' => 'Nama shift tidak boleh kosong',
+                    'tunjangan.required' => 'Tunjangan wajib ditambahkan minimal 1',
+                    'tunjangan.*.nama.required' => 'Nama tunjangan tidak boleh kosong',
+                    'tunjangan.*.value.required' => 'Nilai tunjangan wajib diisi',
                 ],
             );
 
@@ -222,7 +222,6 @@ class UnitController extends Controller
         }
 
         $unit = Unit::with(['picUnit.staff', 'namaMitra'])->findOrFail($id);
-        $shifts = Shift_Absen::select('id', 'nama', 'waktu_masuk', 'waktu_keluar')->where('id_unit', $id)->get();
 
         if ($request->ajax()) {
             // --- HANDLE BORONGAN AJAX ---
@@ -298,7 +297,7 @@ class UnitController extends Controller
         $boronganKategori = Kategori::all();
         $jabatan = JabatanPKWT::all();
 
-        return view('Unit.detail-unit', compact('unit', 'historiUnit', 'pekerja', 'pkwtPekerja', 'borongan', 'divisions', 'boronganKategori', 'jabatan', 'shifts'));
+        return view('Unit.detail-unit', compact('unit', 'historiUnit', 'pekerja', 'pkwtPekerja', 'borongan', 'divisions', 'boronganKategori', 'jabatan'));
     }
 
     public function showDokumenMOU($id, Request $request)

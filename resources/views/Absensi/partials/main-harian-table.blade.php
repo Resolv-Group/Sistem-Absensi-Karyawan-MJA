@@ -32,22 +32,46 @@
         {{-- 2. Durasi Kerja (Merged) --}}
         <td class="px-4 py-5 text-center">
             @if ($detil)
-                <div class="flex flex-col">
-                    <span class="text-sm font-black {{ $detil->hbn == 1 ? 'text-indigo-600' : 'text-blue-600' }}">
-                        {{ $detil->jam_kerja_harian ?? 0 }}
+                @php
+                    $pkwtJam = $dataMap['pkwt_hari_kerja'] ?? 0;
+                    $realJam = $detil->jam_kerja_harian ?? 0;
+                    $isHbn = $detil->hbn == 1;
 
-                        @if($detil->hbn == 0)
-                            {{-- Normal Day: Show the /7 Jam divisor --}}
-                            <span class="text-gray-400 font-bold text-xs">/ {{ $dataMap['pkwt_hari_kerja'] ?? 0 }} Jam</span>
+                    // 1. Logic: Only check "Jam Kurang" on normal days (HBN = 0)
+                    // because on holidays, any hour worked is usually considered extra/OT.
+                    $isShortShift = (!$isHbn && $realJam < $pkwtJam);
+
+                    // 2. Determine Color Priority: Red (Warning) > Indigo (Holiday) > Blue (Normal)
+                    $mainColor = $isShortShift ? 'text-red-600' : ($isHbn ? 'text-indigo-600' : 'text-blue-600');
+
+                    // 3. Determine Label
+                    $subLabel = $isShortShift ? 'Jam Kurang' : ($isHbn ? 'Kerja Hari Libur' : 'Total Durasi');
+                    $subColor = $isShortShift ? 'text-red-400' : ($isHbn ? 'text-indigo-300' : 'text-gray-300');
+                @endphp
+
+                <div class="flex flex-col">
+                    {{-- Main Hour Display --}}
+                    <span class="text-sm font-black {{ $mainColor }}">
+                        {{ $realJam }}
+
+                        @if(!$isHbn)
+                            {{-- Normal Day: Show divisor --}}
+                            <span class="text-gray-400 font-bold text-xs">/ {{ $pkwtJam }} Jam</span>
                         @else
-                            {{-- Holiday (HBN): Hide divisor, add holiday label --}}
+                            {{-- Holiday (HBN): Hide divisor --}}
                             <span class="text-indigo-400 font-bold text-[10px] ml-1 uppercase tracking-tighter">/ Jam</span>
                         @endif
                     </span>
 
-                    <span class="text-[9px] font-black uppercase tracking-tighter {{ $detil->hbn == 1 ? 'text-indigo-300' : 'text-gray-300' }}">
-                        {{ $detil->hbn == 1 ? 'Kerja Hari Libur' : 'Total Durasi' }}
+                    {{-- Sub-label (Dynamic: Total Durasi / Kerja Hari Libur / Jam Kurang) --}}
+                    <span class="text-[10px] font-black uppercase tracking-tighter {{ $subColor }}">
+                        {{ $subLabel }}
                     </span>
+
+                    {{-- Optional: Small Payment Indicator if isPaid is active --}}
+                    @if($detil->isPaid == 1)
+                        <span class="text-[9px] font-bold text-emerald-500 uppercase leading-none mt-0.5 tracking-widest">Dibayar Penuh</span>
+                    @endif
                 </div>
             @else
                 <span class="text-xs font-bold text-gray-300 italic">Belum Input</span>
