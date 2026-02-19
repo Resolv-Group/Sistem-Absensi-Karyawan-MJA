@@ -215,10 +215,43 @@
                 @endif
             </div>
         </td>
+
+        <td class="px-4 py-3 text-center">
+            <div class="flex flex-col items-center gap-1.5">
+                {{-- Row 1: Tunjangan Indicator --}}
+                @if ($absensi && $absensi->tunjangan)
+                    <div class="flex items-center gap-1 px-1.5 py-0.5 bg-emerald-50 text-emerald-600 rounded-md border border-emerald-100 shadow-sm" title="Ada Tunjangan">
+                        <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" stroke-width="4" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span class="text-[8px] font-black uppercase tracking-tighter">Plus</span>
+                    </div>
+                @else
+                    <div class="h-4 flex items-center">
+                        <span class="text-[10px] font-bold text-gray-200">-</span>
+                    </div>
+                @endif
+
+                {{-- Row 2: Potongan Indicator --}}
+                @if ($absensi && $absensi->potongan)
+                    <div class="flex items-center gap-1 px-1.5 py-0.5 bg-rose-50 text-rose-600 rounded-md border border-rose-100 shadow-sm" title="Ada Potongan">
+                        <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" stroke-width="4" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span class="text-[8px] font-black uppercase tracking-tighter">Min</span>
+                    </div>
+                @else
+                    <div class="h-4 flex items-center">
+                        <span class="text-[10px] font-bold text-gray-200">-</span>
+                    </div>
+                @endif
+            </div>
+        </td>
+
     </tr>
 @empty
     <tr>
-        <td colspan="6" class="px-6 py-32 text-center bg-white">
+        <td colspan="10" class="px-6 py-32 text-center bg-white">
             <div x-transition:enter="transition ease-out duration-500"
                 x-transition:enter-start="opacity-0 translate-y-8" x-transition:enter-end="opacity-100 translate-y-0"
                 class="flex flex-col items-center justify-center">

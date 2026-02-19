@@ -9,7 +9,7 @@ class Potongan extends Model
     protected $table = 'potongan';
 
     protected $fillable = [
-        'id_pkwt',
+        'id_pekerja',
         'id_unit',
         'id_absensi',
         'kategori',
@@ -17,5 +17,9 @@ class Potongan extends Model
         'keterangan',
         'updated_by',
         'created_by'
+    ];
+
+    protected $casts = [
+        'kategori' => 'json',
     ];
 }

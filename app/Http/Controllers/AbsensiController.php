@@ -6,7 +6,10 @@ use App\Models\Absensi;
 use App\Models\Borongan;
 use App\Models\Detil_Borongan;
 use App\Models\Detil_Harian;
+use App\Models\Pekerja;
 use App\Models\PKWT;
+use App\Models\Potongan;
+use App\Models\Tunjangan;
 use App\Models\Unit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -139,6 +142,20 @@ class AbsensiController extends Controller
             $savedAbsensi = $existingAbsensi->get($item->id_pekerja);
             $savedDetail = $savedAbsensi ? $savedAbsensi->detilHarian : null;
 
+            $savedPotongan = $savedAbsensi ? $savedAbsensi->potongan : null;
+
+            // Transformasi data: {"telat": 5000} -> [{nama: "telat", nominal: 5000}]
+            $uiPotongan = [];
+            if ($savedPotongan && $savedPotongan->kategori) {
+                $kategoriArr = is_array($savedPotongan->kategori) ? $savedPotongan->kategori : json_decode($savedPotongan->kategori, true);
+                foreach ($kategoriArr as $key => $val) {
+                    $uiPotongan[] = [
+                        'nama' => str_replace('_', ' ', $key), // Balikkan ke nama asli (tanpa underscore)
+                        'nominal' => (int) $val
+                    ];
+                }
+            }
+
             return [
                 $item->id => [
                     'nama' => $item->pekerja->nama,
@@ -146,12 +163,16 @@ class AbsensiController extends Controller
                     'initials' => strtoupper(substr($item->pekerja->nama, 0, 2)),
                     'pkwt_hari_kerja' => (float) $jamNormal,
 
+                    'has_absen' => $savedAbsensi ? true : false,
+
                     // Existing Values from saved attendance
                     'existing_jam' => $savedDetail ? (float) $savedDetail->jam_kerja_harian : null,
                     'existing_hbn' => $savedDetail ? (int) $savedDetail->hbn : 0,
                     'existing_paid' => $savedDetail ? (int) $savedDetail->isPaid : 0,
                     'existing_status' => $savedDetail ? (int) $savedDetail->status_kehadiran : 0,
                     'existing_catatan' => $savedDetail ? $savedDetail->catatan : '',
+            'existing_potongan' => $uiPotongan,
+            'existing_keterangan_potongan' => $savedPotongan?->keterangan ?? '',
                 ],
             ];
         });
@@ -446,6 +467,163 @@ class AbsensiController extends Controller
         } catch (\Throwable $e) {
             DB::rollBack();
             return back()->with('error', $e->getMessage());
+        }
+    }
+
+    public function bulkAbsensiUpdateTunjangan(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'date' => 'required|date',
+            'data' => 'required|array',
+        ]);
+
+        if ($validator->fails()) {
+            return back()->withErrors($validator)->withInput();
+        }
+
+        DB::beginTransaction();
+
+        try {
+            foreach ($request->data as $pkwtId => $values) {
+                $pkwt = PKWT::with(['unit', 'pekerja'])->find($pkwtId);
+                if (!$pkwt) {
+                    continue;
+                }
+
+                $absensi = Absensi::where([
+                    'id_pekerja' => $pkwt->id_pekerja,
+                    'id_unit' => $pkwt->id_unit,
+                    'tgl_absensi' => $request->date,
+                ])->first();
+
+                if (!$absensi) {
+                    throw new \Exception("Absensi untuk " . ($pkwt->pekerja->nama ?? 'Pekerja') . " belum dibuat pada tanggal tersebut.");
+                }
+
+                $kategoriArray = json_decode($values['kategori'], true);
+
+                // ============================================
+                // CHECK IF RECORD EXISTS FIRST
+                // ============================================
+                $existingTunjangan = Tunjangan::where([
+                    'id_pekerja' => $pkwt->id_pekerja,
+                    'id_unit' => $pkwt->id_unit,
+                    'id_absensi' => $absensi->id,
+                ])->first();
+
+                if ($existingTunjangan) {
+                    // ============================================
+                    // UPDATE CASE - Only update updated_by
+                    // ============================================
+                    $existingTunjangan->update([
+                        'kategori'   => $kategoriArray,
+                        'total'      => (float) $values['total'],
+                        'keterangan' => $values['keterangan'] ?? null,
+                        'updated_by' => Auth::id(),
+                    ]);
+                    // created_by remains unchanged!
+                } else {
+                    // ============================================
+                    // CREATE CASE - Set both created_by & updated_by
+                    // ============================================
+                    Tunjangan::create([
+                        'id_pekerja' => $pkwt->id_pekerja,
+                        'id_unit' => $pkwt->id_unit,
+                        'id_absensi' => $absensi->id,
+                        'kategori'   => $kategoriArray,
+                        'total'      => (float) $values['total'],
+                        'keterangan' => $values['keterangan'] ?? null,
+                        'updated_by' => Auth::id(),
+                        'created_by' => Auth::id(),
+                    ]);
+                }
+            }
+
+            DB::commit();
+            return back()->with('success', 'Data tunjangan berhasil disimpan.');
+
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return back()->with('error', 'Gagal menyimpan: ' . $e->getMessage())->withInput();
+        }
+    }
+
+    public function bulkAbsensiUpdatePotongan(Request $request)
+    {
+        // dd($request->all());
+        $validator = Validator::make($request->all(), [
+            'date' => 'required|date',
+            'data' => 'required|array',
+        ]);
+
+        if ($validator->fails()) {
+            return back()->withErrors($validator)->withInput();
+        }
+
+        DB::beginTransaction();
+
+        try {
+            foreach ($request->data as $pkwtId => $values) {
+                $pkwt = PKWT::with(['unit', 'pekerja'])->find($pkwtId);
+                if (!$pkwt) {
+                    continue;
+                }
+
+                $absensi = Absensi::where([
+                    'id_pekerja' => $pkwt->id_pekerja,
+                    'id_unit' => $pkwt->id_unit,
+                    'tgl_absensi' => $request->date,
+                ])->first();
+
+                if (!$absensi) {
+                    throw new \Exception("Absensi untuk " . ($pkwt->pekerja->nama ?? 'Pekerja') . " belum dibuat pada tanggal tersebut.");
+                }
+
+                $kategoriArray = json_decode($values['kategori'], true);
+
+                // ============================================
+                // CHECK IF RECORD EXISTS FIRST
+                // ============================================
+                $existingPotongan = Potongan::where([
+                    'id_pekerja' => $pkwt->id_pekerja,
+                    'id_unit' => $pkwt->id_unit,
+                    'id_absensi' => $absensi->id,
+                ])->first();
+
+                if ($existingPotongan) {
+                    // ============================================
+                    // UPDATE CASE - Only update updated_by
+                    // ============================================
+                    $existingPotongan->update([
+                        'kategori'   => $kategoriArray,
+                        'total'      => (float) $values['total'],
+                        'keterangan' => $values['keterangan'] ?? null,
+                        'updated_by' => Auth::id(),
+                    ]);
+                    // created_by remains unchanged!
+                } else {
+                    // ============================================
+                    // CREATE CASE - Set both created_by & updated_by
+                    // ============================================
+                    Potongan::create([
+                        'id_pekerja' => $pkwt->id_pekerja,
+                        'id_unit' => $pkwt->id_unit,
+                        'id_absensi' => $absensi->id,
+                        'kategori'   => $kategoriArray,
+                        'total'      => (float) $values['total'],
+                        'keterangan' => $values['keterangan'] ?? null,
+                        'updated_by' => Auth::id(),
+                        'created_by' => Auth::id(),
+                    ]);
+                }
+            }
+
+            DB::commit();
+            return back()->with('success', 'Data potongan berhasil disimpan.');
+
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return back()->with('error', 'Gagal menyimpan: ' . $e->getMessage())->withInput();
         }
     }
 
