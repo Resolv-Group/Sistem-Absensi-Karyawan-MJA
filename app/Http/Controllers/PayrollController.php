@@ -165,6 +165,7 @@ class PayrollController extends Controller
                             $gajiReguler = 0;
                             $gajiHariIni = 0;
                             $statusDilindungi = [2,3,4];
+                            $statusTidakDibayar = [5, 6];
 
                             //todo:: logika baru buat jam telat
                             if ($detil->hbn == 1) {
@@ -174,17 +175,21 @@ class PayrollController extends Controller
 
                                 $totalHBN += (float) $detil->overtime;
                                 // dump('Gaji Harian (jamharian*gajiovertime) = ', $gajiHariIni);
-                            } elseif(in_array($detil->status_kehadiran,$statusDilindungi) && $detil->isPaid == 1)
+                            }elseif (in_array($detil->status_kehadiran, $statusTidakDibayar)) {
+                                // TAMBAHAN: JIKA STATUS 5 ATAU 6, GAJI HARI INI = 0
+                                $gajiHariIni = 0;
+
+                            }elseif (in_array($detil->status_kehadiran,$statusDilindungi) && $detil->isPaid == 1)
                             {
                                 $gajiHariIni += ($jamHarian/$jamNormal) * $gajiHarianPkwt;
                                 
-                            }
-                            else {
+                            }else {
                                 // JIKA HARI NORMAL:
                                 // Rumus Reguler: jam_harian * gaji_harian
                                 if($jamHarian >= $jamNormal)
                                 {
                                     $gajiReguler += $gajiHarianPkwt;
+                                    dump($absensi->id,$gajiReguler);
 
                                 }elseif($jamNormal > $jamHarian)                      
                                 {
@@ -196,9 +201,12 @@ class PayrollController extends Controller
                                 // dump('gajiOT (jamOT*gajiOvertimePkwt) = ',$gajiOT);
                                 $gajiHariIni = $gajiReguler + $gajiOT;
                                 // dump('gajiHariIni (gajiReguler*gajiOT) = ',$gajiHariIni);
+
+                                dump($absensi->id,$gajiHariIni);
                             }
 
                             $hasilGajiHarian += $gajiHariIni;
+                            dump($absensi->id,$gajiHariIni);
                         }
                     } else {
                         foreach ($absensi->detilBorongan as $detil) {
@@ -773,17 +781,46 @@ class PayrollController extends Controller
             ->whereIn('id_pekerja', $workerIds)
             ->whereBetween('tgl_absensi', [$tglAwal, $tglAkhir])
             ->get();
-
+    
         // B. Buat Mapping Array
         $attendanceMap = [];
         foreach ($absensiData as $abs) {
             $tgl = \Carbon\Carbon::parse($abs->tgl_absensi)->format('Y-m-d');
-
-            // Pastikan ID menjadi integer agar kunci array konsisten
             $idPekerja = (int) $abs->id_pekerja;
+            
+            $detil = $abs->detilHarian;
+            if ($detil) {
+                $jamKerja = (float) $detil->jam_kerja_harian;
+                $overtime = (float) $detil->overtime;
+                $status   = $detil->status_kehadiran;
+                
+                $warna = ''; // Default Colorless (Hadir biasa)
 
-            // Ambil jam kerja (pastikan nama relasi 'detilHarian' benar sesuai model)
-            $attendanceMap[$idPekerja][$tgl] = $abs->detilHarian->jam_kerja_harian ?? null;
+                // URUTAN FILTER WARNA
+                if ($detil->hbn == 1) {
+                    $warna = '#DDA0DD'; // Ungu (HBN)
+                } elseif (in_array($status, [5, 6])) { // Sesuaikan angka ID Absen Anda
+                    $warna = '#FFC7CE'; // Merah (Absen/Alpha)
+                } elseif ($status == 7) { // Sesuaikan angka ID Rencana Cuti Anda
+                    $warna = '#C6EFCE'; // Hijau (Rencana Cuti)
+                } elseif (in_array($status, [2, 3, 4])) { // Izin, Cuti, Sakit
+                    if ($jamKerja > 0) {
+                        $warna = '#FFEB9C'; // Kuning (Izin tapi ada jam)
+                    } else {
+                        $warna = '#FCD5B4'; // Orange (Izin tidak ada jam)
+                    }
+                } elseif ($detil->isPaid == 1) {
+                    $warna = '#87CEFA'; // Biru (isPaid)
+                } elseif ($overtime > 0) {
+                    $warna = '#FFB6C1'; // Pink (Overtime)
+                }
+
+                // Simpan jam kerja DAN warna ke dalam array
+                $attendanceMap[$idPekerja][$tgl] = [
+                    'jam'   => $jamKerja,
+                    'warna' => $warna
+                ];
+            }
         }
 
         // DEBUG: Cek isi map sebelum lanjut (Hapus jika sudah benar)

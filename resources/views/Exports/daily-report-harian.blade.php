@@ -171,29 +171,8 @@
                 // Loop seluruh data absensi untuk menjumlahkan jam pada tanggal ini
                 if (isset($attendanceMap)) {
                     foreach ($attendanceMap as $workerData) {
-                        // Tambahkan jam kerja jika ada, default 0
-                        $dailySum += $workerData[$fmtDate] ?? 0;
-                    }
-                }
-            @endphp
-
-            <th align="center" valign="middle" style="background-color: #FCE4D6; border: 1px solid #000;">
-                {{-- Tampilkan hasil penjumlahan --}}
-                {{ $dailySum > 0 ? (float)$dailySum : 0 }}
-            </th>
-        @endforeach
-
-        <td colspan="22"></td>
-        @foreach ($periodDates as $date)
-            @php
-                $fmtDate = $date->format('Y-m-d');
-                $dailySum = 0;
-
-                // Loop seluruh data absensi untuk menjumlahkan jam pada tanggal ini
-                if (isset($attendanceMap)) {
-                    foreach ($attendanceMap as $workerData) {
-                        // Tambahkan jam kerja jika ada, default 0
-                        $dailySum += $workerData[$fmtDate] ?? 0;
+                        // PERUBAHAN DI SINI: Panggil ['jam'] dari array
+                        $dailySum += $workerData[$fmtDate]['jam'] ?? 0;
                     }
                 }
             @endphp
@@ -358,11 +337,16 @@
                         // Pastikan ID dipaksa jadi integer agar cocok dengan key array
                         $workerId = (int) $item->id_original;
                         
-                        // Ambil data dari Map. Jika tidak ada, return null
-                        $jamKerja = $attendanceMap[$workerId][$fmtDate] ?? null;
+                        // PERUBAHAN DI SINI: Ambil data array dari Map
+                        $mapData = $attendanceMap[$workerId][$fmtDate] ?? null;
+                        
+                        // Pecah datanya menjadi jam dan warna
+                        $jamKerja = $mapData['jam'] ?? null;
+                        $bgColor = $mapData['warna'] ?? '';
                     @endphp
 
-                    <td align="center" valign="middle" style="border: 1px solid #000; ">
+                    {{-- PERUBAHAN DI SINI: Sisipkan $bgColor ke style jika warnanya tidak kosong --}}
+                    <td align="center" valign="middle" style="border: 1px solid #000; {{ $bgColor != '' ? 'background-color: ' . $bgColor . ';' : '' }}">
                         {{-- Tampilkan angka (float biar 9.0 jadi 9), kosongkan jika null --}}
                         {{ $jamKerja !== null ? (float)$jamKerja : '' }}
                     </td>
