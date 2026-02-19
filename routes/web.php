@@ -143,6 +143,10 @@ Route::middleware(['auth', 'role:pic,admin'])->group(function(){
     Route::put('/absensi/{id_unit}/harian/{date}/bulk-update-status-harian', [AbsensiController::class, 'bulkAbsensiUpdateStatus'])->name('absensi.bulk.update-status');
     Route::put('/absensi/{id_unit}/borongan/{date}/bulk-update-borongan', [AbsensiController::class, 'bulkAbsensiBoronganUpdate'])->name('absensi.borongan.bulk.update');
 
+    //Absensi -> Tunjangan
+    Route::post('/absensi/{id_unit}/harian/{date}/bulk-update-tunjangan', [AbsensiController::class, 'bulkAbsensiUpdateTunjangan'])->name('absensi.bulk.store-tunjangan');
+    Route::post('/absensi/{id_unit}/harian/{date}/bulk-update-potongan', [AbsensiController::class, 'bulkAbsensiUpdatePotongan'])->name('absensi.bulk.store-potongan');
+
     //Penilaian
     //Filtered
     Route::get('/penilaian/unit/{id}', [PenilaianController::class, 'viewPenilaianMain'])->name('view.penilaian');

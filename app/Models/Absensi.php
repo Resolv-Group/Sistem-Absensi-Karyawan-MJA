@@ -35,4 +35,13 @@ class Absensi extends Model
         return $this->belongsTo(Unit::class, 'id_unit');
     }
 
+    public function tunjangan()
+    {
+        return $this->hasOne(Tunjangan::class, 'id_absensi');
+    }
+    public function potongan()
+    {
+        return $this->hasOne(Potongan::class, 'id_absensi');
+    }
+
 }

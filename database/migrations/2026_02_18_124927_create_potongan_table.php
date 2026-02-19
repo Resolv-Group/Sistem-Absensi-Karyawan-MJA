@@ -13,13 +13,13 @@ return new class extends Migration
     {
         Schema::create('potongan', function (Blueprint $table) {
             $table->id();
-            $table->integer('id_pkwt');
+            $table->integer('id_pekerja');
             $table->integer('id_unit');
             $table->integer('id_absensi');
 
-            $table->char('kategori');
+            $table->json('kategori');
             $table->integer('total');
-            $table->char('keterangan');
+            $table->char('keterangan')->nullable();
 
             $table->integer(column: 'updated_by');
             $table->integer(column: 'created_by');

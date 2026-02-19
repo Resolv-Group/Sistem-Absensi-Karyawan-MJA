@@ -436,44 +436,51 @@
                                 </div>
 
                                 <!-- TEMPATKAN INI DI DALAM TEMPLATE WORKER ROW -->
-<div class="sm:col-span-2 mt-2 p-5 bg-emerald-50/50 rounded-2xl border border-emerald-100/50">
-    <div class="flex items-center gap-2 mb-4">
-        <div class="p-1.5 bg-emerald-100 text-emerald-600 rounded-lg">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-        </div>
-        <h4 class="text-[11px] font-black text-emerald-700 uppercase tracking-[0.2em]">Tunjangan Spesifik Unit</h4>
-    </div>
+                                <div
+                                    class="sm:col-span-2 mt-2 p-5 bg-emerald-50/50 rounded-2xl border border-emerald-100/50">
+                                    <div class="flex items-center gap-2 mb-4">
+                                        <div class="p-1.5 bg-emerald-100 text-emerald-600 rounded-lg">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                        </div>
+                                        <h4 class="text-[11px] font-black text-emerald-700 uppercase tracking-[0.2em]">
+                                            Tunjangan Spesifik Unit</h4>
+                                    </div>
 
-    {{-- Hidden Input Utama: Mengirim data sebagai String JSON murni ke Laravel --}}
-    <input type="hidden"
-           :name="`pekerja[${index}][tunjangan]`"
-           :value="JSON.stringify(row.tunjangan || {})">
+                                    {{-- Hidden Input Utama: Mengirim data sebagai String JSON murni ke Laravel --}}
+                                    <input type="hidden" :name="`pekerja[${index}][tunjangan]`"
+                                        :value="JSON.stringify(row.tunjangan || {})">
 
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <template x-for="(val, key) in (row.tunjangan || {})" :key="key">
-            <div class="space-y-1.5">
-                <label class="block text-[10px] font-bold text-emerald-600 uppercase tracking-wider ml-1"
-                       x-text="key.replace(/_/g, ' ')"></label>
-                <div class="relative">
-                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-emerald-400">Rp</span>
+                                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                        <template x-for="(val, key) in (row.tunjangan || {})" :key="key">
+                                            <div class="space-y-1.5">
+                                                <label
+                                                    class="block text-[10px] font-bold text-emerald-600 uppercase tracking-wider ml-1"
+                                                    x-text="key.replace(/_/g, ' ')"></label>
+                                                <div class="relative">
+                                                    <span
+                                                        class="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-emerald-400">Rp</span>
 
-                    {{-- Input Tampilan: TIDAK memiliki atribut 'name' agar tidak terkirim secara terpisah --}}
-                    <input type="text"
-                        :value="formatRupiah(row.tunjangan[key]).replace('Rp', '').trim()"
-                        @input="row.tunjangan[key] = Number($event.target.value.replace(/\D/g, ''))"
-                        class="w-full pl-8 pr-3 py-2 text-sm font-black text-slate-700 bg-white border border-emerald-100 rounded-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all shadow-sm"
-                        placeholder="0">
-                </div>
-            </div>
-        </template>
+                                                    {{-- Input Tampilan: TIDAK memiliki atribut 'name' agar tidak terkirim secara terpisah --}}
+                                                    <input type="text"
+                                                        :value="formatRupiah(row.tunjangan[key]).replace('Rp', '').trim()"
+                                                        @input="row.tunjangan[key] = Number($event.target.value.replace(/\D/g, ''))"
+                                                        class="w-full pl-8 pr-3 py-2 text-sm font-black text-slate-700 bg-white border border-emerald-100 rounded-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all shadow-sm"
+                                                        placeholder="0">
+                                                </div>
+                                            </div>
+                                        </template>
 
-        <div x-show="Object.keys(row.tunjangan || {}).length === 0" class="sm:col-span-3 text-center py-2">
-            <p class="text-xs text-emerald-400 italic font-medium">Unit ini tidak memiliki konfigurasi tunjangan.</p>
-        </div>
-    </div>
-</div>
+                                        <div x-show="Object.keys(row.tunjangan || {}).length === 0"
+                                            class="sm:col-span-3 text-center py-2">
+                                            <p class="text-xs text-emerald-400 italic font-medium">Unit ini tidak memiliki
+                                                konfigurasi tunjangan.</p>
+                                        </div>
+                                    </div>
+                                </div>
 
                                 {{-- Weekly Schedule Input --}}
                                 <div class="sm:col-span-2 mt-4">
@@ -735,11 +742,11 @@
 
         // 2. FORM LOGIC
         function workerForm() {
-            const config = window.unitInfo.tunjanganConfig || {};
-            let initialTunjangan = {};
-            Object.keys(config).forEach(key => {
-                initialTunjangan[key] = config[key];
-            });
+            const createFreshTunjangan = () => {
+                const config = window.unitInfo.tunjanganConfig || {};
+                return JSON.parse(JSON.stringify(config)); // Deep clone agar referensi memori berbeda
+            };
+
             return {
                 rows: [{
                         id: 1,
@@ -761,7 +768,7 @@
                             sat: 0,
                             sun: 0
                         },
-                        tunjangan: initialTunjangan,
+                        tunjangan: createFreshTunjangan(),
                     } // Added fields
                 ],
 
@@ -827,7 +834,7 @@
                             sat: '',
                             sun: ''
                         },
-                        tunjangan: initialTunjangan,
+                        tunjangan: createFreshTunjangan(),
                     };
 
                     this.calculateBpjs(row);
