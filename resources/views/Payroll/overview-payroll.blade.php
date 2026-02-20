@@ -196,7 +196,7 @@
                                         <label for="jabatan" class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">
                                             Jabatan
                                         </label>
-                                        <input type="text" id="jabatan" name="jabatan" 
+                                        <input type="text" id="jabatan" name="jabatan"
                                             placeholder="Silahkan masukkan jabatan disini.."
                                             class="w-full px-5 py-3.5 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-emerald-500/10 focus:bg-white transition-all duration-200">
                                     </div>
@@ -500,10 +500,10 @@
 
                 <div class="flex gap-3">
                     {{-- Tombol Save Draft tetap di luar form jika tipenya hanya link/anchor --}}
-                    <a href="#"
+                    {{-- <a href="#"
                         class="px-8 py-3.5 bg-white border border-slate-200 text-slate-600 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-slate-50 transition-all shadow-sm">
                         Save Draft
-                    </a>
+                    </a> --}}
 
                     {{-- Form Utama dengan target _blank --}}
                     <form method="POST" target="_blank" class="flex gap-3">

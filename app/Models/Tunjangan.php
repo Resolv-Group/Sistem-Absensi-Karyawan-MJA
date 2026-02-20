@@ -22,4 +22,8 @@ class Tunjangan extends Model
     protected $casts = [
         'kategori' => 'json', // Cast kolom kategori sebagai array (JSON)
     ];
+
+    public function absensi() {
+        return $this->belongsTo(Absensi::class, 'id_absensi');
+    }
 }

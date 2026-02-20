@@ -142,6 +142,7 @@ class AbsensiController extends Controller
             $savedAbsensi = $existingAbsensi->get($item->id_pekerja);
             $savedDetail = $savedAbsensi ? $savedAbsensi->detilHarian : null;
 
+            $savedTunjangan = $savedAbsensi ? $savedAbsensi->tunjangan : null;
             $savedPotongan = $savedAbsensi ? $savedAbsensi->potongan : null;
 
             // Transformasi data: {"telat": 5000} -> [{nama: "telat", nominal: 5000}]
@@ -171,8 +172,10 @@ class AbsensiController extends Controller
                     'existing_paid' => $savedDetail ? (int) $savedDetail->isPaid : 0,
                     'existing_status' => $savedDetail ? (int) $savedDetail->status_kehadiran : 0,
                     'existing_catatan' => $savedDetail ? $savedDetail->catatan : '',
-            'existing_potongan' => $uiPotongan,
-            'existing_keterangan_potongan' => $savedPotongan?->keterangan ?? '',
+                    'existing_potongan' => $uiPotongan,
+                    'existing_keterangan_potongan' => $savedPotongan?->keterangan ?? '',
+                    'existing_tunjangan' => $savedTunjangan ? $savedTunjangan->kategori : null,
+                    'existing_keterangan_tunjangan' => $savedTunjangan?->keterangan ?? '',
                 ],
             ];
         });
@@ -195,6 +198,12 @@ class AbsensiController extends Controller
 
         // 1. Sync Attendance Records (Tetap pertahankan ini agar record absensi utama tercipta)
         $allPkwt = PKWT::with('pekerja')->where('id_unit', $id_unit)->get();
+
+        $existingAbsensi = Absensi::where('id_unit', $id_unit)
+            ->where('tgl_absensi', $date)
+            ->with(['detilBorongan', 'tunjangan', 'potongan'])
+            ->get()
+            ->keyBy('id_pekerja');
 
         $barangs = Borongan::where('id_unit', $id_unit)->orderBy('nama_item', 'asc')->get();
         $barangLookup = $barangs->keyBy('id');
@@ -268,12 +277,40 @@ class AbsensiController extends Controller
         }
 
         // 5. Worker Map untuk Modal
-        $workerMap = $allPkwt->mapWithKeys(function ($item) {
+        $workerMap = $allPkwt->mapWithKeys(function ($item) use ($existingAbsensi) {
+            $savedAbsensi = $existingAbsensi->get($item->id_pekerja);
+
+            $savedTunjangan = $savedAbsensi ? $savedAbsensi->tunjangan : null;
+            // Transformasi Potongan dari DB (Object) ke UI (Array) untuk auto-fill
+            $uiPotongan = [];
+            $savedPotongan = $savedAbsensi ? $savedAbsensi->potongan : null;
+            if ($savedPotongan && $savedPotongan->kategori) {
+                $kategoriArr = is_array($savedPotongan->kategori) ? $savedPotongan->kategori : json_decode($savedPotongan->kategori, true);
+                foreach ($kategoriArr as $key => $val) {
+                    $uiPotongan[] = [
+                        'nama' => str_replace('_', ' ', $key),
+                        'nominal' => (int) $val
+                    ];
+                }
+            }
             return [
                 $item->id => [
                     'nama' => $item->pekerja->nama,
                     'nik' => $item->pekerja->nik,
                     'initials' => strtoupper(substr($item->pekerja->nama, 0, 2)),
+                    // FLAG UTAMA: Mengecek apakah record absensi sudah ada di DB
+                    'has_absen' => $savedAbsensi ? true : false,
+
+                    // Data untuk Modal Tunjangan
+                    'existing_tunjangan' => $savedAbsensi?->tunjangan?->kategori ?? null,
+                    'existing_keterangan_tunjangan' => $savedTunjangan?->keterangan ?? '',
+
+                    // Data untuk Modal Potongan
+                    'existing_potongan' => $uiPotongan,
+                    'existing_keterangan_potongan' => $savedPotongan?->keterangan ?? '',
+
+                    // Status kehadiran (ambil dari baris pertama detil borongan jika ada)
+                    'existing_status' => $savedAbsensi?->detilBorongan->first()?->status_kehadiran ?? null,
                 ],
             ];
         });
@@ -802,4 +839,38 @@ class AbsensiController extends Controller
             return back()->with('error', 'Gagal menyimpan: ' . $e->getMessage());
         }
     }
+
+    public function getAdjustments(Request $request)
+{
+    try {
+        $workerIds = $request->worker_ids;
+        $start = $request->tanggal_mulai;
+        $end = $request->tanggal_akhir;
+
+        $results = [];
+
+        foreach ($workerIds as $id) {
+            // Kita hitung berdasarkan relasi tgl_absensi di tabel absensi
+            $totalTunjangan = Tunjangan::where('id_pekerja', $id)
+                ->whereHas('absensi', function($q) use ($start, $end) {
+                    $q->whereBetween('tgl_absensi', [$start, $end]);
+                })->sum('total');
+
+            $totalPotongan = Potongan::where('id_pekerja', $id)
+                ->whereHas('absensi', function($q) use ($start, $end) {
+                    $q->whereBetween('tgl_absensi', [$start, $end]);
+                })->sum('total');
+
+            $results[$id] = [
+                'pembayaran_lain' => (int)$totalPotongan,
+                'tunjangan_bayaran' => (int)$totalTunjangan
+            ];
+        }
+
+        return response()->json($results);
+    } catch (\Exception $e) {
+        // Jika error, kirim pesan error dalam format JSON (bukan HTML)
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
+}
 }

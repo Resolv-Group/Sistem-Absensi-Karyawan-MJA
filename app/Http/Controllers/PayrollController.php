@@ -35,7 +35,7 @@ class PayrollController extends Controller
 
         // --- 2. BUILD QUERY ---
         $query = Unit::query()
-            ->with(['picUnit.staff', 'namaMitra'])
+            ->with(['picUnit.staff', 'namaMitra', 'pkwt.pekerja.tunjangan', 'pkwt.pekerja.potongan']) // Eager load relasi yang diperlukan di modal
             ->withCount('pkwt');
 
         // A. Filter by Search (Name, NIK, KPJ)
@@ -182,16 +182,16 @@ class PayrollController extends Controller
                             }elseif (in_array($detil->status_kehadiran,$statusDilindungi) && $detil->isPaid == 1)
                             {
                                 $gajiHariIni += ($jamHarian/$jamNormal) * $gajiHarianPkwt;
-                                
+
                             }else {
                                 // JIKA HARI NORMAL:
                                 // Rumus Reguler: jam_harian * gaji_harian
                                 if($jamHarian >= $jamNormal)
                                 {
                                     $gajiReguler += $gajiHarianPkwt;
-                                    dump($absensi->id,$gajiReguler);
+                                    // dump($absensi->id,$gajiReguler);
 
-                                }elseif($jamNormal > $jamHarian)                      
+                                }elseif($jamNormal > $jamHarian)
                                 {
                                     $gajiReguler += $gajiHarianPkwt - ( ($jamNormal - $jamHarian) * $gajiOvertimePkwt );
 
@@ -202,11 +202,11 @@ class PayrollController extends Controller
                                 $gajiHariIni = $gajiReguler + $gajiOT;
                                 // dump('gajiHariIni (gajiReguler*gajiOT) = ',$gajiHariIni);
 
-                                dump($absensi->id,$gajiHariIni);
+                                // dump($absensi->id,$gajiHariIni);
                             }
 
                             $hasilGajiHarian += $gajiHariIni;
-                            dump($absensi->id,$gajiHariIni);
+                            // dump($absensi->id,$gajiHariIni);
                         }
                     } else {
                         foreach ($absensi->detilBorongan as $detil) {
@@ -781,19 +781,19 @@ class PayrollController extends Controller
             ->whereIn('id_pekerja', $workerIds)
             ->whereBetween('tgl_absensi', [$tglAwal, $tglAkhir])
             ->get();
-    
+
         // B. Buat Mapping Array
         $attendanceMap = [];
         foreach ($absensiData as $abs) {
             $tgl = \Carbon\Carbon::parse($abs->tgl_absensi)->format('Y-m-d');
             $idPekerja = (int) $abs->id_pekerja;
-            
+
             $detil = $abs->detilHarian;
             if ($detil) {
                 $jamKerja = (float) $detil->jam_kerja_harian;
                 $overtime = (float) $detil->overtime;
                 $status   = $detil->status_kehadiran;
-                
+
                 $warna = ''; // Default Colorless (Hadir biasa)
 
                 // URUTAN FILTER WARNA
