@@ -231,18 +231,35 @@
         },
 
         initTunjanganModal() {
-            const config = (window.unitInfo && window.unitInfo.tunjanganConfig) ? window.unitInfo.tunjanganConfig : {};
+            // Ambil config default dari unit
+            const unitConfig = (window.unitInfo && window.unitInfo.tunjanganConfig) ? window.unitInfo.tunjanganConfig : {};
             this.currentIndex = 0;
 
             this.selectedItems.forEach(id => {
+                const worker = this.workerMap[id];
+
+                // Cek apakah baris tunjangan untuk ID ini sudah pernah diinisialisasi di session ini
                 if (!this.rowTunjangan[id]) {
-                    this.rowTunjangan[id] = {};
-                    Object.keys(config).forEach(key => {
-                        // Nominal diambil dari config dan akan di-readonly
-                        this.rowTunjangan[id][key] = { qty: 1, nominal: config[key] };
-                    });
+
+                    // PRIORITAS 1: Ambil data yang SUDAH DISIMPAN di database
+                    if (worker && worker.existing_tunjangan) {
+                        // Gunakan Deep Clone agar tidak merusak data asli di workerMap
+                        this.rowTunjangan[id] = JSON.parse(JSON.stringify(worker.existing_tunjangan));
+                        this.rowKeteranganTunjangan[id] = worker.existing_keterangan_tunjangan || '';
+                    }
+                    // PRIORITAS 2: Jika data baru, gunakan default config dari Unit
+                    else {
+                        this.rowTunjangan[id] = {};
+                        Object.keys(unitConfig).forEach(key => {
+                            // Set default qty: 1 dan nominal: dari config unit
+                            this.rowTunjangan[id][key] = {
+                                qty: 1,
+                                nominal: unitConfig[key]
+                            };
+                        });
+                        this.rowKeteranganTunjangan[id] = '';
+                    }
                 }
-                if (!this.rowKeteranganTunjangan[id]) this.rowKeteranganTunjangan[id] = '';
             });
             this.showTunjanganModal = true;
         },
@@ -1191,7 +1208,7 @@
                                     {{-- Main Area: reduced gap from 12 to 8, py from 10 to 6 --}}
                                     <form
                                         action="{{ route('absensi.bulk.store-tunjangan', ['id_unit' => $unit, 'date' => $date]) }}"
-                                        method="POST" enctype="multipart/form-data"
+                                        method="POST" enctype="multipart/form-data" x-ref="tunjPotForm" x-data="TunjPotFormHandler()"
                                         class="flex-1 overflow-hidden flex flex-col">
                                         @csrf
                                         @method('post')
@@ -1336,7 +1353,7 @@
                                                 <button type="button" @click="showTunjanganModal = false"
                                                     class="text-[10px] font-black text-gray-400 uppercase tracking-widest px-4">Batal</button>
 
-                                                <button type="submit" x-show="currentIndex === selectedItems.length - 1"
+                                                <button type="button" @click="confirmSubmitTunjPot()" x-show="currentIndex === selectedItems.length - 1"
                                                     class="px-8 py-3.5 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all active:scale-95 flex items-center gap-2">
                                                     <span>Finalisasi & Simpan</span>
                                                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24"
@@ -1438,7 +1455,7 @@
 
                                     <form
                                         action="{{ route('absensi.bulk.store-potongan', ['id_unit' => $unit, 'date' => $date]) }}"
-                                        method="POST" enctype="multipart/form-data"
+                                        method="POST" enctype="multipart/form-data" x-ref="tunjPotForm" x-data="TunjPotFormHandler()"
                                         class="flex-1 overflow-hidden flex flex-col">
                                         @csrf
                                         @method('post')
@@ -1602,7 +1619,7 @@
                                                 <button type="button" @click="showPotonganModal = false"
                                                     class="text-[10px] font-black text-gray-400 uppercase tracking-widest px-4">Batal</button>
 
-                                                <button type="submit" x-show="currentIndex === selectedItems.length - 1"
+                                                <button type="button" x-show="currentIndex === selectedItems.length - 1" @click="confirmSubmitTunjPot()"
                                                     class="px-8 py-3.5 bg-rose-600 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl hover:bg-rose-700 shadow-lg shadow-rose-200 transition-all active:scale-95 flex items-center gap-2">
                                                     Simpan Semua
                                                 </button>
@@ -1748,6 +1765,37 @@
                             })
 
                             this.$refs.absenForm.submit()
+                        }
+                    })
+                }
+            }
+        }
+
+        function TunjPotFormHandler() {
+            return {
+                confirmSubmitTunjPot() {
+                    Swal.fire({
+                        title: 'Finalisasi Data?',
+                        text: 'Pastikan semua data sudah benar sebelum disimpan. Setelah ini, data tidak dapat diubah lagi.',
+                        icon: 'warning',
+                        showCancelButton: true,
+                    confirmButtonColor: '#10B981',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Ya, Finalisasi & Simpan',
+                    cancelButtonText: 'Batal',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            Swal.fire({
+                                title: 'Menyimpan...',
+                                text: 'Mohon tunggu',
+                                allowOutsideClick: false,
+                                allowEscapeKey: false,
+                                didOpen: () => {
+                                    Swal.showLoading()
+                                }
+                            })
+
+                            this.$refs.tunjPotForm.submit()
                         }
                     })
                 }

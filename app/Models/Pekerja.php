@@ -80,4 +80,14 @@ class Pekerja extends Model
     {
         return $this->hasMany(Penilaian_Pkwt::class, 'id_pekerja');
     }
+
+    public function tunjangan()
+    {
+        return $this->hasMany(Tunjangan::class, 'id_pekerja', 'id');
+    }
+
+    public function potongan()
+    {
+        return $this->hasMany(Potongan::class, 'id_pekerja', 'id');
+    }
 }

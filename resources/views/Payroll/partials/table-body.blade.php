@@ -68,7 +68,8 @@
         <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
             <div class="flex justify-center">
                 <button type="button"
-                    @click="$store.payslip.open('{{ $u->id }}', '{{ $u->nama_unit }}', {{ $u->pkwt->map(fn($p) => ['id' => $p->id_pekerja, 'nama' => $p->pekerja->nama])->toJson() }})"
+                    @click="$store.payslip.open('{{ $u->id }}', '{{ $u->nama_unit }}', {{ $u->pkwt->map(fn($p) => ['id' => $p->id_pekerja, 'nama' => $p->pekerja->nama, 'total_tunjangan' => $p->pekerja->tunjangan->sum('total'),
+                        'total_potongan' => $p->pekerja->potongan->sum('total')])->toJson() }})"
                     class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-xl font-bold text-[11px] uppercase tracking-widest hover:bg-slate-50 hover:border-emerald-500 hover:text-emerald-600 transition-all duration-200 shadow-sm active:scale-95 group">
 
                     <svg class="w-4 h-4 text-slate-400 group-hover:text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">

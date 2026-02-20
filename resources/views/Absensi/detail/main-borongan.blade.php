@@ -91,6 +91,16 @@
         rowItems: @js($existingBorongan),
         barangLookup: @js($barangLookup),
 
+        // --- Tunjangan ---
+        showTunjanganModal: false,
+        rowTunjangan: {},
+        rowKeteranganTunjangan: {},
+
+        // --- Potongan ---
+        showPotonganModal: false,
+        rowPotongan: {},
+        rowKeteranganPotongan: {},
+
         currentIndex: 0,
         // Computed property to get current worker ID
         get currentWorkerId() {
@@ -229,6 +239,114 @@
 
         toggleAll() {
             this.selectedItems = this.selectedItems.length === this.allIds.length ? [] : [...this.allIds];
+        },
+
+        canShowTunjangan() {
+            if (this.selectedItems.length === 0) return false;
+            return this.selectedItems.every(id => {
+                return this.workerMap[id] && this.workerMap[id].has_absen === true;
+            });
+        },
+
+        canShowPotongan() {
+            if (this.selectedItems.length === 0) return false;
+            return this.selectedItems.every(id => {
+                return this.workerMap[id] && this.workerMap[id].has_absen === true;
+            });
+        },
+
+        initTunjanganModal() {
+            // Ambil config default dari unit
+            const unitConfig = (window.unitInfo && window.unitInfo.tunjanganConfig) ? window.unitInfo.tunjanganConfig : {};
+            this.currentIndex = 0;
+
+            this.selectedItems.forEach(id => {
+                const worker = this.workerMap[id];
+
+                // Cek apakah baris tunjangan untuk ID ini sudah pernah diinisialisasi di session ini
+                if (!this.rowTunjangan[id]) {
+
+                    // PRIORITAS 1: Ambil data yang SUDAH DISIMPAN di database
+                    if (worker && worker.existing_tunjangan) {
+                        // Gunakan Deep Clone agar tidak merusak data asli di workerMap
+                        this.rowTunjangan[id] = JSON.parse(JSON.stringify(worker.existing_tunjangan));
+                        this.rowKeteranganTunjangan[id] = worker.existing_keterangan_tunjangan || '';
+                    }
+                    // PRIORITAS 2: Jika data baru, gunakan default config dari Unit
+                    else {
+                        this.rowTunjangan[id] = {};
+                        Object.keys(unitConfig).forEach(key => {
+                            // Set default qty: 1 dan nominal: dari config unit
+                            this.rowTunjangan[id][key] = {
+                                qty: 1,
+                                nominal: unitConfig[key]
+                            };
+                        });
+                        this.rowKeteranganTunjangan[id] = '';
+                    }
+                }
+            });
+            this.showTunjanganModal = true;
+        },
+
+        nextWorker() { if (this.currentIndex < this.selectedItems.length - 1) this.currentIndex++; },
+        prevWorker() { if (this.currentIndex > 0) this.currentIndex--; },
+
+        calculateCategoryTotal(workerId, key) {
+            const item = this.rowTunjangan[workerId][key];
+            return (parseInt(item.qty) || 0) * (parseInt(item.nominal) || 0);
+        },
+
+        calculateWorkerTotal(id) {
+            const categories = this.rowTunjangan[id] || {};
+            return Object.keys(categories).reduce((sum, key) => sum + this.calculateCategoryTotal(id, key), 0);
+        },
+
+        calculateGrandTotal() {
+            return this.selectedItems.reduce((sum, id) => sum + this.calculateWorkerTotal(id), 0);
+        },
+
+        initPotonganModal() {
+            this.currentIndex = 0;
+            this.selectedItems.forEach(id => {
+                const worker = this.workerMap[id];
+
+                // Auto-fill jika ada data lama
+                if (worker && worker.existing_potongan && worker.existing_potongan.length > 0) {
+                    this.rowPotongan[id] = JSON.parse(JSON.stringify(worker.existing_potongan));
+                    this.rowKeteranganPotongan[id] = worker.existing_keterangan_potongan || '';
+                } else {
+                    // Inisialisasi baris kosong jika data baru
+                    this.rowPotongan[id] = [{ nama: '', nominal: 0 }];
+                    this.rowKeteranganPotongan[id] = '';
+                }
+            });
+            this.showPotonganModal = true;
+        },
+
+        // Fungsi Tambah Baris Baru
+        addPotonganRow(workerId) {
+            this.rowPotongan[workerId].push({ nama: '', nominal: 0 });
+        },
+
+        // Fungsi Hapus Baris
+        removePotonganRow(workerId, index) {
+            this.rowPotongan[workerId].splice(index, 1);
+            // Jika baris habis, tambahkan satu baris kosong sebagai pengaman
+            if (this.rowPotongan[workerId].length === 0) {
+                this.rowPotongan[workerId] = [{ nama: '', nominal: 0 }];
+            }
+        },
+
+        // Hitung total per pekerja
+        calculatePotonganWorkerTotal(id) {
+            const items = this.rowPotongan[id] || [];
+            return items.reduce((sum, item) => sum + (parseInt(item.nominal) || 0), 0);
+        },
+
+        // Hitung Grand Total (seluruh pekerja terpilih)
+        calculatePotonganGrandTotal() {
+            return this.selectedItems.reduce((sum, id) => sum + this.calculatePotonganWorkerTotal(id), 0);
         },
 
         async updateTable(targetUrl = null) {
@@ -620,17 +738,29 @@
                                         </button>
 
                                         <!-- 2. Tunjangan (Emerald) -->
-                                        <button class="group flex items-center gap-2 px-4 py-2.5 bg-emerald-50 hover:bg-emerald-600 border border-emerald-100 text-emerald-700 hover:text-white rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all active:scale-95 shadow-sm">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                        <button x-show="canShowTunjangan()"
+                                            x-transition:enter="transition ease-out duration-200"
+                                            x-transition:enter-start="opacity-0 scale-95"
+                                            x-transition:enter-end="opacity-100 scale-100" @click="initTunjanganModal()"
+                                            class="group flex items-center gap-2 px-4 py-2.5 bg-emerald-50 hover:bg-emerald-600 border border-emerald-100 text-emerald-600 hover:text-white rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all active:scale-95 shadow-sm">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                                    d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                                             </svg>
                                             Tunjangan
                                         </button>
 
                                         <!-- 3. Potongan (Rose) -->
-                                        <button class="group flex items-center gap-2 px-4 py-2.5 bg-rose-50 hover:bg-rose-600 border border-rose-100 text-rose-700 hover:text-white rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all active:scale-95 shadow-sm">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M18 12H6" />
+                                        <button x-show="canShowPotongan()"
+                                            x-transition:enter="transition ease-out duration-200"
+                                            x-transition:enter-start="opacity-0 scale-95"
+                                            x-transition:enter-end="opacity-100 scale-100" @click="initPotonganModal()"
+                                            class="group flex items-center gap-2 px-4 py-2.5 bg-rose-50 hover:bg-rose-600 border border-rose-100 text-rose-600 hover:text-white rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all active:scale-95 shadow-sm">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                                    d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                                             </svg>
                                             Potongan
                                         </button>
@@ -1442,6 +1572,514 @@
                                     </form>
                                 </div>
                             </div>
+
+                            <!-- MODAL: Tunjangan -->
+                            <div x-show="showTunjanganModal"
+                                class="fixed inset-0 z-[100] flex items-center justify-center p-4" x-cloak>
+                                {{-- Glass Backdrop --}}
+                                <div x-show="showTunjanganModal" x-transition.opacity @click="showTunjanganModal = false"
+                                    class="fixed inset-0 bg-slate-900/40 backdrop-blur-md"></div>
+
+                                {{-- Modal Content: Tightened max-width and rounded corner --}}
+                                <div x-show="showTunjanganModal" x-transition:enter="ease-out duration-300"
+                                    x-transition:enter-start="opacity-0 scale-95 translate-y-8"
+                                    x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                                    class="relative bg-white/95 backdrop-blur-2xl rounded-[2.5rem] shadow-[0_25px_80px_-20px_rgba(0,0,0,0.15)] w-full max-w-5xl overflow-hidden flex flex-col border border-white">
+
+                                    {{-- Header Section: Compact py and expanded progress --}}
+                                    <div class="px-8 py-6 bg-white/50 border-b border-gray-100">
+                                        <div class="flex items-center justify-between mb-5">
+                                            <div>
+                                                <span
+                                                    class="inline-block px-2 py-0.5 bg-blue-600 text-white text-[8px] font-black uppercase tracking-widest rounded mb-1">Payroll
+                                                    Adjustment</span>
+                                                <h3 class="text-2xl font-black text-gray-900 tracking-tight">Input Detail
+                                                    Tunjangan<span class="text-blue-600">.</span></h3>
+                                            </div>
+
+                                            {{-- Unified Navigation & Close --}}
+                                            <div class="flex items-center gap-2">
+                                                <div
+                                                    class="flex items-center bg-gray-50 p-1 rounded-xl border border-gray-100">
+                                                    <button type="button" @click="prevWorker()"
+                                                        :disabled="currentIndex === 0"
+                                                        class="p-2.5 rounded-lg transition-all"
+                                                        :class="currentIndex === 0 ? 'text-gray-200 cursor-not-allowed' :
+                                                            'text-blue-600 hover:bg-white hover:shadow-sm active:scale-90'">
+                                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                                                            stroke="currentColor" stroke-width="3">
+                                                            <path d="M15 19l-7-7 7-7" />
+                                                        </svg>
+                                                    </button>
+                                                    <div class="w-px h-5 bg-gray-200 mx-1"></div>
+                                                    <button type="button" @click="nextWorker()"
+                                                        :disabled="currentIndex === selectedItems.length - 1"
+                                                        class="p-2.5 rounded-lg transition-all"
+                                                        :class="currentIndex === selectedItems.length - 1 ?
+                                                            'text-gray-200 cursor-not-allowed' :
+                                                            'text-blue-600 hover:bg-white hover:shadow-sm active:scale-90'">
+                                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                                                            stroke="currentColor" stroke-width="3">
+                                                            <path d="M9 5l7 7-7 7" />
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                                <button @click="showTunjanganModal = false"
+                                                    class="p-3 bg-gray-50 hover:bg-rose-50 text-gray-400 hover:text-rose-500 rounded-xl transition-all">
+                                                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                                                        stroke="currentColor" stroke-width="2.5">
+                                                        <path d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        {{-- Full Width Progress Bar --}}
+                                        <div class="space-y-1.5">
+                                            <div
+                                                class="flex justify-between text-[9px] font-black text-gray-400 uppercase tracking-widest px-0.5">
+                                                <span>Progres Pengisian</span>
+                                                <span class="text-blue-600">Pekerja <span
+                                                        x-text="currentIndex + 1"></span> / <span
+                                                        x-text="selectedItems.length"></span></span>
+                                            </div>
+                                            <div class="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
+                                                <div class="h-full bg-blue-600 transition-all duration-500 ease-out shadow-[0_0_10px_rgba(37,99,235,0.3)]"
+                                                    :style="`width: ${((currentIndex + 1) / selectedItems.length) * 100}%`">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {{-- Main Area: reduced gap from 12 to 8, py from 10 to 6 --}}
+                                    <form
+                                        action="{{ route('absensi.bulk.store-tunjangan', ['id_unit' => $unit, 'date' => $date]) }}"
+                                        method="POST" enctype="multipart/form-data" x-ref="tunjPotForm" x-data="TunjPotFormHandler()"
+                                        class="flex-1 overflow-hidden flex flex-col">
+                                        @csrf
+                                        @method('post')
+
+                                        <input type="hidden" name="date" value="{{ $date }}">
+
+                                        {{-- Hidden Data --}}
+                                        <template x-for="id in selectedItems" :key="'hidden-' + id">
+                                            <div>
+                                                <input type="hidden" :name="`data[${id}][kategori]`"
+                                                    :value="JSON.stringify(rowTunjangan[id])">
+                                                <input type="hidden" :name="`data[${id}][total]`"
+                                                    :value="calculateWorkerTotal(id)">
+                                                <input type="hidden" :name="`data[${id}][keterangan]`"
+                                                    :value="rowKeteranganTunjangan[id]">
+                                            </div>
+                                        </template>
+
+                                        <div class="flex-1 overflow-y-auto px-10 py-6 custom-scrollbar">
+                                            <template x-for="(id, index) in selectedItems" :key="'visible-' + id">
+                                                <div x-show="index === currentIndex"
+                                                    x-transition:enter="transition ease-out duration-300"
+                                                    x-transition:enter-start="opacity-0 translate-y-4"
+                                                    x-transition:enter-end="opacity-100 translate-y-0">
+
+                                                    <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+                                                        {{-- Info Panel (Left) --}}
+                                                        <div class="md:col-span-4 space-y-5">
+                                                            <div
+                                                                class="p-6 bg-gray-50/50 border border-gray-100 rounded-[2rem]">
+                                                                <p
+                                                                    class="text-[9px] font-black text-blue-600 uppercase tracking-widest mb-3">
+                                                                    Informasi Pekerja</p>
+                                                                <h4 class="text-xl font-black text-gray-900 leading-tight mb-1"
+                                                                    x-text="workerMap[id]?.nama"></h4>
+                                                                <p class="text-xs font-bold text-gray-400 font-mono"
+                                                                    x-text="workerMap[id]?.nik"></p>
+                                                            </div>
+
+                                                            <div
+                                                                class="p-6 bg-blue-600 rounded-[2rem] text-white shadow-lg shadow-blue-200">
+                                                                <p
+                                                                    class="text-[9px] font-black opacity-60 uppercase tracking-widest mb-1">
+                                                                    Total Tunjangan</p>
+                                                                <p class="text-3xl font-black tracking-tighter"
+                                                                    x-text="'Rp ' + formatRibuan(calculateWorkerTotal(id))">
+                                                                </p>
+                                                            </div>
+
+                                                            <div class="space-y-2">
+                                                                <label
+                                                                    class="block text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Catatan
+                                                                    Khusus (Opsional)</label>
+                                                                <textarea x-model="rowKeteranganTunjangan[id]" placeholder="Keterangan..."
+                                                                    class="w-full h-24 px-5 py-4 bg-white border border-gray-100 rounded-2xl text-xs font-bold text-gray-600 focus:border-blue-400 outline-none shadow-sm resize-none"></textarea>
+                                                            </div>
+                                                        </div>
+
+                                                        {{-- Input Panel (Right) --}}
+                                                        <div class="md:col-span-8">
+                                                            <div
+                                                                class="bg-white border border-gray-100 rounded-[2rem] overflow-hidden shadow-sm">
+                                                                <div
+                                                                    class="grid grid-cols-12 gap-4 px-6 py-4 bg-gray-50/50 text-[9px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                                                                    <div class="col-span-4">Nama Tunjangan</div>
+                                                                    <div class="col-span-3">Nominal</div>
+                                                                    <div class="col-span-2 text-center">Jumlah</div>
+                                                                    <div class="col-span-3 text-right">Sub-Total</div>
+                                                                </div>
+
+                                                                <div class="divide-y divide-gray-50">
+                                                                    <template x-for="(item, key) in rowTunjangan[id]"
+                                                                        :key="key">
+                                                                        <div
+                                                                            class="grid grid-cols-12 gap-4 px-6 py-4 items-center hover:bg-blue-50/30 transition-colors">
+                                                                            <div class="col-span-4">
+                                                                                <p class="text-[11px] font-black text-gray-900 uppercase tracking-tight"
+                                                                                    x-text="key.replace(/_/g, ' ')"></p>
+                                                                            </div>
+                                                                            <div class="col-span-3">
+                                                                                <div
+                                                                                    class="flex items-center gap-1.5 text-[11px] font-bold text-gray-400">
+                                                                                    <span>Rp</span>
+                                                                                    <span
+                                                                                        x-text="formatRibuan(rowTunjangan[id][key].nominal)"></span>
+                                                                                    <svg class="w-3 h-3 opacity-30"
+                                                                                        fill="none" viewBox="0 0 24 24"
+                                                                                        stroke="currentColor">
+                                                                                        <path
+                                                                                            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                                                                                            stroke-width="3" />
+                                                                                    </svg>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-span-2">
+                                                                                <input type="number"
+                                                                                    x-model="rowTunjangan[id][key].qty"
+                                                                                    min="0" step="1"
+                                                                                    {{-- Mencegah pengetikan simbol -, +, dan e --}}
+                                                                                    @keydown="if(['-', '+', 'e', 'E'].includes($event.key)) $event.preventDefault()"
+                                                                                    {{-- Memastikan jika di-paste atau diinput manual tetap jadi angka positif --}}
+                                                                                    @input="if($event.target.value < 0) rowTunjangan[id][key].qty = 0"
+                                                                                    class="w-full py-1.5 bg-gray-50 border border-gray-100 rounded-lg text-xs font-black text-center focus:bg-white focus:border-blue-400 outline-none transition-all">
+                                                                            </div>
+                                                                            <div class="col-span-3 text-right">
+                                                                                <p class="text-[13px] font-black text-blue-600"
+                                                                                    x-text="'Rp.' + formatRibuan(calculateCategoryTotal(id, key))">
+                                                                                </p>
+                                                                            </div>
+                                                                        </div>
+                                                                    </template>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </template>
+                                        </div>
+
+                                        {{-- Footer: Compacted py-5 --}}
+                                        <div
+                                            class="px-10 py-5 bg-white border-t border-gray-50 flex items-center justify-between">
+                                            <div class="flex items-center gap-3">
+                                                <div
+                                                    class="h-10 w-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 border border-emerald-100">
+                                                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                                                        stroke="currentColor" stroke-width="2.5">
+                                                        <path
+                                                            d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                                                    </svg>
+                                                </div>
+                                                <div>
+                                                    <p
+                                                        class="text-[8px] font-black text-gray-400 uppercase tracking-[0.2em]">
+                                                        Grand Total Alokasi</p>
+                                                    <p class="text-xl font-black text-emerald-600 tracking-tighter"
+                                                        x-text="'Rp ' + formatRibuan(calculateGrandTotal())"></p>
+                                                </div>
+                                            </div>
+
+                                            <div class="flex items-center gap-3">
+                                                <button type="button" @click="showTunjanganModal = false"
+                                                    class="text-[10px] font-black text-gray-400 uppercase tracking-widest px-4">Batal</button>
+
+                                                <button type="button" @click="confirmSubmitTunjPot()" x-show="currentIndex === selectedItems.length - 1"
+                                                    class="px-8 py-3.5 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all active:scale-95 flex items-center gap-2">
+                                                    <span>Finalisasi & Simpan</span>
+                                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                                                        stroke="currentColor" stroke-width="3">
+                                                        <path d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                </button>
+
+                                                <button type="button" @click="nextWorker()"
+                                                    x-show="currentIndex < selectedItems.length - 1"
+                                                    class="px-8 py-3.5 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl hover:bg-blue-600 transition-all active:scale-95 flex items-center gap-2">
+                                                    Pekerja Berikutnya
+                                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                                                        stroke="currentColor" stroke-width="3">
+                                                        <path d="M9 5l7 7-7 7" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <!-- MODAL: Potongan -->
+                            <div x-show="showPotonganModal"
+                                class="fixed inset-0 z-[100] flex items-center justify-center p-4" x-cloak>
+                                {{-- Glass Backdrop --}}
+                                <div x-show="showPotonganModal" x-transition.opacity @click="showPotonganModal = false"
+                                    class="fixed inset-0 bg-slate-900/40 backdrop-blur-md"></div>
+
+                                {{-- Modal Content --}}
+                                <div x-show="showPotonganModal" x-transition:enter="ease-out duration-300"
+                                    x-transition:enter-start="opacity-0 scale-95 translate-y-8"
+                                    x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                                    class="relative bg-white/95 backdrop-blur-2xl rounded-[2.5rem] shadow-[0_40px_120px_-20px_rgba(0,0,0,0.15)] w-full max-w-5xl overflow-hidden flex flex-col border border-white">
+
+                                    {{-- Header Section --}}
+                                    <div class="px-12 py-6 bg-white/50 border-b border-gray-100">
+                                        <div class="flex items-start justify-between mb-5">
+                                            <div>
+                                                <span
+                                                    class="inline-block px-2 py-0.5 bg-rose-600 text-white text-[8px] font-black uppercase tracking-widest rounded mb-1">Payroll
+                                                    Adjustment</span>
+                                                <h3 class="text-2xl font-black text-gray-900 tracking-tight">Input Detail
+                                                    Potongan<span class="text-rose-600">.</span></h3>
+                                            </div>
+
+                                            <div class="flex items-center gap-2">
+                                                <div
+                                                    class="flex items-center bg-gray-50 p-1 rounded-xl border border-gray-100">
+                                                    <button type="button" @click="prevWorker()"
+                                                        :disabled="currentIndex === 0"
+                                                        class="p-2.5 rounded-lg transition-all"
+                                                        :class="currentIndex === 0 ? 'text-gray-200 cursor-not-allowed' :
+                                                            'text-rose-600 hover:bg-white hover:shadow-sm active:scale-90'">
+                                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                                                            stroke="currentColor" stroke-width="3">
+                                                            <path d="M15 19l-7-7 7-7" />
+                                                        </svg>
+                                                    </button>
+                                                    <div class="w-px h-5 bg-gray-200 mx-1"></div>
+                                                    <button type="button" @click="nextWorker()"
+                                                        :disabled="currentIndex === selectedItems.length - 1"
+                                                        class="p-2.5 rounded-lg transition-all"
+                                                        :class="currentIndex === selectedItems.length - 1 ?
+                                                            'text-gray-200 cursor-not-allowed' :
+                                                            'text-rose-600 hover:bg-white hover:shadow-sm active:scale-90'">
+                                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                                                            stroke="currentColor" stroke-width="3">
+                                                            <path d="M9 5l7 7-7 7" />
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                                <button @click="showPotonganModal = false"
+                                                    class="p-3 bg-gray-50 hover:bg-rose-50 text-gray-400 hover:text-rose-500 rounded-xl transition-all active:scale-90">
+                                                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                                                        stroke="currentColor" stroke-width="2.5">
+                                                        <path d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div class="space-y-1.5">
+                                            <div
+                                                class="flex justify-between text-[9px] font-black text-gray-400 uppercase tracking-widest px-0.5">
+                                                <span>Progres Pengisian</span>
+                                                <span class="text-rose-600">Pekerja <span
+                                                        x-text="currentIndex + 1"></span> / <span
+                                                        x-text="selectedItems.length"></span></span>
+                                            </div>
+                                            <div class="h-1 w-full bg-gray-100 rounded-full overflow-hidden">
+                                                <div class="h-full bg-rose-600 transition-all duration-500 ease-out"
+                                                    :style="`width: ${((currentIndex + 1) / selectedItems.length) * 100}%`">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <form
+                                        action="{{ route('absensi.bulk.store-potongan', ['id_unit' => $unit, 'date' => $date]) }}"
+                                        method="POST" enctype="multipart/form-data" x-ref="tunjPotForm" x-data="TunjPotFormHandler()"
+                                        class="flex-1 overflow-hidden flex flex-col">
+                                        @csrf
+                                        @method('post')
+                                        <input type="hidden" name="date" value="{{ $date }}">
+
+                                        {{-- Hidden Submit Data untuk semua pekerja --}}
+                                        <template x-for="id in selectedItems" :key="'hidden-pot-' + id">
+                                            <div>
+                                                <input type="hidden" :name="`data[${id}][kategori]`"
+                                                    :value="JSON.stringify((rowPotongan[id] || []).reduce((acc, item) => {
+                                                        if (item.nama) {
+                                                            // Ubah nama menjadi key snake_case untuk DB
+                                                            let key = item.nama.toLowerCase().replace(/ /g,
+                                                                '_');
+                                                            acc[key] = item.nominal;
+                                                        }
+                                                        return acc;
+                                                    }, {}))">
+
+                                                <input type="hidden" :name="`data[${id}][total]`"
+                                                    :value="calculatePotonganWorkerTotal(id)">
+                                                <input type="hidden" :name="`data[${id}][keterangan]`"
+                                                    :value="rowKeteranganPotongan[id]">
+                                            </div>
+                                        </template>
+
+                                        <div class="flex-1 overflow-y-auto px-10 py-6 custom-scrollbar">
+                                            <template x-for="(id, index) in selectedItems" :key="'visible-pot-' + id">
+                                                <div x-show="index === currentIndex"
+                                                    x-transition:enter="transition ease-out duration-300">
+
+                                                    <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+                                                        {{-- Info Panel (Kiri) --}}
+                                                        <div class="md:col-span-4 space-y-5">
+                                                            <div
+                                                                class="p-6 bg-gray-50/50 border border-gray-100 rounded-[2rem]">
+                                                                <p
+                                                                    class="text-[9px] font-black text-rose-600 uppercase tracking-widest mb-3">
+                                                                    Profil Pekerja</p>
+                                                                <h4 class="text-xl font-black text-gray-900 leading-tight mb-1"
+                                                                    x-text="workerMap[id]?.nama"></h4>
+                                                                <p class="text-xs font-bold text-gray-400 font-mono"
+                                                                    x-text="workerMap[id]?.nik"></p>
+                                                            </div>
+
+                                                            <div
+                                                                class="p-6 bg-rose-600 rounded-[2rem] text-white shadow-lg shadow-rose-200">
+                                                                <p
+                                                                    class="text-[9px] font-black opacity-60 uppercase tracking-widest mb-1">
+                                                                    Total Potongan</p>
+                                                                <p class="text-3xl font-black tracking-tighter"
+                                                                    x-text="'Rp ' + formatRibuan(calculatePotonganWorkerTotal(id))">
+                                                                </p>
+                                                            </div>
+
+                                                            <div class="space-y-2">
+                                                                <label
+                                                                    class="block text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Keterangan
+                                                                    Internal</label>
+                                                                <textarea x-model="rowKeteranganPotongan[id]" placeholder="Contoh: Terlambat, Kerusakan barang, dsb..."
+                                                                    class="w-full h-24 px-5 py-4 bg-white border border-gray-100 rounded-2xl text-xs font-bold text-gray-600 focus:border-rose-400 outline-none shadow-sm resize-none"></textarea>
+                                                            </div>
+                                                        </div>
+
+                                                        {{-- Input Panel (Kanan) --}}
+                                                        <div class="md:col-span-8">
+                                                            <div
+                                                                class="bg-white border border-gray-100 rounded-[2rem] overflow-hidden shadow-sm">
+                                                                <div
+                                                                    class="grid grid-cols-12 gap-4 px-6 py-4 bg-gray-50/50 text-[9px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                                                                    <div class="col-span-6">Nama Potongan</div>
+                                                                    <div class="col-span-4">Nominal</div>
+                                                                    <div class="col-span-2 text-center">Aksi</div>
+                                                                </div>
+
+                                                                <div
+                                                                    class="divide-y divide-gray-50 max-h-[300px] overflow-y-auto">
+                                                                    <template x-for="(item, pIdx) in rowPotongan[id]"
+                                                                        :key="pIdx">
+                                                                        <div
+                                                                            class="grid grid-cols-12 gap-4 px-6 py-4 items-center hover:bg-rose-50/30 transition-colors">
+                                                                            {{-- Nama Potongan --}}
+                                                                            <div class="col-span-6">
+                                                                                <input type="text"
+                                                                                    x-model="rowPotongan[id][pIdx].nama"
+                                                                                    placeholder="Masukkan nama potongan..."
+                                                                                    class="w-full px-3 py-2 bg-white border border-gray-100 rounded-xl text-[11px] font-bold text-gray-700 focus:border-rose-400 focus:ring-0 outline-none">
+                                                                            </div>
+
+                                                                            {{-- Nominal --}}
+                                                                            <div class="col-span-4">
+                                                                                <div class="relative group/input">
+                                                                                    <span
+                                                                                        class="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] font-black text-gray-300">Rp</span>
+                                                                                    <input type="text"
+                                                                                        :value="formatRibuan(rowPotongan[id][
+                                                                                            pIdx
+                                                                                        ].nominal)"
+                                                                                        @input="rowPotongan[id][pIdx].nominal = $event.target.value.replace(/\D/g, '')"
+                                                                                        class="w-full pl-8 pr-3 py-2 bg-white border border-gray-100 rounded-xl text-xs font-black text-gray-700 focus:border-rose-400 outline-none">
+                                                                                </div>
+                                                                            </div>
+
+                                                                            {{-- Hapus Baris --}}
+                                                                            <div class="col-span-2 text-center">
+                                                                                <button type="button"
+                                                                                    @click="removePotonganRow(id, pIdx)"
+                                                                                    class="p-2 text-gray-300 hover:text-rose-500 transition-colors">
+                                                                                    <svg class="w-4 h-4" fill="none"
+                                                                                        viewBox="0 0 24 24"
+                                                                                        stroke="currentColor"
+                                                                                        stroke-width="2.5">
+                                                                                        <path d="M6 18L18 6M6 6l12 12" />
+                                                                                    </svg>
+                                                                                </button>
+                                                                            </div>
+                                                                        </div>
+                                                                    </template>
+                                                                </div>
+
+                                                                {{-- Tombol Tambah Baris --}}
+                                                                <div class="p-4 bg-gray-50/50 border-t border-gray-50">
+                                                                    <button type="button" @click="addPotonganRow(id)"
+                                                                        class="w-full py-2 border-2 border-dashed border-gray-200 rounded-xl text-[10px] font-black text-gray-400 uppercase tracking-widest hover:bg-white hover:border-rose-300 hover:text-rose-500 transition-all flex items-center justify-center gap-2">
+                                                                        <svg class="w-3 h-3" fill="none"
+                                                                            viewBox="0 0 24 24" stroke="currentColor"
+                                                                            stroke-width="3">
+                                                                            <path d="M12 4v16m8-8H4" />
+                                                                        </svg>
+                                                                        Tambah Jenis Potongan
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </template>
+                                        </div>
+
+                                        {{-- Footer --}}
+                                        <div
+                                            class="px-10 py-5 bg-white border-t border-gray-50 flex items-center justify-between">
+                                            <div class="flex items-center gap-3">
+                                                <div
+                                                    class="h-10 w-10 rounded-xl bg-rose-50 flex items-center justify-center text-rose-600 border border-rose-100">
+                                                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                                                        stroke="currentColor" stroke-width="2.5">
+                                                        <path d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                </div>
+                                                <div>
+                                                    <p
+                                                        class="text-[8px] font-black text-gray-400 uppercase tracking-[0.2em]">
+                                                        Grand Total Potongan (Global)</p>
+                                                    <p class="text-xl font-black text-rose-600 tracking-tighter"
+                                                        x-text="'Rp ' + formatRibuan(calculatePotonganGrandTotal())"></p>
+                                                </div>
+                                            </div>
+
+                                            <div class="flex items-center gap-3">
+                                                <button type="button" @click="showPotonganModal = false"
+                                                    class="text-[10px] font-black text-gray-400 uppercase tracking-widest px-4">Batal</button>
+
+                                                <button type="button" x-show="currentIndex === selectedItems.length - 1" @click="confirmSubmitTunjPot()"
+                                                    class="px-8 py-3.5 bg-rose-600 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl hover:bg-rose-700 shadow-lg shadow-rose-200 transition-all active:scale-95 flex items-center gap-2">
+                                                    Simpan Semua
+                                                </button>
+
+                                                <button type="button" @click="nextWorker()"
+                                                    x-show="currentIndex < selectedItems.length - 1"
+                                                    class="px-8 py-3.5 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl hover:bg-blue-600 transition-all active:scale-95 flex items-center gap-2">
+                                                    Lanjut Pekerja Berikutnya
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1469,6 +2107,9 @@
                                 <th
                                     class="px-4 py-4 text-[12px] font-black text-center text-gray-400 uppercase tracking-widest">
                                     Catatan</th>
+                                <th
+                                    class="px-4 py-4 text-[12px] font-black text-center text-gray-400 uppercase tracking-widest">
+                                    Tunj/Pot</th>
                             </tr>
                         </thead>
                         <tbody id="main-table-body" class="divide-y divide-gray-50">
@@ -1493,6 +2134,11 @@
 
 @section('scripts')
     <script>
+        window.unitInfo = {
+            umk: {{ $unit->umk ?? 0 }},
+            tunjanganConfig: @js($unit->tunjangan ?? [])
+        };
+
         document.addEventListener("click", function(e) {
             // Find the closest anchor tag inside the pagination container
             const anchor = e.target.closest("#search-pagination a");
@@ -1548,6 +2194,37 @@
                         })
 
                         this.$refs.absenForm.submit()
+                    }
+                })
+            }
+        }
+    }
+
+    function TunjPotFormHandler() {
+        return {
+            confirmSubmitTunjPot() {
+                Swal.fire({
+                    title: 'Finalisasi Data?',
+                    text: 'Pastikan semua data sudah benar sebelum disimpan. Setelah ini, data tidak dapat diubah lagi.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                confirmButtonColor: '#10B981',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Ya, Finalisasi & Simpan',
+                cancelButtonText: 'Batal',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: 'Menyimpan...',
+                            text: 'Mohon tunggu',
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            didOpen: () => {
+                                Swal.showLoading()
+                            }
+                        })
+
+                        this.$refs.tunjPotForm.submit()
                     }
                 })
             }
