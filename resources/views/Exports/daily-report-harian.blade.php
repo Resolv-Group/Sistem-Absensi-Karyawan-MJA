@@ -82,22 +82,10 @@
         </th>
         <th colspan="{{ $totalDays }}" align="center" valign="middle"
             style="background-color: #FCE4D6; border: 1px solid #000;">Tanggal</th>
-
-
-        <td colspan="22"></td>
-        <th colspan="{{ $totalDays }}" align="center" valign="middle"
-            style="background-color: #FCE4D6; border: 1px solid #000;">Tanggal Tidak Masuk Kerja</th>
     </tr>
 
     <tr>
         <td colspan="10"></td>
-        @foreach ($periodDates as $date)
-            <th width="4"
-                style="background-color: #FCE4D6; border: 1px solid #000; text-align: center; font-weight: bold; vertical-align: middle;">
-                {{ $date->format('d') }} {{-- Akan muncul 01, 02, 03... --}}
-            </th>
-        @endforeach
-        <td colspan="22"></td>
         @foreach ($periodDates as $date)
             <th width="4"
                 style="background-color: #FCE4D6; border: 1px solid #000; text-align: center; font-weight: bold; vertical-align: middle;">
@@ -128,21 +116,6 @@
             </th>
         @endforeach
 
-        <td colspan="22"></td>
-        {{-- LOOPING HARI --}}
-        @foreach ($periodDates as $date)
-            @php
-                // Menggunakan format 'ddd' untuk singkatan 3 huruf (Min, Sen, Sel...)
-                $dayName = $date->isoFormat('ddd'); 
-                
-                // Cek Minggu: dayOfWeek di Carbon adalah 0 untuk Minggu
-                $isSunday = $date->dayOfWeek === \Carbon\Carbon::SUNDAY;
-                $fontColor = $isSunday ? '#FF0000' : '#000000';
-            @endphp
-            <th style="background-color: #FCE4D6; border: 1px solid #000; text-align: center; vertical-align: middle; font-size: 8pt; color: {{ $fontColor }};">
-                {{ $dayName }}
-            </th>
-        @endforeach
         {{-- (Kolom Kanan Kosong karena sudah kena Rowspan di atas) --}}
     </tr>
     <tr>
@@ -153,12 +126,6 @@
             </th>
         @endforeach
 
-        <td colspan="22"></td>
-        @foreach ($periodDates as $date)
-            <th align="center" valign="middle" style="background-color: #FCE4D6; border: 1px solid #000;">
-                0
-            </th>
-        @endforeach
     </tr>
     <tr>
         <td colspan="9"></td>
@@ -247,11 +214,27 @@
 
             <th rowspan="2" width="15"
                 style="background-color: #FCE4D6; font-weight: bold; text-align: center; border: 1px solid #000; white-space: normal;">
-                JML. UANG INSENTIF (H)</th>
+                JML. UANG INSENTIF (H)
+            </th>
 
-            <th rowspan="2" width="15"
-                style="background-color: #92D050; font-weight: bold; text-align: center; border: 1px solid #000; white-space: normal;">
-                UANG TUNJ. (I)</th>
+            {{-- HEADER ATAS: UANG TUNJ. (I) --}}
+            @php
+                $jmlKategori = count($semuaKategoriTunjangan);
+            @endphp
+
+            @if($jmlKategori > 0)
+                {{-- Jika ada tunjangan dinamis, gunakan colspan agar melebar --}}
+                <th colspan="{{ $jmlKategori }}" width="15"
+                    style="background-color: #92D050; font-weight: bold; text-align: center; border: 1px solid #000; white-space: normal;">
+                    UANG TUNJ. (I)
+                </th>
+            @else
+                {{-- Jika tidak ada tunjangan, kembali ke desain asli (rowspan) --}}
+                <th rowspan="2" width="15"
+                    style="background-color: #92D050; font-weight: bold; text-align: center; border: 1px solid #000; white-space: normal;">
+                    UANG TUNJ. (I)
+                </th>
+            @endif
 
 
             <th rowspan="2" width="15"
@@ -281,7 +264,7 @@
                 style="background-color: #FFFF00; font-weight: bold; text-align: center; border: 1px solid #000; white-space: normal;">
                 TOTAL UPAH (K) = (B+D+F+H-J)-(L+N)</th>
 
-            <th colspan="3" width="15"
+            <th colspan="4" width="15"
                 style="background-color: #FCE4D6; font-weight: bold; text-align: center; border: 1px solid #000; white-space: normal;">
                 POTONGAN</th>
 
@@ -298,9 +281,47 @@
                 style="background-color: #FCE4D6; font-weight: bold; text-align: center; border: 1px solid #000; white-space: normal;">
                 NO. REKENING</th>
 
+            <th></th>
+            <th></th>
+
+            <th rowspan="2" width="15"
+                style="background-color: #FCE4D6; font-weight: bold; text-align: center; border: 1px solid #000; white-space: normal;">
+                JML HARI KERJA</th>
+
+            <th rowspan="2" width="15"
+                style="background-color: #FCE4D6; font-weight: bold; text-align: center; border: 1px solid #000; white-space: normal;">
+                JML ABSEN</th>
+
+            <th rowspan="2" width="15"
+                style="background-color: #FCE4D6; font-weight: bold; text-align: center; border: 1px solid #000; white-space: normal;">
+                KEHADIRAN</th>
+            
+            <th rowspan="2" width="15"
+                style="background-color: #FCE4D6; font-weight: bold; text-align: center; border: 1px solid #000; white-space: normal;">
+                KETIDAKHADIRAN</th>
+
+            <th colspan="5" width="15"
+                style="background-color: #FCE4D6; font-weight: bold; text-align: center; border: 1px solid #000; white-space: normal;">
+                JUMLAH</th>
+
+            <th rowspan="2" width="15"
+                style="background-color: #FCE4D6; font-weight: bold; text-align: center; border: 1px solid #000; white-space: normal;">
+                OVERTIME</th>
+
+            <th rowspan="2" width="15"
+                style="background-color: #FCE4D6; font-weight: bold; text-align: center; border: 1px solid #000; white-space: normal;">
+                KETERANGAN</th>
+
         </tr>
         <tr>
             <td colspan="{{ $totalDays }}"></td>
+            @if($jmlKategori > 0)
+                @foreach($semuaKategoriTunjangan as $kategori)
+                    <th style="background-color: #92D050; font-weight: bold; text-align: center; border: 1px solid #000; white-space: normal;">
+                        {{ $kategori }}
+                    </th>
+                @endforeach
+            @endif
             <th width="15"
                 style="background-color: #FCE4D6; font-weight: bold; text-align: center; border: 1px solid #000; white-space: normal;">
                 BPJS NAKER</th>
@@ -310,7 +331,27 @@
             <th width="15"
                 style="background-color: #FCE4D6; font-weight: bold; text-align: center; border: 1px solid #000; white-space: normal;">
                 BIAYA KLAIM</th>
-        </tr>
+            <th width="15"
+                style="background-color: #FCE4D6; font-weight: bold; text-align: center; border: 1px solid #000; white-space: normal;">
+                POTONGAN</th>
+
+            <td></td>
+            <td></td>
+            <th width="15"
+                style="background-color: #FCE4D6; font-weight: bold; text-align: center; border: 1px solid #000; white-space: normal;">
+                IZIN</th>
+            <th width="15"
+                style="background-color: #FCE4D6; font-weight: bold; text-align: center; border: 1px solid #000; white-space: normal;">
+                CUTI</th>
+            <th width="15"
+                style="background-color: #FCE4D6; font-weight: bold; text-align: center; border: 1px solid #000; white-space: normal;">
+                SAKIT</th>
+            <th width="15"
+                style="background-color: #FCE4D6; font-weight: bold; text-align: center; border: 1px solid #000; white-space: normal;">
+                RENCANA CUTI</th>
+            <th width="15"
+                style="background-color: #FCE4D6; font-weight: bold; text-align: center; border: 1px solid #000; white-space: normal;">
+                ABSEN</th>
     </thead>
 
     {{-- ISI DATA (Mulai Baris 8) --}}
@@ -381,8 +422,19 @@
                     {{ number_format($item->jml_uang_insentif) }}</td>
 
                 {{-- (I) UANG TUNJ. --}}
-                <td style="text-align: right; border: 1px solid #000;">
-                    {{ number_format($item->uang_tunjangan) }}</td>
+                {{-- <td style="text-align: right; border: 1px solid #000;">
+                    {{ number_format($item->uang_tunjangan) }}</td> --}}
+                {{-- BODY (I) UANG TUNJ. DINAMIS --}}
+                        @if(count($semuaKategoriTunjangan) > 0)
+                            @foreach($semuaKategoriTunjangan as $kategori)
+                                <td style="text-align: right; border: 1px solid #000;">
+                                    {{-- Berikan angka mentah (raw), biarkan Excel yang beri titik --}}
+                                    {{ $item->detail_tunjangan[$kategori] ?? 0 }}
+                                </td>
+                            @endforeach
+                        @else
+                            <td style="text-align: right; border: 1px solid #000;">0</td>
+                        @endif
 
                 {{-- (J) JML. UANG TUNJ. --}}
                 <td style="text-align: right; border: 1px solid #000;">
@@ -416,6 +468,8 @@
                     ({{ number_format($item->bpjs_kes)}})</td>
                 <td style="text-align: right; border: 1px solid #000;">
                     ({{ number_format($item->biaya_klaim)}}) </td>
+                <td style="text-align: right; border: 1px solid #000;">
+                    ({{ number_format($item->potongan_lain)}}) </td>
 
                 {{-- B. ADMIN --}}
                 <td style="text-align: right; border: 1px solid #000;">
@@ -430,10 +484,27 @@
                 <td style="text-align: left; border: 1px solid #000;">{{ $item->no_rekening }}</td>
 
                 <td></td>
+                <td></td>
 
-                @foreach ($periodDates as $date)
-                    <td style="border: 1px solid #000;"></td>
-                @endforeach
+                {{-- TOTAL HARI KERJA & ABSEN --}}
+                {{-- JML HARI KERJA & JML ABSEN --}}
+                <td style="text-align: center; border: 1px solid #000;">{{ $item->jml_hari_kerja ?? 0 }}</td>
+                <td style="text-align: center; border: 1px solid #000;">{{ $item->jml_absen ?? 0 }}</td>
+                
+                {{-- PERSENTASE KEHADIRAN & KETIDAKHADIRAN --}}
+                <td style="text-align: center; border: 1px solid #000;">{{ number_format($item->pct_hadir ?? 0, 0) }}%</td>
+                <td style="text-align: center; border: 1px solid #000;">{{ number_format($item->pct_absen ?? 0, 0) }}%</td>
+                
+                {{-- RINCIAN JUMLAH (IZIN, CUTI, SAKIT, RENCANA CUTI, ABSEN) --}}
+                <td style="text-align: center; border: 1px solid #000;">{{ $item->izin ?? 0 }}</td>
+                <td style="text-align: center; border: 1px solid #000;">{{ $item->cuti ?? 0 }}</td>
+                <td style="text-align: center; border: 1px solid #000;">{{ $item->sakit ?? 0 }}</td>
+                <td style="text-align: center; border: 1px solid #000;">{{ $item->rencanaCuti ?? 0 }}</td>
+                <td style="text-align: center; border: 1px solid #000;">{{ $item->absen ?? 0 }}</td>
+                
+                {{-- OVERTIME & KETERANGAN --}}
+                <td style="text-align: center; border: 1px solid #000;">{{ number_format($item->pct_overtime ?? 0, 0) }}%</td>
+                <td style="border: 1px solid #000;"></td> {{-- Dikosongkan untuk diisi manual/catatan --}}
                 
             </tr>
         @endforeach
@@ -468,8 +539,8 @@
 
             <td style="text-align: center; border: 1px solid #000; text-decoration: bold;">GRAND TOTAL</td>
 
-            {{-- (B) JML. POKOK UPAH --}}
-            <td style="text-align: right; font-weight: bold; border: 1px solid #000; background-color: #FCE4D6;">
+        {{-- (B) JML. POKOK UPAH --}}
+        <td style="text-align: right; font-weight: bold; border: 1px solid #000; background-color: #FCE4D6;">
             {{ number_format($items->sum('jml_pokok_upah')) }}
         </td>
 
@@ -504,9 +575,21 @@
         </td>
 
         {{-- (I) UANG TUNJ. --}}
-        <td style="text-align: right; font-weight: bold; border: 1px solid #000; background-color: #FCE4D6;">
+        {{-- <td style="text-align: right; font-weight: bold; border: 1px solid #000; background-color: #FCE4D6;">
             {{ number_format($items->sum('uang_tunjangan')) }}
-        </td>
+        </td> --}}
+        {{-- FOOTER TOTAL: (I) UANG TUNJ. DINAMIS --}}
+        @if(count($semuaKategoriTunjangan) > 0)
+            @foreach($semuaKategoriTunjangan as $kategori)
+                <td style="text-align: right; font-weight: bold; border: 1px solid #000; background-color: #FCE4D6;">
+                    {{ $items->sum(function($item) use ($kategori) {
+                        return $item->detail_tunjangan[$kategori] ?? 0;
+                    }) }}
+                </td>
+            @endforeach
+        @else
+            <td style="text-align: right; font-weight: bold; border: 1px solid #000; background-color: #FCE4D6;">0</td>
+        @endif
 
         {{-- (J) JML. UANG TUNJ. --}}
         <td style="text-align: right; font-weight: bold; border: 1px solid #000; background-color: #FCE4D6;">
@@ -551,6 +634,10 @@
             ({{ number_format($items->sum('biaya_klaim')) }})
         </td>
 
+        <td style="text-align: right; font-weight: bold; border: 1px solid #000; background-color: #FCE4D6;">
+            ({{ number_format($items->sum('potongan_lain')) }})
+        </td>
+
         {{-- B. ADMIN --}}
         <td style="text-align: right; font-weight: bold; border: 1px solid #000; background-color: #FCE4D6;">
             ({{ number_format($items->sum('biaya_admin')) }})
@@ -562,7 +649,49 @@
         </td>
 
             {{-- NO REKENING --}}
-            <td style="text-align: left; border: 1px solid #000; text-decoration: bold;"></td>
+        <td style="text-align: left; border: 1px solid #000; text-decoration: bold;"></td>
+
+        <td></td>
+        <td></td>
+
+        {{-- TOTAL HARI KERJA & ABSEN --}}
+            <td style="text-align: center; font-weight: bold; border: 1px solid #000; background-color: #FCE4D6;">
+                {{ $items->sum('jml_hari_kerja') }}
+            </td>
+            <td style="text-align: center; font-weight: bold; border: 1px solid #000; background-color: #FCE4D6;">
+                {{ $items->sum('jml_absen') }}
+            </td>
+
+            {{-- AVERAGE (RATA-RATA) PERSENTASE --}}
+            <td style="text-align: center; font-weight: bold; border: 1px solid #000; background-color: #FCE4D6;">
+                {{ number_format($items->avg('pct_hadir'), 0) }}%
+            </td>
+            <td style="text-align: center; font-weight: bold; border: 1px solid #000; background-color: #FCE4D6;">
+                {{ number_format($items->avg('pct_absen'), 0) }}%
+            </td>
+
+            {{-- TOTAL RINCIAN --}}
+            <td style="text-align: center; font-weight: bold; border: 1px solid #000; background-color: #FCE4D6;">
+                {{ $items->sum('izin') }}
+            </td>
+            <td style="text-align: center; font-weight: bold; border: 1px solid #000; background-color: #FCE4D6;">
+                {{ $items->sum('cuti') }}
+            </td>
+            <td style="text-align: center; font-weight: bold; border: 1px solid #000; background-color: #FCE4D6;">
+                {{ $items->sum('sakit') }}
+            </td>
+            <td style="text-align: center; font-weight: bold; border: 1px solid #000; background-color: #FCE4D6;">
+                {{ $items->sum('rencanaCuti') }}
+            </td>
+            <td style="text-align: center; font-weight: bold; border: 1px solid #000; background-color: #FCE4D6;">
+                {{ $items->sum('absen') }}
+            </td>
+
+            {{-- AVERAGE OVERTIME --}}
+            <td style="text-align: center; font-weight: bold; border: 1px solid #000; background-color: #FCE4D6;">
+                {{ number_format($items->avg('pct_overtime'), 0) }}%
+            </td>
+            <td style="border: 1px solid #000; background-color: #FCE4D6;"></td>
         </tr>
     </tfoot>
 </table>

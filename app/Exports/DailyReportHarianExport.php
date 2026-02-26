@@ -24,8 +24,9 @@ class DailyReportHarianExport implements FromView, ShouldAutoSize, WithStyles, W
     protected $tglAkhir;
     protected $attendanceMap;
     protected $unit;
+    protected $semuaKategoriTunjangan;
 
-    public function __construct($data, $periode, $grandTotal, $unitName, $totalDays, $tglAwal, $tglAkhir, $attendanceMap, $unit)
+    public function __construct($data, $periode, $grandTotal, $unitName, $totalDays, $tglAwal, $tglAkhir, $attendanceMap, $unit, $semuaKategoriTunjangan)
     {
         $this->data = $data;
         $this->periode = $periode;
@@ -36,6 +37,7 @@ class DailyReportHarianExport implements FromView, ShouldAutoSize, WithStyles, W
         $this->tglAkhir = $tglAkhir;
         $this->attendanceMap = $attendanceMap;
         $this->unit = $unit;
+        $this->semuaKategoriTunjangan = $semuaKategoriTunjangan;
     }
 
     public function view(): View
@@ -48,7 +50,8 @@ class DailyReportHarianExport implements FromView, ShouldAutoSize, WithStyles, W
             'tglAwal' => $this->tglAwal,
             'tglAkhir' => $this->tglAkhir,
             'attendanceMap' => $this->attendanceMap,
-            'unit' => $this->unit
+            'unit' => $this->unit,
+            'semuaKategoriTunjangan' => $this->semuaKategoriTunjangan,
         ]);
     }
 
