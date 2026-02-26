@@ -22,7 +22,7 @@ class Potongan extends Model
     protected $casts = [
         'kategori' => 'json',
     ];
-
+    
     public function absensi() {
         return $this->belongsTo(Absensi::class, 'id_absensi');
     }

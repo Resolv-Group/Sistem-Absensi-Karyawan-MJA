@@ -26,4 +26,6 @@ class Tunjangan extends Model
     public function absensi() {
         return $this->belongsTo(Absensi::class, 'id_absensi');
     }
+
+    
 }
