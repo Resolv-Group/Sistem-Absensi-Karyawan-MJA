@@ -231,34 +231,45 @@
         },
 
         initTunjanganModal() {
-            // Ambil config default dari unit
+            // Data default dari Unit (Global)
             const unitConfig = (window.unitInfo && window.unitInfo.tunjanganConfig) ? window.unitInfo.tunjanganConfig : {};
             this.currentIndex = 0;
 
             this.selectedItems.forEach(id => {
                 const worker = this.workerMap[id];
 
-                // Cek apakah baris tunjangan untuk ID ini sudah pernah diinisialisasi di session ini
                 if (!this.rowTunjangan[id]) {
+                    let finalData = {};
 
-                    // PRIORITAS 1: Ambil data yang SUDAH DISIMPAN di database
+                    // 1. PRIORITAS UTAMA: Data yang sudah tersimpan di database untuk hari ini (Existing)
                     if (worker && worker.existing_tunjangan) {
-                        // Gunakan Deep Clone agar tidak merusak data asli di workerMap
-                        this.rowTunjangan[id] = JSON.parse(JSON.stringify(worker.existing_tunjangan));
+                        finalData = JSON.parse(JSON.stringify(worker.existing_tunjangan));
                         this.rowKeteranganTunjangan[id] = worker.existing_keterangan_tunjangan || '';
-                    }
-                    // PRIORITAS 2: Jika data baru, gunakan default config dari Unit
+                    } 
                     else {
-                        this.rowTunjangan[id] = {};
-                        Object.keys(unitConfig).forEach(key => {
-                            // Set default qty: 1 dan nominal: dari config unit
-                            this.rowTunjangan[id][key] = {
+                        // 2. PRIORITAS KEDUA: Data dari Kontrak PKWT (Spesifik per pekerja)
+                        // 3. PRIORITAS KETIGA: Data dari Config Unit (Global)
+                        
+                        // Cek apakah pkwt_tunjangan ada isinya
+                        const hasPkwtData = worker.pkwt_tunjangan && Object.keys(worker.pkwt_tunjangan).length > 0;
+                        const baseSource = hasPkwtData ? worker.pkwt_tunjangan : unitConfig;
+
+                        // Transformasi format
+                        Object.keys(baseSource).forEach(key => {
+                            let val = baseSource[key];
+                            
+                            // Handle jika data di PKWT berbentuk angka langsung atau objek
+                            let nominalValue = (typeof val === 'object' && val !== null) ? val.nominal : val;
+
+                            finalData[key] = {
                                 qty: 1,
-                                nominal: unitConfig[key]
+                                nominal: nominalValue
                             };
                         });
                         this.rowKeteranganTunjangan[id] = '';
                     }
+
+                    this.rowTunjangan[id] = finalData;
                 }
             });
             this.showTunjanganModal = true;
