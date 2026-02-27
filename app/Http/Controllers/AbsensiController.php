@@ -143,6 +143,13 @@ class AbsensiController extends Controller
             $savedDetail = $savedAbsensi ? $savedAbsensi->detilHarian : null;
 
             $savedTunjangan = $savedAbsensi ? $savedAbsensi->tunjangan : null;
+
+            // Decode tunjangan PKWT secara manual karena tidak menggunakan Casting di Model
+            $pkwtTunjanganRaw = $item->tunjangan; 
+            $pkwtTunjanganParsed = is_string($pkwtTunjanganRaw) 
+                ? json_decode($pkwtTunjanganRaw, true) 
+                : $pkwtTunjanganRaw;
+
             $savedPotongan = $savedAbsensi ? $savedAbsensi->potongan : null;
 
             // Transformasi data: {"telat": 5000} -> [{nama: "telat", nominal: 5000}]
@@ -174,6 +181,7 @@ class AbsensiController extends Controller
                     'existing_catatan' => $savedDetail ? $savedDetail->catatan : '',
                     'existing_potongan' => $uiPotongan,
                     'existing_keterangan_potongan' => $savedPotongan?->keterangan ?? '',
+                    'pkwt_tunjangan' => $pkwtTunjanganParsed, 
                     'existing_tunjangan' => $savedTunjangan ? $savedTunjangan->kategori : null,
                     'existing_keterangan_tunjangan' => $savedTunjangan?->keterangan ?? '',
                 ],
@@ -281,6 +289,13 @@ class AbsensiController extends Controller
             $savedAbsensi = $existingAbsensi->get($item->id_pekerja);
 
             $savedTunjangan = $savedAbsensi ? $savedAbsensi->tunjangan : null;
+
+            // Decode tunjangan PKWT secara manual karena tidak menggunakan Casting di Model
+            $pkwtTunjanganRaw = $item->tunjangan; 
+            $pkwtTunjanganParsed = is_string($pkwtTunjanganRaw) 
+                ? json_decode($pkwtTunjanganRaw, true) 
+                : $pkwtTunjanganRaw;
+
             // Transformasi Potongan dari DB (Object) ke UI (Array) untuk auto-fill
             $uiPotongan = [];
             $savedPotongan = $savedAbsensi ? $savedAbsensi->potongan : null;
@@ -304,6 +319,7 @@ class AbsensiController extends Controller
                     // Data untuk Modal Tunjangan
                     'existing_tunjangan' => $savedAbsensi?->tunjangan?->kategori ?? null,
                     'existing_keterangan_tunjangan' => $savedTunjangan?->keterangan ?? '',
+                    'pkwt_tunjangan' => $pkwtTunjanganParsed,
 
                     // Data untuk Modal Potongan
                     'existing_potongan' => $uiPotongan,

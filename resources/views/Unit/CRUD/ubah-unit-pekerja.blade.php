@@ -45,7 +45,7 @@
         @endif
 
         <form action="{{ route('update.unit-pekerja', ['unitId' => $unitSelected->id, 'pekerjaId' => $pkwt->id]) }}"
-            method="POST" enctype="multipart/form-data" x-data="workerForm()" class="space-y-6">
+            method="POST" enctype="multipart/form-data" x-ref="updateForm" x-data="workerForm()" @submit.prevent="confirmSubmit" class="space-y-6">
             @csrf
             @method('put')
 
@@ -280,33 +280,40 @@
                                 <div>
                                     <label class="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">
                                         Iuran BPJS Kes
-                                        <span x-show="row.kpj && row.kpj.trim() !== ''" class="text-green-500 text-[10px] ml-1">● Editable</span>
+                                        <span x-show="row.kpj && row.kpj.trim() !== ''"
+                                            class="text-green-500 text-[10px] ml-1">● Editable</span>
                                     </label>
                                     <div class="relative">
-                                        <input
-                                            type="text"
-                                            {{-- Conditional readonly based on KPJ existence --}}
+                                        <input type="text" {{-- Conditional readonly based on KPJ existence --}}
                                             :readonly="!row.kpj || row.kpj.trim() === ''"
                                             :value="formatRupiah(row.bpjsKesehatan)"
                                             @input="row.bpjsKesehatan = Number($event.target.value.replace(/\D/g, ''))"
                                             {{-- Dynamic classes based on KPJ and value --}}
                                             :class="{
-                                                'bg-blue-50 text-blue-700 border-blue-200 cursor-text': row.kpj && row.kpj.trim() !== '' && row.bpjsKesehatan > 0,
-                                                'bg-white text-gray-700 border-gray-300 cursor-text hover:border-blue-400': row.kpj && row.kpj.trim() !== '' && row.bpjsKesehatan === 0,
-                                                'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed': !row.kpj || row.kpj.trim() === ''
+                                                'bg-blue-50 text-blue-700 border-blue-200 cursor-text': row.kpj && row
+                                                    .kpj.trim() !== '' && row.bpjsKesehatan > 0,
+                                                'bg-white text-gray-700 border-gray-300 cursor-text hover:border-blue-400': row
+                                                    .kpj && row.kpj.trim() !== '' && row.bpjsKesehatan === 0,
+                                                'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed': !row
+                                                    .kpj || row.kpj.trim() === ''
                                             }"
                                             class="w-full rounded-xl border text-sm font-bold py-3 px-4 transition-colors focus:ring-2 focus:ring-blue-300 focus:outline-none"
                                             placeholder="Rp 0">
 
-                                        <input type="hidden" :name="`pekerja[${index}][bpjs_kesehatan]`" :value="row.bpjsKesehatan">
+                                        <input type="hidden" :name="`pekerja[${index}][bpjs_kesehatan]`"
+                                            :value="row.bpjsKesehatan">
 
                                         {{-- Icon indicator --}}
                                         <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                            <svg x-show="row.kpj && row.kpj.trim() !== ''" class="w-4 h-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                            <svg x-show="row.kpj && row.kpj.trim() !== ''" class="w-4 h-4 text-green-500"
+                                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                             </svg>
-                                            <svg x-show="!row.kpj || row.kpj.trim() === ''" class="w-4 h-4 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                            <svg x-show="!row.kpj || row.kpj.trim() === ''" class="w-4 h-4 text-gray-300"
+                                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                                             </svg>
                                         </div>
                                     </div>
@@ -316,33 +323,42 @@
                                 <div>
                                     <label class="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">
                                         Iuran BPJS Naker
-                                        <span x-show="row.naker && row.naker.trim() !== ''" class="text-green-500 text-[10px] ml-1">● Editable</span>
+                                        <span x-show="row.naker && row.naker.trim() !== ''"
+                                            class="text-green-500 text-[10px] ml-1">● Editable</span>
                                     </label>
                                     <div class="relative">
-                                        <input
-                                            type="text"
-                                            {{-- Conditional readonly based on Naker existence --}}
+                                        <input type="text" {{-- Conditional readonly based on Naker existence --}}
                                             :readonly="!row.naker || row.naker.trim() === ''"
                                             :value="formatRupiah(row.bpjsNaker)"
                                             @input="row.bpjsNaker = Number($event.target.value.replace(/\D/g, ''))"
                                             {{-- Dynamic classes based on Naker and value --}}
                                             :class="{
-                                                'bg-blue-50 text-blue-700 border-blue-200 cursor-text': row.naker && row.naker.trim() !== '' && row.bpjsNaker > 0,
-                                                'bg-white text-gray-700 border-gray-300 cursor-text hover:border-blue-400': row.naker && row.naker.trim() !== '' && row.bpjsNaker === 0,
-                                                'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed': !row.naker || row.naker.trim() === ''
+                                                'bg-blue-50 text-blue-700 border-blue-200 cursor-text': row.naker && row
+                                                    .naker.trim() !== '' && row.bpjsNaker > 0,
+                                                'bg-white text-gray-700 border-gray-300 cursor-text hover:border-blue-400': row
+                                                    .naker && row.naker.trim() !== '' && row.bpjsNaker === 0,
+                                                'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed': !row
+                                                    .naker || row.naker.trim() === ''
                                             }"
                                             class="w-full rounded-xl border text-sm font-bold py-3 px-4 transition-colors focus:ring-2 focus:ring-blue-300 focus:outline-none"
                                             placeholder="Rp 0">
 
-                                        <input type="hidden" :name="`pekerja[${index}][bpjs_naker]`" :value="row.bpjsNaker">
+                                        <input type="hidden" :name="`pekerja[${index}][bpjs_naker]`"
+                                            :value="row.bpjsNaker">
 
                                         {{-- Icon indicator --}}
                                         <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                            <svg x-show="row.naker && row.naker.trim() !== ''" class="w-4 h-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                            <svg x-show="row.naker && row.naker.trim() !== ''"
+                                                class="w-4 h-4 text-green-500" fill="none" viewBox="0 0 24 24"
+                                                stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                             </svg>
-                                            <svg x-show="!row.naker || row.naker.trim() === ''" class="w-4 h-4 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                            <svg x-show="!row.naker || row.naker.trim() === ''"
+                                                class="w-4 h-4 text-gray-300" fill="none" viewBox="0 0 24 24"
+                                                stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                                             </svg>
                                         </div>
                                     </div>
@@ -366,44 +382,51 @@
                                 </div>
 
                                 <!-- TEMPATKAN INI DI DALAM TEMPLATE WORKER ROW -->
-<div class="sm:col-span-2 mt-2 p-5 bg-emerald-50/50 rounded-2xl border border-emerald-100/50">
-    <div class="flex items-center gap-2 mb-4">
-        <div class="p-1.5 bg-emerald-100 text-emerald-600 rounded-lg">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-        </div>
-        <h4 class="text-[11px] font-black text-emerald-700 uppercase tracking-[0.2em]">Tunjangan Spesifik Unit</h4>
-    </div>
+                                <div
+                                    class="sm:col-span-2 mt-2 p-5 bg-emerald-50/50 rounded-2xl border border-emerald-100/50">
+                                    <div class="flex items-center gap-2 mb-4">
+                                        <div class="p-1.5 bg-emerald-100 text-emerald-600 rounded-lg">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                        </div>
+                                        <h4 class="text-[11px] font-black text-emerald-700 uppercase tracking-[0.2em]">
+                                            Tunjangan Spesifik Unit</h4>
+                                    </div>
 
-    {{-- Hidden Input Utama: Mengirim data sebagai String JSON murni ke Laravel --}}
-    <input type="hidden"
-           :name="`pekerja[${index}][tunjangan]`"
-           :value="JSON.stringify(row.tunjangan || {})">
+                                    {{-- Hidden Input Utama: Mengirim data sebagai String JSON murni ke Laravel --}}
+                                    <input type="hidden" :name="`pekerja[${index}][tunjangan]`"
+                                        :value="JSON.stringify(row.tunjangan || {})">
 
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <template x-for="(val, key) in (row.tunjangan || {})" :key="key">
-            <div class="space-y-1.5">
-                <label class="block text-[10px] font-bold text-emerald-600 uppercase tracking-wider ml-1"
-                       x-text="key.replace(/_/g, ' ')"></label>
-                <div class="relative">
-                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-emerald-400">Rp</span>
+                                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                        <template x-for="(val, key) in (row.tunjangan || {})" :key="key">
+                                            <div class="space-y-1.5">
+                                                <label
+                                                    class="block text-[10px] font-bold text-emerald-600 uppercase tracking-wider ml-1"
+                                                    x-text="key.replace(/_/g, ' ')"></label>
+                                                <div class="relative">
+                                                    <span
+                                                        class="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-emerald-400">Rp</span>
 
-                    {{-- Input Tampilan: TIDAK memiliki atribut 'name' agar tidak terkirim secara terpisah --}}
-                    <input type="text"
-                        :value="formatRupiah(row.tunjangan[key]).replace('Rp', '').trim()"
-                        @input="row.tunjangan[key] = Number($event.target.value.replace(/\D/g, ''))"
-                        class="w-full pl-8 pr-3 py-2 text-sm font-black text-slate-700 bg-white border border-emerald-100 rounded-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all shadow-sm"
-                        placeholder="0">
-                </div>
-            </div>
-        </template>
+                                                    {{-- Input Tampilan: TIDAK memiliki atribut 'name' agar tidak terkirim secara terpisah --}}
+                                                    <input type="text"
+                                                        :value="formatRupiah(row.tunjangan[key]).replace('Rp', '').trim()"
+                                                        @input="row.tunjangan[key] = Number($event.target.value.replace(/\D/g, ''))"
+                                                        class="w-full pl-8 pr-3 py-2 text-sm font-black text-slate-700 bg-white border border-emerald-100 rounded-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all shadow-sm"
+                                                        placeholder="0">
+                                                </div>
+                                            </div>
+                                        </template>
 
-        <div x-show="Object.keys(row.tunjangan || {}).length === 0" class="sm:col-span-3 text-center py-2">
-            <p class="text-xs text-emerald-400 italic font-medium">Unit ini tidak memiliki konfigurasi tunjangan.</p>
-        </div>
-    </div>
-</div>
+                                        <div x-show="Object.keys(row.tunjangan || {}).length === 0"
+                                            class="sm:col-span-3 text-center py-2">
+                                            <p class="text-xs text-emerald-400 italic font-medium">Unit ini tidak memiliki
+                                                konfigurasi tunjangan.</p>
+                                        </div>
+                                    </div>
+                                </div>
 
                                 <div class="sm:col-span-2 mt-4">
                                     <div class="flex items-center justify-between mb-3 px-1">
@@ -434,16 +457,13 @@
                                                         x-text="dayName"></span>
                                                 </div>
 
-                                                <input type="number"
-                                                    step="0.1"
-                                                    placeholder="0"
-                                                    :name="`pekerja[${index}][days][${dayKey}]`"
-                                                    :value="row.days[dayKey]"
+                                                <input type="number" step="0.1" placeholder="0"
+                                                    :name="`pekerja[${index}][days][${dayKey}]`" :value="row.days[dayKey]"
                                                     @input="validateDayInput($event, row, dayKey)"
                                                     @blur="cleanupDayInput(row, dayKey)"
                                                     class="w-full pt-7 pb-3 text-center text-base font-bold bg-transparent border-none outline-none ring-0 focus:ring-0 focus:outline-none placeholder:text-gray-200 z-10 relative transition-all"
-                                                    :class="row.days[dayKey] !== '' && row.days[dayKey] != 0 ? 'text-gray-900' : 'text-gray-400'"
-                                                />
+                                                    :class="row.days[dayKey] !== '' && row.days[dayKey] != 0 ?
+                                                        'text-gray-900' : 'text-gray-400'" />
 
                                                 <div
                                                     class="absolute inset-0 rounded-xl transition-all duration-300 opacity-0 group-hover/day:opacity-100 group-focus-within/day:opacity-100 group-focus-within/day:bg-white group-focus-within/day:shadow-sm">
@@ -526,7 +546,7 @@
                         </div>
 
                         {{-- Save Button --}}
-                        <button type="submit"
+                        <button type="button" @click="confirmSubmit"
                             class="w-full sm:w-auto px-8 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-200/50 transition transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
                             <span>Simpan</span>
                             <svg class="w-5 h-5 text-emerald-100" fill="none" viewBox="0 0 24 24"
@@ -535,6 +555,7 @@
                                     d="M5 13l4 4L19 7" />
                             </svg>
                         </button>
+
                     </div>
 
                 </div>
@@ -564,7 +585,8 @@
                 const formatted = {};
                 ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].forEach(day => {
                     const val = rawDays[day];
-                    formatted[day] = (val !== undefined && val !== null) ? parseFloat(val).toString() : '';
+                    formatted[day] = (val !== undefined && val !== null) ? parseFloat(val)
+                    .toString() : '';
                 });
                 return formatted;
             })(),
@@ -718,6 +740,39 @@
                         currency: 'IDR',
                         minimumFractionDigits: 0
                     }).format(value);
+                },
+
+                confirmSubmit() {
+                    Swal.fire({
+                        title: 'Konfirmasi Perbarui Data',
+                        text: 'Pastikan semua data yang Anda ubah sudah benar. Lanjutkan menyimpan?',
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#10b981', // emerald-600
+                        cancelButtonColor: '#6b7280', // gray-500
+                        confirmButtonText: 'Ya, Perbarui',
+                        cancelButtonText: 'Batal',
+                        reverseButtons: false,
+                        customClass: {
+                            popup: 'rounded-2xl',
+                            confirmButton: 'rounded-xl px-6 py-2.5 font-bold',
+                            cancelButton: 'rounded-xl px-6 py-2.5 font-bold'
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            Swal.fire({
+                                title: 'Menyimpan...',
+                                text: 'Mohon tunggu',
+                                allowOutsideClick: false,
+                                allowEscapeKey: false,
+                                didOpen: () => {
+                                    Swal.showLoading()
+                                }
+                            })
+
+                            this.$refs.updateForm.submit()
+                        }
+                    });
                 }
             }
         }

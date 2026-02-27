@@ -51,7 +51,7 @@
         @endif
 
         <form action="{{ route('tambah.unit-pekerja.post') }}" method="POST" enctype="multipart/form-data"
-            x-data="workerForm()" class="space-y-6">
+            x-ref="workerForm" x-data="workerForm()" @submit.prevent="confirmSubmit" class="space-y-6">
             @csrf
 
             {{-- CARD 1: INFORMASI UNIT --}}
@@ -607,7 +607,7 @@
                         </div>
 
                         {{-- Save Button --}}
-                        <button type="submit"
+                        <button type="button" @click="confirmSubmit()"
                             class="w-full sm:w-auto px-8 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-200/50 transition transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
                             <span>Simpan</span>
                             <svg class="w-5 h-5 text-emerald-100" fill="none" viewBox="0 0 24 24"
@@ -875,6 +875,34 @@
                         currency: 'IDR',
                         minimumFractionDigits: 0
                     }).format(value);
+                },
+
+                confirmSubmit() {
+                    Swal.fire({
+                        title: 'Konfirmasi Simpan Data',
+                        text: 'Pastikan semua data yang Anda input sudah benar. Lanjutkan menyimpan?',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Ya, Simpan',
+                        cancelButtonText: 'Cek lagi',
+                        customClass: {
+                            popup: 'rounded-2xl',
+                            confirmButton: 'rounded-xl px-6 py-2.5 font-bold',
+                            cancelButton: 'rounded-xl px-6 py-2.5 font-bold'
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            Swal.fire({
+                                title: 'Sedang Menyimpan...',
+                                text: 'Mohon tunggu sebentar.',
+                                allowOutsideClick: false,
+                                didOpen: () => {
+                                    Swal.showLoading();
+                                }
+                            });
+                            this.$refs.workerForm.submit();
+                        }
+                    });
                 }
             }
         }

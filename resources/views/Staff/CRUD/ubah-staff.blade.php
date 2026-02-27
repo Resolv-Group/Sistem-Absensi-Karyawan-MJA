@@ -40,6 +40,7 @@
 
         {{-- FORM CARD --}}
         <form action="{{ route('update.staff', $staff->id) }}" method="POST" enctype="multipart/form-data"
+            x-ref="workerForm" x-data="workerForm()" @submit.prevent="confirmSubmit"
             class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
 
             @csrf
@@ -731,7 +732,7 @@
                     Batalkan
                 </a>
 
-                <button type="submit"
+                <button type="button" @click="confirmSubmit()"
                     class="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-emerald-600 rounded-lg
                     hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition shadow-sm">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
@@ -847,6 +848,38 @@
             document.getElementById('removeBtn').classList.add('hidden');
             document.getElementById('removeFotoFlag').value = "1";
 
+        }
+
+        function workerForm() {
+            return {
+                confirmSubmit() {
+                    Swal.fire({
+                        title: 'Konfirmasi Simpan Data',
+                        text: 'Pastikan semua data yang Anda input sudah benar. Lanjutkan menyimpan?',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Ya, Simpan',
+                        cancelButtonText: 'Cek lagi',
+                        customClass: {
+                            popup: 'rounded-2xl',
+                            confirmButton: 'rounded-xl px-6 py-2.5 font-bold',
+                            cancelButton: 'rounded-xl px-6 py-2.5 font-bold'
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            Swal.fire({
+                                title: 'Sedang Menyimpan...',
+                                text: 'Mohon tunggu sebentar.',
+                                allowOutsideClick: false,
+                                didOpen: () => {
+                                    Swal.showLoading();
+                                }
+                            });
+                            this.$refs.workerForm.submit();
+                        }
+                    });
+                }
+            }
         }
     </script>
 @endsection
