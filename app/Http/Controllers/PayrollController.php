@@ -89,6 +89,10 @@ class PayrollController extends Controller
 
         $unit = Unit::find($id_unit); // ⬅️ ambil unit
 
+        $penanggungJawab = $request->input('penanggung_jawab'); 
+        $jabatanPJ = $request->input('jabatan_pj'); 
+        $biayaAdmin = $request->input('biaya_admin', 0); 
+
         $paidWorkerIds = $request->input('paid_workers', []);
         $tanggalMulai = $request->tanggal_mulai;
         $tanggalAkhir = $request->tanggal_akhir;
@@ -114,7 +118,10 @@ class PayrollController extends Controller
             'total_pekerja' => $workers->count(),
             'tanggal_mulai' => $tanggalMulai,
             'tanggal_akhir' => $tanggalAkhir,
-            'items' => $workers->map(function ($w) use ($id_unit, $isHarian, $periode, $specificExclusions, $allAdjustments, $tanggalMulai, $tanggalAkhir) {
+            'penanggung_jawab' => $penanggungJawab,
+            'jabatan_pj' => $jabatanPJ,
+            'biaya_admin' => $biayaAdmin,
+            'items' => $workers->map(function ($w) use ($id_unit, $isHarian, $periode, $specificExclusions, $allAdjustments, $tanggalMulai, $tanggalAkhir, $biayaAdmin, $penanggungJawab, $jabatanPJ) {
                 // 1. Dapatkan list tanggal yang dikecualikan (potongan) untuk pekerja ini
                 $excludedDates = $specificExclusions->get($w->id) ? $specificExclusions->get($w->id)->pluck('date')->toArray() : [];
 
@@ -250,6 +257,9 @@ class PayrollController extends Controller
                     'potongan_count' => count($excludedDates),
                     'potongan_dates' => $excludedDates,
                     'net_salary' => $netSalary,
+                    'biaya_admin' => $biayaAdmin,
+                    'penanggung_jawab' => $penanggungJawab,
+                    'jabatan_pj' => $jabatanPJ,
                     'pembayaran_lain' => $workerPembayaranLain,
                     'tunjangan' => $workerTunjangan,
                     'tanggal_mulai' => $tanggalMulai,
