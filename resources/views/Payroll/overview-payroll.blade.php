@@ -168,39 +168,42 @@
                                     </div>
 
                                     <div class="space-y-5">
-                                    <!-- Group 1: Nomor Resi -->
-                                    <div>
-                                        <label for="no_resi" class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">
-                                            Nomor Resi / No. Ref
-                                        </label>
-                                        <input type="text" id="no_resi" name="no_resi" required
-                                            placeholder="Silahkan masukkan No Resi Disini.."
-                                            class="w-full px-5 py-3.5 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-emerald-500/10 focus:bg-white transition-all duration-200">
-                                        <p class="mt-2 text-[10px] text-slate-400 italic font-medium ml-1">
-                                            * Contoh: 021 RD / MJA - BISI / INVOICE / XI / 2025
-                                        </p>
-                                    </div>
+                                        <!-- Group 1: Nomor Resi -->
+                                        <div>
+                                            <label for="no_resi"
+                                                class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">
+                                                Nomor Resi / No. Ref
+                                            </label>
+                                            <input type="text" id="no_resi" name="no_resi" required
+                                                placeholder="Silahkan masukkan No Resi Disini.."
+                                                class="w-full px-5 py-3.5 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-emerald-500/10 focus:bg-white transition-all duration-200">
+                                            <p class="mt-2 text-[10px] text-slate-400 italic font-medium ml-1">
+                                                * Contoh: 021 RD / MJA - BISI / INVOICE / XI / 2025
+                                            </p>
+                                        </div>
 
-                                    <!-- Group 2: Nama Penanggungjawab -->
-                                    <div>
-                                        <label for="nama_resi" class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">
-                                            Penanggungjawab
-                                        </label>
-                                        <input type="text" id="nama_resi" name="nama_resi" required
-                                            placeholder="Silahkan masukkan nama disini.."
-                                            class="w-full px-5 py-3.5 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-emerald-500/10 focus:bg-white transition-all duration-200">
-                                    </div>
+                                        <!-- Group 2: Nama Penanggungjawab -->
+                                        <div>
+                                            <label for="nama_resi"
+                                                class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">
+                                                Penanggungjawab
+                                            </label>
+                                            <input type="text" id="nama_resi" name="nama_resi" required
+                                                placeholder="Silahkan masukkan nama disini.."
+                                                class="w-full px-5 py-3.5 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-emerald-500/10 focus:bg-white transition-all duration-200">
+                                        </div>
 
-                                    <!-- Group 3: Jabatan -->
-                                    <div>
-                                        <label for="jabatan" class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">
-                                            Jabatan
-                                        </label>
-                                        <input type="text" id="jabatan" name="jabatan"
-                                            placeholder="Silahkan masukkan jabatan disini.."
-                                            class="w-full px-5 py-3.5 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-emerald-500/10 focus:bg-white transition-all duration-200">
+                                        <!-- Group 3: Jabatan -->
+                                        <div>
+                                            <label for="jabatan"
+                                                class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">
+                                                Jabatan
+                                            </label>
+                                            <input type="text" id="jabatan" name="jabatan"
+                                                placeholder="Silahkan masukkan jabatan disini.."
+                                                class="w-full px-5 py-3.5 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-emerald-500/10 focus:bg-white transition-all duration-200">
+                                        </div>
                                     </div>
-                                </div>
 
                                     <div class="grid grid-cols-2 gap-3 mt-8">
                                         <button type="button" @click="show = false"
@@ -327,7 +330,8 @@
                                         <!-- Total Jam Kerja -->
                                         <td class="px-4 py-4 text-center border-x border-slate-50/50">
                                             <div class="flex flex-col">
-                                                <span class="text-sm font-black text-slate-700">{{ $item['total_jam_kerja'] }}</span>
+                                                <span
+                                                    class="text-sm font-black text-slate-700">{{ $item['total_jam_kerja'] }}</span>
                                                 <span class="text-[11px] font-bold text-blue-500 uppercase">Jam</span>
                                             </div>
                                         </td>
@@ -335,7 +339,8 @@
                                         <!-- Total Overtime -->
                                         <td class="px-4 py-4 text-center">
                                             <div class="flex flex-col">
-                                                <span class="text-sm font-black text-amber-600">{{ $item['total_overtime'] }}</span>
+                                                <span
+                                                    class="text-sm font-black text-amber-600">{{ $item['total_overtime'] }}</span>
                                                 <span class="text-[11px] font-bold text-amber-500/80 uppercase">Jam OT</span>
                                             </div>
                                         </td>
@@ -485,10 +490,10 @@
                             'upah' => $item['net_salary'],
                             'exclusion_date' => $item['potongan_dates'] ?? [],
                             'potongan' => $item['pembayaran_lain'],
-                            'tunjangan' => $item['tunjangan']
+                            'tunjangan' => $item['tunjangan'],
                         ];
 
-                        if($payrollData['sistem_pengajian'] == 1) {
+                        if ($payrollData['sistem_pengajian'] == 1) {
                             $workerData['jam_kerja'] = $item['total_jam_kerja'];
                             $workerData['overtime'] = $item['total_overtime'];
                             $workerData['hbn'] = $item['total_hbn'];
@@ -514,39 +519,177 @@
                         <input type="hidden" name="tgl_akhir" value="{{ $payrollData['tanggal_akhir'] }}">
                         <input type="hidden" name="grand_total" value="{{ $payrollData['grand_total'] }}">
                         <input type="hidden" name="workers_json" value="{{ $jsonWorkers }}">
+                        <input type="hidden" name="biaya_admin" value="{{ $payrollData['biaya_admin'] }}">
+                        <input type="hidden" name="penanggung_jawab" value="{{ $payrollData['penanggung_jawab'] }}">
+                        <input type="hidden" name="jabatan_pj" value="{{ $payrollData['jabatan_pj'] }}">
 
-                        @if($payrollData['sistem_pengajian'] == 1)
+
+                        @if ($payrollData['sistem_pengajian'] == 1)
                             {{-- BUTTONS UNTUK HARIAN --}}
                             <button type="submit" formaction="{{ route('export.rincian.upah.harian') }}"
                                 class="group flex items-center gap-3 bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-3.5 rounded-xl font-black text-xs uppercase tracking-widest shadow-xl shadow-emerald-500/20 transition-all active:scale-95">
                                 Generate Rincian Upah
-                                <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7l5 5-5 5M6 7l5 5-5 5" />
+                                <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform"
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                        d="M13 7l5 5-5 5M6 7l5 5-5 5" />
                                 </svg>
                             </button>
 
-                            <button type="submit" formaction="{{ route('export.detail.harian') }}"
-                                class="group flex items-center gap-3 bg-blue-600 hover:bg-blue-500 text-white px-8 py-3.5 rounded-xl font-black text-xs uppercase tracking-widest shadow-xl shadow-blue-500/20 transition-all active:scale-95">
-                                Generate Report Harian
-                                <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 17v-2a4 4 0 014-4h4m0 0l-4-4m4 4l-4 4" />
-                                </svg>
-                            </button>
+                            <div class="flex gap-3" x-data="reportModal()">
+                                @php
+                                    $payloadReportHarian = [
+                                        'id_unit' => $payrollData['unit_id'],
+                                        'tgl_awal' => $payrollData['tanggal_mulai'],
+                                        'tgl_akhir' => $payrollData['tanggal_akhir'],
+                                        'grand_total' => $payrollData['grand_total'],
+                                        'workers_json' => $jsonWorkers, // Data JSON pekerja
+                                    ];
+                                @endphp
 
-                        @else
-                            {{-- BUTTON UNTUK BORONGAN --}}
-                            <button type="submit" formaction="{{ route('export.rincian.upah.borongan') }}"
-                                class="group flex items-center gap-3 bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-3.5 rounded-xl font-black text-xs uppercase tracking-widest shadow-xl shadow-emerald-500/20 transition-all active:scale-95">
-                                Generate Rincian Upah
-                                <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7l5 5-5 5M6 7l5 5-5 5" />
-                                </svg>
-                            </button>
+                                <button type="button"
+                                    @click="open('Report Harian', '{{ route('export.detail.harian') }}', {{ json_encode($payloadReportHarian) }})"
+                                    class="group flex items-center gap-3 bg-blue-600 hover:bg-blue-500 text-white px-8 py-3.5 rounded-xl font-black text-xs uppercase tracking-widest shadow-xl shadow-blue-500/20 transition-all active:scale-95">
+                                    Generate Report Harian
+                                    <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform"
+                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                            d="M9 17v-2a4 4 0 014-4h4m0 0l-4-4m4 4l-4 4" />
+                                    </svg>
+                                </button>
+
+                                {{-- MODAL STRUCTURE --}}
+                            @else
+                                {{-- BUTTON UNTUK BORONGAN --}}
+                                <button type="submit" formaction="{{ route('export.rincian.upah.borongan') }}"
+                                    class="group flex items-center gap-3 bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-3.5 rounded-xl font-black text-xs uppercase tracking-widest shadow-xl shadow-emerald-500/20 transition-all active:scale-95">
+                                    Generate Rincian Upah
+                                    <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform"
+                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                            d="M13 7l5 5-5 5M6 7l5 5-5 5" />
+                                    </svg>
+                                </button>
                         @endif
                     </form>
+
+                    <div x-show="show" class="fixed inset-0 z-[100] flex items-center justify-center p-4" x-cloak>
+
+                        <!-- Overlay -->
+                        <div x-show="show" x-transition.opacity @click="show = false"
+                            class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm">
+                        </div>
+
+                        <!-- Modal -->
+                        <div x-show="show" x-transition:enter="transition ease-out duration-300"
+                            x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
+                            class="relative w-full max-w-sm bg-white rounded-[2rem] shadow-2xl border border-slate-100 p-8">
+
+                            <form :action="actionUrl" method="POST" class="space-y-6">
+                                @csrf
+
+                                <!-- Hidden Inputs -->
+                                <template x-for="(value, key) in extraData" :key="key">
+                                    <input type="hidden" :name="key" :value="value">
+                                </template>
+
+                                <!-- Header -->
+                                <div class="text-center space-y-3">
+                                    <div
+                                        class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 mx-auto">
+                                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3" />
+                                        </svg>
+                                    </div>
+
+                                    <h3 class="text-lg font-black text-slate-800" x-text="'Generate ' + title"></h3>
+
+                                    <p class="text-xs text-slate-400">
+                                        Masukkan biaya administrasi untuk memproses dokumen ini.
+                                    </p>
+                                </div>
+
+                                <!-- Input -->
+                                <div class="space-y-4" x-data="rupiahInput()">
+
+                                    <!-- ===================== -->
+                                    <!-- BIAYA ADMIN -->
+                                    <!-- ===================== -->
+                                    <div class="space-y-2">
+                                        <label
+                                            class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
+                                            Biaya Administrasi
+                                        </label>
+
+                                        <div class="relative">
+                                            <span
+                                                class="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">
+                                                Rp
+                                            </span>
+
+                                            <!-- Visible formatted input -->
+                                            <input type="text" x-model="display" @input="format" inputmode="numeric"
+                                                placeholder="0"
+                                                class="w-full pl-10 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-400 transition">
+
+                                            <!-- Hidden raw numeric value -->
+                                            <input type="hidden" name="biaya_admin" :value="raw">
+                                        </div>
+                                    </div>
+
+
+                                    <!-- ===================== -->
+                                    <!-- NAMA PJ -->
+                                    <!-- ===================== -->
+                                    <div class="space-y-2">
+                                        <label
+                                            class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
+                                            Nama Penanggung Jawab
+                                        </label>
+
+                                        <input type="text" name="penanggung_jawab" placeholder="Contoh: Budi Santoso"
+                                            class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold text-slate-700 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-400 transition">
+                                    </div>
+
+                                    <!-- ===================== -->
+                                    <!-- JABATAN PJ -->
+                                    <!-- ===================== -->
+                                    <div class="space-y-2">
+                                        <label
+                                            class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
+                                            Jabatan Penanggung Jawab
+                                        </label>
+
+                                        <input type="text" name="jabatan_pj" placeholder="Contoh: Supervisor Lapangan"
+                                            class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold text-slate-700 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-400 transition">
+                                    </div>
+
+
+
+                                </div>
+
+                                <!-- Actions -->
+                                <div class="grid grid-cols-2 gap-3 pt-4">
+                                    <button type="button" @click="show = false"
+                                        class="text-xs font-black text-slate-400 uppercase tracking-widest hover:text-slate-600 transition">
+                                        Batal
+                                    </button>
+
+                                    <button type="submit"
+                                        class="py-3.5 bg-emerald-600 text-white text-xs font-black uppercase tracking-widest rounded-2xl shadow-lg shadow-emerald-200 hover:bg-emerald-700 transition active:scale-95">
+                                        Generate
+                                    </button>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
+    </div>
     </div>
 
     <style>
@@ -596,6 +739,37 @@
                         const input = document.querySelector('input[name="no_resi"]');
                         if (input) input.focus();
                     }, 100);
+                }
+            }
+        }
+
+        function reportModal() {
+            return {
+                show: false,
+                title: '',
+                actionUrl: '',
+                extraData: {},
+
+                open(title, url, payload = {}) {
+                    this.title = title;
+                    this.actionUrl = url;
+                    this.extraData = payload;
+                    this.show = true;
+                }
+            }
+        }
+
+        function rupiahInput() {
+            return {
+                raw: '',
+                display: '',
+
+                format() {
+                    // Remove non digits
+                    this.raw = this.display.replace(/\D/g, '');
+
+                    // Format as Indonesian Rupiah
+                    this.display = new Intl.NumberFormat('id-ID').format(this.raw);
                 }
             }
         }
