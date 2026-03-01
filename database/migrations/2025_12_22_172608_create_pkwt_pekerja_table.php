@@ -18,9 +18,6 @@ return new class extends Migration
             $table->char('id_pekerja', 20);
             $table->char('id_unit', 20);
 
-            // $table->char('divisi', 100);
-            // $table->char('jabatan', 100);
-
             $table->integer('divisi_id');
             $table->integer('jabatan_id');
 
@@ -30,8 +27,11 @@ return new class extends Migration
             $table->string('dokumen_mime', 100)->nullable();
 
             $table->integer('status_aktif')->default(1);
+
+            $table->unsignedInteger('gaji_bulanan')->nullable();
             $table->unsignedInteger('gaji_harian')->nullable();
             $table->unsignedInteger('gaji_overtime')->nullable();
+            $table->unsignedInteger('gaji_hbn')->nullable();
 
             $table->integer('bpjs_kesehatan')->default(0);
             $table->integer('bpjs_naker')->default(0);

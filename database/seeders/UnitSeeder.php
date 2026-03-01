@@ -104,23 +104,33 @@ class UnitSeeder extends Seeder
                 $tglMulai = $faker->dateTimeBetween('-6 months', 'now');
                 $tglAkhir = (clone $tglMulai)->modify('+1 year');
 
+                if ($unitId == 1) { // harian
+                    $gajiBulanan = $faker->randomElement([10000000, 15000000]);
+                } else { // borongan
+                    $gajiBulanan = $faker->randomElement([15000000, 25000000]);
+                }
+
+                $gajiHarian = $gajiBulanan / 25;
+                $gajiOvertime = $gajiBulanan / 173;
+                $gajiHbn = $gajiOvertime * 1.5;
+
                 $pkwt = PKWT::create([
-                    'id_pekerja'      => $pekerjaIds[$index],
-                    'id_unit'         => $unitId,
-                    'divisi_id'       => rand(1, 5),
-                    'jabatan_id'      => rand(1, 5),
-                    'tgl_mulai_pkwt'  => $tglMulai->format('Y-m-d'),
-                    'tgl_akhir_pkwt'  => $tglAkhir->format('Y-m-d'),
-                    'dokumen_pkwt'    => 'dummy_pkwt.pdf',
-                    'dokumen_mime'    => null,
-                    'status_aktif'    => 1,
-                    'gaji_harian'     => $unitId == 6
-                        ? $faker->numberBetween(100000, 150000) // harian
-                        : $faker->numberBetween(150000, 250000), // borongan
-                    'gaji_overtime' => 100000,
-                    'bpjs_kesehatan' => 0,
-                    'bpjs_naker' => 0,
-                    'tunjangan' => [
+                    'id_pekerja'         => $pekerjaIds[$index],
+                    'id_unit'            => $unitId,
+                    'divisi_id'          => rand(1, 5),
+                    'jabatan_id'         => rand(1, 5),
+                    'tgl_mulai_pkwt'     => $tglMulai->format('Y-m-d'),
+                    'tgl_akhir_pkwt'     => $tglAkhir->format('Y-m-d'),
+                    'dokumen_pkwt'       => 'dummy_pkwt.pdf',
+                    'dokumen_mime'       => null,
+                    'status_aktif'       => 1,
+                    'gaji_bulanan'       => $gajiBulanan,
+                    'gaji_harian'        => $gajiHarian,
+                    'gaji_overtime'      => $gajiOvertime,
+                    'gaji_hbn'           => $gajiHbn,
+                    'bpjs_kesehatan'     => 0,
+                    'bpjs_naker'         => 0,
+                    'tunjangan'          => [
                         'score' => 1000,
                         'driver' => 2000,
                     ],

@@ -135,429 +135,408 @@
                 <div class="p-6 space-y-6">
                     <template x-for="(row, index) in rows" :key="row.id">
                         <div
-                            class="bg-white rounded-2xl border border-gray-200 p-5 relative group transition hover:border-blue-300 hover:shadow-lg hover:shadow-blue-500/10">
+                            class="bg-white rounded-xl border border-gray-200 p-8 md:p-10 relative group transition-all duration-300 hover:border-blue-300 hover:shadow-[0_20px_50px_rgba(0,0,0,0.04)] space-y-12 mb-10">
 
-
-                            {{-- HEADER BARIS: Memisahkan Nomor & Tombol Hapus agar tidak menabrak input --}}
-                            <div class="flex items-center justify-between mb-6">
-                                <div
-                                    class="absolute -top-2 -left-2 h-6 w-6 bg-blue-600 text-white text-[13px] font-bold rounded-full flex items-center justify-center shadow-md">
-                                    <span x-text="index + 1"></span>
+                            {{-- 1. HEADER BARIS --}}
+                            <div class="flex items-center justify-between border-b border-gray-50 pb-6">
+                                <div class="flex items-center gap-4">
+                                    <div class="h-10 w-10 bg-blue-600 text-white text-sm font-black rounded-2xl flex items-center justify-center shadow-lg shadow-blue-200"
+                                        x-text="index + 1"></div>
+                                    <div>
+                                        <h3 class="text-sm font-black text-slate-800 uppercase tracking-widest">Konfigurasi
+                                            Kontrak</h3>
+                                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">
+                                            Entry Data Pekerja & Alokasi Unit</p>
+                                    </div>
                                 </div>
-
-                                <div class="flex items-center gap-3">
-                                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Data
-                                        Pekerja ke-<span x-text="index + 1"></span></span>
-                                </div>
-
-                                {{-- Tombol Hapus: Sekarang di posisi yang aman dan mudah diklik --}}
                                 <button type="button" @click="removeRow(index)"
-                                    class="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-red-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all border border-transparent hover:border-red-100">
-                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    class="flex items-center gap-2 px-4 py-2 text-[10px] font-black text-red-500 uppercase tracking-widest hover:bg-red-50 rounded-xl transition-all active:scale-95">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                                        stroke-width="2.5">
+                                        <path
                                             d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                     </svg>
-                                    Hapus
+                                    Hapus Baris
                                 </button>
                             </div>
 
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
+                            {{-- SECTION 1: PERSONALIA --}}
+                            <div class="space-y-6">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-1.5 h-6 bg-blue-500 rounded-full"></div>
+                                    <h4 class="text-[11px] font-black text-slate-800 uppercase tracking-[0.2em]">Informasi
+                                        Personalia</h4>
+                                </div>
 
-                                {{-- 1. Worker Combobox --}}
-                                <div x-data="workerCombobox(row)" x-init="init()" class="relative sm:col-span-2">
-                                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Nama
-                                        Pekerja</label>
-                                    <input type="hidden" :name="`pekerja[${index}][id_pekerja]`" x-model="selectedId">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
+                                    {{-- Nama Pekerja --}}
+                                    <div x-data="workerCombobox(row)" x-init="init()" class="relative sm:col-span-2">
+                                        <label
+                                            class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Nama
+                                            Pekerja</label>
+                                        <input type="hidden" :name="`pekerja[${index}][id_pekerja]`"
+                                            x-model="selectedId">
+                                        <div class="relative group">
+                                            <input type="text" x-model="search" @focus="open = true"
+                                                @click.outside="close()" placeholder="Cari berdasarkan Nama atau NIK..."
+                                                class="w-full pl-5 pr-20 py-4 text-sm font-bold text-slate-700 bg-slate-50 border-none rounded-xl focus:ring-4 focus:ring-blue-100 focus:bg-white transition-all shadow-sm">
 
-                                    <div class="relative">
+                                            <div class="absolute inset-y-0 right-0 flex items-center pr-3 gap-2">
+                                                <button type="button" x-show="selectedId"
+                                                    @click.stop="selectedId = null; row.workerId = ''; search = ''; row.kpj = ''; row.naker = ''; row.bpjsKesehatan = 0; row.bpjsNaker = 0;"
+                                                    class="p-2 text-slate-300 hover:text-red-500 transition-colors">
+                                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                                                        stroke="currentColor" stroke-width="3">
+                                                        <path d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                </button>
+                                                <svg class="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24"
+                                                    stroke="currentColor" stroke-width="2.5">
+                                                    <path d="M19 9l-7 7-7-7" />
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        <ul x-show="open" x-transition.opacity
+                                            class="absolute z-50 w-full mt-2 bg-white border border-gray-100 rounded-3xl shadow-2xl max-h-64 overflow-y-auto py-3 custom-scrollbar">
+                                            <template x-for="p in filtered" :key="p.id">
+                                                <li @click="select(p)"
+                                                    class="px-6 py-3.5 text-sm cursor-pointer hover:bg-blue-50 transition-colors flex items-center justify-between group">
+                                                    <div class="flex flex-col">
+                                                        <span class="font-bold text-slate-800" x-text="p.nama"></span>
+                                                        <span
+                                                            class="text-[10px] text-slate-400 font-mono tracking-widest uppercase mt-0.5"
+                                                            x-text="p.nik"></span>
+                                                    </div>
+                                                    <svg class="w-4 h-4 text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                        fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                                                        stroke-width="3">
+                                                        <path d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                </li>
+                                            </template>
+                                        </ul>
+                                    </div>
+
+                                    {{-- Divisi --}}
+                                    <div x-data="idCombobox(row, 'divisiId', window.divisiData, d => d.nama)" x-init="init()" class="relative">
+                                        <label
+                                            class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Divisi
+                                            Pekerja</label>
                                         <input type="text" x-model="search" @focus="open = true"
-                                            @click.outside="close()" placeholder="Cari nama atau NIK..."
-                                            class="w-full pl-4 pr-20 py-3 text-sm font-medium text-gray-800 bg-gray-50 rounded-xl border-gray-200 focus:bg-white focus:border-blue-500 transition cursor-pointer">
-
-                                        {{-- Clear Button --}}
-                                        <button type="button" x-show="selectedId"
-                                            @click.stop="selectedId = null; row.workerId = ''; search = ''; row.kpj = ''; row.naker = ''; row.bpjsKesehatan = 0; row.bpjsNaker = 0;"
-                                            class="absolute inset-y-0 right-10 flex items-center pr-2 text-gray-400 hover:text-red-500 transition">
-                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24"
-                                                stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M6 18L18 6M6 6l12 12" />
-                                            </svg>
-                                        </button>
-
-                                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M19 9l-7 7-7-7" />
-                                            </svg>
-                                        </div>
+                                            @click.outside="close()" placeholder="Pilih Divisi..."
+                                            class="w-full px-5 py-4 text-sm font-bold text-slate-700 bg-slate-50 border-none rounded-xl focus:ring-4 focus:ring-blue-100 focus:bg-white transition-all shadow-sm">
+                                        <ul x-show="open"
+                                            class="absolute z-50 w-full mt-2 bg-white border border-gray-100 rounded-2xl shadow-xl max-h-48 overflow-y-auto py-2 custom-scrollbar">
+                                            <template x-for="item in filtered" :key="item.id">
+                                                <li @click="select(item)"
+                                                    class="px-5 py-2.5 text-sm font-bold text-slate-600 hover:bg-blue-50 cursor-pointer"
+                                                    x-text="item.nama"></li>
+                                            </template>
+                                        </ul>
+                                        <input type="hidden" :name="`pekerja[${index}][divisi_id]`"
+                                            :value="row.divisiId">
                                     </div>
 
-                                    <ul x-show="open" x-transition.opacity
-                                        class="absolute z-50 w-full mt-1 bg-white border border-gray-100 rounded-xl shadow-xl max-h-56 overflow-y-auto py-1">
-                                        <template x-for="p in filtered" :key="p.id">
-                                            <li @click="select(p)"
-                                                class="px-4 py-2.5 text-sm cursor-pointer hover:bg-blue-50 hover:text-blue-700 flex flex-col">
-                                                <span class="font-semibold" x-text="p.nama"></span>
-                                                <span class="text-[10px] text-gray-400 font-mono" x-text="p.nik"></span>
-                                            </li>
-                                        </template>
-                                        <li x-show="filtered.length === 0"
-                                            class="px-4 py-3 text-xs text-gray-400 text-center">Tidak ditemukan</li>
-                                    </ul>
-                                </div>
-
-                                {{-- 2. Divisi (Searchable Combobox) --}}
-                                <div x-data="idCombobox(row, 'divisiId', window.divisiData, d => d.nama)" x-init="init()" class="relative">
-                                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
-                                        Divisi
-                                    </label>
-
-                                    <div class="relative">
-                                        <!-- Visible input (search/display only) -->
-                                        <input type="text" x-model="search" @focus="open = true" @click="open = true"
-                                            @click.outside="close()" @keydown.escape="open = false"
-                                            placeholder="Pilih divisi..."
-                                            class="w-full pl-4 pr-10 py-3 text-sm font-medium text-gray-800 bg-gray-50 rounded-xl focus:bg-white focus:border-blue-500 transition"
-                                            autocomplete="off">
-
-                                        <!-- Chevron -->
-                                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M19 9l-7 7-7-7" />
-                                            </svg>
-                                        </div>
-                                    </div>
-
-                                    <!-- Dropdown -->
-                                    <ul x-show="open" x-transition.opacity
-                                        class="absolute z-50 w-full mt-1 bg-white border border-gray-100 rounded-xl shadow-xl max-h-48 overflow-y-auto py-1">
-                                        <template x-for="item in filtered" :key="item.id">
-                                            <li @click="select(item)"
-                                                class="px-4 py-2.5 text-sm cursor-pointer hover:bg-blue-50 hover:text-blue-700 font-medium text-gray-700">
-                                                <span x-text="item.nama"></span>
-                                            </li>
-                                        </template>
-
-                                        <li x-show="filtered.length === 0" class="px-4 py-2 text-xs text-gray-400 italic">
-                                            Tidak ada hasil
-                                        </li>
-                                    </ul>
-
-                                    <!-- Hidden input (actual submitted value) -->
-                                    <input type="hidden" :name="`pekerja[${index}][divisi_id]`" :value="row.divisiId">
-                                </div>
-
-                                {{-- 3. Jabatan (Searchable Combobox) --}}
-                                <div x-data="idCombobox(row, 'jabatanId', window.jabatanData, j => j.nama)" x-init="init()" class="relative">
-                                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
-                                        Jabatan
-                                    </label>
-
-                                    <div class="relative">
-                                        <!-- Visible input -->
-                                        <input type="text" x-model="search" @focus="open = true" @click="open = true"
-                                            @click.outside="close()" @keydown.escape="open = false"
-                                            placeholder="Pilih jabatan..."
-                                            class="w-full pl-4 pr-10 py-3 text-sm font-medium text-gray-800 bg-gray-50 rounded-xl focus:bg-white focus:border-blue-500 transition"
-                                            autocomplete="off">
-
-                                        <!-- Chevron -->
-                                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M19 9l-7 7-7-7" />
-                                            </svg>
-                                        </div>
-                                    </div>
-
-                                    <!-- Dropdown -->
-                                    <ul x-show="open" x-transition.opacity
-                                        class="absolute z-50 w-full mt-1 bg-white border border-gray-100 rounded-xl shadow-xl max-h-48 overflow-y-auto py-1">
-                                        <template x-for="item in filtered" :key="item.id">
-                                            <li @click="select(item)"
-                                                class="px-4 py-2.5 text-sm cursor-pointer hover:bg-blue-50 hover:text-blue-700 font-medium text-gray-700">
-                                                <span x-text="item.nama"></span>
-                                            </li>
-                                        </template>
-
-                                        <li x-show="filtered.length === 0" class="px-4 py-2 text-xs text-gray-400 italic">
-                                            Tidak ada hasil
-                                        </li>
-                                    </ul>
-
-                                    <!-- Hidden input (submitted value) -->
-                                    <input type="hidden" :name="`pekerja[${index}][jabatan_id]`" :value="row.jabatanId">
-                                </div>
-
-                                {{-- 4. Gaji Harian --}}
-                                <div>
-                                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
-                                        Gaji Harian
-                                    </label>
-                                    <div class="relative">
-                                        {{-- Input ini hanya untuk tampilan (display) --}}
-                                        <input type="text" :value="formatRupiah(row.gaji)"
-                                            @input="row.gaji = Number($event.target.value.replace(/\D/g, ''))"
-                                            class="w-full rounded-xl border-gray-200 bg-gray-50 text-sm font-bold text-gray-900 focus:bg-white focus:border-blue-500 py-3 px-4"
-                                            placeholder="Rp 0">
-
-                                        {{-- Hidden input untuk mengirim angka murni ke Controller --}}
-                                        <input type="hidden" :name="`pekerja[${index}][gaji_harian]`"
-                                            :value="row.gaji">
-                                    </div>
-                                </div>
-
-                                {{-- 5. Gaji Overtime (Lembur) --}}
-                                <div>
-                                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
-                                        Gaji Overtime (Lembur) / Jam
-                                    </label>
-                                    <div class="relative">
-                                        {{-- Input Tampilan --}}
-                                        <input type="text" :value="formatRupiah(row.overtime)"
-                                            @input="row.overtime = Number($event.target.value.replace(/\D/g, ''))"
-                                            class="w-full rounded-xl border-gray-200 bg-gray-50 text-sm font-bold text-gray-900 focus:bg-white focus:border-blue-500 py-3 px-4"
-                                            placeholder="Rp 0">
-
-                                        {{-- Hidden input untuk mengirim angka murni ke database --}}
-                                        <input type="hidden" :name="`pekerja[${index}][gaji_overtime]`"
-                                            :value="row.overtime">
-                                    </div>
-                                </div>
-
-                                {{-- HASIL BPJS KESEHATAN --}}
-                                <div>
-                                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">
-                                        Iuran BPJS Kes
-                                        <span x-show="row.kpj && row.kpj.trim() !== ''"
-                                            class="text-green-500 text-[10px] ml-1">● Editable</span>
-                                    </label>
-                                    <div class="relative">
-                                        <input type="text" {{-- Conditional readonly based on KPJ existence --}}
-                                            :readonly="!row.kpj || row.kpj.trim() === ''"
-                                            :value="formatRupiah(row.bpjsKesehatan)"
-                                            @input="row.bpjsKesehatan = Number($event.target.value.replace(/\D/g, ''))"
-                                            {{-- Dynamic classes based on KPJ and value --}}
-                                            :class="{
-                                                'bg-blue-50 text-blue-700 border-blue-200 cursor-text': row.kpj && row
-                                                    .kpj.trim() !== '' && row.bpjsKesehatan > 0,
-                                                'bg-white text-gray-700 border-gray-300 cursor-text hover:border-blue-400': row
-                                                    .kpj && row.kpj.trim() !== '' && row.bpjsKesehatan === 0,
-                                                'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed': !row
-                                                    .kpj || row.kpj.trim() === ''
-                                            }"
-                                            class="w-full rounded-xl border text-sm font-bold py-3 px-4 transition-colors focus:ring-2 focus:ring-blue-300 focus:outline-none"
-                                            placeholder="Rp 0">
-
-                                        <input type="hidden" :name="`pekerja[${index}][bpjs_kesehatan]`"
-                                            :value="row.bpjsKesehatan">
-
-                                        {{-- Optional: Icon indicator --}}
-                                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                            <svg x-show="row.kpj && row.kpj.trim() !== ''" class="w-4 h-4 text-green-500"
-                                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                            </svg>
-                                            <svg x-show="!row.kpj || row.kpj.trim() === ''" class="w-4 h-4 text-gray-300"
-                                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                            </svg>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {{-- HASIL BPJS NAKER --}}
-                                <div>
-                                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">
-                                        Iuran BPJS Naker
-                                        <span x-show="row.naker && row.naker.trim() !== ''"
-                                            class="text-green-500 text-[10px] ml-1">● Editable</span>
-                                    </label>
-                                    <div class="relative">
-                                        <input type="text" {{-- Conditional readonly based on Naker existence --}}
-                                            :readonly="!row.naker || row.naker.trim() === ''"
-                                            :value="formatRupiah(row.bpjsNaker)"
-                                            @input="row.bpjsNaker = Number($event.target.value.replace(/\D/g, ''))"
-                                            {{-- Dynamic classes based on Naker and value --}}
-                                            :class="{
-                                                'bg-blue-50 text-blue-700 border-blue-200 cursor-text': row.naker && row
-                                                    .naker.trim() !== '' && row.bpjsNaker > 0,
-                                                'bg-white text-gray-700 border-gray-300 cursor-text hover:border-blue-400': row
-                                                    .naker && row.naker.trim() !== '' && row.bpjsNaker === 0,
-                                                'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed': !row
-                                                    .naker || row.naker.trim() === ''
-                                            }"
-                                            class="w-full rounded-xl border text-sm font-bold py-3 px-4 transition-colors focus:ring-2 focus:ring-blue-300 focus:outline-none"
-                                            placeholder="Rp 0">
-
-                                        <input type="hidden" :name="`pekerja[${index}][bpjs_naker]`"
-                                            :value="row.bpjsNaker">
-
-                                        {{-- Optional: Icon indicator --}}
-                                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                            <svg x-show="row.naker && row.naker.trim() !== ''"
-                                                class="w-4 h-4 text-green-500" fill="none" viewBox="0 0 24 24"
-                                                stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                            </svg>
-                                            <svg x-show="!row.naker || row.naker.trim() === ''"
-                                                class="w-4 h-4 text-gray-300" fill="none" viewBox="0 0 24 24"
-                                                stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                            </svg>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {{-- 8. Dates Mulai --}}
-                                <div>
-                                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Mulai
-                                        PKWT</label>
-                                    <input type="date" :name="`pekerja[${index}][tgl_mulai_pkwt]`"
-                                        value="{{ now()->toDateString() }}"
-                                        class="w-full rounded-xl border-gray-200 bg-gray-50 text-sm py-3 px-4 text-gray-600 focus:bg-white focus:border-blue-500">
-                                </div>
-
-                                {{-- 9. Dates Akhir --}}
-                                <div>
-                                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Akhir
-                                        PKWT</label>
-                                    <input type="date" :name="`pekerja[${index}][tgl_akhir_pkwt]`"
-                                        class="w-full rounded-xl border-gray-200 bg-gray-50 text-sm py-3 px-4 text-gray-600 focus:bg-white focus:border-blue-500">
-                                </div>
-
-                                <!-- TEMPATKAN INI DI DALAM TEMPLATE WORKER ROW -->
-                                <div
-                                    class="sm:col-span-2 mt-2 p-5 bg-emerald-50/50 rounded-2xl border border-emerald-100/50">
-                                    <div class="flex items-center gap-2 mb-4">
-                                        <div class="p-1.5 bg-emerald-100 text-emerald-600 rounded-lg">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                            </svg>
-                                        </div>
-                                        <h4 class="text-[11px] font-black text-emerald-700 uppercase tracking-[0.2em]">
-                                            Tunjangan Spesifik Unit</h4>
-                                    </div>
-
-                                    {{-- Hidden Input Utama: Mengirim data sebagai String JSON murni ke Laravel --}}
-                                    <input type="hidden" :name="`pekerja[${index}][tunjangan]`"
-                                        :value="JSON.stringify(row.tunjangan || {})">
-
-                                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                        <template x-for="(val, key) in (row.tunjangan || {})" :key="key">
-                                            <div class="space-y-1.5">
-                                                <label
-                                                    class="block text-[10px] font-bold text-emerald-600 uppercase tracking-wider ml-1"
-                                                    x-text="key.replace(/_/g, ' ')"></label>
-                                                <div class="relative">
-                                                    <span
-                                                        class="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-emerald-400">Rp</span>
-
-                                                    {{-- Input Tampilan: TIDAK memiliki atribut 'name' agar tidak terkirim secara terpisah --}}
-                                                    <input type="text"
-                                                        :value="formatRupiah(row.tunjangan[key]).replace('Rp', '').trim()"
-                                                        @input="row.tunjangan[key] = Number($event.target.value.replace(/\D/g, ''))"
-                                                        class="w-full pl-8 pr-3 py-2 text-sm font-black text-slate-700 bg-white border border-emerald-100 rounded-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all shadow-sm"
-                                                        placeholder="0">
-                                                </div>
-                                            </div>
-                                        </template>
-
-                                        <div x-show="Object.keys(row.tunjangan || {}).length === 0"
-                                            class="sm:col-span-3 text-center py-2">
-                                            <p class="text-xs text-emerald-400 italic font-medium">Unit ini tidak memiliki
-                                                konfigurasi tunjangan.</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {{-- Weekly Schedule Input --}}
-                                <div class="sm:col-span-2 mt-4">
-                                    <div class="flex items-center justify-between mb-3 px-1">
+                                    {{-- Jabatan --}}
+                                    <div x-data="idCombobox(row, 'jabatanId', window.jabatanData, j => j.nama)" x-init="init()" class="relative">
                                         <label
-                                            class="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">Alokasi
-                                            Jam Harian</label>
-                                        <div class="flex items-center gap-2">
+                                            class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Jabatan
+                                            Pekerja</label>
+                                        <input type="text" x-model="search" @focus="open = true"
+                                            @click.outside="close()" placeholder="Pilih Jabatan..."
+                                            class="w-full px-5 py-4 text-sm font-bold text-slate-700 bg-slate-50 border-none rounded-xl focus:ring-4 focus:ring-blue-100 focus:bg-white transition-all shadow-sm">
+                                        <ul x-show="open"
+                                            class="absolute z-50 w-full mt-2 bg-white border border-gray-100 rounded-2xl shadow-xl max-h-48 overflow-y-auto py-2 custom-scrollbar">
+                                            <template x-for="item in filtered" :key="item.id">
+                                                <li @click="select(item)"
+                                                    class="px-5 py-2.5 text-sm font-bold text-slate-600 hover:bg-blue-50 cursor-pointer"
+                                                    x-text="item.nama"></li>
+                                            </template>
+                                        </ul>
+                                        <input type="hidden" :name="`pekerja[${index}][jabatan_id]`"
+                                            :value="row.jabatanId">
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- SECTION 2: STANDAR WAKTU & JADWAL --}}
+                            <div class="space-y-6">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-1.5 h-6 bg-indigo-500 rounded-full"></div>
+                                    <h4 class="text-[11px] font-black text-slate-800 uppercase tracking-[0.2em]">Standar
+                                        Waktu & Alokasi</h4>
+                                </div>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
+                                    {{-- Weekly Schedule --}}
+                                    <div class="sm:col-span-2">
+                                        <div class="flex items-center justify-between mb-4 px-1">
+                                            <label
+                                                class="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Prakiraan
+                                                Jam Kerja Harian</label>
+                                            <div
+                                                class="flex items-center gap-2 px-3 py-1 bg-slate-50 rounded-lg border border-slate-100">
+                                                <span
+                                                    class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Total:</span>
+                                                <span class="font-mono text-xs font-black text-blue-600"
+                                                    x-text="(Object.values(row.days).reduce((a, b) => (parseFloat(a) || 0) + (parseFloat(b) || 0), 0)).toFixed(1) + ' Jam'"></span>
+                                            </div>
+                                        </div>
+                                        <div
+                                            class="flex bg-slate-50 p-1.5 rounded-[1.5rem] border border-slate-100 overflow-hidden shadow-inner">
+                                            <template
+                                                x-for="(dayName, dayKey) in {mon:'Senin', tue:'Selasa', wed:'Rabu', thu:'Kamis', fri:'Jumat', sat:'Sabtu', sun:'Minggu'}"
+                                                :key="dayKey">
+                                                <div class="flex-1 relative group/day">
+                                                    <div
+                                                        class="absolute top-3 left-0 right-0 text-center pointer-events-none z-20">
+                                                        <span
+                                                            class="text-[9px] font-black uppercase tracking-tighter transition-colors"
+                                                            :class="row.days[dayKey] !== '' && parseFloat(row.days[
+                                                                dayKey]) > 0 ? (dayKey === 'sun' ?
+                                                                'text-red-500' : 'text-blue-600') : 'text-slate-300'"
+                                                            x-text="dayName"></span>
+                                                    </div>
+                                                    <input type="number" step="0.1" placeholder="0"
+                                                        :name="`pekerja[${index}][days][${dayKey}]`"
+                                                        :value="row.days[dayKey]"
+                                                        @input="validateDayInput($event, row, dayKey)"
+                                                        @blur="cleanupDayInput(row, dayKey)"
+                                                        class="w-full pt-8 pb-4 text-center text-sm font-black bg-transparent border-none outline-none ring-0 focus:ring-0 z-10 relative transition-all"
+                                                        :class="row.days[dayKey] !== '' ? 'text-slate-800' :
+                                                            'text-slate-300'" />
+                                                    <div x-show="dayKey !== 'sun'"
+                                                        class="absolute right-0 top-4 bottom-4 w-px bg-slate-200/60 group-focus-within/day:opacity-0 transition-opacity">
+                                                    </div>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- SECTION 3: STRUKTUR GAJI --}}
+                            <div class="space-y-6">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-1.5 h-6 bg-emerald-500 rounded-full"></div>
+                                    <h4 class="text-[11px] font-black text-slate-800 uppercase tracking-[0.2em]">Struktur
+                                        Kompensasi</h4>
+                                </div>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
+                                    {{-- Gaji Bulanan --}}
+                                    <div class="space-y-2">
+                                        <label
+                                            class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Gaji
+                                            Bulanan (Pokok)</label>
+                                        <div class="relative group">
                                             <span
-                                                class="text-[10px] font-bold text-gray-300 uppercase tracking-widest">Total</span>
-                                            <span class="font-mono text-sm font-black text-gray-900"
-                                                x-text="(Object.values(row.days).reduce((a, b) => (parseFloat(a) || 0) + (parseFloat(b) || 0), 0)).toFixed(1)">
-                                            </span>
+                                                class="absolute left-5 top-1/2 -translate-y-1/2 text-xs font-black text-slate-300 group-focus-within:text-emerald-500 transition-colors">Rp</span>
+                                            <input type="text" :value="formatRupiah(row.gaji_bulanan)"
+                                                @input="row.gaji_bulanan = Number($event.target.value.replace(/\D/g, '')); calculateSalaryComponents(row)"
+                                                class="w-full pl-12 pr-5 py-4 text-sm font-black text-slate-700 bg-slate-50 border-none rounded-xl focus:ring-4 focus:ring-emerald-100 focus:bg-white transition-all shadow-sm"
+                                                placeholder="0">
+                                            <input type="hidden" :name="`pekerja[${index}][gaji_bulanan]`"
+                                                :value="row.gaji_bulanan">
+                                        </div>
+                                    </div>
+                                    {{-- Gaji Harian --}}
+                                    <div class="space-y-2">
+                                        <label
+                                            class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Gaji
+                                            Harian (Proporsional)</label>
+                                        <div class="relative group">
+                                            <span
+                                                class="absolute left-5 top-1/2 -translate-y-1/2 text-xs font-black text-slate-300 group-focus-within:text-emerald-500 transition-colors">Rp</span>
+                                            <input type="text" :value="formatRupiah(row.gaji)"
+                                                @input="calculateSalaryComponents(row)"
+                                                class="w-full pl-12 pr-5 py-4 text-sm font-black text-slate-700 bg-slate-50 border-none rounded-xl focus:ring-4 focus:ring-emerald-100 focus:bg-white transition-all shadow-sm"
+                                                placeholder="0">
+                                            <input type="hidden" :name="`pekerja[${index}][gaji_harian]`"
+                                                :value="row.gaji">
+                                        </div>
+                                    </div>
+                                    {{-- Overtime --}}
+                                    <div class="space-y-2">
+                                        <label
+                                            class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Upah
+                                            Overtime / Jam</label>
+                                        <div class="relative group">
+                                            <span
+                                                class="absolute left-5 top-1/2 -translate-y-1/2 text-xs font-black text-slate-300 group-focus-within:text-emerald-500 transition-colors">Rp</span>
+                                            <input type="text" :value="formatRupiah(row.overtime)"
+                                                @input="row.overtime = Number($event.target.value.replace(/\D/g, ''))"
+                                                class="w-full pl-12 pr-5 py-4 text-sm font-black text-slate-700 bg-slate-50 border-none rounded-xl focus:ring-4 focus:ring-emerald-100 focus:bg-white transition-all shadow-sm"
+                                                placeholder="0">
+                                            <input type="hidden" :name="`pekerja[${index}][gaji_overtime]`"
+                                                :value="row.overtime">
+                                        </div>
+                                    </div>
+                                    {{-- HBN --}}
+                                    <div class="space-y-2">
+                                        <label
+                                            class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Upah
+                                            HBN (Lembur Libur)</label>
+                                        <div class="relative group">
+                                            <span
+                                                class="absolute left-5 top-1/2 -translate-y-1/2 text-xs font-black text-slate-300 group-focus-within:text-emerald-500 transition-colors">Rp</span>
+                                            <input type="text" :value="formatRupiah(row.gaji_hbn)"
+                                                @input="row.gaji_hbn = Number($event.target.value.replace(/\D/g, ''))"
+                                                class="w-full pl-12 pr-5 py-4 text-sm font-black text-slate-700 bg-slate-50 border-none rounded-xl focus:ring-4 focus:ring-emerald-100 focus:bg-white transition-all shadow-sm"
+                                                placeholder="0">
+                                            <input type="hidden" :name="`pekerja[${index}][gaji_hbn]`"
+                                                :value="row.gaji_hbn">
                                         </div>
                                     </div>
 
-                                    <div class="flex bg-gray-50/80 p-1 rounded-2xl border border-gray-100 overflow-hidden">
-                                        <template
-                                            x-for="(dayName, dayKey) in {mon:'Senin', tue:'Selasa', wed:'Rabu', thu:'Kamis', fri:'Jumat', sat:'Sabtu', sun:'Minggu'}"
-                                            :key="dayKey">
-                                            <div class="flex-1 relative group/day">
-                                                <div
-                                                    class="absolute top-2.5 left-0 right-0 text-center pointer-events-none z-20">
-                                                    <span class="text-[10px] font-black tracking-tighter"
-                                                        :class="row.days[dayKey] !== '' && parseFloat(row.days[
-                                                            dayKey]) > 0 ? (dayKey === 'sun' ?
-                                                            'text-red-500' :
-                                                            'text-blue-500') : 'text-gray-300'"
-                                                        x-text="dayName"></span>
-                                                </div>
-
-                                                <input type="number" step="0.1" placeholder="0"
-                                                    :name="`pekerja[${index}][days][${dayKey}]`" :value="row.days[dayKey]"
-                                                    @input="validateDayInput($event, row, dayKey)"
-                                                    @blur="cleanupDayInput(row, dayKey)"
-                                                    class="w-full pt-7 pb-3 text-center text-base font-bold bg-transparent border-none outline-none ring-0 focus:ring-0 focus:outline-none placeholder:text-gray-200 z-10 relative transition-all"
-                                                    :class="row.days[dayKey] !== '' ? 'text-gray-900' : 'text-gray-400'" />
-
-                                                <div
-                                                    class="absolute inset-0 rounded-xl transition-all duration-300 opacity-0 group-hover/day:opacity-100 group-focus-within/day:opacity-100 group-focus-within/day:bg-white group-focus-within/day:shadow-sm">
-                                                </div>
-                                                <div x-show="dayKey !== 'sat'"
-                                                    class="absolute right-0 top-4 bottom-4 w-px bg-gray-200/60 group-focus-within/day:opacity-0 transition-opacity">
-                                                </div>
-                                                <div x-show="dayKey !== 'sun'"
-                                                    class="absolute right-0 top-4 bottom-4 w-px bg-gray-200/60 group-focus-within/day:opacity-0 transition-opacity">
-                                                </div>
-                                            </div>
-                                        </template>
+                                    {{-- BPJS Section --}}
+                                    <div class="space-y-2">
+                                        <label
+                                            class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Iuran
+                                            BPJS Kesehatan
+                                            <span x-show="row.kpj"
+                                                class="ml-2 px-1.5 py-0.5 bg-emerald-50 text-emerald-600 text-[8px] rounded uppercase font-black">Editable</span>
+                                        </label>
+                                        <div class="relative">
+                                            <input type="text" :readonly="!row.kpj"
+                                                :value="formatRupiah(row.bpjsKesehatan, true)" 
+                                                @input="row.bpjsKesehatan = Number($event.target.value.replace(/\D/g, ''))"
+                                                :class="{
+                                                    'bg-blue-50 text-blue-700 border border-blue-100 cursor-text': row
+                                                        .kpj && row.bpjsKesehatan > 0,
+                                                    'bg-white border border-slate-200': row.kpj && row.bpjsKesehatan ===
+                                                        0,
+                                                    'bg-slate-100 text-slate-400 border-none cursor-not-allowed': !row
+                                                        .kpj
+                                                }"
+                                                class="w-full px-5 py-4 text-sm font-black rounded-xl transition-all outline-none">
+                                            <input type="hidden" :name="`pekerja[${index}][bpjs_kesehatan]`"
+                                                :value="row.bpjsKesehatan">
+                                        </div>
+                                    </div>
+                                    <div class="space-y-2">
+                                        <label
+                                            class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Iuran
+                                            BPJS Ketenagakerjaan
+                                            <span x-show="row.naker"
+                                                class="ml-2 px-1.5 py-0.5 bg-emerald-50 text-emerald-600 text-[8px] rounded uppercase font-black">Editable</span>
+                                        </label>
+                                        <div class="relative">
+                                            <input type="text" :readonly="!row.naker"
+                                                :value="formatRupiah(row.bpjsNaker, true)"
+                                                @input="row.bpjsNaker = Number($event.target.value.replace(/\D/g, ''))"
+                                                :class="{
+                                                    'bg-blue-50 text-blue-700 border border-blue-100 cursor-text': row
+                                                        .naker && row.bpjsNaker > 0,
+                                                    'bg-white border border-slate-200': row.naker && row.bpjsNaker ===
+                                                        0,
+                                                    'bg-slate-100 text-slate-400 border-none cursor-not-allowed': !row
+                                                        .naker
+                                                }"
+                                                class="w-full px-5 py-4 text-sm font-black rounded-xl transition-all outline-none">
+                                            <input type="hidden" :name="`pekerja[${index}][bpjs_naker]`"
+                                                :value="row.bpjsNaker">
+                                        </div>
                                     </div>
                                 </div>
+                            </div>
 
-                                {{-- 10. File Upload --}}
-                                <div class="sm:col-span-2" x-data="{ fileName: '' }">
-                                    <label
-                                        class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Dokumen
-                                        PKWT</label>
-                                    <div class="flex items-center gap-3">
+                            {{-- SECTION 4: TUNJANGAN UNIT (Emerald Glass Box) --}}
+                            <div class="p-8 bg-emerald-50/40 rounded-[1.5rem] border border-emerald-100 space-y-6">
+                                <div class="flex items-center gap-3">
+                                    <div
+                                        class="p-2 bg-white rounded-xl shadow-sm text-emerald-600 border border-emerald-50">
+                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                                            stroke-width="2.5">
+                                            <path
+                                                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+                                    <h4 class="text-[11px] font-black text-emerald-800 uppercase tracking-[0.2em]">
+                                        Tunjangan Spesifik Unit</h4>
+                                </div>
+
+                                <input type="hidden" :name="`pekerja[${index}][tunjangan]`"
+                                    :value="JSON.stringify(row.tunjangan || {})">
+
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                                    <template x-for="(val, key) in (row.tunjangan || {})" :key="key">
+                                        <div class="space-y-2">
+                                            <label
+                                                class="block text-[10px] font-black text-emerald-600 uppercase tracking-widest ml-1"
+                                                x-text="key.replace(/_/g, ' ')"></label>
+                                            <div class="relative group/t">
+                                                <span
+                                                    class="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-emerald-300 group-focus-within/t:text-emerald-600 transition-colors">Rp</span>
+                                                <input type="text"
+                                                    :value="formatRupiah(row.tunjangan[key]).replace('Rp', '').trim()"
+                                                    @input="row.tunjangan[key] = Number($event.target.value.replace(/\D/g, ''))"
+                                                    class="w-full pl-10 pr-4 py-3 text-sm font-black text-emerald-800 bg-white border border-emerald-100 rounded-2xl focus:ring-4 focus:ring-emerald-200/50 outline-none transition-all shadow-sm"
+                                                    placeholder="0">
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+
+                                <div x-show="Object.keys(row.tunjangan || {}).length === 0"
+                                    class="text-center py-4 text-emerald-400 italic text-xs font-bold uppercase tracking-widest">
+                                    Tidak ada konfigurasi tunjangan tambahan.
+                                </div>
+                            </div>
+
+                            {{-- SECTION 5: ADMINISTRASI --}}
+                            <div class="space-y-6">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-1.5 h-6 bg-slate-400 rounded-full"></div>
+                                    <h4 class="text-[11px] font-black text-slate-500 uppercase tracking-[0.2em]">
+                                        Administrasi & Dokumen PKWT</h4>
+                                </div>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
+                                    <div class="space-y-2">
                                         <label
-                                            class="flex-shrink-0 cursor-pointer inline-flex items-center gap-2 px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50 transition shadow-sm">
-                                            <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24"
-                                                stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                                            </svg>
-                                            <span>Pilih File</span>
+                                            class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Mulai
+                                            Berlaku PKWT</label>
+                                        <input type="date" :name="`pekerja[${index}][tgl_mulai_pkwt]`"
+                                            value="{{ now()->toDateString() }}"
+                                            class="w-full px-5 py-4 text-sm font-bold text-slate-600 bg-slate-50 border-none rounded-xl focus:ring-4 focus:ring-slate-100 focus:bg-white transition-all shadow-sm">
+                                    </div>
+                                    <div class="space-y-2">
+                                        <label
+                                            class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Berakhir
+                                            Berlaku PKWT</label>
+                                        <input type="date" :name="`pekerja[${index}][tgl_akhir_pkwt]`"
+                                            class="w-full px-5 py-4 text-sm font-bold text-slate-600 bg-slate-50 border-none rounded-xl focus:ring-4 focus:ring-slate-100 focus:bg-white transition-all shadow-sm">
+                                    </div>
+
+                                    {{-- File Upload --}}
+                                    <div class="sm:col-span-2 mt-2" x-data="{ fileName: '' }">
+                                        <label
+                                            class="flex items-center gap-5 p-6 bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl cursor-pointer hover:bg-white hover:border-blue-400 transition-all group shadow-sm">
+                                            <div
+                                                class="h-14 w-14 bg-white rounded-2xl shadow-sm border border-slate-100 flex items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors">
+                                                <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24"
+                                                    stroke="currentColor" stroke-width="2">
+                                                    <path
+                                                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                                </svg>
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <p class="text-sm font-black text-slate-700 group-hover:text-blue-600 transition-colors truncate"
+                                                    x-text="fileName || 'Upload Dokumen PKWT Resmi'"></p>
+                                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1"
+                                                    x-show="!fileName">Format yang didukung: PDF, PNG, JPG (Maks. 2MB)</p>
+                                                <p class="text-[10px] font-bold text-emerald-500 uppercase tracking-widest mt-1"
+                                                    x-show="fileName">File siap diunggah</p>
+                                            </div>
                                             <input type="file" class="hidden"
                                                 :name="`pekerja[${index}][dokumen_pkwt]`"
                                                 @change="fileName = $event.target.files[0]?.name || ''">
                                         </label>
-                                        <div class="text-sm text-gray-500 font-medium truncate" x-show="fileName"
-                                            x-text="fileName"></div>
-                                        <div class="text-xs text-gray-400 italic" x-show="!fileName">Belum ada file
-                                            dipilih.</div>
                                     </div>
                                 </div>
                             </div>
+
                         </div>
                     </template>
 
@@ -751,7 +730,9 @@
                 rows: [{
                         id: 1,
                         gaji: 0,
-                        gajiOvertime: 0,
+                        gaji_bulanan: 0, // Inisialisasi
+                        overtime: 0,
+                        gaji_hbn: 0, // Inisialisasi
                         workerId: '',
                         divisiId: null,
                         jabatanId: null,
@@ -771,6 +752,21 @@
                         tunjangan: createFreshTunjangan(),
                     } // Added fields
                 ],
+
+                calculateSalaryComponents(row) {
+                    const bulanan = parseFloat(row.gaji_bulanan) || 0;
+
+                    // 1. Gaji Harian = Gaji Bulanan / 25
+                    row.gaji = Math.round(bulanan / 25);
+
+                    // 2. Gaji Overtime = Gaji Bulanan / 173
+                    // Kita hitung base OT dulu
+                    const otBase = bulanan / 173;
+                    row.overtime = Math.round(otBase);
+
+                    // 3. Gaji HBN = Gaji Overtime * 2
+                    row.gaji_hbn = Math.round(otBase * 1.5);
+                },
 
                 getSelectedWorkerIds() {
                     return this.rows.map(row => row.workerId).filter(id => id !== '');
@@ -814,10 +810,23 @@
                 },
 
                 addRow() {
+
+                    if (this.rows.length >= 5) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Batas Maksimum Tercapai',
+                            text: 'Untuk menjaga performa dan ketelitian, Anda hanya dapat menambah maksimal 5 pekerja dalam satu sesi simpan.',
+                            confirmButtonColor: '#3B82F6', // Sesuai tema biru Anda
+                        });
+                        return; // Berhenti di sini, tidak mengeksekusi baris bawahnya
+                    }
+
                     const row = {
                         id: Date.now(),
                         gaji: 0,
-                        gajiOvertime: 0,
+                        gaji_bulanan: 0,
+                        overtime: 0,
+                        gaji_hbn: 0,
                         workerId: '',
                         divisiId: '',
                         jabatanId: '',
@@ -842,6 +851,15 @@
                 },
 
                 removeRow(index) {
+                    if (this.rows.length <= 1) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Minimal 1 Pekerja',
+                            text: 'Anda harus memiliki minimal 1 pekerja dalam daftar.',
+                            confirmButtonColor: '#3B82F6',
+                        });
+                        return;
+                    }
                     this.rows.splice(index, 1);
                 },
                 get totalAllocation() {
@@ -868,13 +886,16 @@
                     }
                 },
 
-                formatRupiah(amount) {
+                formatRupiah(amount, withCurrency = false) {
                     const value = Number(amount) || 0;
-                    return new Intl.NumberFormat('id-ID', {
-                        style: 'currency',
-                        currency: 'IDR',
-                        minimumFractionDigits: 0
+
+                    const formatted = new Intl.NumberFormat('id-ID', {
+                        style: 'decimal',
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0
                     }).format(value);
+
+                    return withCurrency ? `Rp ${formatted}` : formatted;
                 },
 
                 confirmSubmit() {
