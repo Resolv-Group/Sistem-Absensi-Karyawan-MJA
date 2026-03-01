@@ -387,17 +387,6 @@ php artisan serve
 
 ---
 
-# 🔐 Development Guidelines
-
-* Do not remove existing logic or error handling
-* Preserve configuration hierarchy resolution
-* Follow semantic color system
-* Maintain glassmorphism UI consistency
-* Use deep cloning in Alpine.js loops
-* Keep business calculations deterministic
-
----
-
 # 📈 System Philosophy
 
 MJA is built to:
@@ -410,16 +399,3 @@ MJA is built to:
 
 ---
 
-# 🏷 Current Active Module
-
-**Absensi Borongan**
-
-All future modifications must preserve:
-
-* Quantity formula integrity
-* Reject deduction logic
-* Data hierarchy priority
-* Existing validation and error handling
-
-
-Just tell me your target maturity level (Startup / SME / Enterprise Production).
