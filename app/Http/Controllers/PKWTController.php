@@ -87,11 +87,11 @@ class PKWTController extends Controller
         $unitSelected = Unit::with('namaMitra')->where('id', $id_unit)->firstOrFail();
 
         // 2. Get IDs of workers who ALREADY have an active contract (in any unit)
-        $assignedWorkerIds = PKWT::where('status_aktif', 1)->pluck('id_pekerja')->toArray();
+        $assignedWorkerIds = PKWT::where('id_unit', $id_unit)->where('status_aktif', 1)->pluck('id_pekerja')->toArray();
 
         // 3. Get workers who are active but NOT in the assigned list
         // This handles the requirement: "cannot add worker if already in this or other unit"
-        $pekerjaList = Pekerja::select('id', 'nama', 'nik', 'kpj', 'naker')->where('status_aktif', 1)->get();
+        $pekerjaList = Pekerja::select('id', 'nama', 'nik', 'kpj', 'naker')->whereNotIn('id', $assignedWorkerIds)->get();
         $divisiList = Divisi::select('id', 'nama')->get();
         $jabatanList = JabatanPKWT::select('id', 'nama')->get();
 
@@ -119,8 +119,11 @@ class PKWTController extends Controller
                     'pekerja.*.tgl_mulai_pkwt' => 'required|date',
                     'pekerja.*.tgl_akhir_pkwt' => 'required|date|after_or_equal:pekerja.*.tgl_mulai_pkwt',
 
+                    'pekerja.*.gaji_bulanan' => 'required|numeric|min:0',
                     'pekerja.*.gaji_harian' => 'required|numeric|min:0',
                     'pekerja.*.gaji_overtime' => 'required|numeric|min:0',
+                    'pekerja.*.gaji_hbn' => 'required|numeric|min:0',
+
                     'pekerja.*.bpjs_kesehatan' => 'required|numeric|min:0',
                     'pekerja.*.bpjs_naker' => 'required|numeric|min:0',
 
@@ -174,8 +177,10 @@ class PKWTController extends Controller
                     'jabatan_id' => $data['jabatan_id'],
                     'tgl_mulai_pkwt' => $data['tgl_mulai_pkwt'],
                     'tgl_akhir_pkwt' => $data['tgl_akhir_pkwt'],
+                    'gaji_bulanan' => $data['gaji_bulanan'],
                     'gaji_harian' => $data['gaji_harian'],
                     'gaji_overtime' => $data['gaji_overtime'],
+                    'gaji_hbn' => $data['gaji_hbn'],
                     'bpjs_kesehatan' => $data['bpjs_kesehatan'],
                     'bpjs_naker' => $data['bpjs_naker'],
                     'tunjangan' => json_decode($data['tunjangan'], true),
@@ -238,8 +243,10 @@ class PKWTController extends Controller
 
             $request->validate([
                 'pekerja.*.id_pekerja' => 'required|exists:pekerja,id',
+                'pekerja.*.gaji_bulanan' => 'required|numeric|min:0',
                 'pekerja.*.gaji_harian' => 'required|numeric|min:0',
                 'pekerja.*.gaji_overtime' => 'required|numeric|min:0',
+                'pekerja.*.gaji_hbn' => 'required|numeric|min:0',
                 'pekerja.*.bpjs_kesehatan' => 'required|numeric|min:0',
                 'pekerja.*.bpjs_naker' => 'required|numeric|min:0',
                 'pekerja.*.divisi_id' => 'required|exists:divisi,id',
@@ -261,8 +268,10 @@ class PKWTController extends Controller
             // Update field utama
             $pkwt->update([
                 'id_pekerja' => $data['id_pekerja'],
+                'gaji_bulanan' => $data['gaji_bulanan'],
                 'gaji_harian' => $data['gaji_harian'],
                 'gaji_overtime' => $data['gaji_overtime'],
+                'gaji_hbn' => $data['gaji_hbn'],
                 'bpjs_kesehatan' => $data['bpjs_kesehatan'],
                 'bpjs_naker' => $data['bpjs_naker'],
                 'divisi_id' => $data['divisi_id'],
