@@ -29,7 +29,7 @@
                 <div class="flex items-baseline gap-0.5">
                     <span class="text-[12px] font-bold text-gray-400">Rp</span>
                     <span class="text-sm font-black text-gray-900 tracking-tight">
-                        {{ number_format($pkwt->gaji_harian, 0, ',', '.') }}
+                        {{ number_format($pkwt->gaji_bulanan, 0, ',', '.') }}
                     </span>
                 </div>
 

@@ -25,7 +25,7 @@ class PKWT extends Model
         'gaji_bulanan',
         'gaji_harian',
         'gaji_overtime',
-        'gaji_hbn',
+        'rate_hbn',
         'bpjs_kesehatan',
         'bpjs_naker',
         'tunjangan',

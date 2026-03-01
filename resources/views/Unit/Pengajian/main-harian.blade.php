@@ -894,8 +894,8 @@
                                     & Divisi</th>
                                 <th
                                     class="px-4 py-4 text-[11px] font-black text-gray-400 uppercase tracking-widest text-center">
-                                    Gaji Harian
-                                    & Gaji Lembur</th>
+                                    Gaji Bulanan
+                                    & Gaji OT</th>
                                 <th
                                     class="px-4 py-4 text-[11px] font-black text-gray-400 uppercase tracking-widest text-center">
                                     BPJS Kesehatan

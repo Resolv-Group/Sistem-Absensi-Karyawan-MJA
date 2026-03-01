@@ -286,13 +286,37 @@
 
     {{-- HBN - SEKARANG EDITABLE --}}
     <div class="space-y-2">
-        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Upah HBN (Lembur Libur)</label>
+        {{-- Header: Judul & Hasil dalam satu baris (Compact) --}}
+        <div class="flex items-center justify-between px-1">
+            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                Upah HBN (OT × <span class="text-blue-600" x-text="row.rate_hbn || 0"></span>)
+            </label>
+            
+            {{-- Hasil Kalkulasi Nominal di samping label --}}
+            <div class="flex items-center gap-1.5" x-show="row.gaji_hbn > 0">
+                <span class="text-[11px] font-bold text-slate-300 uppercase tracking-tighter">Hasil:</span>
+                <span class="text-[12px] font-black text-blue-600 tracking-tight" 
+                    x-text="formatRupiah(row.gaji_hbn, true)"></span>
+            </div>
+        </div>
+
         <div class="relative group">
-            <span class="absolute left-5 top-1/2 -translate-y-1/2 text-xs font-black text-slate-300 group-focus-within:text-emerald-500 transition-colors">Rp</span>
-            <input type="text" :value="formatRupiah(row.gaji_hbn)" 
-                @input="row.gaji_hbn = Number($event.target.value.replace(/\D/g, ''))"
-                class="w-full pl-12 pr-5 py-4 text-sm font-black text-slate-700 bg-slate-50 border-none rounded-xl focus:ring-4 focus:ring-emerald-100 focus:bg-white transition-all shadow-sm" placeholder="0">
-            <input type="hidden" :name="`pekerja[${index}][gaji_hbn]`" :value="row.gaji_hbn">
+            {{-- Ikon Multiplier (×) --}}
+            <span class="absolute left-5 top-1/2 -translate-y-1/2 text-xs font-black text-slate-300 group-focus-within:text-blue-500 transition-colors">
+                ×
+            </span>
+            
+            {{-- Input Multiplier (Rate HBN) --}}
+            <input type="number" 
+                step="0.1" 
+                min="0"
+                x-model="row.rate_hbn"
+                @input="calculateSalaryComponents(row)"
+                class="w-full pl-10 pr-5 py-4 text-sm font-black text-slate-700 bg-slate-50 border-none rounded-xl focus:ring-4 focus:ring-blue-100 focus:bg-white transition-all shadow-sm outline-none"
+                placeholder="0.0">
+
+            {{-- Hidden Inputs untuk Backend --}}
+            <input type="hidden" :name="`pekerja[${index}][rate_hbn]`" :value="row.rate_hbn">
         </div>
     </div>
 
@@ -462,7 +486,7 @@
             gaji_bulanan: {{ $pkwt->gaji_bulanan }},
             gaji: {{ $pkwt->gaji_harian }},
             overtime: {{ $pkwt->gaji_overtime }},
-            gaji_hbn: {{ $pkwt->gaji_hbn }},
+            rate_hbn: {{ $pkwt->rate_hbn }},
             bpjsKesehatan: {{ $pkwt->bpjs_kesehatan }},
             bpjsNaker: {{ $pkwt->bpjs_naker }},
             divisiId: {{ $pkwt->divisi_id }},
@@ -539,6 +563,7 @@
                         gaji_bulanan: 0,
                         gaji: 0,
                         overtime: 0,
+                        rate_hbn: 0,
                         gaji_hbn: 0,
                         workerId: '',
                         divisiId: null,
@@ -564,6 +589,7 @@
                     // Recalculate BPJS for existing data in case UMK/percentages changed
                     this.rows.forEach(row => {
                         if (row.kpj || row.naker) {
+                            this.calculateSalaryComponents(row)
                             this.calculateBpjs(row);
                         }
                     });
@@ -574,17 +600,18 @@
 
                 calculateSalaryComponents(row) {
                     const bulanan = parseFloat(row.gaji_bulanan) || 0;
+                    const rateHbn = parseFloat(row.rate_hbn) || 0;
 
-                    // 1. Gaji Harian = Gaji Bulanan / 25
+                    // 1. Gaji Harian
                     row.gaji = Math.round(bulanan / 25);
 
-                    // 2. Gaji Overtime = Gaji Bulanan / 173
-                    // Kita hitung base OT dulu
+                    // 2. Upah Overtime per Jam (Base)
                     const otBase = bulanan / 173;
                     row.overtime = Math.round(otBase);
 
-                    // 3. Gaji HBN = Gaji Overtime * 2
-                    row.gaji_hbn = Math.round(otBase * 1.5);
+                    // 3. Gaji HBN (Hasil Otomatis)
+                    // Rumus: Base Overtime x Angka Pengali (Rate)
+                    row.gaji_hbn = Math.round(row.overtime * rateHbn);
                 },
 
 
@@ -642,14 +669,19 @@
                         row.days[dayKey] = isNaN(n) ? '' : parseFloat(n.toFixed(1)).toString();
                     }
                 },
-                formatRupiah(amount) {
+
+                formatRupiah(amount, withCurrency = false) {
                     const value = Number(amount) || 0;
-                    return new Intl.NumberFormat('id-ID', {
-                        style: 'currency',
-                        currency: 'IDR',
-                        minimumFractionDigits: 0
+
+                    const formatted = new Intl.NumberFormat('id-ID', {
+                        style: 'decimal',
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0
                     }).format(value);
+
+                    return withCurrency ? `Rp ${formatted}` : formatted;
                 },
+
 
                 confirmSubmit() {
                     Swal.fire({
