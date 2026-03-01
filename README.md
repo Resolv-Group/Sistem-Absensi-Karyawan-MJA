@@ -1,59 +1,425 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🏢 MJA Integrated HR & Payroll System
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+![Laravel](https://img.shields.io/badge/Laravel-PHP%208%2B-red)
+![AlpineJS](https://img.shields.io/badge/Alpine.js-State%20Management-blue)
+![TailwindCSS](https://img.shields.io/badge/TailwindCSS-UI%20Framework-38bdf8)
+![Architecture](https://img.shields.io/badge/Architecture-Modular%20%7C%20Hierarchical-indigo)
+![License](https://img.shields.io/badge/License-Private-inactive)
 
-## About Laravel
+MJA is an enterprise-grade **Human Resource, Attendance, and Payroll Management System** built for structured workforce environments supporting both **Daily (Harian)** and **Piecework (Borongan)** payroll models.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+The system emphasizes:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+* Hierarchical configuration resolution
+* Contract-based personalization (PKWT)
+* Dynamic attendance logic
+* Automated payroll & billing exports
+* Clean, scalable Laravel architecture
+* Glassmorphism-based UI consistency
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+# 📐 System Architecture
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+### Backend
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+* Laravel (PHP 8+)
+* Modular Controller-Service Pattern
+* AJAX-driven Payroll Review Engine
 
-## Laravel Sponsors
+### Frontend
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+* Alpine.js (state management)
+* Tailwind CSS (utility-first styling)
+* Glassmorphism UI system
 
-### Premium Partners
+### Configuration Resolution Hierarchy
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+```
+Existing Record > PKWT Contract > Unit Default
+```
 
-## Contributing
+⚠️ Existing business logic and error handling must **never be removed** unless explicitly requested.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+---
 
-## Code of Conduct
+# 🎨 Design System
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### UI Language
 
-## Security Vulnerabilities
+* Light Mode + Glassmorphism
+* `rounded-[1.5rem]` (cards)
+* `rounded-[2.5rem]` (modals)
+* `px-12 py-16` spacious modal padding
+* `tracking-[0.2em]` wide letter spacing
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### Semantic Colors
 
-## License
+| Color      | Purpose                          |
+| ---------- | -------------------------------- |
+| 🟢 Emerald | Additions / Success / Allowances |
+| 🔴 Rose    | Deductions / Errors / Expired    |
+| 🔵 Blue    | Attendance / HR / Primary Info   |
+| 🟠 Orange  | Borongan / Production / Alerts   |
+| 🟣 Indigo  | Scheduling / System Logic        |
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+---
+
+# 🧱 Core Modules
+
+---
+
+## 1️⃣ Master Data Management
+
+### Mitra Kerja
+
+Parent organization entity.
+
+### Units
+
+Sub-entity under Mitra containing:
+
+* Sistem Pengajian:
+
+  * `1` → Harian
+  * `2` → Borongan
+* UMK Fee
+* Management Fee %
+* BPJS Health %
+* BPJS Labor %
+* Default Tunjangan (JSON)
+
+---
+
+### Staff
+
+Internal management assigned as PIC to Units.
+
+---
+
+### Pekerja
+
+Stored in Humaniora and assigned via PKWT contracts.
+
+---
+
+## 2️⃣ PKWT (Contract Engine)
+
+Each PKWT defines:
+
+* Gaji Bulanan
+* Gaji Harian
+* Gaji Overtime
+* Gaji HBN (multiplier rate)
+* Weekly Schedule (Mon–Sun, decimal format)
+* BPJS calculation based on UMK
+* Worker-specific allowance overrides
+
+Editable BPJS fields only activate when KPJ/Naker ID exists.
+
+---
+
+## 3️⃣ Absensi Module
+
+### 🟦 Harian System
+
+Tracks:
+
+* Daily hours
+* Overtime
+* HBN flag
+
+Visual warning:
+
+```
+if jam_aktual < jam_normal → highlight "Jam Kurang"
+```
+
+---
+
+### 🟠 Borongan System
+
+Tracks production-based quantity.
+
+**Total QTY Formula:**
+
+```
+Total QTY = FD + act_rej + good_mc
+```
+
+**Reject Logic:**
+
+```
+if act_rej > max_rej_subkon:
+    rej_mc_dibebankan = act_rej - max_rej_subkon
+```
+
+Tunjangan = `Qty × Nominal`
+Potongan = dynamic row-based deductions
+
+Buttons are hidden until base attendance record exists (`has_absen` flag).
+
+---
+
+## 4️⃣ Payroll Engine
+
+Multi-step wizard:
+
+1. Select date range
+2. Select workers
+3. Exclude specific dates
+4. Live adjustment review (AJAX)
+5. Generate payroll output
+
+### Biaya Admin
+
+Transient field added during report generation (not stored in DB).
+
+---
+
+## 5️⃣ Document Generation
+
+* MOU (PDF stream)
+* Payslip (Worker breakdown)
+* Invoice (Unit-level billing)
+* Kwitansi
+* Custom reference numbering (Resi)
+
+---
+
+# 🧩 Recurring UI Patterns
+
+### Hybrid Combobox
+
+Searchable dropdown with modal deep-search fallback.
+
+### Worker Stepper
+
+Carousel-based bulk processing with progress bar.
+
+### Floating Action Bar
+
+Glass-style bottom action bar for bulk actions.
+
+### Deep Cloning Standard
+
+```js
+JSON.parse(JSON.stringify(object))
+```
+
+Required to prevent Alpine.js reference mutation bugs.
+
+---
+
+# 🗄 Database Schema Overview
+
+High-level entity structure:
+
+```
+mitras
+units
+staff
+pekerja
+pkwt_contracts
+absensi_harian
+absensi_borongan
+absensi_adjustments
+payroll_batches
+payroll_details
+invoices
+documents
+```
+
+---
+
+## Core Relationship Mapping
+
+```
+Mitra
+ └── Units
+       ├── Staff (PIC)
+       ├── PKWT Contracts
+       │     └── Pekerja
+       └── Absensi
+              ├── Harian
+              └── Borongan
+                     └── Adjustments
+```
+
+---
+
+## Key Table Highlights
+
+### units
+
+* mitra_id
+* sistem_pengajian
+* umk_fee
+* management_fee_percent
+* bpjs_health_percent
+* bpjs_labor_percent
+* tunjangan_default (JSON)
+
+---
+
+### pkwt_contracts
+
+* pekerja_id
+* unit_id
+* gaji_bulanan
+* gaji_harian
+* gaji_overtime
+* gaji_hbn_rate
+* schedule_json
+* bpjs_override_flag
+
+---
+
+### absensi_borongan
+
+* pk_id
+* date
+* fd
+* act_rej
+* good_mc
+* max_rej_subkon
+* rej_mc_dibebankan
+* total_qty
+
+---
+
+# ⚙️ Installation Guide
+
+## Requirements
+
+* PHP 8+
+* Composer
+* MySQL / MariaDB
+* Node.js 18+
+* NPM
+* Web server (Nginx / Apache)
+
+---
+
+## 1️⃣ Clone Repository
+
+```bash
+git clone <repository-url>
+cd mja-system
+```
+
+---
+
+## 2️⃣ Install Dependencies
+
+```bash
+composer install
+npm install
+```
+
+---
+
+## 3️⃣ Environment Setup
+
+Copy environment file:
+
+```bash
+cp .env.example .env
+```
+
+Configure:
+
+```
+APP_NAME=MJA
+APP_ENV=local
+APP_KEY=
+APP_DEBUG=true
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=sistem-mja
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+Generate key:
+
+```bash
+php artisan key:generate
+```
+
+---
+
+## 4️⃣ Database Migration
+
+```bash
+php artisan migrate
+```
+
+(Optional seed if available)
+
+```bash
+php artisan db:seed
+```
+
+---
+
+## 5️⃣ Compile Frontend
+
+```bash
+npm run build
+```
+
+For development:
+
+```bash
+npm run dev
+```
+
+---
+
+## 6️⃣ Run Application
+
+```bash
+php artisan serve
+```
+
+---
+
+# 🔐 Development Guidelines
+
+* Do not remove existing logic or error handling
+* Preserve configuration hierarchy resolution
+* Follow semantic color system
+* Maintain glassmorphism UI consistency
+* Use deep cloning in Alpine.js loops
+* Keep business calculations deterministic
+
+---
+
+# 📈 System Philosophy
+
+MJA is built to:
+
+* Minimize payroll miscalculations
+* Support contract-level flexibility
+* Maintain transparent hierarchy logic
+* Provide scalable HR infrastructure
+* Deliver enterprise-grade reliability
+
+---
+
+# 🏷 Current Active Module
+
+**Absensi Borongan**
+
+All future modifications must preserve:
+
+* Quantity formula integrity
+* Reject deduction logic
+* Data hierarchy priority
+* Existing validation and error handling
+
+
+Just tell me your target maturity level (Startup / SME / Enterprise Production).
