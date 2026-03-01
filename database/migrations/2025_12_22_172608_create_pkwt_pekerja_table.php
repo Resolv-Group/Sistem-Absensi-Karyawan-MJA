@@ -28,10 +28,10 @@ return new class extends Migration
 
             $table->integer('status_aktif')->default(1);
 
-            $table->unsignedInteger('gaji_bulanan')->nullable();
-            $table->unsignedInteger('gaji_harian')->nullable();
-            $table->unsignedInteger('gaji_overtime')->nullable();
-            $table->unsignedInteger('gaji_hbn')->nullable();
+            $table->unsignedInteger('gaji_bulanan')->default(0);
+            $table->unsignedInteger('gaji_harian')->default(0);
+            $table->unsignedInteger('gaji_overtime')->default(0);
+            $table->decimal('rate_hbn', 4, 1)->default(1.5);
 
             $table->integer('bpjs_kesehatan')->default(0);
             $table->integer('bpjs_naker')->default(0);

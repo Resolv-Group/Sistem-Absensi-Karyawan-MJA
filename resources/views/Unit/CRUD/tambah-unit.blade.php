@@ -14,8 +14,7 @@
         removeTunjangan(index) {
             this.tunjanganList.splice(index, 1);
         }
-    }"
-    class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    }" class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
         {{-- HEADER SECTION --}}
         <div class="mb-8">
@@ -174,46 +173,40 @@
                         </div>
 
                         {{-- PIC Name --}}
-                        <div x-data="picCombobox()" x-init="init()" class="group"> {{-- Hapus relative di sini --}}
+                        <div x-data="picCombobox()" x-init="init()" class="group">
 
-                            {{-- Label --}}
-                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
-                                Penanggung Jawab (PIC)
-                            </label>
+                            {{-- Label & Trigger Modal --}}
+                            <div class="flex items-center justify-between mb-2">
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide">
+                                    Penanggung Jawab (PIC)
+                                </label>
+                                <button type="button" @click="openModalWithSearch()"
+                                    class="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:text-blue-800 transition">
+                                    Cari Lebih Lanjut
+                                </button>
+                            </div>
 
-                            {{-- Hidden Inputs for Form Submission --}}
+                            {{-- Hidden Inputs --}}
                             <template x-for="item in selectedItems" :key="item.val">
                                 <input type="hidden" name="pic_ids[]" :value="item.val">
                             </template>
 
-                            {{-- WRAPPER BARU: Ini yang membuat dropdown nempel dengan input --}}
                             <div class="relative">
-
-                                {{-- Main Container (Input Box) --}}
-                                <div class="relative w-full min-h-[50px] rounded-xl border border-gray-200 bg-gray-50 px-2 py-1.5 flex flex-wrap gap-2 transition-all duration-200
-                                    cursor-text"
+                                {{-- Main Input Box --}}
+                                <div class="relative w-full min-h-[50px] rounded-xl border border-gray-200 bg-gray-50 px-2 py-1.5 flex flex-wrap gap-2 transition-all duration-200 cursor-text"
                                     @click="$refs.searchInput.focus()">
 
-                                    {{-- A. Selected Chips --}}
                                     <template x-for="(item, index) in selectedItems" :key="item.val">
                                         <div
                                             class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white border border-gray-200 shadow-sm animate-fadeIn">
-
-                                            {{-- User Icon --}}
                                             <div
                                                 class="w-5 h-5 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3"
-                                                    viewBox="0 0 20 20" fill="currentColor">
-                                                    <path fill-rule="evenodd"
-                                                        d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                                                        clip-rule="evenodd" />
-                                                </svg>
+                                                <span class="text-[10px] font-black"
+                                                    x-text="item.label.substring(0,1)"></span>
                                             </div>
-
                                             <span x-text="item.label" class="text-xs font-bold text-gray-700"></span>
-
                                             <button type="button" @click.stop="removeItem(index)"
-                                                class="p-0.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors">
+                                                class="p-0.5 text-gray-400 hover:text-red-500 rounded-md transition-colors">
                                                 <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
                                                     stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -223,7 +216,6 @@
                                         </div>
                                     </template>
 
-                                    {{-- B. Search Input --}}
                                     <div class="flex-1 min-w-[150px] relative">
                                         <input x-ref="searchInput" type="text" x-model="search" @input="open = true"
                                             @click="open = true" @click.outside="open = false"
@@ -232,43 +224,22 @@
                                             class="w-full h-full bg-transparent border-none focus:ring-0 p-2 text-sm font-medium text-gray-900 placeholder-gray-400"
                                             autocomplete="off">
                                     </div>
-
-                                    {{-- Right Chevron --}}
-                                    <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
-                                        <svg class="w-4 h-4 text-gray-400 group-focus-within:text-blue-500 transition-colors"
-                                            :class="{ 'rotate-180': open }" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M19 9l-7 7-7-7"></path>
-                                        </svg>
-                                    </div>
                                 </div>
 
-                                {{-- 3. Dropdown List (Sekarang di dalam relative wrapper yang sama dengan input) --}}
-                                <div x-show="open" x-transition:enter="transition ease-out duration-100"
-                                    x-transition:enter-start="transform opacity-0 scale-95"
-                                    x-transition:enter-end="transform opacity-100 scale-100"
-                                    x-transition:leave="transition ease-in duration-75"
-                                    x-transition:leave-start="transform opacity-100 scale-100"
-                                    x-transition:leave-end="transform opacity-0 scale-95"
+                                {{-- Dropdown Biasa (Quick Search) --}}
+                                <div x-show="open" x-cloak
                                     class="absolute w-full mt-1 bg-white border border-gray-100 rounded-xl shadow-xl z-50 overflow-hidden">
-
                                     <ul class="max-h-60 overflow-y-auto py-2">
                                         <template x-for="item in filteredList" :key="item.val">
                                             <li @click="selectOption(item)"
                                                 class="px-4 py-2.5 text-sm cursor-pointer transition flex items-center gap-3 hover:bg-blue-50 group">
-
-                                                {{-- Avatar Placeholder --}}
                                                 <div
                                                     class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 group-hover:bg-blue-200 group-hover:text-blue-700 transition">
                                                     <span class="text-xs font-bold"
                                                         x-text="item.label.substring(0,1)"></span>
                                                 </div>
-
                                                 <span x-text="item.label"
                                                     class="text-gray-700 font-medium group-hover:text-blue-700"></span>
-
-                                                {{-- Plus Icon --}}
                                                 <svg class="w-4 h-4 ml-auto text-gray-300 group-hover:text-blue-500"
                                                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -276,17 +247,101 @@
                                                 </svg>
                                             </li>
                                         </template>
-
-                                        {{-- No Results --}}
-                                        <li x-show="filteredList.length === 0" class="px-4 py-4 text-center">
-                                            <p class="text-sm text-gray-500">Tidak ditemukan "<span x-text="search"
-                                                    class="font-bold text-gray-900"></span>"</p>
+                                        <li x-show="filteredList.length === 0" @click="openModalWithSearch()"
+                                            class="px-4 py-4 text-center cursor-pointer hover:bg-gray-50">
+                                            <p class="text-xs font-bold text-blue-600 uppercase tracking-widest underline">
+                                                Cari di database lengkap</p>
                                         </li>
                                     </ul>
                                 </div>
-
                             </div>
 
+                            {{-- ==========================================
+                                MODAL PENCARIAN (GLASSMORPHISM LIGHT)
+                            ========================================== --}}
+                            <div x-show="showModal"
+                                class="fixed inset-0 z-[150] flex items-center justify-center p-4 sm:p-6" x-cloak>
+                                {{-- Backdrop --}}
+                                <div x-show="showModal" x-transition.opacity @click="showModal = false"
+                                    class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"></div>
+
+                                {{-- Modal Content --}}
+                                <div x-show="showModal" x-transition:enter="transition ease-out duration-300"
+                                    x-transition:enter-start="opacity-0 translate-y-8 scale-95"
+                                    x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                                    class="relative w-full max-w-lg bg-white rounded-[1.5rem] shadow-2xl overflow-hidden border border-slate-100 flex flex-col max-h-[80vh]">
+
+                                    {{-- Modal Header --}}
+                                    <div class="p-6 border-b border-slate-50">
+                                        <div class="flex items-center justify-between mb-4">
+                                            <h3 class="text-lg font-black text-slate-800 tracking-tight">Cari Penanggung
+                                                Jawab</h3>
+                                            <button type="button" @click="showModal = false"
+                                                class="text-slate-300 hover:text-rose-500 transition-colors">
+                                                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+                                                    stroke="currentColor" stroke-width="2.5">
+                                                    <path d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                            </button>
+                                        </div>
+
+                                        {{-- Modal Search Input --}}
+                                        <div class="relative">
+                                            <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"
+                                                fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                                                stroke-width="2.5">
+                                                <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                            </svg>
+                                            <input type="text" x-model="modalSearch" placeholder="Ketik nama staff..."
+                                                class="w-full pl-11 pr-4 py-3.5 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-blue-100 focus:bg-white transition-all outline-none">
+                                        </div>
+                                    </div>
+
+                                    {{-- Modal List --}}
+                                    <div class="flex-1 overflow-y-auto p-2 custom-scrollbar bg-white">
+                                        <div class="space-y-1">
+                                            <template x-for="item in filteredModalList" :key="item.val">
+                                                <button type="button" @click="selectOption(item)"
+                                                    class="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-blue-50/50 transition-all text-left group">
+
+                                                    <div
+                                                        class="h-11 w-11 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 font-black text-sm group-hover:bg-blue-600 group-hover:text-white transition-all shadow-sm">
+                                                        <span x-text="item.label.substring(0, 1)"></span>
+                                                    </div>
+
+                                                    <div class="flex-1">
+                                                        <p class="text-sm font-black text-slate-800" x-text="item.label">
+                                                        </p>
+                                                        <p
+                                                            class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                                                            Klik untuk memilih</p>
+                                                    </div>
+
+                                                    <svg class="w-5 h-5 text-blue-500 opacity-0 group-hover:opacity-100 transition-all"
+                                                        fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                                                        stroke-width="3">
+                                                        <path d="M12 4v16m8-8H4" />
+                                                    </svg>
+                                                </button>
+                                            </template>
+
+                                            {{-- Empty Modal State --}}
+                                            <div x-show="filteredModalList.length === 0" class="py-12 text-center">
+                                                <p
+                                                    class="text-[11px] font-black text-slate-300 uppercase tracking-[0.2em]">
+                                                    Staff Tidak Ditemukan</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {{-- Modal Footer --}}
+                                    <div class="p-4 bg-slate-50 border-t border-slate-100 text-center">
+                                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">
+                                            Menampilkan data dari seluruh departemen
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                     </div>
@@ -300,9 +355,12 @@
                     {{-- HEADER --}}
                     <div class="flex items-center justify-between mb-6">
                         <div class="flex items-center gap-3">
-                            <div class="h-10 w-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100 shadow-sm">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            <div
+                                class="h-10 w-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100 shadow-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                             </div>
                             <h2 class="text-lg font-black text-gray-900">Pengaturan Tunjangan</h2>
@@ -310,22 +368,26 @@
                     </div>
 
                     {{-- INPUT SECTION --}}
-                    <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end bg-gray-50/50 p-6 rounded-[2rem] border border-gray-100 mb-8">
+                    <div
+                        class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end bg-gray-50/50 p-6 rounded-[2rem] border border-gray-100 mb-8">
                         {{-- Kategori Tunjangan --}}
                         <div class="md:col-span-7">
-                            <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Kategori Tunjangan</label>
+                            <label
+                                class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Kategori
+                                Tunjangan</label>
                             <input type="text" x-model="newTunjangan.nama" placeholder="Contoh: Score / Makan"
                                 class="w-full rounded-2xl border-gray-200 bg-white focus:border-emerald-500 transition py-3 px-5 text-sm font-bold shadow-sm">
                         </div>
 
                         {{-- Nilai Tunjangan (Formatted Input) --}}
                         <div class="md:col-span-4">
-                            <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Nilai (Rp)</label>
+                            <label
+                                class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Nilai
+                                (Rp)</label>
                             <div class="relative">
-                                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-400">Rp</span>
-                                <input type="text"
-                                    :value="newTunjangan.display"
-                                    @input="handleNewInput($event)"
+                                <span
+                                    class="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-400">Rp</span>
+                                <input type="text" :value="newTunjangan.display" @input="handleNewInput($event)"
                                     placeholder="0"
                                     class="w-full rounded-2xl border-gray-200 bg-white focus:border-emerald-500 transition py-3 pl-10 pr-4 text-sm font-black text-gray-700 shadow-sm">
                             </div>
@@ -335,8 +397,10 @@
                         <div class="md:col-span-1">
                             <button type="button" @click="addTunjangan()"
                                 class="w-full h-[48px] flex items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl transition shadow-lg shadow-emerald-200">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                        d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                                 </svg>
                             </button>
                         </div>
@@ -345,23 +409,25 @@
                     {{-- LIST PREVIEW --}}
                     <div class="space-y-3">
                         <template x-for="(t, index) in tunjanganList" :key="index">
-                            <div class="flex items-center justify-between p-4 bg-white border border-gray-100 rounded-[1.5rem] hover:border-emerald-300 transition-all group shadow-sm">
+                            <div
+                                class="flex items-center justify-between p-4 bg-white border border-gray-100 rounded-[1.5rem] hover:border-emerald-300 transition-all group shadow-sm">
 
                                 {{-- Hidden input asli untuk dikirim ke Backend --}}
                                 <input type="hidden" name="tunjangan" :value="tunjanganJson">
 
                                 <div class="flex items-center gap-5 flex-1">
-                                    <div class="h-10 w-10 rounded-xl bg-gray-50 text-gray-400 flex items-center justify-center font-black text-xs" x-text="index + 1"></div>
+                                    <div class="h-10 w-10 rounded-xl bg-gray-50 text-gray-400 flex items-center justify-center font-black text-xs"
+                                        x-text="index + 1"></div>
 
                                     <div class="flex-1 grid grid-cols-2 gap-4">
                                         {{-- Edit Nama langsung di list --}}
-                                        <input type="text" x-model="t.nama" class="bg-transparent border-none p-0 text-sm font-black text-gray-900 focus:ring-0">
+                                        <input type="text" x-model="t.nama"
+                                            class="bg-transparent border-none p-0 text-sm font-black text-gray-900 focus:ring-0">
 
                                         {{-- Edit Nilai langsung di list (Formatted) --}}
                                         <div class="flex items-center gap-1">
                                             <span class="text-xs font-bold text-emerald-500">Rp</span>
-                                            <input type="text"
-                                                :value="formatDisplay(t.value)"
+                                            <input type="text" :value="formatDisplay(t.value)"
                                                 @input="handleListInput($event, index)"
                                                 class="bg-transparent border-none p-0 text-sm font-black text-emerald-600 focus:ring-0 w-full">
                                         </div>
@@ -372,7 +438,8 @@
                                 <button type="button" @click="removeTunjangan(index)"
                                     class="p-2.5 text-gray-300 hover:text-rose-500 transition-all">
                                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                     </svg>
                                 </button>
                             </div>
@@ -756,29 +823,23 @@
 
         function picCombobox() {
             return {
-                // Data passed from Controller
                 list: @json($picList ?? []),
                 selectedItems: [],
                 search: '',
                 open: false,
+                // State Baru untuk Modal
+                showModal: false,
+                modalSearch: '',
 
                 init() {
-                    // Handle Old Data (Validation Errors)
                     let oldIds = @json(old('pic_ids', []));
-
-                    // Ensure oldIds is an array (Laravel sometimes sends single string if only 1 selected)
-                    if (!Array.isArray(oldIds)) {
-                        oldIds = [oldIds];
-                    }
-
+                    if (!Array.isArray(oldIds)) oldIds = [oldIds];
                     if (oldIds.length > 0) {
-                        // Re-map IDs to full objects
                         this.selectedItems = this.list.filter(item => oldIds.includes(item.val.toString()));
                     }
                 },
 
                 get filteredList() {
-                    // Show items that match search AND are not already selected
                     return this.list.filter(item => {
                         const matchesSearch = item.label.toLowerCase().includes(this.search.toLowerCase());
                         const notSelected = !this.selectedItems.some(selected => selected.val === item.val);
@@ -786,10 +847,20 @@
                     });
                 },
 
+                // Filter khusus untuk di dalam Modal
+                get filteredModalList() {
+                    return this.list.filter(item => {
+                        const matches = item.label.toLowerCase().includes(this.modalSearch.toLowerCase());
+                        const notSelected = !this.selectedItems.some(selected => selected.val === item.val);
+                        return matches && notSelected;
+                    });
+                },
+
                 selectOption(item) {
                     this.selectedItems.push(item);
-                    this.search = ''; // Clear search
-                    this.$refs.searchInput.focus(); // Keep focus for rapid selection
+                    this.search = '';
+                    this.open = false;
+                    this.showModal = false; // Tutup modal jika memilih dari modal
                 },
 
                 removeItem(index) {
@@ -797,77 +868,133 @@
                 },
 
                 handleBackspace() {
-                    // If search is empty, remove the last tag
                     if (this.search === '' && this.selectedItems.length > 0) {
                         this.selectedItems.pop();
                     }
                 },
 
-                // Placeholder for modal logic
+                // Buka Modal
                 openModalWithSearch() {
-                    alert("Logic Modal Tambah PIC (Sama seperti sebelumnya)");
+                    this.modalSearch = '';
+                    this.showModal = true;
+                    this.open = false; // Tutup dropdown biasa
                 }
             }
         }
 
         function tunjanganManager() {
-    return {
-        tunjanganList: [],
-        newTunjangan: {
-            nama: '',
-            value: '', // Nilai mentah (angka)
-            display: '' // Nilai tampilan (format rupiah)
-        },
+            return {
+                tunjanganList: [],
+                newTunjangan: {
+                    nama: '',
+                    value: '', // Nilai mentah (angka)
+                    display: '' // Nilai tampilan (format rupiah)
+                },
 
-        // Format angka ke ribuan (1000 -> 1.000)
-        formatDisplay(val) {
-            if (!val) return '';
-            return new Intl.NumberFormat('id-ID').format(val);
-        },
+                // Format angka ke ribuan (1000 -> 1.000)
+                formatDisplay(val) {
+                    if (!val) return '';
+                    return new Intl.NumberFormat('id-ID').format(val);
+                },
 
-        // Menangani input untuk Tunjangan Baru
-        handleNewInput(e) {
-            let rawValue = e.target.value.replace(/\D/g, ''); // Hapus semua karakter non-angka
-            this.newTunjangan.value = rawValue;
-            this.newTunjangan.display = this.formatDisplay(rawValue);
-        },
+                // Menangani input untuk Tunjangan Baru
+                handleNewInput(e) {
+                    let rawValue = e.target.value.replace(/\D/g, ''); // Hapus semua karakter non-angka
+                    this.newTunjangan.value = rawValue;
+                    this.newTunjangan.display = this.formatDisplay(rawValue);
+                },
 
-        // Menangani input untuk Edit di dalam List
-        handleListInput(e, index) {
-            let rawValue = e.target.value.replace(/\D/g, '');
-            this.tunjanganList[index].value = rawValue;
-            e.target.value = this.formatDisplay(rawValue); // Timpa tampilan input langsung
-        },
+                // Menangani input untuk Edit di dalam List
+                handleListInput(e, index) {
+                    let rawValue = e.target.value.replace(/\D/g, '');
+                    this.tunjanganList[index].value = rawValue;
+                    e.target.value = this.formatDisplay(rawValue); // Timpa tampilan input langsung
+                },
 
-        get tunjanganJson() {
-            let result = {};
-            this.tunjanganList.forEach(item => {
-                if (item.nama.trim() !== '') {
-                    // Ubah nama menjadi snake_case untuk key (opsional)
-                    let key = item.nama.toLowerCase().replace(/\s+/g, '_');
-                    result[key] = parseInt(item.value) || 0;
+                get tunjanganJson() {
+                    let result = {};
+                    this.tunjanganList.forEach(item => {
+                        if (item.nama.trim() !== '') {
+                            // Ubah nama menjadi snake_case untuk key (opsional)
+                            let key = item.nama.toLowerCase().replace(/\s+/g, '_');
+                            result[key] = parseInt(item.value) || 0;
+                        }
+                    });
+                    return JSON.stringify(result);
+                },
+
+                addTunjangan() {
+                    // 1. Validasi Input
+                    if (this.newTunjangan.nama.trim() === '' || !this.newTunjangan.value) {
+                        Swal.fire({
+                            title: 'Gagal!',
+                            text: 'Mohon isi nama dan nilai tunjangan.',
+                            icon: 'error',
+                            confirmButtonText: 'OK',
+                            confirmButtonColor: '#ef4444',
+                            timer: 3000,
+                            timerProgressBar: true,
+                            showClass: {
+                                popup: 'animate__animated animate__fadeInDown'
+                            },
+                            hideClass: {
+                                popup: 'animate__animated animate__fadeOutUp'
+                            }
+                        });
+                        return;
+                    }
+
+                    // 2. Cek Duplikat Nama (Case Insensitive)
+                    const namaBaru = this.newTunjangan.nama.trim().toLowerCase();
+                    const isDuplicate = this.tunjanganList.some(item =>
+                        item.nama.trim().toLowerCase() === namaBaru
+                    );
+
+                    if (isDuplicate) {
+                        Swal.fire({
+                            title: 'Gagal!',
+                            text: 'Nama tunjangan "' + this.newTunjangan.nama + '" sudah ada di daftar.',
+                            icon: 'error',
+                            confirmButtonText: 'OK',
+                            confirmButtonColor: '#ef4444',
+                            timer: 3000,
+                            timerProgressBar: true,
+                            showClass: {
+                                popup: 'animate__animated animate__fadeInDown'
+                            },
+                            hideClass: {
+                                popup: 'animate__animated animate__fadeOutUp'
+                            }
+                        });
+                        return;
+                    }
+
+                    // 3. Tambahkan ke List
+                    this.tunjanganList.push({
+                        nama: this.newTunjangan.nama,
+                        value: parseInt(this.newTunjangan.value)
+                    });
+                    // Reset
+                    this.newTunjangan.nama = '';
+                    this.newTunjangan.value = '';
+                    this.newTunjangan.display = '';
+                },
+
+                removeTunjangan(index) {
+                    Swal.fire({
+                        title: 'Apakah Anda yakin ingin menghapus tunjangan ini?',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Ya, hapus',
+                        cancelButtonText: 'Batal'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            this.tunjanganList.splice(index, 1);
+                        }
+                    });
                 }
-            });
-            return JSON.stringify(result);
-        },
-
-        addTunjangan() {
-            if (this.newTunjangan.nama.trim() === '' || !this.newTunjangan.value) return;
-            this.tunjanganList.push({
-                nama: this.newTunjangan.nama,
-                value: parseInt(this.newTunjangan.value)
-            });
-            // Reset
-            this.newTunjangan.nama = '';
-            this.newTunjangan.value = '';
-            this.newTunjangan.display = '';
-        },
-
-        removeTunjangan(index) {
-            this.tunjanganList.splice(index, 1);
+            }
         }
-    }
-}
     </script>
 
     @if (session('success'))

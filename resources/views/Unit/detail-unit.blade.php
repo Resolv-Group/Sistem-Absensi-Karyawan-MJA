@@ -8,8 +8,8 @@
             <div>
                 <nav class="flex text-sm font-medium text-gray-500 mb-2">
                     <span class="hover:text-gray-700">Unit</a>
-                    <span class="mx-2 text-gray-400">/</span>
-                    <span class="text-blue-600">Detail</span>
+                        <span class="mx-2 text-gray-400">/</span>
+                        <span class="text-blue-600">Detail</span>
                 </nav>
                 <div class="flex items-center gap-4">
                     <a href="{{ route('view.unit') }}"
@@ -40,23 +40,14 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
                         </svg>
-                        Nonaktifkan
+                        Nonaktifkan Unit
                     @else
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                         </svg>
-                        Aktifkan
+                        Aktifkan Unit
                     @endif
                 </button>
-                <a href="{{ route('view.ubah.unit', $unit->id) }}"
-                    class="px-4 py-2 text-sm font-medium text-white bg-black border border-black rounded-lg hover:bg-gray-800 transition shadow-sm flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                    </svg>
-                    Ubah Data
-                </a>
             </div>
         </div>
         {{-- 2. TOP SECTION: IDENTITY & CONTRACT (Grid Layout) --}}
@@ -64,74 +55,225 @@
 
             {{-- LEFT: Unit Profile --}}
             <div class="lg:col-span-1">
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden h-full flex flex-col">
-                    <div class="h-24 bg-gradient-to-br from-gray-900 to-gray-800 relative">
-                        <div class="absolute inset-0 opacity-20"
+                <div
+                    class="bg-white rounded-[1.5rem] shadow-sm border border-gray-200 overflow-hidden h-full flex flex-col">
+                    {{-- Banner Section --}}
+                    <div class="h-28 bg-slate-800 relative">
+                        <div class="absolute inset-0 opacity-10"
                             style="background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 16px 16px;">
                         </div>
+
+                        {{-- System Badge Overlay --}}
+                        <div class="absolute top-4 left-1/2 -translate-x-1/2 w-max">
+                            <span
+                                class="px-3 py-1 {{ $unit->sistem_pengajian == 1 ? 'bg-purple-500' : 'bg-orange-500' }} text-white text-[12px] font-black uppercase tracking-[0.2em] rounded-full shadow-lg">
+                                Sistem {{ $unit->sistem_pengajian == 1 ? 'Harian' : 'Borongan' }}
+                            </span>
+                        </div>
                     </div>
-                    <div class="px-6 pb-6 relative text-center flex-1">
-                        <div class="relative -mt-12 inline-block">
+
+                    <div class="px-8 pb-8 relative text-center flex-1">
+                        {{-- Logo Initials --}}
+                        <div class="relative -mt-14 inline-block">
                             <div
-                                class="h-24 w-24 rounded-2xl border-4 border-white shadow-xl bg-white overflow-hidden flex items-center justify-center text-3xl font-black text-gray-800 tracking-tighter">
+                                class="h-28 w-28 rounded-2xl border-[6px] border-white shadow-2xl bg-white flex items-center justify-center text-4xl font-black text-slate-800 tracking-tighter">
                                 {{ substr($unit->nama_unit, 0, 2) }}
                             </div>
                         </div>
-                        <h2 class="mt-4 text-xl font-bold text-gray-900 leading-tight">{{ $unit->nama_unit }}</h2>
 
-                        <div class="mt-3 flex justify-center gap-2">
+                        <h2 class="mt-4 text-2xl font-black text-slate-900 tracking-tight leading-none">
+                            {{ $unit->nama_unit }}</h2>
+
+                        <div class="mt-3 flex justify-center">
                             <span
-                                class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold {{ $unit->status_aktif ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-red-50 text-red-600 border border-red-100' }}">
+                                class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest {{ $unit->status_aktif ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600' }} border {{ $unit->status_aktif ? 'border-emerald-100' : 'border-rose-100' }}">
                                 <span
-                                    class="w-2 h-2 {{ $unit->status_aktif ? 'bg-emerald-500' : 'bg-red-500' }} rounded-full mr-2"></span>
-                                {{ $unit->status_aktif ? 'Status Aktif' : 'Tidak Aktif' }}
+                                    class="w-1.5 h-1.5 {{ $unit->status_aktif ? 'bg-emerald-500' : 'bg-rose-500' }} rounded-full mr-2"></span>
+                                {{ $unit->status_aktif ? 'Active' : 'Inactive' }}
                             </span>
                         </div>
 
-                        <div class="mt-8 text-left space-y-4 border-t border-gray-100 pt-6">
-                            <div class="flex justify-between items-center group cursor-default">
-                                <span
-                                    class="text-xs text-gray-400 uppercase font-bold tracking-wide group-hover:text-blue-600 transition">ID
-                                    Unit</span>
-                                <span
-                                    class="font-mono text-xs font-bold text-gray-700 bg-gray-100 px-2.5 py-1 rounded-md group-hover:bg-blue-50 group-hover:text-blue-700 transition">{{ $unit->id }}</span>
+                        {{-- 1. OPERATIONAL STATS GRID (Pekerja & PKWT Expiring) --}}
+                        <div class="mt-8 grid grid-cols-2 gap-3">
+                            {{-- Total Pekerja --}}
+                            <div class="p-4 bg-slate-50 border border-slate-100 rounded-[1.25rem] text-center">
+                                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Pekerja
+                                </p>
+                                <div class="flex items-center justify-center gap-1.5">
+                                    <span
+                                        class="text-xl font-black text-slate-800">{{ $unit->pkwt_count ?? $unit->pkwt->count() }}</span>
+                                    <svg class="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                    </svg>
+                                </div>
                             </div>
-                            <div class="flex justify-between items-start group">
-                                <span
-                                    class="text-xs text-gray-400 uppercase font-bold tracking-wide group-hover:text-blue-600 transition">Induk
-                                    Mitra</span>
-                                <span
-                                    class="text-sm font-bold text-gray-900 text-right max-w-[60%] leading-snug group-hover:text-blue-700 transition">{{ $unit->namaMitra->nama_mitra ?? '-' }}</span>
-                            </div>
-                            <div class="flex justify-between items-start group">
-                                <span
-                                    class="text-xs text-gray-400 uppercase font-bold tracking-wide group-hover:text-blue-600 transition">Mulai
-                                    Perjanjian</span>
-                                <span
-                                    class="text-sm font-bold text-gray-900 text-right max-w-[60%] leading-snug group-hover:text-blue-700 transition">{{ formatTanggal($unit->mulai_perjanjian) }}</span>
+
+                            {{-- PKWT Expiring dalam 30 hari --}}
+                            {{-- PKWT Expiring dalam 30 hari --}}
+                            @php
+                                $expiringSoon = $unit->pkwt
+                                    ->filter(function ($p) {
+                                        return \Carbon\Carbon::parse($p->tgl_akhir_pkwt)->diffInDays(now(), false) >=
+                                            -30 && \Carbon\Carbon::parse($p->tgl_akhir_pkwt)->isFuture();
+                                    })
+                                    ->count();
+                            @endphp
+                            <div
+                                class="p-4 {{ $expiringSoon > 0 ? 'bg-orange-50 border-orange-100' : 'bg-slate-50 border-slate-100' }} border rounded-[1.25rem] text-center">
+                                {{-- Teks diganti ke Bahasa Indonesia --}}
+                                <p
+                                    class="text-[9px] font-black {{ $expiringSoon > 0 ? 'text-orange-400' : 'text-slate-400' }} uppercase tracking-widest mb-1">
+                                    Segera Berakhir
+                                </p>
+                                <div class="flex items-center justify-center gap-1.5">
+                                    <span
+                                        class="text-xl font-black {{ $expiringSoon > 0 ? 'text-orange-600' : 'text-slate-800' }}">
+                                        {{ $expiringSoon }}
+                                    </span>
+                                    <span class="text-[9px] text-slate-400 font-bold uppercase">PKWT</span>
+
+                                </div>
                             </div>
                         </div>
+
+                        {{-- 1. CONTRACT TIMELINE (New Value Element) --}}
+                        <div class="mt-8 text-left">
+                            @php
+                                $start = \Carbon\Carbon::parse($unit->mulai_perjanjian);
+                                $end = \Carbon\Carbon::parse($unit->tgl_akhir_mou);
+                                $now = \Carbon\Carbon::now();
+                                $totalDays = $start->diffInDays($end);
+                                $elapsedDays = $start->diffInDays($now);
+                                $percentage = $totalDays > 0 ? min(100, max(0, ($elapsedDays / $totalDays) * 100)) : 0;
+                            @endphp
+                            <div class="flex justify-between items-end mb-2">
+                                <span class="text-[10px] text-slate-400 font-black uppercase tracking-widest">Masa
+                                    Kontrak</span>
+                                <span class="text-[11px] font-bold text-slate-700">{{ round($percentage) }}%</span>
+                            </div>
+                            <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                                <div class="h-full bg-blue-500 transition-all duration-1000"
+                                    style="width: {{ $percentage }}%"></div>
+                            </div>
+                            <div class="flex justify-between mt-2">
+                                <span
+                                    class="text-[9px] text-slate-400 font-bold uppercase">{{ $start->format('M Y') }}</span>
+                                <span
+                                    class="text-[9px] text-slate-400 font-bold uppercase">{{ $end->format('M Y') }}</span>
+                            </div>
+                        </div>
+
+                        {{-- 2. METADATA LIST --}}
+                        <div class="mt-8 text-left space-y-4 border-t border-gray-100 pt-6">
+                            <div class="flex justify-between items-center group">
+                                <span class="text-[10px] text-slate-400 font-black uppercase tracking-widest">Induk
+                                    Mitra</span>
+                                <span
+                                    class="text-xs font-bold text-slate-700 truncate max-w-[150px]">{{ $unit->namaMitra->nama_mitra ?? '-' }}</span>
+                            </div>
+                            <div class="flex justify-between items-center group">
+                                <span class="text-[10px] text-slate-400 font-black uppercase tracking-widest">ID Unit</span>
+                                <span
+                                    class="font-mono text-[11px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md">{{ $unit->id }}</span>
+                            </div>
+                        </div>
+
+                        {{-- 3. FINANCIAL SNAPSHOT (New Element) --}}
+                        <div
+                            class="mt-6 p-4 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between">
+                            <div class="text-left">
+                                <p class="text-[9px] font-black text-slate-400 uppercase tracking-tighter">Rate UMK</p>
+                                <p class="text-sm font-black text-slate-800">
+                                    Rp{{ number_format($unit->umk, 0, ',', '.') }}</p>
+                            </div>
+                            <div class="h-8 w-px bg-slate-200"></div>
+                            <div class="text-right">
+                                <p class="text-[9px] font-black text-slate-400 uppercase tracking-tighter">Mgmt Fee</p>
+                                <p class="text-sm font-black text-emerald-600">{{ $unit->persentase_management_fee }}%</p>
+                            </div>
+                        </div>
+
+                        {{-- 4. SAFE ACTIONS --}}
+                        {{-- 4. SAFE ACTIONS --}}
+                        <div class="mt-8">
+                            @if ($unit->sistem_pengajian == 1)
+                                {{-- Layout untuk Sistem Harian (2 Tombol) --}}
+                                <div class="grid grid-cols-2 gap-3">
+                                    <a href="{{ route('view.tambah.unit-pekerja', $unit->id) }}"
+                                        class="flex items-center justify-center gap-2 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-blue-500 hover:text-blue-600 transition active:scale-95 shadow-sm">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                                d="M12 4v16m8-8H4" />
+                                        </svg>
+                                        Pekerja
+                                    </a>
+                                    <a href="{{ route('view.ubah.unit', $unit->id) }}"
+                                        class="flex items-center justify-center gap-2 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-blue-500 hover:text-blue-600 transition active:scale-95 shadow-sm">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                        Unit
+                                    </a>
+                                </div>
+                            @else
+                                {{-- Layout untuk Sistem Borongan (3 Tombol) --}}
+                                <div class="space-y-3">
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <a href="{{ route('view.tambah.unit-pekerja', $unit->id) }}"
+                                            class="flex items-center justify-center gap-2 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-blue-500 hover:text-blue-600 transition active:scale-95 shadow-sm">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                                    d="M12 4v16m8-8H4" />
+                                            </svg>
+                                            Pekerja
+                                        </a>
+                                        {{-- Tombol Borongan Baru --}}
+                                        <a href="{{ route('view.tambah.unit-borongan', $unit->id) }}"
+                                            class="flex items-center justify-center gap-2 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-orange-500 hover:text-orange-600 transition active:scale-95 shadow-sm">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                                    d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                            </svg>
+                                            Borongan
+                                        </a>
+                                    </div>
+                                    <a href="{{ route('view.ubah.unit', $unit->id) }}"
+                                        class="w-full flex items-center justify-center gap-2 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-blue-500 hover:text-blue-600 transition active:scale-95 shadow-sm">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                        Edit Data Unit
+                                    </a>
+                                </div>
+                            @endif
+                        </div>
                     </div>
-                    <div class="border-t border-gray-100 grid grid-cols-1 divide-x divide-gray-100">
-                        <a href="{{ route('stream.mou', $unit->id) }}" target="_blank"
-                            class="flex items-center justify-center gap-2 py-4 text-sm font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-50 transition group">
 
-                            <svg class="w-5 h-5 text-gray-400 group-hover:text-blue-500 transition" fill="none"
-                                stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M4 6h11a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2z" />
-                            </svg>
-
-                            <span>Lihat MOU</span>
-                        </a>
-
-                    </div>
+                    {{-- Footer: Document Stream --}}
+                    <a href="{{ route('stream.mou', $unit->id) }}" target="_blank"
+                        class="group flex items-center justify-center gap-3 py-5 bg-slate-50 border-t border-slate-100 hover:bg-white transition-colors">
+                        <svg class="w-4 h-4 text-slate-400 group-hover:text-blue-600" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <span
+                            class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] group-hover:text-blue-600">Lihat
+                            MOU</span>
+                    </a>
                 </div>
             </div>
 
             {{-- RIGHT: Contract & PIC --}}
             <div class="lg:col-span-2 flex flex-col gap-6">
-
                 {{-- A. PIC Section (Interactive) --}}
                 <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
                     <div class="flex items-center justify-between mb-5">
@@ -194,143 +336,193 @@
                     @endif
                 </div>
 
-                {{-- B. Contract Details (Colorful & Visual) --}}
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 flex-1">
+
+                {{-- C. Tunjangan Spesifik Unit (New Section) --}}
+                <div class="bg-white rounded-[1.5rem] shadow-sm border border-gray-200 p-6 flex flex-col h-full">
+                    {{-- Header Section --}}
                     <div class="flex items-center justify-between mb-6">
-                        <h3 class="font-bold text-gray-900 flex items-center gap-2">
-                            <div class="p-1.5 bg-purple-50 text-purple-600 rounded-lg">
-                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 011.414.586l5.414 5.414a1 1 0 01.586 1.414V19a2 2 0 01-2 2z" />
+                        <div class="flex items-center gap-3">
+                            <div class="p-2 bg-emerald-50 text-emerald-600 rounded-xl border border-emerald-100">
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                                    stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                             </div>
-                            Detail Kontrak & Legalitas
-                        </h3>
-                        @if ($unit->dokumen)
-                            <a href="{{ asset('storage/' . $unit->dokumen) }}" target="_blank"
-                                class="text-xs font-bold text-blue-600 hover:underline flex items-center gap-1">
-                                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                </svg>
-                                Lihat Dokumen
-                            </a>
-                        @endif
+                            <h3 class="text-lg font-black text-slate-800 tracking-tight">Pengaturan Tunjangan</h3>
+                        </div>
+                        <span
+                            class="text-[9px] font-black text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md uppercase tracking-[0.15em] border border-emerald-100">
+                            {{ count($unit->tunjangan ?? []) }} Kategori
+                        </span>
                     </div>
 
-                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                        {{-- 1. Pengajian --}}
-                        <div
-                            class="p-4 rounded-xl bg-gray-50 border border-gray-100 hover:border-purple-200 hover:bg-purple-50/30 transition group">
-                            <div class="flex items-center gap-2 mb-2">
-                                <div class="p-1 rounded bg-white shadow-sm text-gray-500 group-hover:text-purple-600">
-                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
+                    {{-- Content Area --}}
+                    @if (!empty($unit->tunjangan) && count($unit->tunjangan) > 0)
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
+                            @foreach ($unit->tunjangan as $kategori => $nominal)
+                                <div
+                                    class="flex items-center justify-between p-3.5 bg-slate-50/50 border border-slate-100 rounded-2xl hover:border-emerald-200 hover:bg-white hover:shadow-md hover:shadow-emerald-900/5 transition-all group">
+                                    {{-- Left Side: Icon & Name --}}
+                                    <div class="flex items-center gap-3 min-w-0">
+                                        <div
+                                            class="w-1.5 h-1.5 rounded-full bg-emerald-400 group-hover:scale-150 transition-transform">
+                                        </div>
+                                        <span
+                                            class="text-[10px] font-black text-slate-400 uppercase tracking-widest group-hover:text-emerald-600 transition-colors truncate">
+                                            {{ str_replace('_', ' ', $kategori) }}
+                                        </span>
+                                    </div>
+
+                                    {{-- Right Side: Nominal --}}
+                                    <div class="text-right ml-4">
+                                        <span class="text-sm font-black text-slate-800">
+                                            <span
+                                                class="text-[10px] text-slate-400 font-bold mr-0.5">Rp</span>{{ number_format($nominal, 0, ',', '.') }}
+                                        </span>
+                                    </div>
                                 </div>
-                                <span class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Sistem</span>
-                            </div>
-                            <p class="font-bold text-gray-900">
-                                {{ $unit->sistem_pengajian == 1 ? 'Harian' : 'Borongan' }}
-                            </p>
+                            @endforeach
                         </div>
-
-
-                        {{-- 3. Expiry Date --}}
+                    @else
+                        {{-- Empty State --}}
                         <div
-                            class="p-4 rounded-xl bg-gray-50 border border-gray-100 hover:border-emerald-200 hover:bg-emerald-50/30 transition group">
-                            <div class="flex items-center gap-2 mb-2">
-                                <div class="p-1 rounded bg-white shadow-sm text-gray-500 group-hover:text-emerald-600">
-                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            class="flex-1 flex flex-col items-center justify-center py-10 bg-slate-50/50 rounded-[1.25rem] border border-dashed border-slate-200">
+                            <svg class="w-8 h-8 text-slate-200 mb-2" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+                            </svg>
+                            <p class="text-[10px] text-slate-400 font-black uppercase tracking-widest italic">Belum Ada
+                                Tunjangan</p>
+                        </div>
+                    @endif
+                </div>
+
+                {{-- B. Contract Details (Colorful & Visual) --}}
+                {{-- B. Aturan Payroll & Masa Berlaku (Optimized Design) --}}
+                <div class="bg-white rounded-[1.5rem] shadow-sm border border-gray-200 p-6">
+                    {{-- Header --}}
+                    <div class="flex items-center gap-3 mb-8">
+                        <div class="p-2 bg-indigo-50 text-indigo-600 rounded-xl border border-indigo-100">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                                stroke-width="2.5">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-black text-slate-800 tracking-tight text-left">Aturan Payroll & Masa
+                            Berlaku</h3>
+                    </div>
+
+                    <div class="space-y-6">
+                        {{-- 1. Masa Berlaku Kontrak (Full Width Highlight) --}}
+                        <div
+                            class="p-5 bg-slate-50 rounded-[1.25rem] border border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div class="flex items-center gap-4 text-left">
+                                <div
+                                    class="h-10 w-10 bg-white rounded-xl flex items-center justify-center text-slate-400 border border-slate-100 shadow-sm">
+                                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                     </svg>
                                 </div>
-                                <span class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Berakhir</span>
-                            </div>
-                            <p class="font-bold text-gray-900">
-                                {{ \Carbon\Carbon::parse($unit->tgl_akhir_mou)->format('d M Y') }}</p>
-
-                            {{-- Days Left Indicator --}}
-                            @php $days = \Carbon\Carbon::now()->diffInDays(\Carbon\Carbon::parse($unit->tgl_akhir_mou), false); @endphp
-                            <div class="mt-2 h-1 w-full bg-gray-200 rounded-full overflow-hidden">
-                                <div class="h-full {{ $days < 30 ? 'bg-red-500' : 'bg-emerald-500' }}"
-                                    style="width: {{ min(100, max(0, ($days / 365) * 100)) }}%"></div>
-                            </div>
-                        </div>
-
-                        {{-- 2. Fee --}}
-                        {{-- 1. UMK Fee --}}
-                        <div
-                            class="p-4 rounded-xl bg-gray-50 border border-gray-100 hover:border-orange-200 hover:bg-orange-50/30 transition group">
-                            <div class="flex items-center gap-2 mb-2">
-                                <div class="p-1 rounded bg-white shadow-sm text-gray-500 group-hover:text-orange-600">
-                                    {{-- Icon: Cash/Banknote --}}
-                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-                                    </svg>
+                                <div>
+                                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-0.5">
+                                        Kontrak Berakhir Pada</p>
+                                    <p class="text-base font-black text-slate-800">
+                                        {{ \Carbon\Carbon::parse($unit->tgl_akhir_mou)->format('d F Y') }}</p>
                                 </div>
-                                <span class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">UMK Fee</span>
                             </div>
-                            <p class="font-bold text-gray-900">Rp.{{ number_format($unit->umk) }}</p>
-                        </div>
 
-                        {{-- 2. Management Fee --}}
-                        <div
-                            class="p-4 rounded-xl bg-gray-50 border border-gray-100 hover:border-orange-200 hover:bg-orange-50/30 transition group">
-                            <div class="flex items-center gap-2 mb-2">
-                                <div class="p-1 rounded bg-white shadow-sm text-gray-500 group-hover:text-orange-600">
-                                    {{-- Icon: Briefcase (Professional Service) --}}
-                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M21 13.255A2.396 2.396 0 0019.5 13H17c-1.105 0-2 .895-2 2s.895 2 2 2h2.5c.39 0 .753-.105 1.055-.255A5.002 5.002 0 1121 13.255zM11 13.255A2.396 2.396 0 009.5 13H7c-1.105 0-2 .895-2 2s.895 2 2 2h2.5c.39 0 .753-.105 1.055-.255A5.002 5.002 0 1111 13.255z" />
-                                    </svg>
+                            {{-- Progress Bar Inline --}}
+                            <div class="flex-1 max-w-xs">
+                                @php
+                                    $start = \Carbon\Carbon::parse($unit->mulai_perjanjian);
+                                    $end = \Carbon\Carbon::parse($unit->tgl_akhir_mou);
+                                    $percentage = min(
+                                        100,
+                                        max(0, ($start->diffInDays(now()) / $start->diffInDays($end)) * 100),
+                                    );
+                                @endphp
+                                <div class="flex justify-between items-center mb-1.5">
+                                    <span class="text-[9px] font-black text-indigo-600 uppercase tracking-widest">Masa
+                                        Berlaku</span>
+                                    <span class="text-[10px] font-bold text-slate-500">{{ round($percentage) }}%</span>
                                 </div>
-                                <span class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Mgmt Fee</span>
-                            </div>
-                            <p class="font-bold text-gray-900">{{ $unit->persentase_management_fee }}%</p>
-                        </div>
-
-                        {{-- 3. BPJS Kesehatan Fee --}}
-                        <div
-                            class="p-4 rounded-xl bg-gray-50 border border-gray-100 hover:border-orange-200 hover:bg-orange-50/30 transition group">
-                            <div class="flex items-center gap-2 mb-2">
-                                <div class="p-1 rounded bg-white shadow-sm text-gray-500 group-hover:text-orange-600">
-                                    {{-- Icon: Heart (Health) --}}
-                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                                    </svg>
+                                <div class="h-1.5 w-full bg-slate-200 rounded-full overflow-hidden">
+                                    <div class="h-full bg-indigo-500 rounded-full transition-all duration-1000 shadow-[0_0_8px_rgba(99,102,241,0.4)]"
+                                        style="width: {{ $percentage }}%"></div>
                                 </div>
-                                <span class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">BPJS Kesehatan
-                                    Fee</span>
                             </div>
-                            <p class="font-bold text-gray-900">{{ $unit->bpjs_kesehatan }}%</p>
                         </div>
 
-                        {{-- 4. BPJS Naker Fee --}}
-                        <div
-                            class="p-4 rounded-xl bg-gray-50 border border-gray-100 hover:border-orange-200 hover:bg-orange-50/30 transition group">
-                            <div class="flex items-center gap-2 mb-2">
-                                <div class="p-1 rounded bg-white shadow-sm text-gray-500 group-hover:text-orange-600">
-                                    {{-- Icon: Users/Workers (Labor) --}}
-                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                                    </svg>
+                        {{-- 2. Payroll Configuration (Grid of Horizontal Rows) --}}
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-6 px-2">
+                            {{-- BPJS Kesehatan --}}
+                            <div class="flex items-center justify-between border-b border-slate-50 pb-4">
+                                <div class="flex items-center gap-3 text-left">
+                                    <div class="p-2 bg-rose-50 text-rose-500 rounded-lg">
+                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                        </svg>
+                                    </div>
+                                    <span class="text-[11px] font-black text-slate-400 uppercase tracking-widest">BPJS
+                                        Kesehatan</span>
                                 </div>
-                                <span class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">BPJS Naker
-                                    Fee</span>
+                                <p class="text-sm font-black text-slate-800">{{ $unit->bpjs_kesehatan }}% <span
+                                        class="text-[9px] text-slate-300 font-bold ml-1 uppercase">UMK</span></p>
                             </div>
-                            <p class="font-bold text-gray-900">{{ $unit->bpjs_naker }}%</p>
-                        </div>
 
+                            {{-- BPJS Naker --}}
+                            <div class="flex items-center justify-between border-b border-slate-50 pb-4 text-left">
+                                <div class="flex items-center gap-3">
+                                    <div class="p-2 bg-amber-50 text-amber-500 rounded-lg">
+                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                                        </svg>
+                                    </div>
+                                    <span class="text-[11px] font-black text-slate-400 uppercase tracking-widest">BPJS
+                                        Tenaga Kerja</span>
+                                </div>
+                                <p class="text-sm font-black text-slate-800 text-right">{{ $unit->bpjs_naker }}% <span
+                                        class="text-[9px] text-slate-300 font-bold ml-1 uppercase">UMK</span></p>
+                            </div>
+
+                            {{-- Mulai Kerjasama --}}
+                            <div class="flex items-center justify-between border-b border-slate-50 pb-4 text-left">
+                                <div class="flex items-center gap-3">
+                                    <div class="p-2 bg-blue-50 text-blue-500 rounded-lg">
+                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                                        </svg>
+                                    </div>
+                                    <span class="text-[11px] font-black text-slate-400 uppercase tracking-widest">Mulai
+                                        Kerjasama</span>
+                                </div>
+                                <p class="text-sm font-black text-slate-800 text-right">
+                                    {{ \Carbon\Carbon::parse($unit->mulai_perjanjian)->format('d M Y') }}</p>
+                            </div>
+
+                            {{-- Status Pengajian --}}
+                            <div class="flex items-center justify-between border-b border-slate-50 pb-4 text-left">
+                                <div class="flex items-center gap-3">
+                                    <div class="p-2 bg-purple-50 text-purple-500 rounded-lg">
+                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+                                    <span class="text-[11px] font-black text-slate-400 uppercase tracking-widest">Metode
+                                        Gaji</span>
+                                </div>
+                                <p class="text-sm font-black text-indigo-600 text-right uppercase tracking-tighter">
+                                    {{ $unit->sistem_pengajian == 1 ? 'Harian' : 'Borongan' }}</p>
+                            </div>
+                        </div>
                     </div>
-
                 </div>
 
             </div>

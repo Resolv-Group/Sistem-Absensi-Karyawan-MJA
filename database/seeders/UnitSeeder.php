@@ -112,7 +112,7 @@ class UnitSeeder extends Seeder
 
                 $gajiHarian = $gajiBulanan / 25;
                 $gajiOvertime = $gajiBulanan / 173;
-                $gajiHbn = $gajiOvertime * 1.5;
+                $rateHbn = $faker->randomElement([1.5, 2.0]);
 
                 $pkwt = PKWT::create([
                     'id_pekerja'         => $pekerjaIds[$index],
@@ -127,7 +127,7 @@ class UnitSeeder extends Seeder
                     'gaji_bulanan'       => $gajiBulanan,
                     'gaji_harian'        => $gajiHarian,
                     'gaji_overtime'      => $gajiOvertime,
-                    'gaji_hbn'           => $gajiHbn,
+                    'rate_hbn'           => $rateHbn,
                     'bpjs_kesehatan'     => 0,
                     'bpjs_naker'         => 0,
                     'tunjangan'          => [
