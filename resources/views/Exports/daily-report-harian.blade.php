@@ -77,7 +77,7 @@
 
     {{-- BARIS 1: HEADER STATIS + LOOPING TANGGAL (ANGKA) --}}
     <tr>
-        <td colspan="9"></td>
+        <td colspan="10"></td>
         <th rowspan="2" width="15" style="background-color: #FCE4D6; border: 1px solid #000;">{{ $periode }}
         </th>
         <th colspan="{{ $totalDays }}" align="center" valign="middle"
@@ -99,7 +99,7 @@
     {{-- BARIS 2: LOOPING NAMA HARI (SEN, SEL...) --}}
     <tr>
         {{-- (Kolom Kiri Kosong karena sudah kena Rowspan di atas) --}}
-        <td colspan="9"></td>
+        <td colspan="10"></td>
         <th rowspan="2" style="background-color: #FCE4D6; border: 1px solid #000;">{{ $periode }} </th>
         {{-- LOOPING HARI --}}
         @foreach ($periodDates as $date)
@@ -119,7 +119,7 @@
         {{-- (Kolom Kanan Kosong karena sudah kena Rowspan di atas) --}}
     </tr>
     <tr>
-        <td colspan="9"></td>
+        <td colspan="10"></td>
         @foreach ($periodDates as $date)
             <th align="center" valign="middle" style="background-color: #FCE4D6; border: 1px solid #000;">
                 0
@@ -128,7 +128,7 @@
 
     </tr>
     <tr>
-        <td colspan="9"></td>
+        <td colspan="10"></td>
         <td align="center" valign="middle" style="background-color: #FCE4D6; border: 1px solid #000;">Total Jam</td>
         @foreach ($periodDates as $date)
             @php
@@ -169,15 +169,19 @@
 
             <tH rowspan="2" width="14"
                 style="background-color: #FCE4D6; font-weight: bold; text-align: center; border: 1px solid #000; white-space: normal;">
-                UPAH POKOH/BULAN</th>
+                UPAH POKOK/BULANAN</th>
+
+            <tH rowspan="2" width="14"
+                style="background-color: #FCE4D6; font-weight: bold; text-align: center; border: 1px solid #000; white-space: normal;">
+                UPAH HARIAN</th>
 
             <th rowspan="2" width="12"
                 style="background-color: #FCE4D6; font-weight: bold; text-align: center; border: 1px solid #000; white-space: normal;">
-                UPAH POKOH/HARI</th>
+                UPAH OVERTIME</th>
 
             <th rowspan="2" width="12"
                 style="background-color: #FCE4D6; font-weight: bold; text-align: center; border: 1px solid #000; white-space: normal;">
-                UPAH/JAM (LEMBUR)</th>
+                UPAH HBN</th>
             <th rowspan="2" width="12"
                 style="background-color: #FCE4D6; font-weight: bold; text-align: center; border: 1px solid #000; white-space: normal;">
                 UANG INSENTIF</th>
@@ -242,22 +246,20 @@
                 JML. UANG. TUNJ. (J)</th>
 
             <th rowspan="2" width="15"
-                style="background-color: #92D050; font-weight: bold; text-align: center; border: 1px solid #000; white-space: normal;">
-                POT. ABSEN / HARI (K)</th>
-
-
-            <th rowspan="2" width="15"
                 style="background-color: #FCE4D6; font-weight: bold; text-align: center; border: 1px solid #000; white-space: normal;">
-                JML. POT. ABSEN / HARI (L)</th>
-
+                JML. POT. ABSEN / HARI (K)</th>
 
             <th rowspan="2" width="15"
                 style="background-color: #92D050; font-weight: bold; text-align: center; border: 1px solid #000; white-space: normal;">
-                POT. ABSEN / JAM (M)</th>
+                POT. ABSEN / HARI (L)</th>
 
             <th rowspan="2" width="15"
                 style="background-color: #FCE4D6; font-weight: bold; text-align: center; border: 1px solid #000; white-space: normal;">
-                JML. POT. ABSEN/JAM (N)</th>
+                JML. POT. ABSEN/JAM (M)</th>
+
+            <th rowspan="2" width="15"
+                style="background-color: #92D050; font-weight: bold; text-align: center; border: 1px solid #000; white-space: normal;">
+                POT. ABSEN / JAM (N)</th>
 
 
             <th rowspan="2" width="15"
@@ -287,6 +289,11 @@
             <th rowspan="2" width="15"
                 style="background-color: #FCE4D6; font-weight: bold; text-align: center; border: 1px solid #000; white-space: normal;">
                 JML HARI KERJA</th>
+
+            <th rowspan="2" width="15"
+                style="background-color: #FCE4D6; font-weight: bold; text-align: center; border: 1px solid #000; white-space: normal;">
+                TOTAL KERJA (JAM)
+            </th>
 
             <th rowspan="2" width="15"
                 style="background-color: #FCE4D6; font-weight: bold; text-align: center; border: 1px solid #000; white-space: normal;">
@@ -364,6 +371,7 @@
                 <td>{{ $item->divisi }}</td>
 
                 <td style="text-align: center;">{{ $item->rate_pokok }}</td>
+                <td style="text-align: center;">{{ $item->rate_harian }}</td>
                 <td style="text-align: center;">{{ $item->rate_lembur }}</td>
                 <td style="text-align: center;">{{ $item->rate_hbn }}</td>
 
@@ -397,7 +405,7 @@
 
                 {{-- (B) JML. POKOK UPAH --}}
                 <td style="text-align: right; border: 1px solid #000;">
-                    {{ number_format($item->jml_pokok_upah, 0, ',', '.') }}</td>
+                    {{ number_format($item->jml_pokok_upah) }}</td>
 
                 {{-- (C) JAM LEMBUR --}}
                 <td style="text-align: center; border: 1px solid #000;">{{ $item->jam_lembur }}</td>
@@ -440,21 +448,21 @@
                 <td style="text-align: right; border: 1px solid #000;">
                     {{ number_format($item->jml_uang_tunjangan) }}</td>
 
-                {{-- (K) POT. ABSEN / HARI --}}
-                <td style="text-align: right; border: 1px solid #000;">
-                    {{ number_format($item->pot_absen_per_hari) }}</td>
-
                 {{-- (L) JML. POT. ABSEN / HARI --}}
                 <td style="text-align: right; border: 1px solid #000;">
                     {{ number_format($item->jml_pot_absen_hari) }}</td>
 
-                {{-- (M) POT. ABSEN / JAM --}}
+                {{-- (K) POT. ABSEN / HARI --}}
                 <td style="text-align: right; border: 1px solid #000;">
-                    {{ number_format($item->pot_absen_per_jam) }}</td>
+                    {{ number_format($item->pot_absen_per_hari) }}</td>
 
                 {{-- (N) JML. POT. ABSEN/JAM --}}
                 <td style="text-align: right; border: 1px solid #000;">
                     {{ number_format($item->jml_pot_absen_jam) }}</td>
+
+                {{-- (M) POT. ABSEN / JAM --}}
+                <td style="text-align: right; border: 1px solid #000;">
+                    {{ number_format($item->pot_absen_per_jam) }}</td>
 
                 {{-- TOTAL UPAH (HEADER K) --}}
                 <td style="text-align: right;font-weight: bold; border: 1px solid #000;">
@@ -489,6 +497,9 @@
                 {{-- TOTAL HARI KERJA & ABSEN --}}
                 {{-- JML HARI KERJA & JML ABSEN --}}
                 <td style="text-align: center; border: 1px solid #000;">{{ $item->jml_hari_kerja ?? 0 }}</td>
+                <td style="text-align: center; border: 1px solid #000;">
+                    {{ $item->jam_kerja ?? 0 }} / {{ $item->target_jam_kerja ?? 0 }}
+                </td>
                 <td style="text-align: center; border: 1px solid #000;">{{ $item->jml_absen ?? 0 }}</td>
                 
                 {{-- PERSENTASE KEHADIRAN & KETIDAKHADIRAN --}}
@@ -513,7 +524,7 @@
     {{-- FOOTER TOTAL --}}
     <tfoot>
         <tr>
-            <td colspan="9"></td>
+            <td colspan="10"></td>
             <td style="text-align: center; border: 1px solid #000; text-decoration: bold;">TOTAL MAN POWER</td>
             @foreach ($periodDates as $date)
                 @php
@@ -596,24 +607,28 @@
             {{ number_format($items->sum('jml_uang_tunjangan')) }}
         </td>
 
-        {{-- (K) POT. ABSEN / HARI --}}
-        <td style="text-align: right; font-weight: bold; border: 1px solid #000; background-color: #FCE4D6;">
-            {{ number_format($items->sum('pot_absen_per_hari')) }}
-        </td>
+        
 
         {{-- (L) JML. POT. ABSEN / HARI --}}
         <td style="text-align: right; font-weight: bold; border: 1px solid #000; background-color: #FCE4D6;">
             {{ number_format($items->sum('jml_pot_absen_hari')) }}
         </td>
 
-        {{-- (M) POT. ABSEN / JAM --}}
+        {{-- (K) POT. ABSEN / HARI --}}
         <td style="text-align: right; font-weight: bold; border: 1px solid #000; background-color: #FCE4D6;">
-            {{ number_format($items->sum('pot_absen_per_jam')) }}
+            {{ number_format($items->sum('pot_absen_per_hari')) }}
         </td>
+
+        
 
         {{-- (N) JML. POT. ABSEN/JAM --}}
         <td style="text-align: right; font-weight: bold; border: 1px solid #000; background-color: #FCE4D6;">
             {{ number_format($items->sum('jml_pot_absen_jam')) }}
+        </td>
+
+        {{-- (M) POT. ABSEN / JAM --}}
+        <td style="text-align: right; font-weight: bold; border: 1px solid #000; background-color: #FCE4D6;">
+            {{ number_format($items->sum('pot_absen_per_jam')) }}
         </td>
 
         {{-- TOTAL UPAH (HEADER K) --}}
@@ -659,6 +674,9 @@
                 {{ $items->sum('jml_hari_kerja') }}
             </td>
             <td style="text-align: center; font-weight: bold; border: 1px solid #000; background-color: #FCE4D6;">
+                {{ $items->sum('jam_kerja') }} / {{ $items->sum('target_jam_kerja') }}
+            </td>   
+            <td style="text-align: center; font-weight: bold; border: 1px solid #000; background-color: #FCE4D6;">
                 {{ $items->sum('jml_absen') }}
             </td>
 
@@ -692,6 +710,45 @@
                 {{ number_format($items->avg('pct_overtime'), 0) }}%
             </td>
             <td style="border: 1px solid #000; background-color: #FCE4D6;"></td>
+
+            
         </tr>
+        <tr></tr>
+            <tr></tr>
+            <tr>
+                <td colspan="2"></td>
+                <td colspan="2" style="text-align: center;">Sidoarjo, {{ \Carbon\Carbon::now()->locale('id')->translatedFormat('d F Y') }}</td>
+            </tr>
+            <tr>
+                <td colspan="2"></td>
+                <td colspan="2" style="text-align: center;">DIBUAT OLEH</td>
+                <td></td>
+                <td></td>
+                <td colspan="2" style="text-align: center;">MENGETAHUI</td>
+            </tr>
+            <tr>
+                <td colspan="2"></td>
+                <td colspan="2" style="text-align: center;">PT MITRA JUA ABADI</td>
+                <td></td>
+                <td></td>
+                <td colspan="2" style="text-align: center;">{{ $unit_name }}
+
+                </td>
+            </tr>
+            <tr></tr>
+            <tr></tr>
+            <tr></tr>
+            <tr></tr>
+            <tr></tr>
+            <tr>
+                <td colspan="2"></td>
+
+                <td colspan="2" style="text-align: center;">{{ $penanggung_jawab }}</td>
+            </tr>
+            <tr>
+                <td colspan="2"></td>
+
+                <td colspan="2" style="text-align: center;">{{ $jabatan_pj }}</td>
+            </tr>
     </tfoot>
 </table>
