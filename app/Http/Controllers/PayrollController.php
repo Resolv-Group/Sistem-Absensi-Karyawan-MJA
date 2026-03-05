@@ -107,7 +107,7 @@ class PayrollController extends Controller
 
         // Olah data potongan tanggal (Step 3) dari modal
         $specificExclusions = collect($request->input('specific_workers', []))->filter(fn($item) => !empty($item['id']) && !empty($item['date']))->groupBy('id');
-
+            
         // dump($specificExclusions);
 
         $payrollData = [
@@ -152,13 +152,39 @@ class PayrollController extends Controller
                 $totalHBN = 0;
                 $hasilGajiHarian = 0;
 
-                $pkwt = PKWT::where('id_pekerja', $w->id)->where('id_unit', $id_unit)->where('status_aktif', 1)->first();
+                // $pkwt = PKWT::where('id_pekerja', $w->id)->where('id_unit', $id_unit)->where('status_aktif', 1)->first();
                 // dump($pkwt);
 
-                $gajiHarianPkwt = $pkwt->gaji_harian ?? 0;
-                $gajiOvertimePkwt = $pkwt->gaji_overtime ?? 0;
+                $semuaPkwt = PKWT::where('id_pekerja', $w->id)->where('id_unit', $id_unit)->get();
+
+                // $gajiHarianPkwt = $pkwt->gaji_harian ?? 0;
+                // $gajiOvertimePkwt = $pkwt->gaji_overtime ?? 0;
 
                 foreach ($absensiRecords as $absensi) {
+                    $tglAbsenSekarang = $absensi->tgl_absensi;
+                    
+                    $pkwtHariIni = $semuaPkwt->first(function ($p) use ($tglAbsenSekarang) {
+                        // CATATAN: Sesuaikan 'tanggal_mulai' dan 'tanggal_selesai' dengan nama kolom di DB Anda
+                        $mulai = $p->tgl_mulai_pkwt; 
+                        $selesai = $p->tgl_akhir_pkwt; 
+                        
+                        // Jika PKWT memiliki tanggal selesai (kontrak lama)
+                        if ($selesai) {
+                            return $tglAbsenSekarang >= $mulai && $tglAbsenSekarang <= $selesai;
+                        }
+                        // Jika PKWT tidak ada tanggal selesai (kontrak berjalan / yang terbaru)
+                        return $tglAbsenSekarang >= $mulai;
+                    });
+
+                    // Fallback (Jaga-jaga): Jika ternyata di tanggal tersebut tidak ada PKWT yg cocok, 
+                    // gunakan PKWT yg statusnya aktif saat ini
+                    if (!$pkwtHariIni) {
+                        $pkwtHariIni = $semuaPkwt->where('status_aktif', 1)->first();
+                    }
+
+                    // Ambil rate gaji sesuai PKWT yang berlaku pada hari tersebut
+                    $gajiHarianPkwt = $pkwtHariIni->gaji_harian ?? 0;
+                    $gajiOvertimePkwt = $pkwtHariIni->gaji_overtime ?? 0;
                     if ($isHarian) {
                         $detil = $absensi->detilHarian;
                         if ($detil) {
@@ -173,6 +199,7 @@ class PayrollController extends Controller
                             $gajiHariIni = 0;
                             $statusDilindungi = [2,3,4];
                             $statusTidakDibayar = [5,6];
+
 
                             //todo:: logika baru buat jam telat
                             if ($detil->hbn == 1) {
@@ -201,8 +228,6 @@ class PayrollController extends Controller
                                 }elseif($jamNormal > $jamHarian)
                                 {
                                     $gajiReguler += $gajiHarianPkwt - ( ($jamNormal - $jamHarian) * $gajiOvertimePkwt );
-
-                                    
                                     
                                 }
                                 // Rumus Overtime: jam_ot * gaji_overtime
@@ -210,8 +235,6 @@ class PayrollController extends Controller
                                 // dump('gajiOT (jamOT*gajiOvertimePkwt) = ',$gajiOT);
                                 $gajiHariIni = $gajiReguler + $gajiOT;
                                 // dump('gajiHariIni (gajiReguler*gajiOT) = ',$gajiHariIni);
-
-                                // dump($absensi->id,$gajiHariIni);
                             }
 
                             $hasilGajiHarian += $gajiHariIni;
@@ -694,7 +717,9 @@ class PayrollController extends Controller
             // --- C. KALKULASI PENDAPATAN ---
 
             // 1. Upah Pokok
-            $item->upah_pokok = (($input['jam_kerja'] ?? 0) - ($input['hbn'] ?? 0)) * $ratePokok;
+            // $item->upah_pokok = (($input['jam_kerja'] ?? 0) - ($input['hbn'] ?? 0)) * $ratePokok;
+
+            $item->upah_pokok = (($input['upah'] ?? 0) - ($input['tunjangan'] ?? 0)) + (($input['potongan'] ?? 0));
 
             // 2. Lembur Biasa
             $item->lembur_jam = ($input['overtime'] ?? 0) - ($input['hbn'] ?? 0);
@@ -764,6 +789,7 @@ class PayrollController extends Controller
     {
         // dd($request->all());
         // 1. Ambil data dari request
+
         $workersInput = json_decode($request->workers_json, true);
         $idUnit = $request->id_unit;
         // Format tanggal untuk Query Database
@@ -778,15 +804,19 @@ class PayrollController extends Controller
             },
             'pkwt.jabatan',
             'pkwt.divisi',
+            'pkwt.hariKerja',
         ])
         ->whereIn('id', $workerIds)
         ->get()
         ->keyBy('id');
 
+        $penanggung_jawab = request()->penanggung_jawab;
+        $jabatan_pj = request()->jabatan_pj;
+
         // ---------------------------------------------------------
         // [BAGIAN 3] AMBIL DATA ABSENSI & BUAT MAPPING (DILAKUKAN SEKALI SAJA)
         // ---------------------------------------------------------
-
+        
         // A. Query Database
         $absensiData = Absensi::with(['detilHarian', 'tunjangan', 'potongan'])
             ->whereIn('id_pekerja', $workerIds)
@@ -843,7 +873,7 @@ class PayrollController extends Controller
                 }elseif ($overtime > 0) {
                     $warna = '#FFB6C1'; // Pink (Overtime)
                 }
-
+                
                 if ($jamKerja > 0 || $detil->hbn == 1) {
                     $prodMap[$idPekerja]['kerja'] += 1;
                 } elseif (in_array($status, [2])) { // Asumsi 4 = Sakit
@@ -926,12 +956,70 @@ class PayrollController extends Controller
             $id = $input['id'];
             if (!isset($dbPekerja[$id])) {
                 continue;
-            }
+            }   
 
             $staffDb = $dbPekerja[$id];
             $pkwtAktif = $staffDb->pkwt->first();
 
             $item = new \stdClass();
+
+            // ===================================================================
+            // --- LOGIKA TARGET JAM KERJA & CEK ABSEN BOLOS (TIDAK CHECK-IN) ---
+            // ===================================================================
+            $jadwalKerja = []; 
+            if ($pkwtAktif && $pkwtAktif->hariKerja) {
+                foreach ($pkwtAktif->hariKerja as $jadwal) {
+                    // Sesuai gambar DB Anda: 'mon', 'tue', 'wed', dst.
+                    $namaHari = strtolower($jadwal->hari); 
+                    $jadwalKerja[$namaHari] = (float) $jadwal->jam_kerja; 
+                }
+            }
+
+            $startPeriode = \Carbon\Carbon::parse($tglAwal)->startOfDay();
+            $endPeriode = \Carbon\Carbon::parse($tglAkhir)->startOfDay();
+            
+            $totalTargetJam = 0;       // Untuk menyimpan Total Jam Seharusnya (Contoh: 90 Jam)
+            $totalHariAbsenBetulan = 0; // Menghitung total hari bolos murni
+            $totalJamAbsenBetulan  = 0; // Menghitung total jam hilang (bolos / pulang cepat)
+
+            for ($date = $startPeriode->copy(); $date->lte($endPeriode); $date->addDay()) {
+                // Gunakan format 'D' untuk menghasilkan singkatan bahasa inggris (Mon, Tue, Wed)
+                $hariStr = strtolower($date->format('D')); 
+                $tglStr = $date->format('Y-m-d');
+                
+                // Ambil target jam dari PKWT pada hari tersebut
+                $targetJam = $jadwalKerja[$hariStr] ?? 0;
+                $totalTargetJam += $targetJam; // Tambahkan ke akumulasi total jam periode ini
+
+                // Cek Absen HANYA JIKA di hari tersebut dia memiliki kewajiban jadwal kerja (targetJam > 0)
+                if ($targetJam > 0) {
+                    if (isset($attendanceMap[$staffDb->id][$tglStr])) {
+                        $absensiHarian = $attendanceMap[$staffDb->id][$tglStr];
+                        $aktualJamKerja = (float) $absensiHarian['jam'];
+
+                        if ($aktualJamKerja == 0) {
+                            // Kasus 1: Ada data absen tapi jam kerjanya 0
+                            $totalHariAbsenBetulan++;
+                            $totalJamAbsenBetulan += $targetJam; 
+                        } else if ($aktualJamKerja < $targetJam) {
+                            // Kasus 2: Pulang cepat / telat (Target 8 jam, tapi kerja 5 jam)
+                            $selisihJam = $targetJam - $aktualJamKerja;
+                            $totalJamAbsenBetulan += $selisihJam;
+                        }
+                    } else {
+                        // Kasus 3: Tidak ada data di database (Mangkir/Bolos Murni)
+                        $totalHariAbsenBetulan++;
+                        $totalJamAbsenBetulan += $targetJam; 
+                    }
+                }
+            }
+
+            // Simpan hasil absen siluman
+            $item->hitung_hari_absen = $totalHariAbsenBetulan;
+            $item->hitung_jam_absen = $totalJamAbsenBetulan;
+            
+            // Simpan total target jam untuk rumus persentase
+            $item->target_jam_kerja = $totalTargetJam;
 
             // --- A. IDENTITAS ---
             // PENTING: Simpan ID Asli untuk kunci pencarian di Blade nanti
@@ -945,9 +1033,10 @@ class PayrollController extends Controller
             $item->no_rekening = $staffDb->rekening ?? '-';
 
             // --- B. RATE / TARIF ---
-            $item->rate_pokok = $pkwtAktif?->gaji_harian ?? 0;
+            $item->rate_pokok = $pkwtAktif?->gaji_bulanan ?? 0;
+            $item->rate_harian = $pkwtAktif?->gaji_harian ?? 0;
             $item->rate_lembur = $pkwtAktif?->gaji_overtime ?? 0;
-            $item->rate_hbn = ($pkwtAktif?->gaji_overtime ?? 0) * 1.5;
+            $item->rate_hbn = ($pkwtAktif?->gaji_overtime ?? 0) * ($pkwtAktif?->rate_hbn ?? 0);
 
             $item->tunjangan = (float) ($input['tunjangan'] ?? 0);
             $item->insentif = (float) ($input['insentif'] ?? 0);
@@ -968,15 +1057,24 @@ class PayrollController extends Controller
                 $item->jam_lembur = $jamLemburInput;
             }
 
-            $item->jml_pokok_upah = (float) ($input['upah'] ?? 0) + ($input['potongan'] ?? 0) - ($input['tunjangan'] ?? 0);
+            
             $item->jml_uang_lembur = $item->jam_lembur * $item->rate_lembur;
             $item->jml_uang_lembur_hbn = $item->jam_hbn * $item->rate_hbn;
 
             $item->total_pokok = (float) ($input['upah'] ?? 0);
             $item->total_lembur_biasa = $item->jam_lembur * $item->rate_lembur;
-            $item->total_lembur_hbn = $item->jam_lembur * $item->rate_lembur; // Note: Rumus ini sepertinya typo di kode asli Anda (lembur biasa vs hbn), tapi saya biarkan sesuai aslinya.
+            $item->total_lembur_hbn = $item->jam_hbn * $item->rate_hbn; 
 
             $item->jam_lembur_hbn = (float) ($input['hbn'] ?? 0);
+
+            // dump($item->rate_hbn,$item->jam_hbn);
+
+            // dump(($input['upah'] ?? 0), ($input['potongan'] ?? 0), ($input['tunjangan'] ?? 0), $item->total_lembur_biasa , $item->total_lembur_hbn);
+
+            $item->jml_pokok_upah = (float) ($input['upah'] ?? 0) + ($input['potongan'] ?? 0) - ($input['tunjangan'] ?? 0)
+            - $item->total_lembur_biasa - $item->total_lembur_hbn ;
+
+            
 
             //Tunjangan
             $item->detail_tunjangan = [];
@@ -1000,11 +1098,12 @@ class PayrollController extends Controller
             // --- D. POTONGAN ABSENSI ---
             $item->pot_absen_per_hari = $item->rate_pokok;
             $item->jml_pot_absen_hari = 0;
+
             $item->pot_absen_per_jam = $pkwtAktif?->gaji_overtime ?? 0;
             $item->jml_pot_absen_jam = 0;
 
             // --- E. TOTAL UPAH KOTOR ---
-            $pendapatan_total = $item->jml_pokok_upah + $item->jml_uang_insentif + $item->jml_uang_tunjangan;
+            $pendapatan_total = $item->jml_pokok_upah + $item->jml_uang_insentif + $item->jml_uang_tunjangan + $item->total_lembur_biasa + $item->total_lembur_hbn;
             $potongan_absen = $item->jml_pot_absen_hari + $item->jml_pot_absen_jam;
 
             $item->total_upah_kotor = $pendapatan_total - $potongan_absen;
@@ -1036,6 +1135,8 @@ class PayrollController extends Controller
             $item->rencanaCuti = $prod['rencanaCuti'];
             $item->absen = $prod['absen'];
 
+            $item->absen = $prod['absen'] + $item->hitung_hari_absen;
+
             // 2. Hitung Total Absen (Semua jenis ketidakhadiran digabung)
             $item->jml_absen = $item->izin + $item->cuti + $item->sakit + $item->rencanaCuti + $item->absen;
 
@@ -1049,8 +1150,10 @@ class PayrollController extends Controller
             $item->pct_hadir = $totalHariPeriode > 0 ? ($item->jml_hari_kerja / $totalHariPeriode) * 100 : 0;
             $item->pct_absen = $totalHariPeriode > 0 ? ($item->jml_absen / $totalHariPeriode) * 100 : 0;
 
+            $item->pct_jam_kerja = $item->target_jam_kerja > 0 ? ($item->jam_kerja / $item->target_jam_kerja) * 100 : 0;
+
             // 4. Hitung Persentase Overtime (Asumsi Standar Jam Kerja = 8 Jam/Hari)
-            $standarJamKerja = $item->jml_hari_kerja * 8; 
+            $standarJamKerja = $item->target_jam_kerja * 8; 
             $item->pct_overtime = $standarJamKerja > 0 ? ($prod['jam_ot'] / $standarJamKerja) * 100 : 0;
 
             $realItems[] = $item;
@@ -1080,7 +1183,9 @@ class PayrollController extends Controller
             $tglAkhir, // string Y-m-d
             $attendanceMap, // Array Mapping
             $unit,
-            $semuaKategoriTunjangan
+            $semuaKategoriTunjangan,
+            $penanggung_jawab,
+            $jabatan_pj,
         ), $filename);
     }
 }

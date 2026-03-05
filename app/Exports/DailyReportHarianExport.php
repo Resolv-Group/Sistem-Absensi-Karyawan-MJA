@@ -25,8 +25,10 @@ class DailyReportHarianExport implements FromView, ShouldAutoSize, WithStyles, W
     protected $attendanceMap;
     protected $unit;
     protected $semuaKategoriTunjangan;
+    protected $penanggung_jawab;
+    protected $jabatan_pj;
 
-    public function __construct($data, $periode, $grandTotal, $unitName, $totalDays, $tglAwal, $tglAkhir, $attendanceMap, $unit, $semuaKategoriTunjangan)
+    public function __construct($data, $periode, $grandTotal, $unitName, $totalDays, $tglAwal, $tglAkhir, $attendanceMap, $unit, $semuaKategoriTunjangan,$penanggung_jawab, $jabatan_pj)
     {
         $this->data = $data;
         $this->periode = $periode;
@@ -38,6 +40,8 @@ class DailyReportHarianExport implements FromView, ShouldAutoSize, WithStyles, W
         $this->attendanceMap = $attendanceMap;
         $this->unit = $unit;
         $this->semuaKategoriTunjangan = $semuaKategoriTunjangan;
+        $this->penanggung_jawab = $penanggung_jawab;
+        $this->jabatan_pj = $jabatan_pj;
     }
 
     public function view(): View
@@ -52,6 +56,8 @@ class DailyReportHarianExport implements FromView, ShouldAutoSize, WithStyles, W
             'attendanceMap' => $this->attendanceMap,
             'unit' => $this->unit,
             'semuaKategoriTunjangan' => $this->semuaKategoriTunjangan,
+            'penanggung_jawab' => $this->penanggung_jawab,
+            'jabatan_pj' => $this->jabatan_pj,
         ]);
     }
 
@@ -82,7 +88,7 @@ class DailyReportHarianExport implements FromView, ShouldAutoSize, WithStyles, W
 
         // 1. SET BORDER HITAM TIPIS (Untuk seluruh tabel Data + Header)
         // Range: A6 sampai M(Footer)
-        $sheet->getStyle('A16:I' . $footerRow)->applyFromArray([
+        $sheet->getStyle('A16:J' . $footerRow)->applyFromArray([
             'borders' => [
                 'allBorders' => [
                     'borderStyle' => Border::BORDER_THIN,
@@ -110,7 +116,7 @@ class DailyReportHarianExport implements FromView, ShouldAutoSize, WithStyles, W
         ]);
 
         // 2. STYLE HEADER (Peach Background + Bold + Center)
-        $sheet->getStyle('A16:I16')->applyFromArray([
+        $sheet->getStyle('A16:J16')->applyFromArray([
             'font' => ['bold' => true],
             'alignment' => [
                 'horizontal' => Alignment::HORIZONTAL_CENTER,

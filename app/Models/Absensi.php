@@ -44,4 +44,5 @@ class Absensi extends Model
         return $this->hasOne(Potongan::class, 'id_absensi');
     }
 
+    
 }
