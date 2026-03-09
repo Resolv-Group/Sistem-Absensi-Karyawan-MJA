@@ -184,8 +184,8 @@
             </div>
         </div>
 
-        {{-- SECTION 2: ALOKASI WAKTU --}}
-        <div class="space-y-6">
+        {{-- SECTION 2: ALOKASI WAKTU (hidden when sistem_pengajian == 2) --}}
+        <div class="space-y-6" x-show="window.unitInfo.sistem_pengajian != 2">
             <div class="flex items-center gap-3">
                 <div class="w-1.5 h-6 bg-indigo-500 rounded-full"></div>
                 <h4 class="text-[11px] font-black text-slate-800 uppercase tracking-[0.2em]">Alokasi Waktu & Jadwal</h4>
@@ -248,8 +248,8 @@
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
-    {{-- Bulanan --}}
-    <div class="space-y-2">
+    {{-- Bulanan (hidden when sistem_pengajian == 2) --}}
+    <div class="space-y-2" x-show="window.unitInfo.sistem_pengajian != 2">
         <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Gaji Bulanan (Pokok)</label>
         <div class="relative group">
             <span class="absolute left-5 top-1/2 -translate-y-1/2 text-xs font-black text-slate-300 group-focus-within:text-emerald-500 transition-colors">Rp</span>
@@ -260,8 +260,8 @@
         </div>
     </div>
 
-    {{-- Harian - SEKARANG EDITABLE --}}
-    <div class="space-y-2">
+    {{-- Harian - SEKARANG EDITABLE (hidden when sistem_pengajian == 2) --}}
+    <div class="space-y-2" x-show="window.unitInfo.sistem_pengajian != 2">
         <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Gaji Harian (Proporsional)</label>
         <div class="relative group">
             <span class="absolute left-5 top-1/2 -translate-y-1/2 text-xs font-black text-slate-300 group-focus-within:text-emerald-500 transition-colors">Rp</span>
@@ -272,8 +272,8 @@
         </div>
     </div>
 
-    {{-- Overtime - SEKARANG EDITABLE --}}
-    <div class="space-y-2">
+    {{-- Overtime - SEKARANG EDITABLE (hidden when sistem_pengajian == 2) --}}
+    <div class="space-y-2" x-show="window.unitInfo.sistem_pengajian != 2">
         <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Upah Overtime / Jam</label>
         <div class="relative group">
             <span class="absolute left-5 top-1/2 -translate-y-1/2 text-xs font-black text-slate-300 group-focus-within:text-emerald-500 transition-colors">Rp</span>
@@ -284,8 +284,8 @@
         </div>
     </div>
 
-    {{-- HBN - SEKARANG EDITABLE --}}
-    <div class="space-y-2">
+    {{-- HBN - SEKARANG EDITABLE (hidden when sistem_pengajian == 2) --}}
+    <div class="space-y-2" x-show="window.unitInfo.sistem_pengajian != 2">
         {{-- Header: Judul & Hasil dalam satu baris (Compact) --}}
         <div class="flex items-center justify-between px-1">
             <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">
@@ -547,6 +547,7 @@
             pct_kesehatan: {{ $unitSelected->bpjs_kesehatan ?? 0 }},
             pct_naker: {{ $unitSelected->bpjs_naker ?? 0 }},
             tunjanganConfig: @js($unitSelected->tunjangan ?? []),
+            sistem_pengajian: {{ $unitSelected->sistem_pengajian ?? 1 }},
         };
 
         // 2. FORM LOGIC
@@ -585,15 +586,6 @@
                         },
                         tunjangan: initialTunjangan,
                     }],
-                init() {
-                    // Recalculate BPJS for existing data in case UMK/percentages changed
-                    this.rows.forEach(row => {
-                        if (row.kpj || row.naker) {
-                            this.calculateSalaryComponents(row)
-                            this.calculateBpjs(row);
-                        }
-                    });
-                },
                 get totalAllocation() {
                     return this.rows.reduce((sum, row) => sum + (parseInt(row.gaji) || 0), 0);
                 },
