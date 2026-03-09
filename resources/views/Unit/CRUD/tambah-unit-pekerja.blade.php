@@ -259,8 +259,8 @@
                                 </div>
                             </div>
 
-                            {{-- SECTION 2: STANDAR WAKTU & JADWAL --}}
-                            <div class="space-y-6">
+                            {{-- SECTION 2: STANDAR WAKTU & JADWAL (hidden when sistem_pengajian == 2) --}}
+                            <div class="space-y-6" x-show="window.unitInfo.sistem_pengajian != 2">
                                 <div class="flex items-center gap-3">
                                     <div class="w-1.5 h-6 bg-indigo-500 rounded-full"></div>
                                     <h4 class="text-[11px] font-black text-slate-800 uppercase tracking-[0.2em]">Standar
@@ -324,8 +324,8 @@
                                 </div>
 
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
-                                    {{-- Gaji Bulanan --}}
-                                    <div class="space-y-2">
+                                    {{-- Gaji Bulanan (hidden when sistem_pengajian == 2) --}}
+                                    <div class="space-y-2" x-show="window.unitInfo.sistem_pengajian != 2">
                                         <label
                                             class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Gaji
                                             Bulanan (Pokok)</label>
@@ -340,8 +340,8 @@
                                                 :value="row.gaji_bulanan">
                                         </div>
                                     </div>
-                                    {{-- Gaji Harian --}}
-                                    <div class="space-y-2">
+                                    {{-- Gaji Harian (hidden when sistem_pengajian == 2) --}}
+                                    <div class="space-y-2" x-show="window.unitInfo.sistem_pengajian != 2">
                                         <label
                                             class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Gaji
                                             Harian (Proporsional)</label>
@@ -356,8 +356,8 @@
                                                 :value="row.gaji">
                                         </div>
                                     </div>
-                                    {{-- Overtime --}}
-                                    <div class="space-y-2">
+                                    {{-- Overtime (hidden when sistem_pengajian == 2) --}}
+                                    <div class="space-y-2" x-show="window.unitInfo.sistem_pengajian != 2">
                                         <label
                                             class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Upah
                                             Overtime / Jam</label>
@@ -372,8 +372,8 @@
                                                 :value="row.overtime">
                                         </div>
                                     </div>
-                                    {{-- HBN --}}
-                                    <div class="space-y-2">
+                                    {{-- HBN (hidden when sistem_pengajian == 2) --}}
+                                    <div class="space-y-2" x-show="window.unitInfo.sistem_pengajian != 2">
                                         {{-- Header: Judul & Hasil dalam satu baris --}}
                                         <div class="flex items-center justify-between px-1">
                                             <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">
@@ -733,10 +733,11 @@
         window.workersData = @json($pekerjaList ?? []);
 
         window.unitInfo = {
-            umk: {{ $unitSelected->umk ?? 0 }}, // Pastikan ini angka (integer/float)
-            pct_kesehatan: {{ $unitSelected->bpjs_kesehatan ?? 0 }}, // Contoh: 1 (untuk 1%)
-            pct_naker: {{ $unitSelected->bpjs_naker ?? 0 }}, // Contoh: 2 (untuk 2%)
+            umk: {{ $unitSelected->umk ?? 0 }},
+            pct_kesehatan: {{ $unitSelected->bpjs_kesehatan ?? 0 }},
+            pct_naker: {{ $unitSelected->bpjs_naker ?? 0 }},
             tunjanganConfig: @js($unitSelected->tunjangan ?? []),
+            sistem_pengajian: {{ $unitSelected->sistem_pengajian ?? 1 }},
         };
 
         // 2. FORM LOGIC
