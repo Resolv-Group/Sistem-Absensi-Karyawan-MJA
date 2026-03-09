@@ -331,14 +331,14 @@ class PayrollController extends Controller
         foreach ($absensiList as $absensi) {
             foreach ($absensi->detilBorongan as $detil) {
                 // SKIP kalau detil borongan kosong
-                if ($detil->fd == 0 && $detil->act_rej == 0 && $detil->good_mc == 0) {
-                    continue;
-                }
+                // if ($detil->fd == 0 && $detil->act_rej == 0 && $detil->good_mc == 0) {
+                //     continue;
+                // }
 
                 // ===== RUMUS =====
-                $fd = (int) $detil->FD;
-                $actRej = (int) $detil->act_rej;
-                $goodMc = (int) $detil->good_mc;
+                $fd = $detil->FD;
+                $actRej = $detil->act_rej;
+                $goodMc = $detil->good_mc;
 
                 // qty = fd + act_rej + good_mc
                 $qty = $fd + $actRej + $goodMc;
@@ -352,7 +352,7 @@ class PayrollController extends Controller
                 $totalDibayarRumus = $fd - $rejMc + $goodMc;
 
                 // total dibayar (pcs) → dibulatkan
-                $totalDibayarPcs = round($totalDibayarRumus);
+                $totalDibayarPcs = $totalDibayarRumus;
 
                 // unit price dari tabel borongan
                 $unitPrice = $detil->borongan->harga_pekerja ?? 0;
@@ -386,7 +386,6 @@ class PayrollController extends Controller
         }
 
         // dd($data);
-
         $take_home_pay = $take_home_pay - $PKWT->bpjs_naker - $PKWT->bpjs_kesehatan - $request->potongan + $request->tunjangan;
 
         $filename = "Summary_Upah_{$pekerja->nama}_{$unit->nama_unit}_{$periode}.xlsx";
@@ -415,7 +414,7 @@ class PayrollController extends Controller
             ' ' .
             $end->format('Y');
 
-        $Unit = Unit::where('id_unit', $request->id_unit)->first();
+        $Unit = Unit::where('id', $request->id_unit)->first();
 
         $workerIds = collect($request->workers)->pluck('id');
 
@@ -468,6 +467,7 @@ class PayrollController extends Controller
     }
     function ExportInvoiceBorongan(Request $request)
     {
+        // dd($request->all());
         $jabatan = $request->jabatan ?? '';
         $start = \Carbon\Carbon::parse($request->tanggal_mulai);
         $end = \Carbon\Carbon::parse($request->tanggal_akhir);
@@ -479,7 +479,8 @@ class PayrollController extends Controller
 
         $a = $request->grand_total;
 
-        $Unit = Unit::where('id_unit', $request->id_unit)->first();
+        $Unit = Unit::where('id', $request->id_unit)->first();
+        // dd($Unit);
 
         $MitraKerja = MitraKerja::where('id', $Unit->id_mitra_kerja)->first();
 
@@ -511,7 +512,7 @@ class PayrollController extends Controller
         // dd($request->all());
         $jabatan = $request->jabatan ?? '';
 
-        $Unit = Unit::where('id_unit', $request->id_unit)->first();
+        $Unit = Unit::where('id', $request->id_unit)->first();
 
         $MitraKerja = MitraKerja::where('id', $Unit->id_mitra_kerja)->first();
 
@@ -712,7 +713,7 @@ class PayrollController extends Controller
             // Asumsi: HBN rate biasanya 2x lembur atau ada kolom sendiri.
             // Jika tidak ada kolom khusus, kita pakai logika 2 * rate lembur.
             // Silakan sesuaikan: $pkwtAktif?->gaji_overtime_hbn
-            $rateHbn = ($pkwtAktif?->gaji_overtime ?? 0) * 1.5;
+            $rateHbn = ($pkwtAktif?->gaji_overtime ?? 0) * $pkwtAktif->rate_hbn;
 
             // --- C. KALKULASI PENDAPATAN ---
 

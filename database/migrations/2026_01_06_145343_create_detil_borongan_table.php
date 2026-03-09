@@ -18,14 +18,14 @@ return new class extends Migration
             $table->integer('id_barang');
             $table->integer('status_kehadiran')->default(0);
 
-            $table->integer('FD');
-            $table->integer('act_rej');
-            $table->integer('good_mc');
-            $table->integer('max_rej_subkon');
-            $table->integer('rej_mc_beban');
+            $table->float('FD');
+            $table->float('act_rej')->nullable();
+            $table->float('good_mc')->nullable();
+            $table->float('max_rej_subkon')->nullable();
+            $table->float('rej_mc_beban')->nullable();
 
-            $table->integer('bayaranPerusahaan');
-            $table->integer('bayaranItem');
+            $table->float('bayaranPerusahaan');
+            $table->float('bayaranItem');
 
             $table->binary('buktiSuratJalan')->nullable();
 
