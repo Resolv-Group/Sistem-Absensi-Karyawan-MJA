@@ -477,6 +477,45 @@ class PayrollController extends Controller
 
         $periode = $start->format('d') . ' - ' . $end->format('d') . ' ' . strtoupper($start->translatedFormat('F')) . ' ' . $start->format('Y');
 
+        $workersInput = $request->input('workers', []); 
+        
+        // Ambil semua ID pekerja untuk query PKWT
+        $workerIds = array_column($workersInput, 'id');
+
+        // 1. Ambil data PKWT aktif untuk semua pekerja di array ini sekaligus
+        // (Asumsi nama model Anda adalah PKWT dan status_aktif = 1)
+        $semuaPkwt = \App\Models\PKWT::whereIn('id_pekerja', $workerIds)
+            ->where('status_aktif', 1) // Sesuaikan jika Anda menggunakan filter unit juga
+            ->get()
+            ->keyBy('id_pekerja'); // Kunci array dengan id_pekerja agar mudah dicari
+
+        // 2. Siapkan variabel penghitung (counter)
+        $countBpjsKesehatan = 0;
+        $countBpjsNaker = 0;
+
+        foreach ($workersInput as $input) {
+            $id = $input['id'];
+
+            // 3. Ambil data PKWT untuk pekerja ini dari koleksi yang sudah ditarik di atas
+            $pkwtPekerja = $semuaPkwt->get($id);
+
+            if ($pkwtPekerja) {
+                // Jika nominal bpjs_kesehatan lebih dari 0, tambah 1 ke hitungan
+                if ((float) $pkwtPekerja->bpjs_kesehatan > 0) {
+                    $countBpjsKesehatan++;
+                }
+
+                // Jika nominal bpjs_naker lebih dari 0, tambah 1 ke hitungan
+                if ((float) $pkwtPekerja->bpjs_naker > 0) {
+                    $countBpjsNaker++;
+                }
+            }
+        }
+
+        // Cek hasil hitungannya (Hapus / Comment kode dump ini jika sudah benar)
+        // dump("Total BPJS Kes: " . $countBpjsKesehatan);
+        // dump("Total BPJS Naker: " . $countBpjsNaker);
+
         $a = $request->grand_total;
 
         $Unit = Unit::where('id', $request->id_unit)->first();
@@ -486,25 +525,33 @@ class PayrollController extends Controller
 
         $Bidang = BidangUsaha::where('id', $MitraKerja->bidang_usaha_id)->first();
 
-        $management_fee = round(($a * 6) / 100);
+        $naker = $Unit->umk * $countBpjsNaker * 4.24/100;
+        $kesehatan = $Unit->umk * $countBpjsKesehatan * 4/100;;
+
+        $management_fee = round(($a * $Unit->persentase_management_fee) / 100);
         $ppn = round(($management_fee * 11) / 100);
         $pph = round(($management_fee * 2) / 100);
 
         // Total tagihan dijumlahkan dari hasil yang sudah dibulatkan
-        $total_tagihan = $a + $management_fee + $ppn - $pph;
+        $total_tagihan = $naker + $kesehatan + $a + $management_fee + $ppn + $pph;
 
         $terbilang = ucwords(terbilang($total_tagihan)) . ' Rupiah';
 
         // Menambahkan format titik (number_format)
-        $display_a = number_format($a, 0, ',', '.');
-        $display_management_fee = number_format($management_fee, 0, ',', '.');
-        $display_ppn = number_format($ppn, 0, ',', '.');
-        $display_pph = number_format($pph, 0, ',', '.');
-        $display_total_tagihan = number_format($total_tagihan, 0, ',', '.');
+        $display_a = number_format($a);
+        $display_management_fee = number_format($management_fee);
+        $display_ppn = number_format($ppn);
+        $display_pph = number_format($pph);
+        $display_total_tagihan = number_format($total_tagihan);
 
         $filename = "Invoice_{$Unit->nama_unit}_{$periode}.xlsx";
 
-        return Excel::download(new InvoiceBoronganExport($request->no_resi, $Unit->nama_unit, $MitraKerja->alamat, $Bidang->nama, $MitraKerja->nama_mitra, $display_a, $terbilang, $periode, $display_management_fee, $display_ppn, $display_pph, $display_total_tagihan, $Unit->umk, $request->nama_resi,$jabatan), $filename);
+        return Excel::download(new InvoiceBoronganExport($request->no_resi, 
+        $Unit->nama_unit, $MitraKerja->alamat, $Bidang->nama, $MitraKerja->nama_mitra, 
+        $display_a, $terbilang, $periode, 
+        $display_management_fee, $display_ppn, $display_pph, 
+        $display_total_tagihan, $Unit->umk, $request->nama_resi,$jabatan, $MitraKerja->kota,
+        $countBpjsKesehatan,$countBpjsNaker, $Unit->persentase_management_fee, $naker, $kesehatan), $filename);
     }
 
     function ExportKwitansiBorongan(Request $request)
@@ -526,13 +573,64 @@ class PayrollController extends Controller
 
         $periode = $start->format('d') . ' - ' . $end->format('d') . ' ' . strtoupper($start->translatedFormat('F')) . ' ' . $start->format('Y');
 
-        $management_fee = round(($request->grand_total * 6) / 100);
+        $workersInput = $request->input('workers', []); 
+        
+        // Ambil semua ID pekerja untuk query PKWT
+        $workerIds = array_column($workersInput, 'id');
+
+        // 1. Ambil data PKWT aktif untuk semua pekerja di array ini sekaligus
+        // (Asumsi nama model Anda adalah PKWT dan status_aktif = 1)
+        $semuaPkwt = \App\Models\PKWT::whereIn('id_pekerja', $workerIds)
+            ->where('status_aktif', 1) // Sesuaikan jika Anda menggunakan filter unit juga
+            ->get()
+            ->keyBy('id_pekerja'); // Kunci array dengan id_pekerja agar mudah dicari
+
+        // 2. Siapkan variabel penghitung (counter)
+        $countBpjsKesehatan = 0;
+        $countBpjsNaker = 0;
+
+        foreach ($workersInput as $input) {
+            $id = $input['id'];
+
+            // 3. Ambil data PKWT untuk pekerja ini dari koleksi yang sudah ditarik di atas
+            $pkwtPekerja = $semuaPkwt->get($id);
+
+            if ($pkwtPekerja) {
+                // Jika nominal bpjs_kesehatan lebih dari 0, tambah 1 ke hitungan
+                if ((float) $pkwtPekerja->bpjs_kesehatan > 0) {
+                    $countBpjsKesehatan++;
+                }
+
+                // Jika nominal bpjs_naker lebih dari 0, tambah 1 ke hitungan
+                if ((float) $pkwtPekerja->bpjs_naker > 0) {
+                    $countBpjsNaker++;
+                }
+            }
+        }
+
+        // Cek hasil hitungannya (Hapus / Comment kode dump ini jika sudah benar)
+        // dump("Total BPJS Kes: " . $countBpjsKesehatan);
+        // dump("Total BPJS Naker: " . $countBpjsNaker);
+
+        $a = $request->grand_total;
+
+        $Unit = Unit::where('id', $request->id_unit)->first();
+        // dd($Unit);
+
+        $MitraKerja = MitraKerja::where('id', $Unit->id_mitra_kerja)->first();
+
+        $Bidang = BidangUsaha::where('id', $MitraKerja->bidang_usaha_id)->first();
+
+        $naker = $Unit->umk * $countBpjsNaker * 4.24/100;
+        $kesehatan = $Unit->umk * $countBpjsKesehatan * 4/100;;
+
+        $management_fee = round(($a * $Unit->persentase_management_fee) / 100);
         $ppn = round(($management_fee * 11) / 100);
         $pph = round(($management_fee * 2) / 100);
 
         // Total tagihan dijumlahkan dari hasil yang sudah dibulatkan
-        $total_tagihan = $request->grand_total + $management_fee + $ppn - $pph;
-        $display_total_tagihan = number_format($total_tagihan, 0, ',', '.');
+        $total_tagihan = $naker + $kesehatan + $a + $management_fee + $ppn + $pph;
+        $display_total_tagihan = number_format($total_tagihan);
 
         $terbilang = ucwords(terbilang($total_tagihan)) . ' Rupiah';
 
