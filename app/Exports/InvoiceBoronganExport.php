@@ -30,7 +30,13 @@ class InvoiceBoronganExport implements FromView, WithStyles, WithColumnWidths, W
         public $total_tagihan,
         public $umk,
         public $nama,
-        public $jabatan
+        public $jabatan,
+        public $kota,         
+        public $countBpjsKesehatan,
+        public $countBpjsNaker,
+        public $persentase_management_fee, 
+        public $naker,      
+        public $kesehatan,
     ) {}
 
     public function view(): View
@@ -51,6 +57,12 @@ class InvoiceBoronganExport implements FromView, WithStyles, WithColumnWidths, W
             'umk' => $this->umk,
             'nama' => $this->nama,
             'jabatan' => $this->jabatan,
+            'kota' => $this->kota,      
+            'countBpjsKesehatan' => $this->countBpjsKesehatan,
+            'countBpjsNaker' => $this->countBpjsNaker,
+            'persentase_management_fee' => $this->persentase_management_fee,
+            'naker' => $this->naker,
+            'kesehatan' => $this->kesehatan,
         ]);
     }
     public function columnWidths(): array
@@ -61,8 +73,10 @@ class InvoiceBoronganExport implements FromView, WithStyles, WithColumnWidths, W
             'C' => 16,
             'D' => 13,
             'E' => 12,
-            'G' => 16,
-            'J' => 16,
+            'G' => 12,
+            'I' => 13,
+            'J' => 8,
+            'L' => 16,
         ];
     }
     public function registerEvents(): array
@@ -71,7 +85,8 @@ class InvoiceBoronganExport implements FromView, WithStyles, WithColumnWidths, W
             AfterSheet::class => function (AfterSheet $event) {
                 // Perbesar ROW ke-20
                 $event->sheet->getRowDimension(20)->setRowHeight(30);
-                $event->sheet->getRowDimension(21)->setRowHeight(35);
+                $event->sheet->getRowDimension(21)->setRowHeight(20);
+                $event->sheet->getRowDimension(23)->setRowHeight(30);
             },
         ];
     }
@@ -88,12 +103,13 @@ class InvoiceBoronganExport implements FromView, WithStyles, WithColumnWidths, W
         $ars->setPath(public_path('images\ISO.jpg'));
         $ars->setCoordinates('I1'); // Contoh posisi di area tanda tangan
         $ars->setHeight(60); 
+        $ars->setOffsetX(70); 
 
         $iso = new Drawing();
         $iso->setPath(public_path('images\ARS.png'));
         $iso->setCoordinates('J1'); // Contoh posisi di area tanda tangan
         $iso->setHeight(60); 
-        $iso->setOffsetX(20); 
+        $iso->setOffsetX(65); 
 
         return [$mja, $ars, $iso];
     }
@@ -103,7 +119,7 @@ class InvoiceBoronganExport implements FromView, WithStyles, WithColumnWidths, W
             ->setName('Times New Roman')
             ->setSize(12);
 
-        $sheet->getStyle('A20:J24')->applyFromArray([
+        $sheet->getStyle('A20:L24')->applyFromArray([
             'borders' => [
                 'allBorders' => [
                     'borderStyle' => Border::BORDER_THIN,
