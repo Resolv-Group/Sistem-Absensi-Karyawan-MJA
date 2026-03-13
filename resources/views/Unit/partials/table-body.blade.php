@@ -1,4 +1,11 @@
 @forelse ($unit as $u)
+    @php
+        $isComplete = $u->persentase_management_fee !== null &&
+            $u->bpjs_kesehatan !== null &&
+            $u->bpjs_naker !== null &&
+            $u->umk !== null &&
+            $u->tunjangan !== null;
+    @endphp
     <tr class="hover:bg-gray-50 transition-colors duration-200 group border-b border-gray-100 last:border-0">
 
         {{-- 1. INDEX --}}
@@ -152,7 +159,7 @@
         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
             <div class="flex justify-end gap-2">
                 {{-- Tambah Pekerja --}}
-                <a href="{{ route('view.tambah.unit-pekerja', $u->id) }}"
+                <button type="button" onclick="checkUnitRequirements('{{ route('view.tambah.unit-pekerja', $u->id) }}', {{ $isComplete ? 'true' : 'false' }}, '{{ route('view.ubah.unit', $u->id) }}')"
                     class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg transition-all hover:shadow-sm group"
                     title="Tambah Pekerja">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
@@ -161,11 +168,11 @@
                             d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-5-5a3 3 0 11-6 0 3 3 0 016 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                     </svg>
                     <span class="hidden sm:inline">Pekerja</span>
-                </a>
+                </button>
 
                 {{-- Tambah Borongan (hanya sistem_pengajian = 2) --}}
                 @if ($u->sistem_pengajian == 2)
-                    <a href="{{ route('view.tambah.unit-borongan', $u->id) }}"
+                    <button type="button" onclick="checkUnitRequirements('{{ route('view.tambah.unit-borongan', $u->id) }}', {{ $isComplete ? 'true' : 'false' }}, '{{ route('view.ubah.unit', $u->id) }}')"
                         class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-purple-700 bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-lg transition-all hover:shadow-sm group"
                         title="Tambah Borongan">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
@@ -174,7 +181,7 @@
                                 d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                         </svg>
                         <span class="hidden sm:inline">Borongan</span>
-                    </a>
+                    </button>
                 @endif
 
                 {{-- Edit --}}
@@ -220,3 +227,5 @@
         </td>
     </tr>
 @endforelse
+
+
