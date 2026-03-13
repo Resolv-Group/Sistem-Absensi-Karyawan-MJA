@@ -4,6 +4,13 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
         {{-- 1. HEADER SECTION (Unchanged) --}}
+        @php
+            $isComplete = $unit->persentase_management_fee !== null &&
+            $unit->bpjs_kesehatan !== null &&
+            $unit->bpjs_naker !== null &&
+            $unit->umk !== null &&
+            $unit->tunjangan !== null;
+        @endphp
         <div class="mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div>
                 <nav class="flex text-sm font-medium text-gray-500 mb-2">
@@ -49,9 +56,39 @@
                     @endif
                 </button>
             </div>
+
+            
         </div>
+        
+        {{-- Note --}}
+        @if(!$isComplete)
+            <div class="mt-4 bg-yellow-50 border border-yellow-100 p-4 rounded-xl">
+                <p class="text-sm text-yellow-600 font-medium">*Harap perbarui unit ini sebelum menambahkan karyawan.</p>
+            
+                {{-- //list yang belum di isi  --}}
+                <p class="mt-2 text-sm text-yellow-600 font-medium">List yang belum diisi:</p>
+                <ul class="list-disc pl-6">
+                    @if($unit->persentase_management_fee == null)
+                        <li class="text-sm text-yellow-600">Persentase Management Fee</li>
+                    @endif
+                    @if($unit->bpjs_kesehatan == null)
+                        <li class="text-sm text-yellow-600">BPJS Kesehatan</li>
+                    @endif
+                    @if($unit->bpjs_naker == null)
+                        <li class="text-sm text-yellow-600">BPJS Naker</li>
+                    @endif
+                    @if($unit->umk == null)
+                        <li class="text-sm text-yellow-600">UMK</li>
+                    @endif
+                    @if($unit->tunjangan == null)
+                        <li class="text-sm text-yellow-600">Tunjangan</li>
+                    @endif
+                </ul>
+            </div>
+        @endif
+
         {{-- 2. TOP SECTION: IDENTITY & CONTRACT (Grid Layout) --}}
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10 mt-4">
 
             {{-- LEFT: Unit Profile --}}
             <div class="lg:col-span-1">
@@ -191,24 +228,24 @@
                             <div class="h-8 w-px bg-slate-200"></div>
                             <div class="text-right">
                                 <p class="text-[9px] font-black text-slate-400 uppercase tracking-tighter">Mgmt Fee</p>
-                                <p class="text-sm font-black text-emerald-600">{{ $unit->persentase_management_fee }}%</p>
+                                <p class="text-sm font-black text-emerald-600">{{ $unit->persentase_management_fee ?? 0 }}%</p>
                             </div>
                         </div>
 
                         {{-- 4. SAFE ACTIONS --}}
-                        {{-- 4. SAFE ACTIONS --}}
-                        <div class="mt-8">
+                        <div class="mt-8" x-data="{}">
                             @if ($unit->sistem_pengajian == 1)
                                 {{-- Layout untuk Sistem Harian (2 Tombol) --}}
                                 <div class="grid grid-cols-2 gap-3">
-                                    <a href="{{ route('view.tambah.unit-pekerja', $unit->id) }}"
+                                    <button type="button"
+                                        onclick="checkUnitRequirements('{{ route('view.tambah.unit-pekerja', $unit->id) }}')"
                                         class="flex items-center justify-center gap-2 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-blue-500 hover:text-blue-600 transition active:scale-95 shadow-sm">
                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
                                                 d="M12 4v16m8-8H4" />
                                         </svg>
                                         Pekerja
-                                    </a>
+                                    </button>
                                     <a href="{{ route('view.ubah.unit', $unit->id) }}"
                                         class="flex items-center justify-center gap-2 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-blue-500 hover:text-blue-600 transition active:scale-95 shadow-sm">
                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
@@ -223,7 +260,8 @@
                                 {{-- Layout untuk Sistem Borongan (3 Tombol) --}}
                                 <div class="space-y-3">
                                     <div class="grid grid-cols-2 gap-3">
-                                        <a href="{{ route('view.tambah.unit-pekerja', $unit->id) }}"
+                                        <button type="button"
+                                            onclick="checkUnitRequirements('{{ route('view.tambah.unit-pekerja', $unit->id) }}')"
                                             class="flex items-center justify-center gap-2 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-blue-500 hover:text-blue-600 transition active:scale-95 shadow-sm">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
                                                 viewBox="0 0 24 24">
@@ -231,9 +269,10 @@
                                                     d="M12 4v16m8-8H4" />
                                             </svg>
                                             Pekerja
-                                        </a>
+                                        </button>
                                         {{-- Tombol Borongan Baru --}}
-                                        <a href="{{ route('view.tambah.unit-borongan', $unit->id) }}"
+                                        <button type="button"
+                                            onclick="checkUnitRequirements('{{ route('view.tambah.unit-borongan', $unit->id) }}')"
                                             class="flex items-center justify-center gap-2 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-orange-500 hover:text-orange-600 transition active:scale-95 shadow-sm">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
                                                 viewBox="0 0 24 24">
@@ -241,7 +280,7 @@
                                                     d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                                             </svg>
                                             Borongan
-                                        </a>
+                                        </button>
                                     </div>
                                     <a href="{{ route('view.ubah.unit', $unit->id) }}"
                                         class="w-full flex items-center justify-center gap-2 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-blue-500 hover:text-blue-600 transition active:scale-95 shadow-sm">
@@ -393,7 +432,8 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
                             </svg>
                             <p class="text-[10px] text-slate-400 font-black uppercase tracking-widest italic">Belum Ada
-                                Tunjangan</p>
+                                Tunjangan
+                            </p>
                         </div>
                     @endif
                 </div>
@@ -430,7 +470,7 @@
                                     <p class="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-0.5">
                                         Kontrak Berakhir Pada</p>
                                     <p class="text-base font-black text-slate-800">
-                                        {{ \Carbon\Carbon::parse($unit->tgl_akhir_mou)->format('d F Y') }}</p>
+                                        {{ \Carbon\Carbon::parse($unit->akhir_perjanjian)->format('d F Y') }}</p>
                                 </div>
                             </div>
 
@@ -470,7 +510,7 @@
                                     <span class="text-[11px] font-black text-slate-400 uppercase tracking-widest">BPJS
                                         Kesehatan</span>
                                 </div>
-                                <p class="text-sm font-black text-slate-800">{{ $unit->bpjs_kesehatan }}% <span
+                                <p class="text-sm font-black text-slate-800">{{ $unit->bpjs_kesehatan ?? 0}}% <span
                                         class="text-[9px] text-slate-300 font-bold ml-1 uppercase">UMK</span></p>
                             </div>
 
@@ -486,7 +526,7 @@
                                     <span class="text-[11px] font-black text-slate-400 uppercase tracking-widest">BPJS
                                         Tenaga Kerja</span>
                                 </div>
-                                <p class="text-sm font-black text-slate-800 text-right">{{ $unit->bpjs_naker }}% <span
+                                <p class="text-sm font-black text-slate-800 text-right">{{ $unit->bpjs_naker ?? 0 }}% <span
                                         class="text-[9px] text-slate-300 font-bold ml-1 uppercase">UMK</span></p>
                             </div>
 
@@ -673,6 +713,34 @@
                         });
                 }
             });
+        }
+
+        function checkUnitRequirements(url) {
+            const isComplete = @js($isComplete);
+
+            if (!isComplete) {
+                Swal.fire({
+                    title: 'Unit Belum Lengkap',
+                    text: 'Harap perbarui unit ini sebelum menambahkan PKWT / karyawan.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3b82f6',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Update Sekarang',
+                    cancelButtonText: 'Batal',
+                    customClass: {
+                        popup: 'rounded-2xl',
+                        confirmButton: 'rounded-lg px-4 py-2',
+                        cancelButton: 'rounded-lg px-4 py-2'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "{{ route('view.ubah.unit', $unit->id) }}";
+                    }
+                });
+            } else {
+                window.location.href = url;
+            }
         }
     </script>
 @endsection

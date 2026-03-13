@@ -109,6 +109,14 @@
     $watch('filterKategori', () => updateTable());
     $watch('filterStatus', () => updateTable());">
 
+    @php
+        $isComplete = $unit->persentase_management_fee !== null &&
+            $unit->bpjs_kesehatan !== null &&
+            $unit->bpjs_naker !== null &&
+            $unit->umk !== null &&
+            $unit->tunjangan !== null;
+    @endphp
+
         {{-- HEADER SECTION --}}
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
             <div
@@ -322,13 +330,14 @@
                         </div>
                     </div>
 
-                    <a href="{{ route('view.tambah.unit-borongan', $unit->id) }}"
+                    <button type="button"
+                        onclick="checkUnitRequirements('{{ route('view.tambah.unit-borongan', $unit->id) }}')"
                         class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-orange-600 text-white font-bold rounded-2xl hover:bg-orange-700 shadow-lg shadow-orange-100 transition active:scale-95">
-                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                         </svg>
                         Buat Borongan
-                    </a>
+                    </button>
                 </div>
 
                 {{-- TABLE --}}
@@ -629,6 +638,34 @@
 
 @section('scripts')
     <script>
+        function checkUnitRequirements(url) {
+            const isComplete = @js($isComplete);
+
+            if (!isComplete) {
+                Swal.fire({
+                    title: 'Unit Belum Lengkap',
+                    text: 'Harap perbarui unit ini sebelum menambahkan PKWT / karyawan.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3b82f6',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Update Sekarang',
+                    cancelButtonText: 'Batal',
+                    customClass: {
+                        popup: 'rounded-2xl',
+                        confirmButton: 'rounded-lg px-4 py-2',
+                        cancelButton: 'rounded-lg px-4 py-2'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "{{ route('view.ubah.unit', $unit->id) }}";
+                    }
+                });
+            } else {
+                window.location.href = url;
+            }
+        }
+
         document.addEventListener("click", function(e) {
             // Mencari apakah yang diklik adalah link di dalam pagination
             const anchor = e.target.closest("#search-pagination a");

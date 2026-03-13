@@ -97,15 +97,15 @@ class UnitController extends Controller
                     'akhir_perjanjian' => 'required|date|after_or_equal:mulai_perjanjian',
                     'nama_unit' => 'required|string',
                     'dokumen_mou' => 'file|mimes:png,jpg,jpeg,pdf|max:2048',
-                    'persentase_management_fee' => 'required|int',
-                    'umk' => 'required|numeric|min:0',
-                    'bpjs_kesehatan' => 'required|int',
-                    'bpjs_naker' => 'required|int',
+                    'persentase_management_fee' => 'nullable|numeric|min:0|max:100',
+                    'umk' => 'nullable|numeric|min:0',
+                    'bpjs_kesehatan' => 'nullable|numeric|min:0',
+                    'bpjs_naker' => 'nullable|numeric|min:0',
                     'sistem_pengajian' => 'required|int',
 
                     'pic_ids' => 'required|array|min:1',
                     'pic_ids.*' => 'exists:staff,id',
-                    'tunjangan' => 'required|json',
+                    'tunjangan' => 'nullable|json',
                 ],
                 [
                     'id_unit.required' => 'ID Unit wajib diisi',
@@ -373,10 +373,10 @@ class UnitController extends Controller
                     'id_mitra_kerja' => 'required|exists:mitra_kerja,id',
                     'nama_unit' => 'required|string|max:255',
                     'sistem_pengajian' => 'required|in:1,2',
-                    'persentase_management_fee' => 'required|numeric|min:0|max:100',
-                    'umk' => 'required|numeric|min:0',
-                    'bpjs_kesehatan' => 'required|int',
-                    'bpjs_naker' => 'required|int',
+                    'persentase_management_fee' => 'nullable|numeric|min:0|max:100',
+                    'umk' => 'nullable|numeric|min:0',
+                    'bpjs_kesehatan' => 'nullable|numeric|min:0',
+                    'bpjs_naker' => 'nullable|numeric|min:0',
 
                     'mulai_perjanjian' => 'required|date',
                     'akhir_perjanjian' => 'required|date|after_or_equal:mulai_perjanjian',
@@ -384,7 +384,7 @@ class UnitController extends Controller
                     'pic_ids' => 'required|array|min:1',
                     'pic_ids.*' => 'exists:staff,id',
 
-                    'tunjangan' => 'required|json',
+                    'tunjangan' => 'nullable|json',
 
                     // FILE OPTIONAL
                     'dokumen_mou' => 'nullable|file|mimes:png,jpg,jpeg,pdf|max:2048',
@@ -394,8 +394,6 @@ class UnitController extends Controller
                     'nama_unit.required' => 'Nama unit wajib diisi.',
                     'pic_ids.required' => 'Minimal 1 PIC harus dipilih.',
                     'umk.required' => 'Umk wajib diisi',
-                    'bpjs_kesehatan.required' => 'BPJS Kesehatan fee wajib diisi',
-                    'bpjs_naker.required' => 'BPJS Naker fee wajib diisi',
                     'dokumen_mou.mimes' => 'Dokumen harus PDF / JPG / PNG.',
                     'dokumen_mou.max' => 'Ukuran dokumen maksimal 2MB.',
                     'tunjangan.required' => 'Tunjangan wajib diisi.',

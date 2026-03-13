@@ -116,23 +116,23 @@ Route::middleware(['auth', 'role:hrd,admin,head_supervisor'])->group(function(){
     Route::get('/unit', [UnitController::class, 'viewUnitMain'])->name('view.unit');
     Route::get('/unit/tambah', [UnitController::class, 'viewTambahUnit'])->name('view.tambah.unit');
     Route::POST('/tambah-unit', [UnitController::class, 'tambahUnit'])->name('tambah.unit.post');
+});
 
-    Route::middleware(['role:hrd,admin'])->group(function(){
-        // Payroll
-        Route::get('/payroll', [PayrollController::class, 'viewPayrollMain'])->name('view.payroll');
-        Route::get('/payroll/overview', [PayrollController::class, 'viewPayrollOverview'])->name('view.payroll.overview');
-        Route::post('/payroll/overview', [PayrollController::class, 'overviewPayroll'])->name('overview.payroll');
-        Route::post('/export-detail-harian', [PayrollController::class, 'ExportDetailHarian'] )->name('export.detail.harian');
-        Route::get('/export-detail-borongan', [PayrollController::class, 'ExportDetailBorongan'] )->name('export.detail.borongan');
-        Route::get('/export-tanda-terima-borongan', [PayrollController::class, 'ExportTandaTerimaBorongan'] )->name('export.tanda-terima.borongan');
-        Route::get('/export-invoice-borongan', [PayrollController::class, 'ExportInvoiceBorongan'] )->name('export.invoice.borongan');
-        Route::get('/export-kwitansi-borongan', [PayrollController::class, 'ExportKwitansiBorongan'] )->name('export.kwitansi.borongan');
-        Route::post('/export-rincian-upah-borongan', [PayrollController::class, 'ExportRincianUpahBorongan'] )->name('export.rincian.upah.borongan');
-        Route::post('/export-rincian-upah-harian', [PayrollController::class, 'ExportRincianUpahHarian'] )->name('export.rincian.upah.harian');
-        Route::post('/export-daily-report-harian', [PayrollController::class, 'ExportDailyReportHarian'] )->name('export.daily.report.harian');
+Route::middleware(['auth', 'role:hrd,admin,akuntan,pic'])->group(function(){
+    // Payroll
+    Route::get('/payroll', [PayrollController::class, 'viewPayrollMain'])->name('view.payroll');
+    Route::get('/payroll/overview', [PayrollController::class, 'viewPayrollOverview'])->name('view.payroll.overview');
+    Route::post('/payroll/overview', [PayrollController::class, 'overviewPayroll'])->name('overview.payroll');
+    Route::post('/export-detail-harian', [PayrollController::class, 'ExportDetailHarian'] )->name('export.detail.harian');
+    Route::get('/export-detail-borongan', [PayrollController::class, 'ExportDetailBorongan'] )->name('export.detail.borongan');
+    Route::get('/export-tanda-terima-borongan', [PayrollController::class, 'ExportTandaTerimaBorongan'] )->name('export.tanda-terima.borongan');
+    Route::get('/export-invoice-borongan', [PayrollController::class, 'ExportInvoiceBorongan'] )->name('export.invoice.borongan');
+    Route::get('/export-kwitansi-borongan', [PayrollController::class, 'ExportKwitansiBorongan'] )->name('export.kwitansi.borongan');
+    Route::post('/export-rincian-upah-borongan', [PayrollController::class, 'ExportRincianUpahBorongan'] )->name('export.rincian.upah.borongan');
+    Route::post('/export-rincian-upah-harian', [PayrollController::class, 'ExportRincianUpahHarian'] )->name('export.rincian.upah.harian');
+    Route::post('/export-daily-report-harian', [PayrollController::class, 'ExportDailyReportHarian'] )->name('export.daily.report.harian');
 
-        Route::post('/payroll/get-adjustments', [AbsensiController::class, 'getAdjustments'])->name('payroll.get-adjustments');
-    });
+    Route::post('/payroll/get-adjustments', [AbsensiController::class, 'getAdjustments'])->name('payroll.get-adjustments');
 });
 
 Route::middleware(['auth', 'role:pic,admin'])->group(function(){

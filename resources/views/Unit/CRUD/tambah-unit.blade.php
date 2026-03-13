@@ -92,7 +92,8 @@
 
                             {{-- Label & Add Button --}}
                             <div class="flex justify-between items-center mb-1">
-                                <label class="block text-sm font-bold text-gray-700">Mitra Kerja</label>
+                                <label class="block text-sm font-bold text-gray-700">Mitra Kerja <span
+                                    class="text-red-500">*</span></label>
 
                             </div>
 
@@ -178,7 +179,7 @@
                             {{-- Label & Trigger Modal --}}
                             <div class="flex items-center justify-between mb-2">
                                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide">
-                                    Penanggung Jawab (PIC)
+                                    Penanggung Jawab (PIC) <span class="text-red-500">*</span>
                                 </label>
                                 <button type="button" @click="openModalWithSearch()"
                                     class="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:text-blue-800 transition">
@@ -467,7 +468,8 @@
 
                         {{-- Sistem Pengajian --}}
                         <div x-data="{ open: false, selected: @js(old('sistem_pengajian')) || '', list: [{ val: '1', label: 'Harian' }, { val: '2', label: 'Borongan' }] }" class="relative">
-                            <label class="block text-sm font-bold text-gray-700 mb-1">Sistem Pengajian</label>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Sistem Pengajian <span
+                                    class="text-red-500">*</span></label>
 
                             <input type="hidden" name="sistem_pengajian" x-model="selected">
 
@@ -620,14 +622,14 @@
                         <div class="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <div>
                                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Mulai
-                                    Perjanjian</label>
+                                    Perjanjian <span class="text-red-500">*</span></label>
                                 <input type="date" name="mulai_perjanjian"
                                     class="w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-blue-500 focus:ring-blue-100 transition py-3 px-4 text-sm font-medium text-gray-700"
                                     value="{{ old('mulai_perjanjian', date('Y-m-d')) }}">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Akhir
-                                    Perjanjian</label>
+                                    Perjanjian <span class="text-red-500">*</span></label>
                                 <input type="date" name="akhir_perjanjian" min="{{ date('Y-m-d') }}"
                                     class="w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-blue-500 focus:ring-blue-100 transition py-3 px-4 text-sm font-medium text-gray-700"
                                     value="{{ old('akhir_perjanjian') }}">
@@ -637,7 +639,7 @@
                         {{-- File Upload --}}
                         <div class="md:col-span-2" x-data="{ fileName: '' }">
                             <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Dokumen
-                                Kontrak (PDF/IMG)</label>
+                                Kontrak (PDF/IMG) <span class="text-red-500">*</span></label>
 
                             <label
                                 class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-xl cursor-pointer bg-gray-50 hover:bg-blue-50 hover:border-blue-400 transition group relative overflow-hidden">

@@ -126,7 +126,7 @@
     </tr>
 @empty
     <tr>
-        <td colspan="6" class="px-6 py-32 text-center bg-white">
+        <td colspan="8" class="px-6 py-32 text-center bg-white">
             <div x-transition:enter="transition ease-out duration-500"
                 x-transition:enter-start="opacity-0 translate-y-8" x-transition:enter-end="opacity-100 translate-y-0"
                 class="flex flex-col items-center justify-center">
@@ -198,14 +198,14 @@
                     </p>
 
                     <div class="mt-10">
-                        <a href="{{ route('view.tambah.unit-pekerja', $unit->id) }}"
+                        <button type="button"
+                            onclick="checkUnitRequirements('{{ route('view.tambah.unit-pekerja', $unit->id) }}')"
                             class="inline-flex items-center gap-3 px-10 py-4 bg-blue-600 text-white text-sm font-black rounded-2xl hover:bg-blue-700 shadow-xl shadow-blue-200 transition-all hover:-translate-y-1 active:scale-95">
-                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 4v16m8-8H4" />
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                             </svg>
                             Daftarkan Pekerja Baru
-                        </a>
+                        </button>
                     </div>
                 @endif
             </div>
