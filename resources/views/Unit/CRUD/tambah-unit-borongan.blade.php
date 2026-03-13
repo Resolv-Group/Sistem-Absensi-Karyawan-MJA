@@ -5,7 +5,7 @@
 
         {{-- HEADER --}}
         <div class="mb-8 flex items-center gap-4">
-            <a href="/unit"
+            <a href="{{ url()->previous() }}"
                 class="p-2 rounded-xl border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 transition shadow-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -15,7 +15,7 @@
                 <nav class="flex text-sm font-medium text-gray-500 mb-1">
                     <span class="hover:text-gray-700">Unit</span>
                     <span class="mx-2 text-gray-300">/</span>
-                    <span class="text-blue-600">Tambah Borongan Unit</span>
+                <span class="text-blue-600">Tambah Borongan Unit</span>
                 </nav>
                 <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Tambah Borongan Unit</h1>
             </div>

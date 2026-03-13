@@ -229,13 +229,14 @@
                     </div>
                 </div>
 
-                <a href="{{ route('view.tambah.unit-borongan', $unit->id) }}"
+                <button type="button"
+                    onclick="checkUnitRequirements('{{ route('view.tambah.unit-borongan', $unit->id) }}')"
                     class="px-4 py-2 bg-orange-600 text-white text-xs font-bold rounded-lg hover:bg-orange-700 transition flex items-center gap-2 shadow-sm">
                     <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
                     Borongan
-                </a>
+                </button>
             </div>
         </div>
 

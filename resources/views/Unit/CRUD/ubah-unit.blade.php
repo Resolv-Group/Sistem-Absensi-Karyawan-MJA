@@ -1,6 +1,9 @@
 @extends('layout')
 
 @section('content')
+    @php
+        $isPic = auth()->user()->role === 'pic';
+    @endphp
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
         {{-- HEADER SECTION --}}
@@ -12,7 +15,7 @@
             </nav>
 
             <div class="flex items-center gap-4">
-                <a href="/unit"
+                <a href="{{ url()->previous() }}"
                     class="group p-2 rounded-full border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition shadow-sm">
                     <svg xmlns="http://www.w3.org/2000/svg"
                         class="h-5 w-5 transform group-hover:-translate-x-0.5 transition" fill="none" viewBox="0 0 24 24"
@@ -73,11 +76,11 @@
                             <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">ID
                                 Unit</label>
                             <input type="text" name="id_unit" placeholder="Contoh: 71923"
-                                class="w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-blue-500 focus:ring-blue-100 transition py-3 px-4 text-sm font-medium placeholder-gray-400 pointer-events-none"
+                                class="w-full rounded-xl border-gray-200 bg-gray-100 focus:bg-white focus:border-blue-500 focus:ring-blue-100 transition py-3 px-4 text-sm font-medium placeholder-gray-400 cursor-not-allowed"
                                 value="{{ old('id', $unit->id) }}" maxlength="20" readonly>
                         </div>
 
-                        <div x-data="mitraKerjaCombobox()" x-init="init()" class="relative">
+                        <div x-data="mitraKerjaCombobox(@js($isPic))" x-init="init()" class="relative">
 
                             {{-- Label & Add Button --}}
                             <div class="flex justify-between items-center mb-1">
@@ -100,15 +103,18 @@
                                 </div>
 
                                 <input type="text" x-model="search" @input="open = true; selectedId = ''"
-                                    @click="open = true" @click.outside="closeDropdown()" @keydown.escape="open = false"
+                                    @click="!isPic && (open = true)" @click.outside="closeDropdown()" @keydown.escape="open = false"
                                     placeholder="Cari atau pilih bidang usaha..."
-                                    class="w-full pl-10 pr-10 rounded-lg border-gray-300 bg-gray-50 text-gray-900 placeholder-gray-400
+                                    class="w-full pl-10 pr-10 rounded-lg border-gray-300 text-gray-900 placeholder-gray-400
                                 focus:bg-white focus:border-blue-500 focus:ring-blue-200 transition py-2.5 px-4 text-sm font-medium"
+                                    :class="isPic ? 'cursor-not-allowed bg-gray-100' : 'bg-gray-50'"
+                                    :readonly="isPic"
                                     autocomplete="off">
 
                                 {{-- Chevron Icon (Visual cue that it is a list) --}}
-                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
-                                    @click="toggleDropdown()">
+                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center"
+                                    :class="isPic ? 'cursor-not-allowed' : 'cursor-pointer'"
+                                    @click="!isPic && toggleDropdown()">
                                     <svg class="w-4 h-4 text-gray-400 transition-transform duration-200"
                                         :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor"
                                         viewBox="0 0 24 24">
@@ -157,15 +163,17 @@
                             <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Nama Unit
                                 <span class="text-red-500">*</span></label>
                             <input type="text" name="nama_unit" placeholder="Contoh: Unit Produksi A"
-                                class="w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-blue-500 focus:ring-blue-100 transition py-3 px-4 text-sm font-medium placeholder-gray-400"
-                                value="{{ old('nama_unit', $unit->nama_unit) }}">
+                                class="w-full rounded-xl border-gray-200 focus:bg-white focus:border-blue-500 focus:ring-blue-100 transition py-3 px-4 text-sm font-medium placeholder-gray-400"
+                                :class="isPic ? 'cursor-not-allowed bg-gray-100' : 'bg-gray-50'"
+                                value="{{ old('nama_unit', $unit->nama_unit) }}"
+                                {{ $isPic ? 'readonly' : '' }}>
                         </div>
 
                         {{-- Mitra Kerja (Searchable Combobox) --}}
 
 
                         {{-- PIC Name --}}
-                        <div x-data="picCombobox()" x-init="init()" class="group"> {{-- Hapus relative di sini --}}
+                        <div x-data="picCombobox(@js($isPic))" x-init="init()" class="group"> {{-- Hapus relative di sini --}}
 
                             {{-- Label --}}
                             <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
@@ -181,9 +189,9 @@
                             <div class="relative">
 
                                 {{-- Main Container (Input Box) --}}
-                                <div class="relative w-full min-h-[50px] rounded-xl border border-gray-200 bg-gray-50 px-2 py-1.5 flex flex-wrap gap-2 transition-all duration-200
-                                cursor-text"
-                                    @click="$refs.searchInput.focus()">
+                                <div class="relative w-full min-h-[50px] rounded-xl border border-gray-200 px-2 py-1.5 flex flex-wrap gap-2 transition-all duration-200"
+                                    :class="isPic ? 'cursor-not-allowed bg-gray-100' : 'bg-gray-50 cursor-text'"
+                                    @click="!isPic && $refs.searchInput.focus()">
 
                                     {{-- A. Selected Chips --}}
                                     <template x-for="(item, index) in selectedItems" :key="item.val">
@@ -203,7 +211,7 @@
 
                                             <span x-text="item.label" class="text-xs font-bold text-gray-700"></span>
 
-                                            <button type="button" @click.stop="removeItem(index)"
+                                            <button x-show="!isPic" type="button" @click.stop="removeItem(index)"
                                                 class="p-0.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors">
                                                 <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
                                                     stroke="currentColor">
@@ -217,17 +225,19 @@
                                     {{-- B. Search Input --}}
                                     <div class="flex-1 min-w-[150px] relative">
                                         <input x-ref="searchInput" type="text" x-model="search" @input="open = true"
-                                            @click="open = true" @click.outside="open = false"
+                                            @click="!isPic && (open = true)" @click.outside="open = false"
                                             @keydown.escape="open = false" @keydown.backspace="handleBackspace()"
                                             placeholder="Cari atau pilih staff..."
                                             class="w-full h-full bg-transparent border-none focus:ring-0 p-2 text-sm font-medium text-gray-900 placeholder-gray-400"
+                                            :class="isPic ? 'cursor-not-allowed' : ''"
+                                            :readonly="isPic"
                                             autocomplete="off">
                                     </div>
 
                                     {{-- Right Chevron --}}
                                     <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
                                         <svg class="w-4 h-4 text-gray-400 group-focus-within:text-blue-500 transition-colors"
-                                            :class="{ 'rotate-180': open }" fill="none" stroke="currentColor"
+                                            :class="{ 'rotate-180': open, 'hidden': isPic }" fill="none" stroke="currentColor"
                                             viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M19 9l-7 7-7-7"></path>
@@ -302,7 +312,7 @@
                                         d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                             </div>
-                            <h2 class="text-lg font-black text-gray-900">Update Tunjangan</h2>
+                            <h2 class="text-lg font-black text-gray-900">Update Tunjangan {!! $isPic ? '<span class="text-red-500">*</span>' : '' !!}</h2>
                         </div>
                     </div>
 
@@ -433,7 +443,7 @@
                             umk: '{{ old('umk', isset($unit->umk) ? number_format($unit->umk, 0, ',', '.') : '') }}'
                         }">
                             <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
-                                Nominal Pembayaran (UMK)
+                                Nominal Pembayaran (UMK) {!! $isPic ? '<span class="text-red-500">*</span>' : '' !!}
                             </label>
 
                             <div class="relative group">
@@ -468,7 +478,7 @@
                             {{-- Management Fee --}}
                             <div>
                                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
-                                    Management Fee
+                                    Management Fee {!! $isPic ? '<span class="text-red-500">*</span>' : '' !!}
                                 </label>
 
                                 <div class="relative group">
@@ -499,7 +509,7 @@
                             {{-- BPJS Kesehatan Fee  --}}
                             <div>
                                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
-                                    BPJS Kesehatan Fee (%)
+                                    BPJS Kesehatan Fee (%) {!! $isPic ? '<span class="text-red-500">*</span>' : '' !!}
                                 </label>
 
                                 <div class="relative group">
@@ -530,7 +540,7 @@
                             {{-- BPJS Naker Fee  --}}
                             <div>
                                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
-                                    BPJS Naker Fee (%)
+                                    BPJS Naker Fee (%) {!! $isPic ? '<span class="text-red-500">*</span>' : '' !!}
                                 </label>
 
                                 <div class="relative group">
@@ -564,15 +574,25 @@
                                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Mulai
                                     Perjanjian</label>
                                 <input type="date" name="mulai_perjanjian"
-                                    class="w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-blue-500 focus:ring-blue-100 transition py-3 px-4 text-sm font-medium text-gray-700"
-                                    value="{{ old('mulai_perjanjian', optional($unit->mulai_perjanjian)->format('Y-m-d')) }}">
+                                    class="w-full rounded-xl border-gray-200 focus:bg-white focus:border-blue-500 focus:ring-blue-100 transition py-3 px-4 text-sm font-medium text-gray-700"
+                                    :class="isPic ? 'cursor-not-allowed bg-gray-100' : 'bg-gray-50'"
+                                    @mousedown="isPic && $event.preventDefault()"
+                                    @keydown="isPic && $event.preventDefault()"
+                                    value="{{ old('mulai_perjanjian', optional($unit->mulai_perjanjian)->format('Y-m-d')) }}"
+                                    {{ $isPic ? 'readonly' : '' }}
+                                    >
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Akhir
                                     Perjanjian</label>
                                 <input type="date" name="akhir_perjanjian" min="{{ date('Y-m-d') }}"
-                                    class="w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-blue-500 focus:ring-blue-100 transition py-3 px-4 text-sm font-medium text-gray-700"
-                                    value="{{ old('akhir_perjanjian', optional($unit->akhir_perjanjian)->format('Y-m-d')) }}">
+                                    class="w-full rounded-xl border-gray-200 focus:bg-white focus:border-blue-500 focus:ring-blue-100 transition py-3 px-4 text-sm font-medium text-gray-700"
+                                    :class="isPic ? 'cursor-not-allowed bg-gray-100' : 'bg-gray-50'"
+                                    @mousedown="isPic && $event.preventDefault()"
+                                    @keydown="isPic && $event.preventDefault()"
+                                    value="{{ old('akhir_perjanjian', optional($unit->akhir_perjanjian)->format('Y-m-d')) }}"
+                                    {{ $isPic ? 'readonly' : '' }}
+                                    >
                             </div>
                         </div>
 
@@ -583,7 +603,8 @@
                                 Kontrak (PDF/IMG)</label>
 
                             <label
-                                class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-xl cursor-pointer bg-gray-50 hover:bg-blue-50 hover:border-blue-400 transition group relative overflow-hidden">
+                                :class="isPic ? 'cursor-not-allowed bg-gray-100' : 'cursor-pointer bg-gray-50 hover:bg-blue-50 hover:border-blue-400'"
+                                class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-xl transition group relative overflow-hidden">
 
                                 {{-- Empty State --}}
                                 <div x-show="!fileName" class="flex flex-col items-center justify-center pt-5 pb-6">
@@ -611,6 +632,7 @@
                                 </div>
 
                                 <input type="file" name="dokumen_mou" class="hidden" accept=".pdf,.jpg,.jpeg,.png"
+                                    :disabled="isPic"
                                     @change="fileName = $event.target.files[0] ? $event.target.files[0].name : ''" />
                             </label>
                             <div class="mt-2 flex items-start gap-2 text-xs text-gray-500 italic">
@@ -649,8 +671,11 @@
 
 @section('scripts')
     <script>
-        function mitraKerjaCombobox() {
+        const isPic = @js($isPic);
+
+        function mitraKerjaCombobox(isPicMode = false) {
             return {
+                isPic: isPicMode,
                 // Data passed from Laravel
                 list: @json($mitraKerjaList ?? []),
                 selectedId: '{{ old('id_mitra_kerja', $unit->id_mitra_kerja ?? '') }}',
@@ -720,8 +745,9 @@
             }
         }
 
-        function picCombobox() {
+        function picCombobox(isPicMode = false) {
             return {
+                isPic: isPicMode,
                 // Data passed from Controller
                 list: @json($picList ?? []),
                 selectedItems: [],
@@ -788,21 +814,6 @@
                         value: initialData[key]
                     };
                 });
-            } else {
-                // Default jika data unit belum punya tunjangan
-                startingList = [{
-                        nama: 'Score',
-                        value: 0
-                    },
-                    {
-                        nama: 'Jarak',
-                        value: 0
-                    },
-                    {
-                        nama: 'Driver',
-                        value: 0
-                    }
-                ];
             }
 
             return {

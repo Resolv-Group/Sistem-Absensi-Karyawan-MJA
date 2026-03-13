@@ -152,13 +152,14 @@
                     <p class="text-sm text-gray-400 max-w-[280px] mx-auto mt-3 leading-relaxed">
                         Unit ini belum memiliki daftar pekerja harian yang terdaftar di sistem.
                     </p>
-                    <a href="{{ route('view.tambah.unit-pekerja', $unit->id) }}"
+                    <button type="button"
+                        onclick="checkUnitRequirements('{{ route('view.tambah.unit-pekerja', $unit->id) }}')"
                         class="mt-8 group inline-flex items-center gap-2 px-6 py-3 bg-white text-gray-600 border border-gray-200 text-xs font-bold rounded-2xl hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all shadow-sm hover:-translate-y-1 active:scale-95">
-                        <svg class="w-4 h-4 text-gray-400 group-hover:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                         </svg>
                         Tambah Pekerja Pertama
-                    </a>
+                    </button>
                 @endif
             </div>
         </td>

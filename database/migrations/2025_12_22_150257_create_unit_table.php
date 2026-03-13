@@ -24,11 +24,11 @@ return new class extends Migration
             // $table->binary('dokumen_mou')->nullable();
 
             $table->char('nama_unit');
-            $table->integer('persentase_management_fee');
+            $table->decimal('persentase_management_fee', 5, 2)->nullable();
             $table->integer('sistem_pengajian');
-            $table->integer('umk');
-            $table->integer('bpjs_kesehatan');
-            $table->integer('bpjs_naker');
+            $table->float('umk')->nullable();
+            $table->decimal('bpjs_kesehatan', 5, 2)->nullable();
+            $table->decimal('bpjs_naker', 5, 2)->nullable();
             $table->integer('status_aktif')->default(1);
 
             $table->json('tunjangan')->nullable();

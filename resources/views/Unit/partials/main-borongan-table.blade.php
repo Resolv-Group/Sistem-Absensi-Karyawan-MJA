@@ -118,13 +118,14 @@
                     </p>
 
                     <div class="mt-10">
-                        <a href="{{ route('view.tambah.unit-borongan', $unit->id) }}"
+                        <button type="button"
+                            onclick="checkUnitRequirements('{{ route('view.tambah.unit-borongan', $unit->id) }}')"
                             class="inline-flex items-center gap-3 px-10 py-4 bg-orange-600 text-white text-sm font-black rounded-2xl hover:bg-orange-700 shadow-xl shadow-orange-200 transition-all hover:-translate-y-1 active:scale-95">
-                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                             </svg>
-                            Buat Item Borongan Baru
-                        </a>
+                            Buat Item Borongan
+                        </button>
                     </div>
                 @endif
             </div>
