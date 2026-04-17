@@ -132,6 +132,9 @@ Route::middleware(['auth', 'role:hrd,admin,akuntan,pic'])->group(function(){
     Route::post('/export-rincian-upah-harian', [PayrollController::class, 'ExportRincianUpahHarian'] )->name('export.rincian.upah.harian');
     Route::post('/export-daily-report-harian', [PayrollController::class, 'ExportDailyReportHarian'] )->name('export.daily.report.harian');
 
+    Route::post('/export-summary-upah-harian', [PayrollController::class, 'SummaryUpahHarian'] )->name('export.summary.upah.harian');
+
+
     Route::post('/payroll/get-adjustments', [AbsensiController::class, 'getAdjustments'])->name('payroll.get-adjustments');
 });
 

@@ -725,15 +725,17 @@
                 <td></td>
                 <td></td>
                 <td colspan="2" style="text-align: center;">MENGETAHUI</td>
+                <td></td>
+                <td></td>
+                <td colspan="2" style="text-align: center;">MENGETAHUI</td>
             </tr>
             <tr>
                 <td colspan="2"></td>
                 <td colspan="2" style="text-align: center;">PT MITRA JUA ABADI</td>
                 <td></td>
                 <td></td>
-                <td colspan="2" style="text-align: center;">{{ $unit_name }}
+                {{-- <td colspan="2" style="text-align: center;">{{ $unit_name }} --}}
 
-                </td>
             </tr>
             <tr></tr>
             <tr></tr>
@@ -743,12 +745,27 @@
             <tr>
                 <td colspan="2"></td>
 
-                <td colspan="2" style="text-align: center;">{{ $penanggung_jawab }}</td>
+                <td colspan="2" style="text-align: center;">{{ $penanggung_jawab[0] ?? '' }}</td>
+      
+                <td colspan="2"></td>
+
+                <td colspan="2" style="text-align: center;">{{ $penanggung_jawab[1] ?? '' }}</td>
+     
+                <td colspan="2"></td>
+
+                <td colspan="2" style="text-align: center;">{{ $penanggung_jawab[2] ?? '' }}</td>
             </tr>
             <tr>
                 <td colspan="2"></td>
 
-                <td colspan="2" style="text-align: center;">{{ $jabatan_pj }}</td>
+                <td colspan="2" style="text-align: center;">{{ $jabatan_pj[0] ?? '' }}</td>
+                <td colspan="2"></td>
+
+                <td colspan="2" style="text-align: center;">{{ $jabatan_pj[1] ?? '' }}</td>
+
+                <td colspan="2"></td>
+
+                <td colspan="2" style="text-align: center;">{{ $jabatan_pj[2] ?? '' }}</td>
             </tr>
     </tfoot>
 </table>
