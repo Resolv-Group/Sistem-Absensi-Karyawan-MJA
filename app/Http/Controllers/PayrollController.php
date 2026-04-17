@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\SummaryUpahExport;
 use App\Exports\DailyReportHarianExport;
 use App\Exports\DetilBoronganExport;
 use App\Exports\InvoiceBoronganExport;
@@ -886,7 +887,6 @@ class PayrollController extends Controller
 
     public function ExportDetailHarian(Request $request)
     {
-        // dd($request->all());
         // 1. Ambil data dari request
 
         $workersInput = json_decode($request->workers_json, true);
@@ -909,8 +909,8 @@ class PayrollController extends Controller
         ->get()
         ->keyBy('id');
 
-        $penanggung_jawab = request()->penanggung_jawab;
-        $jabatan_pj = request()->jabatan_pj;
+        $penanggung_jawab = $request->input('pj_nama', []);
+        $jabatan_pj = $request->input('pj_jabatan', []);
 
         // ---------------------------------------------------------
         // [BAGIAN 3] AMBIL DATA ABSENSI & BUAT MAPPING (DILAKUKAN SEKALI SAJA)
@@ -1173,8 +1173,6 @@ class PayrollController extends Controller
             $item->jml_pokok_upah = (float) ($input['upah'] ?? 0) + ($input['potongan'] ?? 0) - ($input['tunjangan'] ?? 0)
             - $item->total_lembur_biasa - $item->total_lembur_hbn ;
 
-            
-
             //Tunjangan
             $item->detail_tunjangan = [];
             $totalUangTunjangan = 0;
@@ -1287,4 +1285,121 @@ class PayrollController extends Controller
             $jabatan_pj,
         ), $filename);
     }
+
+    public function SummaryUpahHarian(Request $request)
+{
+    // 1. Ambil Data Dasar dari Reques
+    $workersInput = is_string($request->workers_json) ? json_decode($request->workers_json, true) : $request->workers_json;
+    
+    $idUnit = $request->id_unit;
+    $tglAwal = \Carbon\Carbon::parse($request->tgl_awal)->format('Y-m-d');
+    $tglAkhir = \Carbon\Carbon::parse($request->tgl_akhir)->format('Y-m-d');
+    
+    $biayaAdminGlobal = (float) $request->biaya_admin;
+
+    // 2. Ambil Data Master Pekerja & PKWT
+    $workerIds = array_column($workersInput, 'id');
+    $dbPekerja = Pekerja::with(['pkwt.divisi'])->whereIn('id', $workerIds)->get()->keyBy('id');
+
+    // 3. Olah Data untuk Summary
+    $processedData = [];
+    $no = 1;
+
+    foreach ($workersInput as $input) {
+        $id = $input['id'];
+        if (!isset($dbPekerja[$id])) continue;
+
+        $staff = $dbPekerja[$id];
+        $pkwt = $staff->pkwt->sortByDesc('id')->first(); 
+        
+        // --- PENDAPATAN ---
+        $gapok = (float) ($input['upah'] ?? 0);
+        $rateLembur = $pkwt->gaji_overtime ?? 0;
+        $rateHbn = $rateLembur * ($pkwt->rate_hbn ?? 1.5);
+        $lembur = ((float) ($input['overtime'] ?? 0) * $rateLembur) + ((float) ($input['hbn'] ?? 0) * $rateHbn);
+        
+        $koreksi = (float) ($input['potongan'] ?? 0);
+        $lainnya = (float) ($input['tunjangan'] ?? 0);
+        
+        $total_pendapatan = $gapok + $lembur - $koreksi + $lainnya;
+
+        // --- BPJS ---
+        $bpjstk = $pkwt->bpjs_naker ?? 0;
+        $bpjskes = $pkwt->bpjs_kesehatan ?? 0;
+        $total_gaji = $total_pendapatan - $bpjstk - $bpjskes;
+
+        // --- INVOICE / PAJAK ---
+        $management_fee = $gapok * ($biayaAdminGlobal / 100); // Misal biaya_admin diinput sbg persen (cth: 5)
+        
+        $dpp = $management_fee / 1.0909; 
+        $ppn = $dpp * 0.12;              
+        $pph = $management_fee * 0.02;   
+        
+        $invoice = $total_gaji + $management_fee + $ppn - $pph;
+
+        \Carbon\Carbon::setLocale('id');
+        $joinDate = $pkwt->tgl_mulai_pkwt ? strtoupper(\Carbon\Carbon::parse($pkwt->tgl_mulai_pkwt)->translatedFormat('d M Y')) : '-';
+        $exitDate = $pkwt->tgl_akhir_pkwt ? strtoupper(\Carbon\Carbon::parse($pkwt->tgl_akhir_pkwt)->translatedFormat('d M Y')) : '-';
+
+        $processedData[] = [
+            'no' => $no++,
+            'nik' => $staff->nik ?? $staff->id_pekerja ?? '-',
+            'nama' => $staff->nama,
+            'section' => $pkwt->divisi->nama ?? '-',
+            'join' => $joinDate,
+            'exit' => $exitDate,
+            'status' => 'HARIAN', // Sesuaikan jika ada logika khusus
+            'gapok' => round($gapok),
+            'lembur' => round($lembur),
+            'koreksi' => round($koreksi),
+            'lainnya' => round($lainnya),
+            'total_pendapatan' => round($total_pendapatan),
+            'management_fee' => round($management_fee),
+            'bpjstk' => round($bpjstk),
+            'bpjskes' => round($bpjskes),
+            'total_gaji' => round($total_gaji),
+            'dpp' => round($dpp),
+            'ppn' => round($ppn),
+            'pph' => round($pph),
+            'invoice' => round($invoice)
+        ];
+    }
+
+    // 4. Hitung Totals
+    $totals = [
+        'gapok' => collect($processedData)->sum('gapok'),
+        'lembur' => collect($processedData)->sum('lembur'),
+        'koreksi' => collect($processedData)->sum('koreksi'),
+        'lainnya' => collect($processedData)->sum('lainnya'),
+        'total_pendapatan' => collect($processedData)->sum('total_pendapatan'),
+        'management_fee' => collect($processedData)->sum('management_fee'),
+        'bpjstk' => collect($processedData)->sum('bpjstk'),
+        'bpjskes' => collect($processedData)->sum('bpjskes'),
+        'total_gaji' => collect($processedData)->sum('total_gaji'),
+        'dpp' => collect($processedData)->sum('dpp'),
+        'ppn' => collect($processedData)->sum('ppn'),
+        'pph' => collect($processedData)->sum('pph'),
+        'invoice' => collect($processedData)->sum('invoice'),
+    ];
+
+    // 5. Finalisasi
+    $start = \Carbon\Carbon::parse($tglAwal)->startOfDay();
+    $end = \Carbon\Carbon::parse($tglAkhir)->startOfDay();
+    $periodeString = strtoupper($start->translatedFormat('d F Y') . ' - ' . $end->translatedFormat('d F Y'));
+    
+    $unit = Unit::find($idUnit);
+    $unitName = $unit ? $unit->nama_unit : 'UNIT TIDAK DIKETAHUI';
+    
+    $filename = 'Summary_Upah_' . $unitName . '_' . now()->format('Ymd_His') . '.xlsx';
+
+    // 6. Return ke Export Class
+    return Excel::download(new \App\Exports\SummaryUpahExport(
+        $processedData, 
+        $totals, 
+        $periodeString, 
+        $unitName,
+        $request->penanggung_jawab,
+        $request->jabatan_pj
+    ), $filename);
+}
 }

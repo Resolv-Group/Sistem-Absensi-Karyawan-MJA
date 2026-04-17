@@ -536,6 +536,7 @@
                                 </svg>
                             </button>
 
+                        
                             <div class="flex gap-3" x-data="reportModal()">
                                 @php
                                     $payloadReportHarian = [
@@ -546,6 +547,17 @@
                                         'workers_json' => $jsonWorkers, // Data JSON pekerja
                                     ];
                                 @endphp
+
+                                <button type="button"
+                                    @click="open('Summary Upah', '{{ route('export.summary.upah.harian') }}', {{ json_encode($payloadReportHarian) }})"
+                                    class="group flex items-center gap-3 bg-red-600 hover:bg-red-500 text-white px-8 py-3.5 rounded-xl font-black text-xs uppercase tracking-widest shadow-xl shadow-emerald-500/20 transition-all active:scale-95">
+                                    Generate Summary Upah
+                                    <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform"
+                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                            d="M9 17v-2a4 4 0 014-4h4m0 0l-4-4m4 4l-4 4" />
+                                    </svg>
+                                </button>
 
                                 <button type="button"
                                     @click="open('Report Harian', '{{ route('export.detail.harian') }}', {{ json_encode($payloadReportHarian) }})"
@@ -611,76 +623,94 @@
                                 </div>
 
                                 <!-- Input -->
-                                <div class="space-y-4" x-data="rupiahInput()">
+                                <div class="space-y-6" x-data="rupiahInput()">
 
-                                    <!-- ===================== -->
                                     <!-- BIAYA ADMIN -->
-                                    <!-- ===================== -->
                                     <div class="space-y-2">
-                                        <label
-                                            class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
+                                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
                                             Biaya Administrasi
                                         </label>
-
                                         <div class="relative">
-                                            <span
-                                                class="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">
+                                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">
                                                 Rp
                                             </span>
-
-                                            <!-- Visible formatted input -->
-                                            <input type="text" x-model="display" @input="format" inputmode="numeric"
-                                                placeholder="0"
+                                            <input type="text" x-model="display" @input="format" inputmode="numeric" placeholder="0"
                                                 class="w-full pl-10 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-400 transition">
-
-                                            <!-- Hidden raw numeric value -->
-                                            <input type="hidden" name="biaya_admin" :value="raw">
                                         </div>
                                     </div>
 
+                                    <div class="border-t border-slate-100 pt-2"></div>
 
-                                    <!-- ===================== -->
-                                    <!-- NAMA PJ -->
-                                    <!-- ===================== -->
-                                    <div class="space-y-2">
-                                        <label
-                                            class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
-                                            Nama Penanggung Jawab
-                                        </label>
+                                    <!-- GRUP PJ BERJEJER -->
+                                    <div class="space-y-5">
+                                        
+                                        <!-- Baris 1 -->
+                                        <div class="grid grid-cols-2 gap-4 items-start">
+                                            <div class="space-y-2">
+                                                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 truncate">
+                                                    Nama PJ 1
+                                                </label>
+                                                <input type="text" name="pj_nama[]" placeholder="Contoh: Budi Sar"
+                                                    class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold text-slate-700 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-400 transition">
+                                            </div>
+                                            <div class="space-y-2">
+                                                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 truncate">
+                                                    Jabatan PJ 1
+                                                </label>
+                                                <input type="text" name="pj_jabatan[]" placeholder="Contoh: Supervis"
+                                                    class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold text-slate-700 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-400 transition">
+                                            </div>
+                                        </div>
 
-                                        <input type="text" name="penanggung_jawab" placeholder="Contoh: Budi Santoso"
-                                            class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold text-slate-700 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-400 transition">
+                                        <!-- Baris 2 -->
+                                        <div class="grid grid-cols-2 gap-4 items-start">
+                                            <div class="space-y-2">
+                                                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 truncate">
+                                                    Nama PJ 2
+                                                </label>
+                                                <input type="text" name="pj_nama[]" placeholder="Contoh: Siti Amir"
+                                                    class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold text-slate-700 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-400 transition">
+                                            </div>
+                                            <div class="space-y-2">
+                                                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 truncate">
+                                                    Jabatan PJ 2
+                                                </label>
+                                                <input type="text" name="pj_jabatan[]" placeholder="Contoh: Manajer"
+                                                    class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold text-slate-700 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-400 transition">
+                                            </div>
+                                        </div>
+
+                                        <!-- Baris 3 -->
+                                        <div class="grid grid-cols-2 gap-4 items-start">
+                                            <div class="space-y-2">
+                                                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 truncate">
+                                                    Nama PJ 3
+                                                </label>
+                                                <input type="text" name="pj_nama[]" placeholder="Contoh: Ahmad I"
+                                                    class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold text-slate-700 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-400 transition">
+                                            </div>
+                                            <div class="space-y-2">
+                                                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 truncate">
+                                                    Jabatan PJ 3
+                                                </label>
+                                                <input type="text" name="pj_jabatan[]" placeholder="Contoh: Direktur"
+                                                    class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold text-slate-700 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-400 transition">
+                                            </div>
+                                        </div>
+
                                     </div>
 
-                                    <!-- ===================== -->
-                                    <!-- JABATAN PJ -->
-                                    <!-- ===================== -->
-                                    <div class="space-y-2">
-                                        <label
-                                            class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
-                                            Jabatan Penanggung Jawab
-                                        </label>
-
-                                        <input type="text" name="jabatan_pj" placeholder="Contoh: Supervisor Lapangan"
-                                            class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold text-slate-700 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-400 transition">
+                                    <!-- TOMBOL AKSI -->
+                                    <div class="flex items-center gap-4 pt-4">
+                                        <button type="button" @click="show = false" class="flex-1 py-4 text-xs font-black text-slate-400 uppercase tracking-widest hover:text-slate-600 transition">
+                                            Batal
+                                        </button>
+                                        <button type="submit" class="flex-1 py-4 bg-emerald-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg shadow-emerald-200 hover:bg-emerald-700 transition">
+                                            Generate
+                                        </button>
                                     </div>
-
-
-
                                 </div>
 
-                                <!-- Actions -->
-                                <div class="grid grid-cols-2 gap-3 pt-4">
-                                    <button type="button" @click="show = false"
-                                        class="text-xs font-black text-slate-400 uppercase tracking-widest hover:text-slate-600 transition">
-                                        Batal
-                                    </button>
-
-                                    <button type="submit"
-                                        class="py-3.5 bg-emerald-600 text-white text-xs font-black uppercase tracking-widest rounded-2xl shadow-lg shadow-emerald-200 hover:bg-emerald-700 transition active:scale-95">
-                                        Generate
-                                    </button>
-                                </div>
 
                             </form>
                         </div>
