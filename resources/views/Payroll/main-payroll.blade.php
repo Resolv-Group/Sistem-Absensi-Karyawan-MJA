@@ -561,19 +561,23 @@
 
                                             <template x-for="worker in $store.payslip.workers" :key="worker.id">
                                                 <label
-                                                    class="flex items-center gap-3 p-3 bg-white border rounded-xl cursor-pointer transition-all shadow-sm"
+                                                    class="flex items-center gap-2.5 px-3 py-2.5 bg-white border rounded-xl cursor-pointer transition-all duration-150"
                                                     :class="$store.payslip.selectedWorkers.includes(worker.id) ?
-                                                        'border-emerald-500 bg-emerald-50/50' :
-                                                        'border-slate-100 opacity-60'">
+                                                        'border-emerald-500 bg-emerald-50/30 shadow-sm shadow-emerald-100/50' :
+                                                        'border-slate-100 hover:border-slate-200'">
                                                     <input type="checkbox" name="paid_workers[]" :value="worker.id"
                                                         x-model="$store.payslip.selectedWorkers"
-                                                        class="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-slate-300">
-                                                    <div class="flex flex-col">
-                                                        <span class="text-[11px] font-bold text-slate-700 leading-tight"
+                                                        class="flex-shrink-0 self-center w-3.5 h-3.5 rounded text-emerald-600 focus:ring-emerald-500 border-slate-300">
+                                                    <div class="flex flex-col min-w-0 flex-1">
+                                                        <span class="text-[12px] font-bold text-slate-700 leading-snug truncate"
                                                             x-text="worker.nama"></span>
-                                                        <span
-                                                            class="text-[11px] font-black text-slate-300 uppercase mt-0.5"
-                                                            x-text="'ID: ' + worker.id"></span>
+                                                        <div class="flex items-center justify-between gap-1 mt-0.5">
+                                                            <span class="text-[10px] font-medium text-slate-400 tracking-tight"
+                                                                x-text="'ID: ' + worker.id"></span>
+                                                            <span x-show="$store.payslip.sistemPengajian == 1"
+                                                                class="flex-shrink-0 text-[12px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded tracking-tight"
+                                                                x-text="(worker.total_alokasi_jam || 0) + ' jam/mggu'"></span>
+                                                        </div>
                                                     </div>
                                                 </label>
                                             </template>
@@ -811,6 +815,7 @@
                 isOpen: false,
                 unitId: '',
                 unitName: '',
+                sistemPengajian: 0,
                 tanggal_mulai: '{{ $startOfMonth->format('Y-m-d') }}',
                 tanggal_akhir: '{{ $today->format('Y-m-d') }}',
                 workers: [],
@@ -869,9 +874,10 @@
 
                 },
 
-                open(unitId, unitName, workerList) {
+                open(unitId, unitName, workerList, sistemPengajian) {
                     this.unitId = unitId;
                     this.unitName = unitName;
+                    this.sistemPengajian = sistemPengajian;
 
                     const uniqueWorkers = [...new Map(workerList.map(item => [item.id, item])).values()];
                     this.workers = uniqueWorkers;
