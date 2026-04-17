@@ -504,12 +504,6 @@
                 @endphp
 
                 <div class="flex gap-3">
-                    {{-- Tombol Save Draft tetap di luar form jika tipenya hanya link/anchor --}}
-                    {{-- <a href="#"
-                        class="px-8 py-3.5 bg-white border border-slate-200 text-slate-600 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-slate-50 transition-all shadow-sm">
-                        Save Draft
-                    </a> --}}
-
                     {{-- Form Utama dengan target _blank --}}
                     <form method="POST" target="_blank" class="flex gap-3">
                         @csrf
@@ -525,18 +519,6 @@
 
 
                         @if ($payrollData['sistem_pengajian'] == 1)
-                            {{-- BUTTONS UNTUK HARIAN --}}
-                            <button type="submit" formaction="{{ route('export.rincian.upah.harian') }}"
-                                class="group flex items-center gap-3 bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-3.5 rounded-xl font-black text-xs uppercase tracking-widest shadow-xl shadow-emerald-500/20 transition-all active:scale-95">
-                                Generate Rincian Upah
-                                <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform"
-                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                                        d="M13 7l5 5-5 5M6 7l5 5-5 5" />
-                                </svg>
-                            </button>
-
-                        
                             <div class="flex gap-3" x-data="reportModal()">
                                 @php
                                     $payloadReportHarian = [
@@ -548,29 +530,41 @@
                                     ];
                                 @endphp
 
+                                <!-- Tombol Summary Upah -->
                                 <button type="button"
                                     @click="open('Summary Upah', '{{ route('export.summary.upah.harian') }}', {{ json_encode($payloadReportHarian) }})"
-                                    class="group flex items-center gap-3 bg-red-600 hover:bg-red-500 text-white px-8 py-3.5 rounded-xl font-black text-xs uppercase tracking-widest shadow-xl shadow-emerald-500/20 transition-all active:scale-95">
-                                    Generate Summary Upah
-                                    <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform"
-                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                                            d="M9 17v-2a4 4 0 014-4h4m0 0l-4-4m4 4l-4 4" />
+                                    class="inline-flex items-center gap-2.5 px-6 py-3.5 bg-slate-50 border border-slate-200 text-slate-500 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-white hover:border-emerald-500 hover:text-emerald-600 group transition-all shadow-sm active:scale-95">
+                                    
+                                    <svg class="w-4 h-4 text-slate-400 group-hover:text-emerald-500 transition-colors" 
+                                        fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                                     </svg>
+                                    <span>Summary Upah</span>
                                 </button>
 
+                                <!-- Tombol Report Harian -->
                                 <button type="button"
                                     @click="open('Report Harian', '{{ route('export.detail.harian') }}', {{ json_encode($payloadReportHarian) }})"
-                                    class="group flex items-center gap-3 bg-blue-600 hover:bg-blue-500 text-white px-8 py-3.5 rounded-xl font-black text-xs uppercase tracking-widest shadow-xl shadow-blue-500/20 transition-all active:scale-95">
-                                    Generate Report Harian
+                                    class="inline-flex items-center gap-2.5 px-6 py-3.5 bg-slate-50 border border-slate-200 text-slate-500 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-white hover:border-emerald-500 hover:text-emerald-600 group transition-all shadow-sm active:scale-95">
+                                    
+                                    <svg class="w-4 h-4 text-slate-400 group-hover:text-emerald-500 transition-colors" 
+                                        fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    <span>Report Harian</span>
+                                </button>
+
+                                {{-- BUTTONS UNTUK HARIAN --}}
+                                <button type="submit" formaction="{{ route('export.rincian.upah.harian') }}"
+                                    class="group flex items-center gap-3 bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-3.5 rounded-xl font-black text-xs uppercase tracking-widest shadow-xl shadow-emerald-500/20 transition-all active:scale-95">
+                                    Generate Rincian Upah
                                     <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform"
                                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                                            d="M9 17v-2a4 4 0 014-4h4m0 0l-4-4m4 4l-4 4" />
+                                            d="M13 7l5 5-5 5M6 7l5 5-5 5" />
                                     </svg>
                                 </button>
 
-                                {{-- MODAL STRUCTURE --}}
                             @else
                                 {{-- BUTTON UNTUK BORONGAN --}}
                                 <button type="submit" formaction="{{ route('export.rincian.upah.borongan') }}"
@@ -595,9 +589,9 @@
                         <!-- Modal -->
                         <div x-show="show" x-transition:enter="transition ease-out duration-300"
                             x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
-                            class="relative w-full max-w-sm bg-white rounded-[2rem] shadow-2xl border border-slate-100 p-8">
+                            class="relative w-full max-w-2xl bg-white rounded-[2rem] shadow-2xl border border-slate-100 p-8">
 
-                            <form :action="actionUrl" method="POST" class="space-y-6">
+                            <form :action="actionUrl" method="POST" class="space-y-10">
                                 @csrf
 
                                 <!-- Hidden Inputs -->
@@ -608,14 +602,14 @@
                                 <!-- Header -->
                                 <div class="text-center space-y-3">
                                     <div
-                                        class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 mx-auto">
-                                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-emerald-50 text-emerald-600 mx-auto">
+                                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3" />
                                         </svg>
                                     </div>
 
-                                    <h3 class="text-lg font-black text-slate-800" x-text="'Generate ' + title"></h3>
+                                    <h3 class="text-xl font-black text-slate-800" x-text="'Generate ' + title"></h3>
 
                                     <p class="text-xs text-slate-400">
                                         Masukkan biaya administrasi untuk memproses dokumen ini.
@@ -623,93 +617,90 @@
                                 </div>
 
                                 <!-- Input -->
-                                <div class="space-y-6" x-data="rupiahInput()">
+                                <div class="space-y-10" x-data="rupiahInput()">
+    
+    <!-- 1. FINANCIAL TOP BAR (Increased Gap & Refined Alignment) -->
+    <div class="flex items-center justify-between p-6 bg-emerald-50/50 rounded-2xl border border-emerald-100/50 shadow-sm">
+        <div class="flex items-center gap-5"> <!-- Increased gap here -->
+            <div class="p-2.5 bg-emerald-100 text-emerald-600 rounded-xl shadow-sm border border-emerald-200/50">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </div>
+            <div class="flex flex-col">
+                <label class="text-[11px] font-black text-emerald-800 uppercase tracking-[0.25em] leading-none">Biaya Administrasi</label>
+                <span class="text-[9px] font-bold text-emerald-600/60 uppercase tracking-widest mt-1">Input Nominal Unit</span>
+            </div>
+        </div>
+        
+        <!-- Input area with more breathing room -->
+        <div class="relative w-56 group">
+            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-[11px] font-black text-emerald-400 group-focus-within:text-emerald-600 transition-colors">Rp</span>
+            <input type="text" x-model="display" @input="format" inputmode="numeric" placeholder="0"
+                class="w-full pl-12 pr-5 py-3.5 bg-white border border-emerald-100 rounded-2xl text-base font-black text-slate-700 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-400 transition-all outline-none shadow-sm">
+        </div>
+    </div>
 
-                                    <!-- BIAYA ADMIN -->
-                                    <div class="space-y-2">
-                                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
-                                            Biaya Administrasi
-                                        </label>
-                                        <div class="relative">
-                                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">
-                                                Rp
-                                            </span>
-                                            <input type="text" x-model="display" @input="format" inputmode="numeric" placeholder="0"
-                                                class="w-full pl-10 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-400 transition">
-                                        </div>
-                                    </div>
+    <!-- 2. PJ SECTION: TABULAR REGISTRY STYLE -->
+    <div class="space-y-3">
+        {{-- Section Header with Blue Accent --}}
+        <div class="flex items-center gap-3 px-1 mb-4">
+            <div class="w-1 h-5 bg-blue-600 rounded-full"></div>
+            <h4 class="text-[11px] font-black text-slate-800 uppercase tracking-[0.2em]">Otorisasi Pejabat Penanggung Jawab</h4>
+        </div>
 
-                                    <div class="border-t border-slate-100 pt-2"></div>
+        {{-- Table Container --}}
+        <div class="bg-white border border-slate-100 rounded-[1.5rem] overflow-hidden shadow-sm">
+            {{-- Column Headers --}}
+            <div class="grid grid-cols-12 gap-4 px-6 py-4 bg-slate-50/80 border-b border-slate-100 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                <div class="col-span-1 text-center">No.</div>
+                <div class="col-span-6 ml-2">Pejabat (Nama Lengkap)</div>
+                <div class="col-span-5">Jabatan / Posisi</div>
+            </div>
 
-                                    <!-- GRUP PJ BERJEJER -->
-                                    <div class="space-y-5">
-                                        
-                                        <!-- Baris 1 -->
-                                        <div class="grid grid-cols-2 gap-4 items-start">
-                                            <div class="space-y-2">
-                                                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 truncate">
-                                                    Nama PJ 1
-                                                </label>
-                                                <input type="text" name="pj_nama[]" placeholder="Contoh: Budi Sar"
-                                                    class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold text-slate-700 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-400 transition">
-                                            </div>
-                                            <div class="space-y-2">
-                                                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 truncate">
-                                                    Jabatan PJ 1
-                                                </label>
-                                                <input type="text" name="pj_jabatan[]" placeholder="Contoh: Supervis"
-                                                    class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold text-slate-700 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-400 transition">
-                                            </div>
-                                        </div>
+            {{-- Table Rows --}}
+            <div class="divide-y divide-slate-50">
+                <template x-for="i in [1, 2, 3]" :key="i">
+                    <div class="grid grid-cols-12 gap-4 px-6 py-4 items-center group hover:bg-blue-50/30 transition-colors">
+                        {{-- No --}}
+                        <div class="col-span-1 text-center">
+                            <span class="text-xs font-black text-slate-300 group-hover:text-blue-500 transition-colors" x-text="i + '.'"></span>
+                        </div>
+                        
+                        {{-- Nama Input --}}
+                        <div class="col-span-6 relative">
+                            <input type="text" name="pj_nama[]" 
+                                :placeholder="['Contoh: Ir. Budi Santoso', 'Contoh: Siti Aminah, SE', 'Contoh: Ahmad Fauzi'][i-1]"
+                                class="w-full px-4 py-2.5 bg-slate-50/50 border-none rounded-xl text-[12px] font-bold text-slate-700 placeholder:text-slate-300 focus:ring-2 focus:ring-blue-100 focus:bg-white outline-none transition-all">
+                        </div>
 
-                                        <!-- Baris 2 -->
-                                        <div class="grid grid-cols-2 gap-4 items-start">
-                                            <div class="space-y-2">
-                                                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 truncate">
-                                                    Nama PJ 2
-                                                </label>
-                                                <input type="text" name="pj_nama[]" placeholder="Contoh: Siti Amir"
-                                                    class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold text-slate-700 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-400 transition">
-                                            </div>
-                                            <div class="space-y-2">
-                                                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 truncate">
-                                                    Jabatan PJ 2
-                                                </label>
-                                                <input type="text" name="pj_jabatan[]" placeholder="Contoh: Manajer"
-                                                    class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold text-slate-700 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-400 transition">
-                                            </div>
-                                        </div>
+                        {{-- Jabatan Input --}}
+                        <div class="col-span-5 relative">
+                            <input type="text" name="pj_jabatan[]" 
+                                :placeholder="['Jabatan: Head of Ops', 'Jabatan: Manager', 'Jabatan: Direktur'][i-1]"
+                                class="w-full px-4 py-2.5 bg-slate-50/50 border-none rounded-xl text-[12px] font-bold text-slate-700 placeholder:text-slate-300 focus:ring-2 focus:ring-blue-100 focus:bg-white outline-none transition-all">
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </div>
 
-                                        <!-- Baris 3 -->
-                                        <div class="grid grid-cols-2 gap-4 items-start">
-                                            <div class="space-y-2">
-                                                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 truncate">
-                                                    Nama PJ 3
-                                                </label>
-                                                <input type="text" name="pj_nama[]" placeholder="Contoh: Ahmad I"
-                                                    class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold text-slate-700 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-400 transition">
-                                            </div>
-                                            <div class="space-y-2">
-                                                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 truncate">
-                                                    Jabatan PJ 3
-                                                </label>
-                                                <input type="text" name="pj_jabatan[]" placeholder="Contoh: Direktur"
-                                                    class="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold text-slate-700 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-400 transition">
-                                            </div>
-                                        </div>
-
-                                    </div>
-
-                                    <!-- TOMBOL AKSI -->
-                                    <div class="flex items-center gap-4 pt-4">
-                                        <button type="button" @click="show = false" class="flex-1 py-4 text-xs font-black text-slate-400 uppercase tracking-widest hover:text-slate-600 transition">
-                                            Batal
-                                        </button>
-                                        <button type="submit" class="flex-1 py-4 bg-emerald-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg shadow-emerald-200 hover:bg-emerald-700 transition">
-                                            Generate
-                                        </button>
-                                    </div>
-                                </div>
+    <!-- 3. ACTIONS (Side-by-side Balanced) -->
+    <div class="flex items-center gap-4 pt-4 border-t border-slate-50">
+        <button type="button" @click="show = false" 
+            class="flex-1 py-4 text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] hover:text-rose-500 transition-all active:scale-95">
+            Batalkan
+        </button>
+        <button type="submit" 
+            class="flex-[2] py-4 bg-slate-900 text-white rounded-2xl text-[11px] font-black uppercase tracking-[0.3em] shadow-xl shadow-slate-200 hover:bg-emerald-600 hover:shadow-emerald-100 transition-all active:scale-95 flex items-center justify-center gap-3 group">
+            Finalisasi Report
+            <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5-5 5M6 7l5 5-5 5" />
+            </svg>
+        </button>
+    </div>
+</div>
 
 
                             </form>
