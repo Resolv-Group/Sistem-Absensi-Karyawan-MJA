@@ -496,7 +496,9 @@
                         if ($payrollData['sistem_pengajian'] == 1) {
                             $workerData['jam_kerja'] = $item['total_jam_kerja'];
                             $workerData['overtime'] = $item['total_overtime'];
+                            $workerData['overtime_salary'] = $item['overtime_salary'];
                             $workerData['hbn'] = $item['total_hbn'];
+                            $workerData['hbn_salary'] = $item['hbn_salary'];
                         }
                         $workers[] = $workerData;
                     }
@@ -561,7 +563,7 @@
                         <div x-data="generatePayroll({
                             workers: {{ json_encode(collect($payrollData['items'])->map(fn($item) => ['nama' => $item['nama'], 'status' => 'pending'])->values()->all()) }},
                             url: '{{ $payrollData['sistem_pengajian'] == 1 ? route('export.rincian.upah.harian') : route('export.rincian.upah.borongan') }}'
-                        })" class="flex items-center">
+                             })" class="flex items-center">
                             
                             <!-- Main Trigger Button -->
                             <button type="button" @click="startGenerate()"
@@ -1023,19 +1025,46 @@
                     this.state = 'sending';
                     this.doneSending = false;
                     
-                    // Reset statuses if retrying
+                    // Reset statuses
                     this.workers.forEach(w => w.status = 'pending');
 
-                    // Mock sending process sequentially with slight random delay
-                    for (let i = 0; i < this.workers.length; i++) {
-                        // Wait between 300ms and 800ms per worker
-                        await new Promise(r => setTimeout(r, 300 + Math.random() * 500));
+                    // Find closest form relative to this Alpine component
+                    const form = this.$el.closest('form');
+                    const formData = new FormData(form);
+
+                    try {
+                        console.log('Sending Payload:', Object.fromEntries(formData.entries()));
+
+                        // Send request to dispatch background jobs
+                        let response = await fetch("{{ route('payroll.dispatch.emails') }}", {
+                            method: 'POST',
+                            body: formData,
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'Accept': 'application/json'
+                            }
+                        });
+
+                        console.log('Response status:', response.status);
+                        let result = await response.json();
+                        console.log('Server result:', result);
                         
-                        // Fake a somewhat realistic fail chance (~15%)
-                        if (Math.random() > 0.85) {
-                            this.workers[i].status = 'failed';
+                        if(result.success) {
+                            // Jobs dispatched successfully. 
+                            // Simulate UI processing for UX
+                            for (let i = 0; i < this.workers.length; i++) {
+                                await new Promise(r => setTimeout(r, 150));
+                                this.workers[i].status = 'sent';
+                            }
                         } else {
-                            this.workers[i].status = 'sent';
+                            console.error('Job dispatch failed:', result);
+                            throw new Error(result.error || 'Gagal');
+                        }
+                    } catch (error) {
+                        console.error('Error dispatching emails:', error);
+                        alert('Error: ' + error.message);
+                        for (let i = 0; i < this.workers.length; i++) {
+                            this.workers[i].status = 'failed';
                         }
                     }
 

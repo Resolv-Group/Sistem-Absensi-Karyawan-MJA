@@ -134,19 +134,11 @@ Route::middleware(['auth', 'role:hrd,admin,akuntan,pic'])->group(function(){
     Route::post('/export-rincian-upah-borongan', [PayrollController::class, 'ExportRincianUpahBorongan'] )->name('export.rincian.upah.borongan');
     Route::post('/export-rincian-upah-harian', [PayrollController::class, 'ExportRincianUpahHarian'] )->name('export.rincian.upah.harian');
     Route::post('/export-rincian-upah-harian-pekerja', [PayrollController::class, 'ExportRincianUpahHarianPerPekerja'] )->name('export.rincian.upah.harian.pekerja');
-    
-
-    Route::get('/test-pdf', function () {
-
-        $pdf = Pdf::loadView('payroll.pdf.rincian-upah');
-
-        return $pdf->stream('test.pdf'); // opens in browser
-    });
+    Route::post('/payroll/dispatch-emails', [PayrollController::class, 'dispatchPayrollEmails'] )->name('payroll.dispatch.emails');
 
     Route::post('/export-daily-report-harian', [PayrollController::class, 'ExportDailyReportHarian'] )->name('export.daily.report.harian');
 
     Route::post('/export-summary-upah-harian', [PayrollController::class, 'SummaryUpahHarian'] )->name('export.summary.upah.harian');
-
 
     Route::post('/payroll/get-adjustments', [AbsensiController::class, 'getAdjustments'])->name('payroll.get-adjustments');
 });

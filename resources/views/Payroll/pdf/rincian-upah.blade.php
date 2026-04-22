@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Slip Gaji - Elvina Mandasari</title>
+    <title>Slip Gaji - {{ $data->nama }}</title>
     <style>
         /* General Setup for dompdf */
         @page { margin: 0.5in; }
@@ -136,7 +136,7 @@
 
     <!-- Header Section -->
     <div class="header-container">
-        <span class="company-name">PT. GLOBAL LOGISTICS INDO</span>
+        <span class="company-name">PT. MITRA JUA ABADI</span>
         <span class="document-title">RINCIAN UPAH KARYAWAN</span>
         <div class="clear"></div>
     </div>
@@ -145,27 +145,21 @@
     <table class="info-table">
         <tr>
             <td class="label">Nama</td>
-            <td class="value">Elvina Mandasari</td>
+            <td class="value">{{ $data->nama }}</td>
             <td class="label">Periode Gaji</td>
-            <td class="value">01 Apr 2026 - 21 Apr 2026</td>
+            <td class="value">{{ \Carbon\Carbon::parse($data->history->period_start)->translatedFormat('d M Y') }} - {{ \Carbon\Carbon::parse($data->history->period_end)->translatedFormat('d M Y') }}</td>
         </tr>
         <tr>
-            <td class="label">ID Karyawan</td>
-            <td class="value">1.28398E+15</td>
-            <td class="label">Status Pajak</td>
-            <td class="value">K/1 (Menikah/1 Anak)</td>
+            <td class="label">ID Pekerja</td>
+            <td class="value">{{ $data->id_pekerja }}</td>
+            <td class="label">Tanggal Cetak</td>
+            <td class="value">{{ now()->translatedFormat('d M Y') }}</td>
         </tr>
         <tr>
-            <td class="label">Jabatan</td>
-            <td class="value">SC / Operator Foreman</td>
-            <td class="label">Bank</td>
-            <td class="value">BCA - **** 5592</td>
-        </tr>
-        <tr>
-            <td class="label">Divisi</td>
-            <td class="value">Insectisida / Borongan</td>
-            <td class="label">Status Kerja</td>
-            <td class="value">Karyawan Tetap</td>
+            <td class="label">Divisi/Jabatan</td>
+            <td class="value">{{ $data->divisi ?? '-' }}/{{ $data->jabatan ?? '-' }}</td>
+            <td class="label">Email</td>
+            <td class="value">{{ $data->email ?? '-' }}</td>
         </tr>
     </table>
 
@@ -173,29 +167,36 @@
     <div class="section-title">I. Pendapatan (Earnings)</div>
     <table class="payroll-table">
         <tr>
-            <td>Upah Pokok (Basic Salary)</td>
+            <td>Upah Pokok / Hasil Produksi (Basic Salary)</td>
             <td class="currency-symbol">Rp</td>
-            <td class="text-right">5.200.000</td>
+            <td class="text-right">{{ number_format($data->upah_pokok, 0, ',', '.') }}</td>
         </tr>
+        @if($data->history->unit && $data->history->unit->sistem_pengajian == 1)
         <tr>
             <td>Upah Lembur (Overtime)</td>
             <td class="currency-symbol">Rp</td>
-            <td class="text-right">57.803</td>
+            <td class="text-right">{{ number_format($data->lembur, 0, ',', '.') }}</td>
         </tr>
         <tr>
             <td>Upah Lembur Hari Libur (HBN)</td>
             <td class="currency-symbol">Rp</td>
-            <td class="text-right">115.606</td>
+            <td class="text-right">{{ number_format($data->lembur_hbn, 0, ',', '.') }}</td>
+        </tr>
+        @endif
+        <tr>
+            <td>Insentif</td>
+            <td class="currency-symbol">Rp</td>
+            <td class="text-right">{{ number_format($data->insentif, 0, ',', '.') }}</td>
         </tr>
         <tr>
-            <td>Tunjangan Jabatan / Transport</td>
+            <td>Tunjangan / Penyesuaian (+)</td>
             <td class="currency-symbol">Rp</td>
-            <td class="text-right">250.000</td>
+            <td class="text-right">{{ number_format($data->tunjangan, 0, ',', '.') }}</td>
         </tr>
         <tr class="subtotal-row">
             <td>TOTAL PENDAPATAN KOTOR (A)</td>
             <td class="currency-symbol">Rp</td>
-            <td class="text-right">5.623.409</td>
+            <td class="text-right">{{ number_format($data->upah_pokok + $data->lembur + $data->lembur_hbn + $data->insentif + $data->tunjangan, 0, ',', '.') }}</td>
         </tr>
     </table>
 
@@ -203,29 +204,14 @@
     <div class="section-title">II. Potongan (Deductions)</div>
     <table class="payroll-table">
         <tr>
-            <td>Absensi / Keterlambatan (Unpaid Leave)</td>
+            <td>Absensi / Keterlambatan / Potongan Lainnya</td>
             <td class="currency-symbol">Rp</td>
-            <td class="text-right">400.000</td>
-        </tr>
-        <tr>
-            <td>BPJS Ketenagakerjaan (JHT/JKM)</td>
-            <td class="currency-symbol">Rp</td>
-            <td class="text-right">104.500</td>
-        </tr>
-        <tr>
-            <td>BPJS Kesehatan</td>
-            <td class="currency-symbol">Rp</td>
-            <td class="text-right">52.000</td>
-        </tr>
-        <tr>
-            <td>Potongan Lain-lain</td>
-            <td class="currency-symbol">Rp</td>
-            <td class="text-right">0</td>
+            <td class="text-right">{{ number_format($data->potongan, 0, ',', '.') }}</td>
         </tr>
         <tr class="subtotal-row">
             <td>TOTAL POTONGAN (B)</td>
             <td class="currency-symbol">Rp</td>
-            <td class="text-right">(556.500)</td>
+            <td class="text-right">({{ number_format($data->potongan, 0, ',', '.') }})</td>
         </tr>
     </table>
 
@@ -233,19 +219,17 @@
     <div class="thp-wrapper">
         <div class="thp-box">
             <span class="thp-label">Gaji Bersih Diterima (Take Home Pay)</span>
-            <span class="thp-amount">Rp 5.066.909</span>
+            <span class="thp-amount">Rp {{ number_format($data->take_home_pay, 0, ',', '.') }}</span>
         </div>
     </div>
-
-    <!-- Footer / Legal Note -->
 
     <!-- STICKY FOOTER -->
     <div class="footer">
         <div class="footer-text">
             <strong>DOKUMEN RAHASIA (CONFIDENTIAL)</strong><br>
-            Slip gaji ini dihasilkan secara otomatis oleh HR System PT. Global Logistics Indo.<br>
+            Slip gaji ini dihasilkan secara otomatis oleh HR System PT. Mitra Jua Abadi.<br>
             Silahkan hubungi Departemen HR jika terdapat ketidaksesuaian data.
-            <p>Dicetak pada: 21 April 2026, 09:45 WIB</p>
+            <p>Dicetak pada: {{ now()->format('d F Y, H:i') }} WIB</p>
         </div>
     </div>
     
