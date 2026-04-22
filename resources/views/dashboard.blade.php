@@ -764,6 +764,7 @@
                         <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
                             <h3 class="text-lg font-bold text-gray-900 mb-4">Pintasan Cepat</h3>
                             <div class="grid grid-cols-2 gap-3">
+                                @if(in_array(Auth::user()->role, ['admin', 'hrd', 'head_supervisor', 'pic']))
                                 <a href="{{ route('view.tambah.pekerja') }}"
                                     class="flex flex-col items-center justify-center p-4 bg-gray-50 border border-gray-100 rounded-xl hover:bg-blue-50 hover:border-blue-200 hover:text-blue-700 transition group">
                                     <div
@@ -777,7 +778,9 @@
                                     </div>
                                     <span class="text-xs font-semibold mt-2 text-center">Tambah Pegawai</span>
                                 </a>
+                                @endif
 
+                                @if(in_array(Auth::user()->role, ['admin', 'hrd', 'akuntan']))
                                 <a href="{{ route('view.tambah.staff') }}"
                                     class="flex flex-col items-center justify-center p-4 bg-gray-50 border border-gray-100 rounded-xl hover:bg-violet-50 hover:border-violet-200 hover:text-violet-700 transition group">
                                     <div
@@ -794,7 +797,9 @@
                                     </div>
                                     <span class="text-xs font-semibold mt-2 text-center">Tambah Staff</span>
                                 </a>
+                                @endif
 
+                                @if(in_array(Auth::user()->role, ['admin', 'hrd', 'head_supervisor']))
                                 <a href="{{ route('view.tambah.mitra-kerja') }}"
                                     class="flex flex-col items-center justify-center p-4 bg-gray-50 border border-gray-100 rounded-xl hover:bg-indigo-50 hover:border-indigo-200 hover:text-indigo-700 transition group">
                                     <div
@@ -825,7 +830,9 @@
                                     </div>
                                     <span class="text-xs font-semibold mt-2 text-center">Tambah Unit</span>
                                 </a>
+                                @endif
 
+                                @if(in_array(Auth::user()->role, ['head_supervisor', 'hrd']))
                                 <div class="col-span-2">
                                     <button @click="showApprovalModal = true"
                                         class="w-full relative flex flex-col items-center justify-center p-4 bg-gray-50 border border-gray-100 rounded-xl hover:bg-green-50 hover:border-green-200 hover:text-green-700 transition group">
@@ -848,6 +855,7 @@
                                         <span class="text-xs font-semibold mt-2 text-center">Approval Penilaian</span>
                                     </button>
                                 </div>
+                                @endif
                             </div>
                         </div>
 
@@ -856,7 +864,7 @@
                             $totalPerhatian =
                                 ($totalExpiredKontrak > 0 ? 1 : 0) +
                                 ($urgentKontrak ? 1 : 0) +
-                                ($totalExpiredMitra > 0 ? 1 : 0) +
+                                ($totalExpiredMitra > 0 ? 1 : 0) +  
                                 ($totalMitraMendekati > 0 ? 1 : 0) +
                                 ($absensiPendingCount > 0 ? 1 : 0);
                         @endphp
@@ -1142,7 +1150,7 @@
                     class="relative w-full max-w-lg bg-white rounded-[3rem] shadow-2xl overflow-hidden border border-white">
                     <div class="p-10">
                         <div class="flex items-center justify-between mb-10">
-                            <div class="flex items-center gap-4">
+                            <div class="flex items-center gap-4">   
                                 <div :class="'bg-' + getGrade(selected.total).color + '-600'"
                                     class="w-16 h-16 rounded-[1.5rem] flex items-center justify-center text-white shadow-xl transform -rotate-3">
                                     <span class="text-3xl font-black" x-text="getGrade(selected.total).label"></span>
@@ -1163,9 +1171,9 @@
                             </button>
                         </div>
 
-                        <div class="grid grid-cols-5 gap-2 mb-10">
+                        <div class="grid grid-cols-4 gap-2 mb-10">
                             <template
-                                x-for="field in [{key: 'mk', label: 'MK'}, {key: 'absensi', label: 'ABS'}, {key: 'pengetahuan', label: 'PNG'}, {key: 'kualitas', label: 'KLT'}, {key: 'sikap', label: 'SKP'}]">
+                                x-for="field in [{key: 'absensi', label: 'ABS'}, {key: 'pengetahuan', label: 'PNG'}, {key: 'kualitas', label: 'KLT'}, {key: 'sikap', label: 'SKP'}]">
                                 <div class="text-center p-3 bg-gray-50/50 rounded-2xl border border-gray-100">
                                     <p class="text-[8px] font-black text-gray-400 uppercase mb-1.5" x-text="field.label"></p>
                                     <p class="text-sm font-black text-gray-900" x-text="selected[field.key]"></p>

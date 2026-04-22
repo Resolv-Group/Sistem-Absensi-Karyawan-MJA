@@ -22,7 +22,12 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
-
+use App\Models\PayrollHistory;
+use App\Models\PayrollHistory_Detail;
+use App\Jobs\GeneratePayrollPdfJob;
+use App\Jobs\SendPayrollEmailsJob;
+use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\DB;
 class PayrollController extends Controller
 {
     function viewPayrollMain(Request $request)
@@ -151,6 +156,8 @@ class PayrollController extends Controller
                 $totalJamKerja = 0;
                 $totalOvertime = 0;
                 $totalHBN = 0;
+                $totalHBN_Salary = 0;
+                $totalOT_Salary = 0;
                 $hasilGajiHarian = 0;
 
                 // $pkwt = PKWT::where('id_pekerja', $w->id)->where('id_unit', $id_unit)->where('status_aktif', 1)->first();
@@ -209,6 +216,7 @@ class PayrollController extends Controller
                                 $gajiHariIni = $jamHarian * ($gajiOvertimePkwt * 1.5);
 
                                 $totalHBN += (float) $detil->overtime;
+                                $totalHBN_Salary += $gajiHariIni;
                                 // dump('Gaji Harian (jamharian*gajiovertime) = ', $gajiHariIni);
                             }elseif (in_array($detil->status_kehadiran, $statusTidakDibayar)) {
                                 // TAMBAHAN: JIKA STATUS 5 ATAU 6, GAJI HARI INI = 0
@@ -236,6 +244,8 @@ class PayrollController extends Controller
                                 // dump('gajiOT (jamOT*gajiOvertimePkwt) = ',$gajiOT);
                                 $gajiHariIni = $gajiReguler + $gajiOT;
                                 // dump('gajiHariIni (gajiReguler*gajiOT) = ',$gajiHariIni);
+
+                                $totalOT_Salary += $gajiOT;
                             }
 
                             $hasilGajiHarian += $gajiHariIni;
@@ -278,6 +288,8 @@ class PayrollController extends Controller
                     'total_jam_kerja' => $totalJamKerja,
                     'total_overtime' => $totalOvertime,
                     'total_hbn' => $totalHBN,
+                    'overtime_salary' => $totalOT_Salary,
+                    'hbn_salary' => $totalHBN_Salary,
                     'potongan_count' => count($excludedDates),
                     'potongan_dates' => $excludedDates,
                     'net_salary' => $netSalary,
@@ -1402,5 +1414,104 @@ class PayrollController extends Controller
             $request->penanggung_jawab,
             $request->jabatan_pj
         ), $filename);
+    }
+
+    public function dispatchPayrollEmails(Request $request)
+    {
+        \Log::info('Dispatching Payroll Request:', $request->all());
+        
+        // 1. Validation
+        $request->validate([
+            'id_unit' => 'required',
+            'tgl_awal' => 'required|date',
+            'tgl_akhir' => 'required|date',
+            'workers_json' => 'required',
+        ]);
+
+        $id_unit = $request->id_unit;
+        $tgl_awal = Carbon::parse($request->tgl_awal)->format('Y-m-d');
+        $tgl_akhir = Carbon::parse($request->tgl_akhir)->format('Y-m-d');
+        $grand_total = $request->grand_total;
+        $workers = json_decode($request->workers_json, true) ?? [];
+
+        \Log::info('Decoded Workers:', ['count' => count($workers)]);
+
+        if (empty($workers)) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Data pekerja kosong. Silahkan periksa kembali inputan anda.'
+            ], 400);
+        }
+
+        return DB::transaction(function () use ($id_unit, $tgl_awal, $tgl_akhir, $grand_total, $workers) {
+            // Create History header
+            $history = PayrollHistory::create([
+                'id_unit' => $id_unit,
+                'period_start' => $tgl_awal,
+                'period_end' => $tgl_akhir,
+                'total_payroll' => $grand_total,
+            ]);
+
+            // Fetch Workers exact info for email mapping if missing
+            $workerIds = array_column($workers, 'id');
+            $dbPekerja = Pekerja::with(['pkwtAktif.divisi', 'pkwtAktif.jabatan'])
+                ->whereIn('id', $workerIds)
+                ->get()
+                ->keyBy('id');
+
+            // Insert Details
+            foreach ($workers as $w) {
+                $dbWorker = $dbPekerja[$w['id']] ?? null;
+                $email = $dbWorker ? $dbWorker->email : null;
+                
+                // Get Divisi & Jabatan Names from Active PKWT
+                $activePkwt = $dbWorker ? $dbWorker->pkwtAktif : null;
+                $divisi = $activePkwt && $activePkwt->divisi ? $activePkwt->divisi->nama : '-';
+                $jabatan = $activePkwt && $activePkwt->jabatan ? $activePkwt->jabatan->nama : '-';
+
+                // PAYLOAD DATA (ensure they are numeric)
+                $upah = (float) ($w['upah'] ?? 0);
+                $potongan = (float) ($w['potongan'] ?? 0);
+                $tunjangan = (float) ($w['tunjangan'] ?? 0);
+                $lembur = (float) ($w['overtime_salary'] ?? 0);
+                $lembur_hbn = (float) ($w['hbn_salary'] ?? 0);
+                $insentif = (float) ($w['insentif'] ?? 0);
+
+                // Note: From frontend, 'upah' usually already includes adjustments (net_salary).
+                // However, to keep it consistent with the table structure:
+                // If 'upah' IS the final amount, then take_home_pay = upah.
+                // We'll trust the 'upah' key from payload as the final calculated rate for now to avoid logic mismatches.
+                $take_home_pay = $upah;
+
+                PayrollHistory_Detail::create([
+                    'payroll_history_id' => $history->id,
+                    'id_pekerja'       => $w['id'],
+                    'nama'             => $dbWorker ? $dbWorker->nama : 'Unknown',
+                    'email'            => $email,
+                    'divisi'           => $divisi,
+                    'jabatan'          => $jabatan,
+                    'upah_pokok'       => $upah, 
+                    'lembur'           => $lembur, 
+                    'lembur_hbn'       => $lembur_hbn, 
+                    'insentif'         => $insentif,
+                    'tunjangan'        => $tunjangan,
+                    'potongan'         => $potongan,
+                    'take_home_pay'    => $take_home_pay,
+                    'email_status'     => 'pending',
+                ]);
+            }
+
+            // Dispatch Jobs sequentially
+            Bus::chain([
+                new GeneratePayrollPdfJob($history->id),
+                new SendPayrollEmailsJob($history->id)
+            ])->dispatch();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Jobs dispatched successfully',
+                'history_id' => $history->id
+            ]);
+        });
     }
 }

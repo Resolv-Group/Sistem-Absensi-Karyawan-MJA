@@ -184,10 +184,16 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
-        $penilaianPending = Penilaian_Pkwt::with(['pekerja', 'unit'])
-            ->where('status_hrd', 0)
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $userRole = auth()->user()->role;
+        $penilaianQuery = Penilaian_Pkwt::with(['pekerja', 'unit']);
+        
+        if ($userRole === 'head_supervisor') {
+            $penilaianQuery->where('status_staff', 0);
+        } else {
+            $penilaianQuery->where('status_hrd', 0);
+        }
+        
+        $penilaianPending = $penilaianQuery->orderBy('created_at', 'desc')->get();
 
         return view(
             'dashboard',

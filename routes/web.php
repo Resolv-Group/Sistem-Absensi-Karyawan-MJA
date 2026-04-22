@@ -19,6 +19,7 @@ use App\Http\Controllers\StaffController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\ShiftAbsenController;
 use Illuminate\Support\Facades\Route;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 // LOGIN
 Route::get('/', [LoginController::class, 'showLoginForm'])->name('login');
@@ -89,17 +90,6 @@ Route::middleware(['auth', 'role:hrd,admin,head_supervisor'])->group(function(){
     Route::put('/staff/ubah/{id}', [StaffController::class, 'updateStaff'])->name('update.staff');
     Route::put('/staff/toggle-status/{id}', [StaffController::class, 'toggleStatus']);
 
-    //Pekerja
-    Route::get('/daftar-pekerja', [PekerjaController::class, 'viewPekerjaMain'])->name('view.pekerja');
-    Route::get('/pekerja/tambah', [PekerjaController::class, 'viewTambahPekerja'])->name('view.tambah.pekerja');
-    Route::get('/pekerja/detail/{id}', [PekerjaController::class, 'viewDetailPekerja'])->name('view.detail.pekerja');
-    Route::POST('/tambah-pekerja', [PekerjaController::class, 'tambahPekerja'])->name('tambah.pekerja.post');
-    Route::get('/pekerja/ubah/{id}', [PekerjaController::class, 'ubahPekerja'])->name('view.ubah.pekerja');
-    Route::put('/pekerja/ubah/{id}', [PekerjaController::class, 'updatePekerja'])->name('update.pekerja');
-    // Route::get('/pekerja/dokumen/{id}', [PekerjaController::class, 'showDokumen'])->name('pekerja.dokumen.show');
-    Route::get('/pkwt/dokumen/{id}', [PekerjaController::class, 'showPkwtDokumen'])->name('pkwt.dokumen.show');// Route for specific PKWT records (Current and History)
-    Route::put('/pekerja/toggle-status/{id}', [PekerjaController::class, 'toggleStatus']);
-
     //Mitra Kerja
     Route::get('/mitra-kerja', [MitraKerjaController::class, 'viewMitraKerjaMain'])->name('view.mitra-kerja');
     Route::get('/mitra-kerja/tambah', [MitraKerjaController::class, 'viewTambahMitraKerja'])->name('view.tambah.mitra-kerja');
@@ -118,6 +108,19 @@ Route::middleware(['auth', 'role:hrd,admin,head_supervisor'])->group(function(){
     Route::POST('/tambah-unit', [UnitController::class, 'tambahUnit'])->name('tambah.unit.post');
 });
 
+Route::middleware(['auth', 'role:hrd,admin,head_supervisor,pic'])->group(function(){
+    //Pekerja
+    Route::get('/daftar-pekerja', [PekerjaController::class, 'viewPekerjaMain'])->name('view.pekerja');
+    Route::get('/pekerja/tambah', [PekerjaController::class, 'viewTambahPekerja'])->name('view.tambah.pekerja');
+    Route::get('/pekerja/detail/{id}', [PekerjaController::class, 'viewDetailPekerja'])->name('view.detail.pekerja');
+    Route::POST('/tambah-pekerja', [PekerjaController::class, 'tambahPekerja'])->name('tambah.pekerja.post');
+    Route::get('/pekerja/ubah/{id}', [PekerjaController::class, 'ubahPekerja'])->name('view.ubah.pekerja');
+    Route::put('/pekerja/ubah/{id}', [PekerjaController::class, 'updatePekerja'])->name('update.pekerja');
+    // Route::get('/pekerja/dokumen/{id}', [PekerjaController::class, 'showDokumen'])->name('pekerja.dokumen.show');
+    Route::get('/pkwt/dokumen/{id}', [PekerjaController::class, 'showPkwtDokumen'])->name('pkwt.dokumen.show');// Route for specific PKWT records (Current and History)
+    Route::put('/pekerja/toggle-status/{id}', [PekerjaController::class, 'toggleStatus']);
+});
+
 Route::middleware(['auth', 'role:hrd,admin,akuntan,pic'])->group(function(){
     // Payroll
     Route::get('/payroll', [PayrollController::class, 'viewPayrollMain'])->name('view.payroll');
@@ -130,10 +133,12 @@ Route::middleware(['auth', 'role:hrd,admin,akuntan,pic'])->group(function(){
     Route::get('/export-kwitansi-borongan', [PayrollController::class, 'ExportKwitansiBorongan'] )->name('export.kwitansi.borongan');
     Route::post('/export-rincian-upah-borongan', [PayrollController::class, 'ExportRincianUpahBorongan'] )->name('export.rincian.upah.borongan');
     Route::post('/export-rincian-upah-harian', [PayrollController::class, 'ExportRincianUpahHarian'] )->name('export.rincian.upah.harian');
+    Route::post('/export-rincian-upah-harian-pekerja', [PayrollController::class, 'ExportRincianUpahHarianPerPekerja'] )->name('export.rincian.upah.harian.pekerja');
+    Route::post('/payroll/dispatch-emails', [PayrollController::class, 'dispatchPayrollEmails'] )->name('payroll.dispatch.emails');
+
     Route::post('/export-daily-report-harian', [PayrollController::class, 'ExportDailyReportHarian'] )->name('export.daily.report.harian');
 
     Route::post('/export-summary-upah-harian', [PayrollController::class, 'SummaryUpahHarian'] )->name('export.summary.upah.harian');
-
 
     Route::post('/payroll/get-adjustments', [AbsensiController::class, 'getAdjustments'])->name('payroll.get-adjustments');
 });
