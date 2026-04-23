@@ -576,7 +576,7 @@
                                                                 x-text="'ID: ' + worker.id"></span>
                                                             <span x-show="$store.payslip.sistemPengajian == 1"
                                                                 class="flex-shrink-0 text-[12px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded tracking-tight"
-                                                                x-text="(worker.total_alokasi_jam || 0) + ' jam/mggu'"></span>
+                                                                x-text="worker.total_alokasi_jam || '-'"></span>
                                                         </div>
                                                     </div>
                                                 </label>
