@@ -138,11 +138,19 @@
     <tr></tr>
     <tr>
         <td></td>
-        <td style="font-weight:bold; text-align:center; vertical-align: middle;">{{ $penanggungjawab }}</td>
+        <td style="font-weight:bold; text-align:center; vertical-align: middle;">{{ $penanggungjawab[0] }}</td>
+        <td></td>
+        <td style="font-weight:bold; text-align:center; vertical-align: middle;">{{ $penanggungjawab[1] }}</td>
+        <td></td>
+        <td style="font-weight:bold; text-align:center; vertical-align: middle;">{{ $penanggungjawab[2] }}</td>
     </tr>
     <tr>
         <td></td>
-        <td style="font-weight:bold; text-align:center; vertical-align: middle;">{{ $jabatan }}</td>
+        <td style="font-weight:bold; text-align:center; vertical-align: middle;">{{ $jabatan[0] }}</td>
+        <td></td>
+        <td style="font-weight:bold; text-align:center; vertical-align: middle;">{{ $jabatan[1] }}</td>
+        <td></td>
+        <td style="font-weight:bold; text-align:center; vertical-align: middle;">{{ $jabatan[2] }}</td>
     </tr>
 
 </table>

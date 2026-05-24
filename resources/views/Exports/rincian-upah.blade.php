@@ -67,7 +67,7 @@
             @foreach($group as $item)
                 <td colspan="7" style="border-left: 1px solid #000000;">UPAH POKOK</td>
                 <td style="text-align: center;">=</td>
-                <td style="border-right: 1px solid #000000; text-align: right;">{{ number_format($item->upah_pokok, 0, ',', '.') }}</td>
+                <td style="border-right: 1px solid #000000; text-align: right;">{{ number_format($item->upah_pokok) }}</td>
                 <td></td>
             @endforeach
         </tr>
@@ -214,14 +214,22 @@
         </tr>
 
         {{-- BARIS 20: Lain-lain --}}
-        <tr>
-            @foreach($group as $item)
-                <td colspan="7" style="border-left: 1px solid #000000;">LAIN - LAIN</td>
-                <td style="text-align: center;">=</td>
-                <td style="border-right: 1px solid #000000; text-align: right;">{{ number_format($item->potonganLain ?? '-') }}</td>
-                <td></td>
+        @if(isset($kategoriPotongan) && count($kategoriPotongan) > 0)
+            @foreach($kategoriPotongan as $kategori)
+            <tr>
+                @foreach($group as $item)
+                    @php
+                        // Ambil nilai dari array, jika tidak ada isikan 0
+                        $nilaiPotongan = $item->detail_potongan[$kategori] ?? 0;
+                    @endphp
+                    <td colspan="7" style="border-left: 1px solid #000000; text-transform: uppercase;">{{ $kategori }}</td>
+                    <td style="text-align: center;">=</td>
+                    <td style="border-right: 1px solid #000000; text-align: right;">{{ $nilaiPotongan > 0 ? number_format($nilaiPotongan) : '-' }}</td>
+                    <td></td>
+                @endforeach
+            </tr>
             @endforeach
-        </tr>
+        @endif
 
         {{-- BARIS 21: Spacer Garis Ganda --}}
         <tr>

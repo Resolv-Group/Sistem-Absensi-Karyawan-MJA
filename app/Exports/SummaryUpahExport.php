@@ -16,7 +16,7 @@ class SummaryUpahExport implements FromView, ShouldAutoSize, WithStyles, WithTit
     protected $data, $totals, $periode, $unitName, $penanggungjawab, $jabatan;
 
     // Terima parameter dari Controller
-    public function __construct($data, $totals, $periode, $unitName, $penanggungjawab, $jabatan)
+    public function __construct($data, $totals, $periode, $unitName, $penanggungjawab = [], $jabatan = [])
     {
         $this->data = $data;
         $this->totals = $totals;

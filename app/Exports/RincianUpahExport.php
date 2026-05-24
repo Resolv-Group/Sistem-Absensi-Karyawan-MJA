@@ -14,10 +14,13 @@ class RincianUpahExport implements FromView, WithEvents, WithColumnWidths
 
     protected $data;
     protected $periode;
-    public function __construct($data, $periode) 
+    protected $kategoriPotongan;
+    
+    public function __construct($data, $periode, $kategoriPotongan = []) 
     {
         $this->data = $data;
         $this->periode = $periode;
+        $this->kategoriPotongan = $kategoriPotongan;
     }
 
     public function view(): View
@@ -25,7 +28,8 @@ class RincianUpahExport implements FromView, WithEvents, WithColumnWidths
         $chunks = $this->data->chunk(3);
         return view('Exports.rincian-upah', [
             'chunks'  => $chunks,
-            'periode' => $this->periode
+            'periode' => $this->periode,
+            'kategoriPotongan' => $this->kategoriPotongan
         ]);
 
     }
