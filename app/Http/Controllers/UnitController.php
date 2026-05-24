@@ -6,21 +6,21 @@ use App\Models\Borongan;
 use App\Models\Divisi;
 use App\Models\History;
 use App\Models\JabatanPKWT;
+use App\Models\Kas_Kecil;
 use App\Models\Kategori;
-use App\Models\Unit;
-use Illuminate\Http\Request;
-use App\Models\Staff;
-use Illuminate\Database\QueryException;
 use App\Models\MitraKerja;
 use App\Models\Pekerja;
 use App\Models\PicUnit;
 use App\Models\PKWT;
-use App\Models\Shift_Absen;
+use App\Models\Staff;
+use App\Models\Unit;
+use Illuminate\Database\QueryException;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class UnitController extends Controller
 {
-    function viewUnitMain(Request $request)
+    public function viewUnitMain(Request $request)
     {
         // --- 1. CALCULATE STATS (Top Cards) ---
         $totalUnit = Unit::count(); // total pekerja
@@ -86,7 +86,7 @@ class UnitController extends Controller
         return view('Unit.CRUD.tambah-unit', compact('picList', 'mitraKerjaList'));
     }
 
-    function tambahUnit(Request $request)
+    public function tambahUnit(Request $request)
     {
         try {
             $request->validate(
@@ -133,7 +133,6 @@ class UnitController extends Controller
                 ],
             );
 
-
             // ✅ Upload dokumen
             $dokumen = null;
             if ($request->hasFile('dokumen_mou')) {
@@ -173,7 +172,7 @@ class UnitController extends Controller
 
             return redirect()
                 ->route('view.tambah.unit')
-                ->with('success', 'Data Unit ' . $unit->nama_mitra . ' berhasil ditambahkan.');
+                ->with('success', 'Data Unit '.$unit->nama_mitra.' berhasil ditambahkan.');
         } catch (QueryException $e) {
             // Tangani error database dan kirim ke front-end melalui session error
             return back()
@@ -199,9 +198,8 @@ class UnitController extends Controller
             })
             ->exists();
 
-        if(in_array($user->role, ['admin', 'hrd']))
-        {}
-        elseif(! $isAllowed ) {
+        if (in_array($user->role, ['admin', 'hrd'])) {
+        } elseif (! $isAllowed) {
             abort(403, 'Anda tidak memiliki akses ke unit ini');
         }
 
@@ -228,6 +226,7 @@ class UnitController extends Controller
                 }
 
                 $borongan = $query->get();
+
                 return view('Unit.partials.borongan-table', compact('borongan', 'unit'))->render();
             }
 
@@ -260,6 +259,7 @@ class UnitController extends Controller
             }
 
             $pkwtPekerja = $query->get();
+
             return view('Unit.partials.harian-table', compact('pkwtPekerja', 'unit'))->render();
         }
 
@@ -290,7 +290,7 @@ class UnitController extends Controller
         $data = Unit::findOrFail($id);
 
         // 2. Check if blob exists
-        if (!$data->dokumen_mou) {
+        if (! $data->dokumen_mou) {
             abort(404, 'Dokumen tidak ditemukan.');
         }
 
@@ -303,19 +303,19 @@ class UnitController extends Controller
         $disposition = $request->has('download') ? 'attachment' : 'inline';
 
         // Generate a filename
-        $filename = 'dokumen-mitra-' . $id;
+        $filename = 'dokumen-mitra-'.$id;
 
         // 5. Return the binary data as a proper HTTP response
         return response($data->dokumen_mou)
             ->header('Content-Type', $mimeType)
-            ->header('Content-Disposition', $disposition . '; filename="' . $filename . '"');
+            ->header('Content-Disposition', $disposition.'; filename="'.$filename.'"');
     }
 
     public function showDokumenPKWT($id, Request $request)
     {
         $data = PKWT::findOrFail($id);
 
-        if (!$data->dokumen_pkwt) {
+        if (! $data->dokumen_pkwt) {
             abort(404, 'Dokumen tidak ditemukan.');
         }
 
@@ -324,14 +324,14 @@ class UnitController extends Controller
 
         $disposition = $request->has('download') ? 'attachment' : 'inline';
 
-        $filename = 'dokumen-pkwt-' . $id;
+        $filename = 'dokumen-pkwt-'.$id;
 
         return response($data->dokumen_pkwt)
             ->header('Content-Type', $mimeType)
-            ->header('Content-Disposition', $disposition . '; filename="' . $filename . '"');
+            ->header('Content-Disposition', $disposition.'; filename="'.$filename.'"');
     }
 
-    function ubahUnit(Request $request, $id)
+    public function ubahUnit(Request $request, $id)
     {
         $user = auth()->user(); // staff login
 
@@ -342,9 +342,8 @@ class UnitController extends Controller
             })
             ->exists();
 
-        if(in_array($user->role, ['admin', 'hrd']))
-        {}
-        elseif(! $isAllowed ) {
+        if (in_array($user->role, ['admin', 'hrd'])) {
+        } elseif (! $isAllowed) {
             abort(403, 'Anda tidak memiliki akses ke unit ini');
         }
 
@@ -359,7 +358,7 @@ class UnitController extends Controller
         return view('Unit.CRUD.ubah-unit', compact('unit', 'mitraKerjaList', 'selectedPicIds', 'picList'));
     }
 
-    function updateUnit(Request $request, $id)
+    public function updateUnit(Request $request, $id)
     {
         // dd($request->all());
         try {
@@ -447,20 +446,23 @@ class UnitController extends Controller
 
             // dd($unit);
             DB::commit();
+
             return redirect()->route('view.detail.unit', $unit->id)->with('success', 'Data unit berhasil diperbarui.');
         } catch (QueryException $e) {
             DB::rollBack();
+
             return back()
                 ->withInput()
                 ->withErrors([
-                    'database' => 'Terjadi kesalahan database: ' . $e->getMessage(),
+                    'database' => 'Terjadi kesalahan database: '.$e->getMessage(),
                 ]);
         } catch (\Exception $e) {
             DB::rollBack();
+
             return back()
                 ->withInput()
                 ->withErrors([
-                    'general' => 'Terjadi kesalahan sistem: ' . $e->getMessage(),
+                    'general' => 'Terjadi kesalahan sistem: '.$e->getMessage(),
                 ]);
         }
     }
@@ -469,7 +471,7 @@ class UnitController extends Controller
     {
         $unit = Unit::findOrFail($id);
 
-        $unit->status_aktif = !$unit->status_aktif;
+        $unit->status_aktif = ! $unit->status_aktif;
         $unit->save();
 
         return response()->json([
@@ -477,4 +479,44 @@ class UnitController extends Controller
         ]);
     }
 
+    public function storeBulkKas(Request $request, $id)
+    {
+        $dataEntries = $request->input('kas');
+
+        if (! $dataEntries || ! is_array($dataEntries)) {
+            return back()->with('error', 'Tidak ada data untuk disimpan.');
+        }
+
+        $savedCount = 0; // Better to count what is actually saved
+
+        foreach ($dataEntries as $index => $entry) {
+            // FIX: Match the key 'ket' from your dd()
+            if (empty($entry['tgl']) || empty($entry['ket'])) {
+                continue;
+            }
+
+            $filePath = null;
+            if ($request->hasFile("kas.$index.nota")) {
+                $filePath = $request->file("kas.$index.nota")->store('notas', 'public');
+            }
+
+            // Use the correct keys here too
+            Kas_Kecil::create([
+                'id_unit' => $id,
+                'tanggal' => $entry['tgl'],
+                'keterangan' => $entry['ket'],   // Match 'ket' from form
+                'debit' => $entry['debit'],
+                'kredit' => $entry['kredit'],
+                'nota' => $filePath,
+            ]);
+
+            $savedCount++;
+        }
+
+        if ($savedCount === 0) {
+            return back()->with('error', 'Gagal menyimpan data. Pastikan semua kolom terisi.');
+        }
+
+        return back()->with('success', "Berhasil menyimpan $savedCount transaksi.");
+    }
 }
