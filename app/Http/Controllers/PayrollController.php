@@ -676,6 +676,56 @@ class PayrollController extends Controller
             ->get()
             ->keyBy('id');
 
+        $absensiData = \App\Models\Absensi::with(['potongan'])
+        ->whereIn('id_pekerja', $workerIds)
+        ->whereBetween('tgl_absensi', [$request->tgl_awal, $request->tgl_akhir])
+        ->get();
+
+        $potonganMap = [];
+        $semuaKategoriPotongan = []; // Array untuk menyimpan semua header potongan (Misal: Kasbon, Koperasi)
+
+        foreach ($absensiData as $abs) {
+            $idPekerja = (int) $abs->id_pekerja;
+
+            if ($abs->potongan && !empty($abs->potongan->kategori)) {
+                // Decode string JSON dari database
+                $kategoriData = is_string($abs->potongan->kategori) 
+                                ? json_decode($abs->potongan->kategori, true) 
+                                : $abs->potongan->kategori;
+
+                if (is_array($kategoriData)) {
+                    foreach ($kategoriData as $namaPot => $val) {
+                        // Rapikan nama kategori (Huruf depan kapital)
+                        $namaPotCap = ucfirst(strtolower(trim($namaPot))); 
+
+                        // Simpan ke daftar header global jika belum ada
+                        if (!in_array($namaPotCap, $semuaKategoriPotongan)) {
+                            $semuaKategoriPotongan[] = $namaPotCap;
+                        }
+
+                        // ==========================================
+                        // PERBAIKAN LOGIKA HITUNGAN:
+                        // Cek apakah data berupa array atau langsung angka
+                        // ==========================================
+                        if (is_array($val)) {
+                            $qty = (int) ($val['qty'] ?? 1);
+                            $nominal = (float) ($val['nominal'] ?? 0);
+                            $subtotal = $qty * $nominal;
+                        } else {
+                            // Jika format JSON-nya langsung {"Makanan": 15000}
+                            $subtotal = (float) $val;
+                        }
+
+                        // Tambahkan ke dompet potongan masing-masing pekerja
+                        if (!isset($potonganMap[$idPekerja][$namaPotCap])) {
+                            $potonganMap[$idPekerja][$namaPotCap] = 0;
+                        }
+                        $potonganMap[$idPekerja][$namaPotCap] += $subtotal;
+                    }
+                }
+            }
+        }
+
         $realItems = [];
 
         // dd($dbPekerja);
@@ -772,7 +822,6 @@ class PayrollController extends Controller
 
     public function ExportRincianUpahHarian(Request $request)
     {
-        // dd($request->all());
         // 2. Decode Input
         $workersInput = json_decode($request->workers_json, true);
         $workerIds = array_column($workersInput, 'id');
@@ -789,7 +838,55 @@ class PayrollController extends Controller
             ->get()
             ->keyBy('id');
 
-        // dd($request->all());
+        $absensiData = \App\Models\Absensi::with(['potongan'])
+        ->whereIn('id_pekerja', $workerIds)
+        ->whereBetween('tgl_absensi', [$request->tgl_awal, $request->tgl_akhir])
+        ->get();
+
+        $potonganMap = [];
+        $semuaKategoriPotongan = []; // Array untuk menyimpan semua header potongan (Misal: Kasbon, Koperasi)
+
+        foreach ($absensiData as $abs) {
+            $idPekerja = (int) $abs->id_pekerja;
+
+            if ($abs->potongan && !empty($abs->potongan->kategori)) {
+                // Decode string JSON dari database
+                $kategoriData = is_string($abs->potongan->kategori) 
+                                ? json_decode($abs->potongan->kategori, true) 
+                                : $abs->potongan->kategori;
+
+                if (is_array($kategoriData)) {
+                    foreach ($kategoriData as $namaPot => $val) {
+                        // Rapikan nama kategori (Huruf depan kapital)
+                        $namaPotCap = ucfirst(strtolower(trim($namaPot))); 
+
+                        // Simpan ke daftar header global jika belum ada
+                        if (!in_array($namaPotCap, $semuaKategoriPotongan)) {
+                            $semuaKategoriPotongan[] = $namaPotCap;
+                        }
+
+                        // ==========================================
+                        // PERBAIKAN LOGIKA HITUNGAN:
+                        // Cek apakah data berupa array atau langsung angka
+                        // ==========================================
+                        if (is_array($val)) {
+                            $qty = (int) ($val['qty'] ?? 1);
+                            $nominal = (float) ($val['nominal'] ?? 0);
+                            $subtotal = $qty * $nominal;
+                        } else {
+                            // Jika format JSON-nya langsung {"Makanan": 15000}
+                            $subtotal = (float) $val;
+                        }
+
+                        // Tambahkan ke dompet potongan masing-masing pekerja
+                        if (!isset($potonganMap[$idPekerja][$namaPotCap])) {
+                            $potonganMap[$idPekerja][$namaPotCap] = 0;
+                        }
+                        $potonganMap[$idPekerja][$namaPotCap] += $subtotal;
+                    }
+                }
+            }
+        }
 
         $realItems = [];
 
@@ -825,6 +922,15 @@ class PayrollController extends Controller
             // Jika tidak ada kolom khusus, kita pakai logika 2 * rate lembur.
             // Silakan sesuaikan: $pkwtAktif?->gaji_overtime_hbn
             $rateHbn = ($pkwtAktif?->gaji_overtime ?? 0) * $pkwtAktif->rate_hbn;
+
+            $item->detail_potongan = [];
+            $totalPotonganDinamis = 0;
+            
+            foreach ($semuaKategoriPotongan as $kategoriHeader) {
+                $uangPotongan = $potonganMap[$id][$kategoriHeader] ?? 0;
+                $item->detail_potongan[$kategoriHeader] = $uangPotongan; // Ini yang nanti di-loop di PDF
+                $totalPotonganDinamis += $uangPotongan;
+            }
 
             // --- C. KALKULASI PENDAPATAN ---
 
@@ -867,7 +973,7 @@ class PayrollController extends Controller
             $item->bpjs_kes = $pkwtAktif?->bpjs_kesehatan ?? 0;
 
             // Potongan Lain (Dari Input, misal kasbon)
-            $item->potonganLain = $input['potongan'] ?? 0;
+            $item->potonganLain = $totalPotonganDinamis;
 
             // TOTAL POTONGAN (Jumlah 2)
             $item->jumlah_2 = $item->bpjs_tk + $item->bpjs_kes + $item->potonganLain;
@@ -881,6 +987,7 @@ class PayrollController extends Controller
             $realItems[] = $item;
         }
 
+        
         // 5. Finalisasi & Download
         $formattedData = collect($realItems);
 
@@ -894,15 +1001,15 @@ class PayrollController extends Controller
 
         // Menggunakan Export Class yang sama (RincianUpahExport)
         // Asalkan Class tersebut bisa membaca properti $item->upah_pokok, dll.
-        return Excel::download(new RincianUpahExport($formattedData, $periodeString), $filename);
+        return Excel::download(new RincianUpahExport($formattedData, $periodeString, $semuaKategoriPotongan), $filename);
     }
 
     public function ExportDetailHarian(Request $request)
     {
         // 1. Ambil data dari request
-
         $workersInput = json_decode($request->workers_json, true);
         $idUnit = $request->id_unit;
+        
         // Format tanggal untuk Query Database
         $tglAwal = \Carbon\Carbon::parse($request->tgl_awal)->format('Y-m-d');
         $tglAkhir = \Carbon\Carbon::parse($request->tgl_akhir)->format('Y-m-d');
@@ -939,6 +1046,7 @@ class PayrollController extends Controller
         $tunjanganMap = [];
         $semuaKategoriTunjangan = [];
         $potonganMap = [];
+        $semuaKategoriPotongan = []; // <-- Array baru untuk header potongan
         $prodMap = [];
         
         foreach ($absensiData as $abs) {
@@ -947,13 +1055,7 @@ class PayrollController extends Controller
 
             if (!isset($prodMap[$idPekerja])) {
                 $prodMap[$idPekerja] = [
-                    'kerja' => 0, 
-                    'izin' => 0, 
-                    'cuti' => 0, 
-                    'sakit' => 0, 
-                    'rencanaCuti' => 0, 
-                    'absen' => 0, 
-                    'jam_ot' => 0
+                    'kerja' => 0, 'izin' => 0, 'cuti' => 0, 'sakit' => 0, 'rencanaCuti' => 0, 'absen' => 0, 'jam_ot' => 0
                 ];
             }
 
@@ -963,51 +1065,49 @@ class PayrollController extends Controller
                 $overtime = (float) $detil->overtime;
                 $status   = $detil->status_kehadiran;
 
-                $warna = ''; // Default Colorless (Hadir biasa)
+                $warna = ''; 
 
-                // URUTAN FILTER WARNA
                 if ($detil->hbn == 1) {
-                    $warna = '#DDA0DD'; // Ungu (HBN)
-                } elseif (in_array($status, [6])) { // Sesuaikan angka ID Absen Anda
-                    $warna = '#FFC7CE'; // Merah (Absen/Alpha)
-                } elseif ($status == 5) { // Sesuaikan angka ID Rencana Cuti Anda
-                    $warna = '#C6EFCE'; // Hijau (Rencana Cuti)
-                } elseif (in_array($status, [2, 3, 4])) { // Izin, Cuti, Sakit
-                    if($detil->isPaid == 1)
-                    {
-                        $warna = '#87CEFA'; // Biru (isPaid)
-                    }elseif($jamKerja > 0) {
-                        $warna = '#FFEB9C'; // Kuning (Izin tapi ada jam)
-                    }else{
-                        $warna = '#FCD5B4'; // Orange (Izin tidak ada jam)
+                    $warna = '#DDA0DD'; 
+                } elseif (in_array($status, [6])) { 
+                    $warna = '#FFC7CE'; 
+                } elseif ($status == 5) { 
+                    $warna = '#C6EFCE'; 
+                } elseif (in_array($status, [2, 3, 4])) { 
+                    if($detil->isPaid == 1) {
+                        $warna = '#87CEFA'; 
+                    } elseif($jamKerja > 0) {
+                        $warna = '#FFEB9C'; 
+                    } else {
+                        $warna = '#FCD5B4'; 
                     }
-                }elseif ($overtime > 0) {
-                    $warna = '#FFB6C1'; // Pink (Overtime)
+                } elseif ($overtime > 0) {
+                    $warna = '#FFB6C1'; 
                 }
                 
                 if ($jamKerja > 0 || $detil->hbn == 1) {
                     $prodMap[$idPekerja]['kerja'] += 1;
-                } elseif (in_array($status, [2])) { // Asumsi 4 = Sakit
+                } elseif (in_array($status, [2])) { 
                     $prodMap[$idPekerja]['izin'] += 1;
-                } elseif (in_array($status, [3])) { // Asumsi 2/3 = Izin/Cuti
+                } elseif (in_array($status, [3])) { 
                     $prodMap[$idPekerja]['cuti'] += 1;
-                } elseif (in_array($status, [4])) { // Asumsi 6 = Alpha
+                } elseif (in_array($status, [4])) { 
                     $prodMap[$idPekerja]['sakit'] += 1;
-                }elseif (in_array($status, [5])) { // Asumsi 6 = Alpha
+                } elseif (in_array($status, [5])) { 
                     $prodMap[$idPekerja]['rencanaCuti'] += 1;
-                }elseif (in_array($status, [6])) { // Asumsi 6 = Alpha
+                } elseif (in_array($status, [6])) { 
                     $prodMap[$idPekerja]['absen'] += 1;
                 }
 
                 $prodMap[$idPekerja]['jam_ot'] += (float) $detil->overtime;
 
-                // Simpan jam kerja DAN warna ke dalam array
                 $attendanceMap[$idPekerja][$tgl] = [
                     'jam'   => $jamKerja,
                     'warna' => $warna
                 ];
             }
 
+            // --- EKSTRAK JSON TUNJANGAN ---
             if ($abs->tunjangan && !empty($abs->tunjangan->kategori)) {
                 $kategoriData = is_string($abs->tunjangan->kategori) 
                                 ? json_decode($abs->tunjangan->kategori, true) 
@@ -1015,20 +1115,16 @@ class PayrollController extends Controller
 
                 if (is_array($kategoriData)) {
                     foreach ($kategoriData as $namaTunj => $val) {
-                        // Kapitalisasi huruf pertama (Misal: 'score' jadi 'Score')
                         $namaTunjCap = ucfirst(strtolower(trim($namaTunj))); 
                         
-                        // Kumpulkan nama kategori ke array header jika belum ada
                         if (!in_array($namaTunjCap, $semuaKategoriTunjangan)) {
                             $semuaKategoriTunjangan[] = $namaTunjCap;
                         }
 
-                        // Hitung subtotal: Qty x Nominal (Sesuai ide gambar Anda)
                         $qty = (int) ($val['qty'] ?? 0);
                         $nominal = (float) ($val['nominal'] ?? 0);
                         $subtotal = $qty * $nominal;
 
-                        // Masukkan ke dompet masing-masing pekerja
                         if (!isset($tunjanganMap[$idPekerja][$namaTunjCap])) {
                             $tunjanganMap[$idPekerja][$namaTunjCap] = 0;
                         }
@@ -1037,31 +1133,45 @@ class PayrollController extends Controller
                 }
             }
 
-            if ($abs->potongan) {
-                // Ambil langsung dari kolom 'total' sesuai database Anda
-                $totalPotongan = (float) $abs->potongan->total;
+            // --- EKSTRAK JSON POTONGAN ---
+            if ($abs->potongan && !empty($abs->potongan->kategori)) {
+                $kategoriData = is_string($abs->potongan->kategori) 
+                                ? json_decode($abs->potongan->kategori, true) 
+                                : $abs->potongan->kategori;
 
-                if (!isset($potonganMap[$idPekerja])) {
-                    $potonganMap[$idPekerja] = 0;
+                if (is_array($kategoriData)) {
+                    foreach ($kategoriData as $namaPot => $val) {
+                        $namaPotCap = ucfirst(strtolower(trim($namaPot))); 
+
+                        if (!in_array($namaPotCap, $semuaKategoriPotongan)) {
+                            $semuaKategoriPotongan[] = $namaPotCap;
+                        }
+
+                        if (is_array($val)) {
+                            $qty = (int) ($val['qty'] ?? 1);
+                            $nominal = (float) ($val['nominal'] ?? 0);
+                            $subtotal = $qty * $nominal;
+                        } else {
+                            $subtotal = (float) $val;
+                        }
+
+                        if (!isset($potonganMap[$idPekerja][$namaPotCap])) {
+                            $potonganMap[$idPekerja][$namaPotCap] = 0;
+                        }
+                        $potonganMap[$idPekerja][$namaPotCap] += $subtotal;
+                    }
                 }
-                $potonganMap[$idPekerja] += $totalPotongan;
             }
         }
 
-
-        // DEBUG: Cek isi map sebelum lanjut (Hapus jika sudah benar)
-        // dd($attendanceMap);
 
         // ---------------------------------------------------------
         // [BAGIAN 4] LOOPING DATA PEKERJA UNTUK ROW EXCEL
         // ---------------------------------------------------------
 
-        // Ambil info Unit untuk nama unit
         $unit = Unit::find($idUnit);
         $unitName = $unit ? $unit->nama_unit : 'UNIT TIDAK DIKETAHUI';
-
         $realItems = [];
-
 
         foreach ($workersInput as $input) {
             $id = $input['id'];
@@ -1075,12 +1185,11 @@ class PayrollController extends Controller
             $item = new \stdClass();
 
             // ===================================================================
-            // --- LOGIKA TARGET JAM KERJA & CEK ABSEN BOLOS (TIDAK CHECK-IN) ---
+            // --- LOGIKA TARGET JAM KERJA & CEK ABSEN BOLOS ---
             // ===================================================================
             $jadwalKerja = []; 
             if ($pkwtAktif && $pkwtAktif->hariKerja) {
                 foreach ($pkwtAktif->hariKerja as $jadwal) {
-                    // Sesuai gambar DB Anda: 'mon', 'tue', 'wed', dst.
                     $namaHari = strtolower($jadwal->hari); 
                     $jadwalKerja[$namaHari] = (float) $jadwal->jam_kerja; 
                 }
@@ -1089,53 +1198,42 @@ class PayrollController extends Controller
             $startPeriode = \Carbon\Carbon::parse($tglAwal)->startOfDay();
             $endPeriode = \Carbon\Carbon::parse($tglAkhir)->startOfDay();
             
-            $totalTargetJam = 0;       // Untuk menyimpan Total Jam Seharusnya (Contoh: 90 Jam)
-            $totalHariAbsenBetulan = 0; // Menghitung total hari bolos murni
-            $totalJamAbsenBetulan  = 0; // Menghitung total jam hilang (bolos / pulang cepat)
+            $totalTargetJam = 0;       
+            $totalHariAbsenBetulan = 0; 
+            $totalJamAbsenBetulan  = 0; 
 
             for ($date = $startPeriode->copy(); $date->lte($endPeriode); $date->addDay()) {
-                // Gunakan format 'D' untuk menghasilkan singkatan bahasa inggris (Mon, Tue, Wed)
                 $hariStr = strtolower($date->format('D')); 
                 $tglStr = $date->format('Y-m-d');
                 
-                // Ambil target jam dari PKWT pada hari tersebut
                 $targetJam = $jadwalKerja[$hariStr] ?? 0;
-                $totalTargetJam += $targetJam; // Tambahkan ke akumulasi total jam periode ini
+                $totalTargetJam += $targetJam; 
 
-                // Cek Absen HANYA JIKA di hari tersebut dia memiliki kewajiban jadwal kerja (targetJam > 0)
                 if ($targetJam > 0) {
                     if (isset($attendanceMap[$staffDb->id][$tglStr])) {
                         $absensiHarian = $attendanceMap[$staffDb->id][$tglStr];
                         $aktualJamKerja = (float) $absensiHarian['jam'];
 
                         if ($aktualJamKerja == 0) {
-                            // Kasus 1: Ada data absen tapi jam kerjanya 0
                             $totalHariAbsenBetulan++;
                             $totalJamAbsenBetulan += $targetJam; 
                         } else if ($aktualJamKerja < $targetJam) {
-                            // Kasus 2: Pulang cepat / telat (Target 8 jam, tapi kerja 5 jam)
                             $selisihJam = $targetJam - $aktualJamKerja;
                             $totalJamAbsenBetulan += $selisihJam;
                         }
                     } else {
-                        // Kasus 3: Tidak ada data di database (Mangkir/Bolos Murni)
                         $totalHariAbsenBetulan++;
                         $totalJamAbsenBetulan += $targetJam; 
                     }
                 }
             }
 
-            // Simpan hasil absen siluman
             $item->hitung_hari_absen = $totalHariAbsenBetulan;
             $item->hitung_jam_absen = $totalJamAbsenBetulan;
-            
-            // Simpan total target jam untuk rumus persentase
             $item->target_jam_kerja = $totalTargetJam;
 
             // --- A. IDENTITAS ---
-            // PENTING: Simpan ID Asli untuk kunci pencarian di Blade nanti
             $item->id_original = $staffDb->id;
-
             $item->nama = $staffDb->nama;
             $item->id_karyawan = $staffDb->id_pekerja ?? $staffDb->nik;
             $item->jabatan = $pkwtAktif?->jabatan?->nama ?? '-';
@@ -1151,23 +1249,18 @@ class PayrollController extends Controller
 
             $item->tunjangan = (float) ($input['tunjangan'] ?? 0);
             $item->insentif = (float) ($input['insentif'] ?? 0);
-
-            // --- C. INPUT JAM & UPAH ---
             $item->jam_kerja = (float) ($input['jam_kerja'] ?? 0);
 
             $jamHbnInput = (float) ($input['hbn'] ?? 0);
             $jamLemburInput = (float) ($input['overtime'] ?? 0);
 
-            // 2. LOGIKA PEMISAHAN HBN DAN OVERTIME BIASA
-            // Jika ada jam HBN, maka masuk ke HBN dan lembur biasa di-nol-kan
             if ($jamHbnInput > 0) {
                 $item->jam_hbn = $jamHbnInput;
-                $item->jam_lembur = 0; // Mencegah masuk ke overtime biasa
+                $item->jam_lembur = 0; 
             } else {
                 $item->jam_hbn = 0;
                 $item->jam_lembur = $jamLemburInput;
             }
-
             
             $item->jml_uang_lembur = $item->jam_lembur * $item->rate_lembur;
             $item->jml_uang_lembur_hbn = $item->jam_hbn * $item->rate_hbn;
@@ -1175,43 +1268,44 @@ class PayrollController extends Controller
             $item->total_pokok = (float) ($input['upah'] ?? 0);
             $item->total_lembur_biasa = $item->jam_lembur * $item->rate_lembur;
             $item->total_lembur_hbn = $item->jam_hbn * $item->rate_hbn; 
-
             $item->jam_lembur_hbn = (float) ($input['hbn'] ?? 0);
 
-            // dump($item->rate_hbn,$item->jam_hbn);
-
-            // dump(($input['upah'] ?? 0), ($input['potongan'] ?? 0), ($input['tunjangan'] ?? 0), $item->total_lembur_biasa , $item->total_lembur_hbn);
-
-            $item->jml_pokok_upah = (float) ($input['upah'] ?? 0) + ($input['potongan'] ?? 0) - ($input['tunjangan'] ?? 0)
-            - $item->total_lembur_biasa - $item->total_lembur_hbn ;
-
-            //Tunjangan
+            // --- C. MEMISAHKAN TUNJANGAN DINAMIS ---
             $item->detail_tunjangan = [];
             $totalUangTunjangan = 0;
 
             foreach ($semuaKategoriTunjangan as $kategoriHeader) {
-                // Ambil dari rekap map, jika tidak ada isikan 0
                 $uangKategori = $tunjanganMap[$staffDb->id][$kategoriHeader] ?? 0;
-                
                 $item->detail_tunjangan[$kategoriHeader] = $uangKategori;
                 $totalUangTunjangan += $uangKategori;
             }
 
             $item->uang_tunjangan = 0; 
-            $item->jml_uang_tunjangan = $totalUangTunjangan; // Total (J)
-
-            // $item->jml_uang_tunjangan = (float) ($input['tunjangan'] ?? 0);
+            $item->jml_uang_tunjangan = $totalUangTunjangan; 
             $item->upah_insentif = 0;
             $item->jml_uang_insentif = 0;
 
-            // --- D. POTONGAN ABSENSI ---
+            // --- D. MEMISAHKAN POTONGAN DINAMIS ---
+            $item->detail_potongan = [];
+            $totalPotonganDinamis = 0;
+
+            foreach ($semuaKategoriPotongan as $kategoriHeader) {
+                $uangPotongan = $potonganMap[$staffDb->id][$kategoriHeader] ?? 0;
+                $item->detail_potongan[$kategoriHeader] = $uangPotongan;
+                $totalPotonganDinamis += $uangPotongan;
+            }
+
+            // Gantikan $input['potongan'] lama dengan total dari database
+            $item->potongan_lain = $totalPotonganDinamis;
+
+            // --- E. KALKULASI UPAH KOTOR ---
+            $item->jml_pokok_upah = (float) ($input['upah'] ?? 0) + $totalPotonganDinamis - $totalUangTunjangan - $item->total_lembur_biasa - $item->total_lembur_hbn;
+
             $item->pot_absen_per_hari = $item->rate_pokok;
             $item->jml_pot_absen_hari = 0;
-
             $item->pot_absen_per_jam = $pkwtAktif?->gaji_overtime ?? 0;
             $item->jml_pot_absen_jam = 0;
 
-            // --- E. TOTAL UPAH KOTOR ---
             $pendapatan_total = $item->jml_pokok_upah + $item->jml_uang_insentif + $item->jml_uang_tunjangan + $item->total_lembur_biasa + $item->total_lembur_hbn;
             $potongan_absen = $item->jml_pot_absen_hari + $item->jml_pot_absen_jam;
 
@@ -1221,47 +1315,32 @@ class PayrollController extends Controller
             $item->bpjs_tk = $pkwtAktif?->bpjs_naker ?? 0;
             $item->bpjs_kes = $pkwtAktif?->bpjs_kesehatan ?? 0;
             $item->biaya_admin = 2000;
-
-            $item->potongan_lain = $potonganMap[$staffDb->id] ?? 0;
             $item->biaya_klaim = 0;
 
             // --- G. HASIL AKHIR ---
             $total_potongan_all = $item->bpjs_tk + $item->bpjs_kes + $item->biaya_admin + $item->potongan_lain + $item->biaya_klaim;
             $item->thp = $item->total_upah_kotor - $total_potongan_all;
 
-            // --- H. Produktivitas ---
-
             // --- H. PRODUKTIVITAS ---
             $prod = $prodMap[$staffDb->id] ?? [
                 'kerja' => 0, 'izin' => 0, 'cuti' => 0, 'sakit' => 0, 'rencanaCuti' => 0, 'absen' => 0, 'jam_ot' => 0
             ];
 
-            // 1. Ambil data mentah dari array map
             $item->jml_hari_kerja = $prod['kerja'];
             $item->izin = $prod['izin'];
             $item->cuti = $prod['cuti'];
             $item->sakit = $prod['sakit'];
             $item->rencanaCuti = $prod['rencanaCuti'];
-            $item->absen = $prod['absen'];
-
+            
             $item->absen = $prod['absen'] + $item->hitung_hari_absen;
-
-            // 2. Hitung Total Absen (Semua jenis ketidakhadiran digabung)
             $item->jml_absen = $item->izin + $item->cuti + $item->sakit + $item->rencanaCuti + $item->absen;
 
-            // 3. Hitung Persentase Kehadiran & Ketidakhadiran
-            // Kita hitung jumlah hari dalam periode ini untuk jadi nilai pembagi (denominator)
-            $startPeriode = \Carbon\Carbon::parse($tglAwal)->startOfDay();
-            $endPeriode = \Carbon\Carbon::parse($tglAkhir)->startOfDay();
             $totalHariPeriode = (int) round($startPeriode->diffInDays($endPeriode)) + 1;
             
-            // Hitung persen (%)
             $item->pct_hadir = $totalHariPeriode > 0 ? ($item->jml_hari_kerja / $totalHariPeriode) * 100 : 0;
             $item->pct_absen = $totalHariPeriode > 0 ? ($item->jml_absen / $totalHariPeriode) * 100 : 0;
-
             $item->pct_jam_kerja = $item->target_jam_kerja > 0 ? ($item->jam_kerja / $item->target_jam_kerja) * 100 : 0;
 
-            // 4. Hitung Persentase Overtime (Asumsi Standar Jam Kerja = 8 Jam/Hari)
             $standarJamKerja = $item->target_jam_kerja * 8; 
             $item->pct_overtime = $standarJamKerja > 0 ? ($prod['jam_ot'] / $standarJamKerja) * 100 : 0;
 
@@ -1280,27 +1359,429 @@ class PayrollController extends Controller
         $totalDays = (int) round($start->diffInDays($end)) + 1;
         $filename = 'Detail_Upah_Harian_' . $unitName . '_' . now()->format('Ymd_His') . '.xlsx';
 
-        // dd($attendanceMap);
-        // Sertakan $attendanceMap ke dalam Export Class
-        return Excel::download(new DailyReportHarianExport(
+        // Sertakan array $semuaKategoriPotongan ke dalam Export Class
+        return \Maatwebsite\Excel\Facades\Excel::download(new DailyReportHarianExport(
             $formattedData,
             $periodeString,
             $grandTotal,
             $unitName,
             $totalDays,
-            $tglAwal, // string Y-m-d
-            $tglAkhir, // string Y-m-d
-            $attendanceMap, // Array Mapping
+            $tglAwal,
+            $tglAkhir,
+            $attendanceMap,
             $unit,
             $semuaKategoriTunjangan,
             $penanggung_jawab,
             $jabatan_pj,
+            $semuaKategoriPotongan // <-- ARRAY KATEGORI POTONGAN DIKIRIM DI SINI
         ), $filename);
     }
 
+    // public function ExportDetailHarian(Request $request)
+    // {
+    //     // 1. Ambil data dari request
+
+    //     $workersInput = json_decode($request->workers_json, true);
+    //     $idUnit = $request->id_unit;
+    //     // Format tanggal untuk Query Database
+    //     $tglAwal = \Carbon\Carbon::parse($request->tgl_awal)->format('Y-m-d');
+    //     $tglAkhir = \Carbon\Carbon::parse($request->tgl_akhir)->format('Y-m-d');
+
+    //     // 2. Persiapkan data Master Pekerja dari Database
+    //     $workerIds = collect($workersInput)->pluck('id')->toArray();
+    //     $dbPekerja = Pekerja::with([
+    //         'pkwt' => function ($query) {
+    //             $query->latest('id'); // Ambil kontrak terbaru
+    //         },
+    //         'pkwt.jabatan',
+    //         'pkwt.divisi',
+    //         'pkwt.hariKerja',
+    //     ])
+    //     ->whereIn('id', $workerIds)
+    //     ->get()
+    //     ->keyBy('id');
+
+    //     $penanggung_jawab = $request->input('pj_nama', []);
+    //     $jabatan_pj = $request->input('pj_jabatan', []);
+
+    //     // ---------------------------------------------------------
+    //     // [BAGIAN 3] AMBIL DATA ABSENSI & BUAT MAPPING (DILAKUKAN SEKALI SAJA)
+    //     // ---------------------------------------------------------
+        
+    //     // A. Query Database
+    //     $absensiData = Absensi::with(['detilHarian', 'tunjangan', 'potongan'])
+    //         ->whereIn('id_pekerja', $workerIds)
+    //         ->whereBetween('tgl_absensi', [$tglAwal, $tglAkhir])
+    //         ->get();
+
+    //     // B. Buat Mapping Array
+    //     $attendanceMap = [];
+    //     $tunjanganMap = [];
+    //     $semuaKategoriTunjangan = [];
+    //     $potonganMap = [];
+    //     $prodMap = [];
+        
+    //     foreach ($absensiData as $abs) {
+    //         $tgl = \Carbon\Carbon::parse($abs->tgl_absensi)->format('Y-m-d');
+    //         $idPekerja = (int) $abs->id_pekerja;
+
+    //         if (!isset($prodMap[$idPekerja])) {
+    //             $prodMap[$idPekerja] = [
+    //                 'kerja' => 0, 
+    //                 'izin' => 0, 
+    //                 'cuti' => 0, 
+    //                 'sakit' => 0, 
+    //                 'rencanaCuti' => 0, 
+    //                 'absen' => 0, 
+    //                 'jam_ot' => 0
+    //             ];
+    //         }
+
+    //         $detil = $abs->detilHarian;
+    //         if ($detil) {
+    //             $jamKerja = (float) $detil->jam_kerja_harian;
+    //             $overtime = (float) $detil->overtime;
+    //             $status   = $detil->status_kehadiran;
+
+    //             $warna = ''; // Default Colorless (Hadir biasa)
+
+    //             // URUTAN FILTER WARNA
+    //             if ($detil->hbn == 1) {
+    //                 $warna = '#DDA0DD'; // Ungu (HBN)
+    //             } elseif (in_array($status, [6])) { // Sesuaikan angka ID Absen Anda
+    //                 $warna = '#FFC7CE'; // Merah (Absen/Alpha)
+    //             } elseif ($status == 5) { // Sesuaikan angka ID Rencana Cuti Anda
+    //                 $warna = '#C6EFCE'; // Hijau (Rencana Cuti)
+    //             } elseif (in_array($status, [2, 3, 4])) { // Izin, Cuti, Sakit
+    //                 if($detil->isPaid == 1)
+    //                 {
+    //                     $warna = '#87CEFA'; // Biru (isPaid)
+    //                 }elseif($jamKerja > 0) {
+    //                     $warna = '#FFEB9C'; // Kuning (Izin tapi ada jam)
+    //                 }else{
+    //                     $warna = '#FCD5B4'; // Orange (Izin tidak ada jam)
+    //                 }
+    //             }elseif ($overtime > 0) {
+    //                 $warna = '#FFB6C1'; // Pink (Overtime)
+    //             }
+                
+    //             if ($jamKerja > 0 || $detil->hbn == 1) {
+    //                 $prodMap[$idPekerja]['kerja'] += 1;
+    //             } elseif (in_array($status, [2])) { // Asumsi 4 = Sakit
+    //                 $prodMap[$idPekerja]['izin'] += 1;
+    //             } elseif (in_array($status, [3])) { // Asumsi 2/3 = Izin/Cuti
+    //                 $prodMap[$idPekerja]['cuti'] += 1;
+    //             } elseif (in_array($status, [4])) { // Asumsi 6 = Alpha
+    //                 $prodMap[$idPekerja]['sakit'] += 1;
+    //             }elseif (in_array($status, [5])) { // Asumsi 6 = Alpha
+    //                 $prodMap[$idPekerja]['rencanaCuti'] += 1;
+    //             }elseif (in_array($status, [6])) { // Asumsi 6 = Alpha
+    //                 $prodMap[$idPekerja]['absen'] += 1;
+    //             }
+
+    //             $prodMap[$idPekerja]['jam_ot'] += (float) $detil->overtime;
+
+    //             // Simpan jam kerja DAN warna ke dalam array
+    //             $attendanceMap[$idPekerja][$tgl] = [
+    //                 'jam'   => $jamKerja,
+    //                 'warna' => $warna
+    //             ];
+    //         }
+
+    //         if ($abs->tunjangan && !empty($abs->tunjangan->kategori)) {
+    //             $kategoriData = is_string($abs->tunjangan->kategori) 
+    //                             ? json_decode($abs->tunjangan->kategori, true) 
+    //                             : $abs->tunjangan->kategori;
+
+    //             if (is_array($kategoriData)) {
+    //                 foreach ($kategoriData as $namaTunj => $val) {
+    //                     // Kapitalisasi huruf pertama (Misal: 'score' jadi 'Score')
+    //                     $namaTunjCap = ucfirst(strtolower(trim($namaTunj))); 
+                        
+    //                     // Kumpulkan nama kategori ke array header jika belum ada
+    //                     if (!in_array($namaTunjCap, $semuaKategoriTunjangan)) {
+    //                         $semuaKategoriTunjangan[] = $namaTunjCap;
+    //                     }
+
+    //                     // Hitung subtotal: Qty x Nominal (Sesuai ide gambar Anda)
+    //                     $qty = (int) ($val['qty'] ?? 0);
+    //                     $nominal = (float) ($val['nominal'] ?? 0);
+    //                     $subtotal = $qty * $nominal;
+
+    //                     // Masukkan ke dompet masing-masing pekerja
+    //                     if (!isset($tunjanganMap[$idPekerja][$namaTunjCap])) {
+    //                         $tunjanganMap[$idPekerja][$namaTunjCap] = 0;
+    //                     }
+    //                     $tunjanganMap[$idPekerja][$namaTunjCap] += $subtotal;
+    //                 }
+    //             }
+    //         }
+
+    //         if ($abs->potongan) {
+    //             // Ambil langsung dari kolom 'total' sesuai database Anda
+    //             $totalPotongan = (float) $abs->potongan->total;
+
+    //             if (!isset($potonganMap[$idPekerja])) {
+    //                 $potonganMap[$idPekerja] = 0;
+    //             }
+    //             $potonganMap[$idPekerja] += $totalPotongan;
+    //         }
+    //     }
+
+
+    //     // DEBUG: Cek isi map sebelum lanjut (Hapus jika sudah benar)
+    //     // dd($attendanceMap);
+
+    //     // ---------------------------------------------------------
+    //     // [BAGIAN 4] LOOPING DATA PEKERJA UNTUK ROW EXCEL
+    //     // ---------------------------------------------------------
+
+    //     // Ambil info Unit untuk nama unit
+    //     $unit = Unit::find($idUnit);
+    //     $unitName = $unit ? $unit->nama_unit : 'UNIT TIDAK DIKETAHUI';
+
+    //     $realItems = [];
+
+
+    //     foreach ($workersInput as $input) {
+    //         $id = $input['id'];
+    //         if (!isset($dbPekerja[$id])) {
+    //             continue;
+    //         }   
+
+    //         $staffDb = $dbPekerja[$id];
+    //         $pkwtAktif = $staffDb->pkwt->first();
+
+    //         $item = new \stdClass();
+
+    //         // ===================================================================
+    //         // --- LOGIKA TARGET JAM KERJA & CEK ABSEN BOLOS (TIDAK CHECK-IN) ---
+    //         // ===================================================================
+    //         $jadwalKerja = []; 
+    //         if ($pkwtAktif && $pkwtAktif->hariKerja) {
+    //             foreach ($pkwtAktif->hariKerja as $jadwal) {
+    //                 // Sesuai gambar DB Anda: 'mon', 'tue', 'wed', dst.
+    //                 $namaHari = strtolower($jadwal->hari); 
+    //                 $jadwalKerja[$namaHari] = (float) $jadwal->jam_kerja; 
+    //             }
+    //         }
+
+    //         $startPeriode = \Carbon\Carbon::parse($tglAwal)->startOfDay();
+    //         $endPeriode = \Carbon\Carbon::parse($tglAkhir)->startOfDay();
+            
+    //         $totalTargetJam = 0;       // Untuk menyimpan Total Jam Seharusnya (Contoh: 90 Jam)
+    //         $totalHariAbsenBetulan = 0; // Menghitung total hari bolos murni
+    //         $totalJamAbsenBetulan  = 0; // Menghitung total jam hilang (bolos / pulang cepat)
+
+    //         for ($date = $startPeriode->copy(); $date->lte($endPeriode); $date->addDay()) {
+    //             // Gunakan format 'D' untuk menghasilkan singkatan bahasa inggris (Mon, Tue, Wed)
+    //             $hariStr = strtolower($date->format('D')); 
+    //             $tglStr = $date->format('Y-m-d');
+                
+    //             // Ambil target jam dari PKWT pada hari tersebut
+    //             $targetJam = $jadwalKerja[$hariStr] ?? 0;
+    //             $totalTargetJam += $targetJam; // Tambahkan ke akumulasi total jam periode ini
+
+    //             // Cek Absen HANYA JIKA di hari tersebut dia memiliki kewajiban jadwal kerja (targetJam > 0)
+    //             if ($targetJam > 0) {
+    //                 if (isset($attendanceMap[$staffDb->id][$tglStr])) {
+    //                     $absensiHarian = $attendanceMap[$staffDb->id][$tglStr];
+    //                     $aktualJamKerja = (float) $absensiHarian['jam'];
+
+    //                     if ($aktualJamKerja == 0) {
+    //                         // Kasus 1: Ada data absen tapi jam kerjanya 0
+    //                         $totalHariAbsenBetulan++;
+    //                         $totalJamAbsenBetulan += $targetJam; 
+    //                     } else if ($aktualJamKerja < $targetJam) {
+    //                         // Kasus 2: Pulang cepat / telat (Target 8 jam, tapi kerja 5 jam)
+    //                         $selisihJam = $targetJam - $aktualJamKerja;
+    //                         $totalJamAbsenBetulan += $selisihJam;
+    //                     }
+    //                 } else {
+    //                     // Kasus 3: Tidak ada data di database (Mangkir/Bolos Murni)
+    //                     $totalHariAbsenBetulan++;
+    //                     $totalJamAbsenBetulan += $targetJam; 
+    //                 }
+    //             }
+    //         }
+
+    //         // Simpan hasil absen siluman
+    //         $item->hitung_hari_absen = $totalHariAbsenBetulan;
+    //         $item->hitung_jam_absen = $totalJamAbsenBetulan;
+            
+    //         // Simpan total target jam untuk rumus persentase
+    //         $item->target_jam_kerja = $totalTargetJam;
+
+    //         // --- A. IDENTITAS ---
+    //         // PENTING: Simpan ID Asli untuk kunci pencarian di Blade nanti
+    //         $item->id_original = $staffDb->id;
+
+    //         $item->nama = $staffDb->nama;
+    //         $item->id_karyawan = $staffDb->id_pekerja ?? $staffDb->nik;
+    //         $item->jabatan = $pkwtAktif?->jabatan?->nama ?? '-';
+    //         $item->divisi = $pkwtAktif?->divisi?->nama ?? '-';
+    //         $item->checkman = 'TRUE';
+    //         $item->no_rekening = $staffDb->rekening ?? '-';
+
+    //         // --- B. RATE / TARIF ---
+    //         $item->rate_pokok = $pkwtAktif?->gaji_bulanan ?? 0;
+    //         $item->rate_harian = $pkwtAktif?->gaji_harian ?? 0;
+    //         $item->rate_lembur = $pkwtAktif?->gaji_overtime ?? 0;
+    //         $item->rate_hbn = ($pkwtAktif?->gaji_overtime ?? 0) * ($pkwtAktif?->rate_hbn ?? 0);
+
+    //         $item->tunjangan = (float) ($input['tunjangan'] ?? 0);
+    //         $item->insentif = (float) ($input['insentif'] ?? 0);
+
+    //         // --- C. INPUT JAM & UPAH ---
+    //         $item->jam_kerja = (float) ($input['jam_kerja'] ?? 0);
+
+    //         $jamHbnInput = (float) ($input['hbn'] ?? 0);
+    //         $jamLemburInput = (float) ($input['overtime'] ?? 0);
+
+    //         // 2. LOGIKA PEMISAHAN HBN DAN OVERTIME BIASA
+    //         // Jika ada jam HBN, maka masuk ke HBN dan lembur biasa di-nol-kan
+    //         if ($jamHbnInput > 0) {
+    //             $item->jam_hbn = $jamHbnInput;
+    //             $item->jam_lembur = 0; // Mencegah masuk ke overtime biasa
+    //         } else {
+    //             $item->jam_hbn = 0;
+    //             $item->jam_lembur = $jamLemburInput;
+    //         }
+
+            
+    //         $item->jml_uang_lembur = $item->jam_lembur * $item->rate_lembur;
+    //         $item->jml_uang_lembur_hbn = $item->jam_hbn * $item->rate_hbn;
+
+    //         $item->total_pokok = (float) ($input['upah'] ?? 0);
+    //         $item->total_lembur_biasa = $item->jam_lembur * $item->rate_lembur;
+    //         $item->total_lembur_hbn = $item->jam_hbn * $item->rate_hbn; 
+
+    //         $item->jam_lembur_hbn = (float) ($input['hbn'] ?? 0);
+
+    //         // dump($item->rate_hbn,$item->jam_hbn);
+
+    //         // dump(($input['upah'] ?? 0), ($input['potongan'] ?? 0), ($input['tunjangan'] ?? 0), $item->total_lembur_biasa , $item->total_lembur_hbn);
+
+    //         $item->jml_pokok_upah = (float) ($input['upah'] ?? 0) + ($input['potongan'] ?? 0) - ($input['tunjangan'] ?? 0)
+    //         - $item->total_lembur_biasa - $item->total_lembur_hbn ;
+
+    //         //Tunjangan
+    //         $item->detail_tunjangan = [];
+    //         $totalUangTunjangan = 0;
+
+    //         foreach ($semuaKategoriTunjangan as $kategoriHeader) {
+    //             // Ambil dari rekap map, jika tidak ada isikan 0
+    //             $uangKategori = $tunjanganMap[$staffDb->id][$kategoriHeader] ?? 0;
+                
+    //             $item->detail_tunjangan[$kategoriHeader] = $uangKategori;
+    //             $totalUangTunjangan += $uangKategori;
+    //         }
+
+    //         $item->uang_tunjangan = 0; 
+    //         $item->jml_uang_tunjangan = $totalUangTunjangan; // Total (J)
+
+    //         // $item->jml_uang_tunjangan = (float) ($input['tunjangan'] ?? 0);
+    //         $item->upah_insentif = 0;
+    //         $item->jml_uang_insentif = 0;
+
+    //         // --- D. POTONGAN ABSENSI ---
+    //         $item->pot_absen_per_hari = $item->rate_pokok;
+    //         $item->jml_pot_absen_hari = 0;
+
+    //         $item->pot_absen_per_jam = $pkwtAktif?->gaji_overtime ?? 0;
+    //         $item->jml_pot_absen_jam = 0;
+
+    //         // --- E. TOTAL UPAH KOTOR ---
+    //         $pendapatan_total = $item->jml_pokok_upah + $item->jml_uang_insentif + $item->jml_uang_tunjangan + $item->total_lembur_biasa + $item->total_lembur_hbn;
+    //         $potongan_absen = $item->jml_pot_absen_hari + $item->jml_pot_absen_jam;
+
+    //         $item->total_upah_kotor = $pendapatan_total - $potongan_absen;
+
+    //         // --- F. POTONGAN WAJIB ---
+    //         $item->bpjs_tk = $pkwtAktif?->bpjs_naker ?? 0;
+    //         $item->bpjs_kes = $pkwtAktif?->bpjs_kesehatan ?? 0;
+    //         $item->biaya_admin = 2000;
+
+            
+    //         $item->potongan_lain = $potonganMap[$staffDb->id] ?? 0;
+
+
+    //         $item->biaya_klaim = 0;
+
+    //         // --- G. HASIL AKHIR ---
+    //         $total_potongan_all = $item->bpjs_tk + $item->bpjs_kes + $item->biaya_admin + $item->potongan_lain + $item->biaya_klaim;
+    //         $item->thp = $item->total_upah_kotor - $total_potongan_all;
+
+    //         // --- H. PRODUKTIVITAS ---
+    //         $prod = $prodMap[$staffDb->id] ?? [
+    //             'kerja' => 0, 'izin' => 0, 'cuti' => 0, 'sakit' => 0, 'rencanaCuti' => 0, 'absen' => 0, 'jam_ot' => 0
+    //         ];
+
+    //         // 1. Ambil data mentah dari array map
+    //         $item->jml_hari_kerja = $prod['kerja'];
+    //         $item->izin = $prod['izin'];
+    //         $item->cuti = $prod['cuti'];
+    //         $item->sakit = $prod['sakit'];
+    //         $item->rencanaCuti = $prod['rencanaCuti'];
+    //         $item->absen = $prod['absen'];
+
+    //         $item->absen = $prod['absen'] + $item->hitung_hari_absen;
+
+    //         // 2. Hitung Total Absen (Semua jenis ketidakhadiran digabung)
+    //         $item->jml_absen = $item->izin + $item->cuti + $item->sakit + $item->rencanaCuti + $item->absen;
+
+    //         // 3. Hitung Persentase Kehadiran & Ketidakhadiran
+    //         // Kita hitung jumlah hari dalam periode ini untuk jadi nilai pembagi (denominator)
+    //         $startPeriode = \Carbon\Carbon::parse($tglAwal)->startOfDay();
+    //         $endPeriode = \Carbon\Carbon::parse($tglAkhir)->startOfDay();
+    //         $totalHariPeriode = (int) round($startPeriode->diffInDays($endPeriode)) + 1;
+            
+    //         // Hitung persen (%)
+    //         $item->pct_hadir = $totalHariPeriode > 0 ? ($item->jml_hari_kerja / $totalHariPeriode) * 100 : 0;
+    //         $item->pct_absen = $totalHariPeriode > 0 ? ($item->jml_absen / $totalHariPeriode) * 100 : 0;
+
+    //         $item->pct_jam_kerja = $item->target_jam_kerja > 0 ? ($item->jam_kerja / $item->target_jam_kerja) * 100 : 0;
+
+    //         // 4. Hitung Persentase Overtime (Asumsi Standar Jam Kerja = 8 Jam/Hari)
+    //         $standarJamKerja = $item->target_jam_kerja * 8; 
+    //         $item->pct_overtime = $standarJamKerja > 0 ? ($prod['jam_ot'] / $standarJamKerja) * 100 : 0;
+
+    //         $realItems[] = $item;
+    //     }
+
+    //     // 5. Finalisasi Data untuk Export
+    //     $formattedData = collect($realItems);
+    //     $grandTotal = $formattedData->sum('thp');
+
+    //     // 6. Hitung Periode & Total Days untuk Header Excel
+    //     $start = \Carbon\Carbon::parse($tglAwal)->startOfDay();
+    //     $end = \Carbon\Carbon::parse($tglAkhir)->startOfDay();
+    //     $periodeString = strtoupper($start->isoFormat('D MMMM Y') . ' - ' . $end->isoFormat('D MMMM Y'));
+
+    //     $totalDays = (int) round($start->diffInDays($end)) + 1;
+    //     $filename = 'Detail_Upah_Harian_' . $unitName . '_' . now()->format('Ymd_His') . '.xlsx';
+
+    //     // dd($attendanceMap);
+    //     // Sertakan $attendanceMap ke dalam Export Class
+    //     return Excel::download(new DailyReportHarianExport(
+    //         $formattedData,
+    //         $periodeString,
+    //         $grandTotal,
+    //         $unitName,
+    //         $totalDays,
+    //         $tglAwal, // string Y-m-d
+    //         $tglAkhir, // string Y-m-d
+    //         $attendanceMap, // Array Mapping
+    //         $unit,
+    //         $semuaKategoriTunjangan,
+    //         $penanggung_jawab,
+    //         $jabatan_pj,
+    //     ), $filename);
+    // }
+
     public function SummaryUpahHarian(Request $request)
     {
-        dd($request->all());
+        // dd($request->all());
         // 1. Ambil Data Dasar dari Reques
         $workersInput = is_string($request->workers_json) ? json_decode($request->workers_json, true) : $request->workers_json;
         
@@ -1404,17 +1885,18 @@ class PayrollController extends Controller
         $unitName = $unit ? $unit->nama_unit : 'UNIT TIDAK DIKETAHUI';
         
         $filename = 'Summary_Upah_' . $unitName . '_' . now()->format('Ymd_His') . '.xlsx';
-
         // 6. Return ke Export Class
         return Excel::download(new \App\Exports\SummaryUpahExport(
             $processedData, 
             $totals, 
             $periodeString, 
             $unitName,
-            $request->penanggung_jawab,
-            $request->jabatan_pj
+            $request->pj_nama,
+            $request->pj_jabatan
         ), $filename);
     }
+
+
 
     public function dispatchPayrollEmails(Request $request)
     {

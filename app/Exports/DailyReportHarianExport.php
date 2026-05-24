@@ -27,8 +27,10 @@ class DailyReportHarianExport implements FromView, ShouldAutoSize, WithStyles, W
     protected $semuaKategoriTunjangan;
     protected $penanggung_jawab;
     protected $jabatan_pj;
+    protected $semuaKategoriPotongan;
 
-    public function __construct($data, $periode, $grandTotal, $unitName, $totalDays, $tglAwal, $tglAkhir, $attendanceMap, $unit, $semuaKategoriTunjangan,$penanggung_jawab, $jabatan_pj)
+    public function __construct($data, $periode, $grandTotal, $unitName, $totalDays, $tglAwal, $tglAkhir, 
+    $attendanceMap, $unit, $semuaKategoriTunjangan,$penanggung_jawab, $jabatan_pj, $semuaKategoriPotongan)
     {
         $this->data = $data;
         $this->periode = $periode;
@@ -42,6 +44,7 @@ class DailyReportHarianExport implements FromView, ShouldAutoSize, WithStyles, W
         $this->semuaKategoriTunjangan = $semuaKategoriTunjangan;
         $this->penanggung_jawab = $penanggung_jawab;
         $this->jabatan_pj = $jabatan_pj;
+        $this->semuaKategoriPotongan = $semuaKategoriPotongan;
     }
 
     public function view(): View
@@ -58,6 +61,7 @@ class DailyReportHarianExport implements FromView, ShouldAutoSize, WithStyles, W
             'semuaKategoriTunjangan' => $this->semuaKategoriTunjangan,
             'penanggung_jawab' => $this->penanggung_jawab,
             'jabatan_pj' => $this->jabatan_pj,
+            'semuaKategoriPotongan' => $this->semuaKategoriPotongan,
         ]);
     }
 
@@ -72,7 +76,7 @@ class DailyReportHarianExport implements FromView, ShouldAutoSize, WithStyles, W
         $totalRows = count($this->data);
         $lastDataRow = 16 + $totalRows;
         $footerRow = $lastDataRow + 1;
-
+    
         $leftStaticCount = 10; 
         
         $dateStartColIndex = $leftStaticCount + 1; // Mulai setelah kolom statis kiri

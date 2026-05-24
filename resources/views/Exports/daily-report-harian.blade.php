@@ -266,9 +266,11 @@
                 style="background-color: #FFFF00; font-weight: bold; text-align: center; border: 1px solid #000; white-space: normal;">
                 TOTAL UPAH (K) = (B+D+F+H-J)-(L+N)</th>
 
-            <th colspan="4" width="15"
+            @php $jmlPotongan = count($semuaKategoriPotongan ?? []); @endphp
+            <th colspan="{{ 3 + $jmlPotongan }}" width="15"
                 style="background-color: #FCE4D6; font-weight: bold; text-align: center; border: 1px solid #000; white-space: normal;">
-                POTONGAN</th>
+                POTONGAN
+            </th>
 
 
             <th rowspan="2" width="15"
@@ -338,9 +340,13 @@
             <th width="15"
                 style="background-color: #FCE4D6; font-weight: bold; text-align: center; border: 1px solid #000; white-space: normal;">
                 BIAYA KLAIM</th>
-            <th width="15"
-                style="background-color: #FCE4D6; font-weight: bold; text-align: center; border: 1px solid #000; white-space: normal;">
-                POTONGAN</th>
+            @if($jmlPotongan > 0)
+                @foreach($semuaKategoriPotongan as $katPot)
+                    <th width="15" style="background-color: #FCE4D6; font-weight: bold; text-align: center; border: 1px solid #000; white-space: normal; text-transform: uppercase;">
+                        {{ $katPot }}
+                    </th>
+                @endforeach
+            @endif
 
             <td></td>
             <td></td>
@@ -476,8 +482,15 @@
                     ({{ number_format($item->bpjs_kes)}})</td>
                 <td style="text-align: right; border: 1px solid #000;">
                     ({{ number_format($item->biaya_klaim)}}) </td>
-                <td style="text-align: right; border: 1px solid #000;">
-                    ({{ number_format($item->potongan_lain)}}) </td>
+                {{-- LOOPING ISI NOMINAL POTONGAN DINAMIS --}}
+                @if($jmlPotongan > 0)
+                    @foreach($semuaKategoriPotongan as $katPot)
+                        @php $nilaiPot = $item->detail_potongan[$katPot] ?? 0; @endphp
+                        <td style="text-align: right; border: 1px solid #000;">
+                            {{ $nilaiPot > 0 ? '(' . number_format($nilaiPot) . ')' : '0' }}
+                        </td>
+                    @endforeach
+                @endif
 
                 {{-- B. ADMIN --}}
                 <td style="text-align: right; border: 1px solid #000;">
@@ -649,9 +662,13 @@
             ({{ number_format($items->sum('biaya_klaim')) }})
         </td>
 
-        <td style="text-align: right; font-weight: bold; border: 1px solid #000; background-color: #FCE4D6;">
-            ({{ number_format($items->sum('potongan_lain')) }})
-        </td>
+        @if($jmlPotongan > 0)
+            @foreach($semuaKategoriPotongan as $katPot)
+                <td style="text-align: right; font-weight: bold; border: 1px solid #000; background-color: #FCE4D6;">
+                    ({{ number_format($items->sum(function($item) use ($katPot) { return $item->detail_potongan[$katPot] ?? 0; })) }})
+                </td>
+            @endforeach
+        @endif
 
         {{-- B. ADMIN --}}
         <td style="text-align: right; font-weight: bold; border: 1px solid #000; background-color: #FCE4D6;">
