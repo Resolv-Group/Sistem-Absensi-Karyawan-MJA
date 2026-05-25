@@ -168,9 +168,12 @@ Route::middleware(['auth', 'role:pic,admin'])->group(function () {
     Route::post('/penilaian/unit/{unitId}', [PenilaianController::class, 'ExportExcel'])->name('export.excel');
 });
 
-Route::middleware(['auth', 'role:hrd,pic,admin,head_supervisor'])->group(function () {
-    // Unit -> Main - Detail
-    // Filtered
+Route::middleware(['auth', 'role:hrd,pic,admin,head_supervisor'])->group(function(){
+    //Import Pekerja-Borongan
+    Route::post('/pekerja/import', [PekerjaController::class, 'importExcel'])->name('pekerja.import');
+    Route::post('/borongan/import', [BoronganController::class, 'importExcel'])->name('borongan.import');
+    //Unit -> Main - Detail
+    //Filtered
     Route::get('/unit/detail/{id}', [UnitController::class, 'viewDetailUnit'])->name('view.detail.unit');
     Route::get('/unit/ubah/{id}', [UnitController::class, 'ubahUnit'])->name('view.ubah.unit');
     // =--=

@@ -12,6 +12,9 @@ use App\Models\Penilaian_Pkwt;
 use App\Models\PKWT;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use App\Imports\PekerjaImport;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\DB;
 
 class PekerjaController extends Controller
 {
@@ -518,7 +521,37 @@ class PekerjaController extends Controller
         ]);
     }
 
+public function importExcel(Request $request)
+    {
+        // 1. Validasi File
+        $request->validate([
+            'file_excel' => 'required|mimes:xlsx,xls,csv|max:10240' // Max 10MB
+        ], [
+            'file_excel.required' => 'Pilih file Excel terlebih dahulu!',
+            'file_excel.mimes'    => 'Format file harus berupa .xlsx, .xls, atau .csv!',
+        ]);
 
+        DB::beginTransaction();
+        try {
+            // 2. Eksekusi proses Import menggunakan class PekerjaImport
+            Excel::import(new PekerjaImport, $request->file('file_excel'));
+            
+            DB::commit(); // Simpan permanen ke database jika sukses semua
+            
+            return redirect()->back()->with('success', 'Data Pekerja berhasil di-import ke sistem!');
+            
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            DB::rollBack(); // Batalkan semua proses jika ada yang gagal
+            
+            // Opsional: Anda bisa melihat detail errornya dengan $e->failures()
+            return redirect()->back()->with('error', 'Terjadi kesalahan format pada baris tertentu di Excel. Pastikan format sesuai template.');
+            
+        } catch (\Exception $e) {
+            DB::rollBack(); // Batalkan semua proses jika ada error umum
+            
+            return redirect()->back()->with('error', 'Gagal memproses file: ' . $e->getMessage());
+        }
+    }
 
 
 }
