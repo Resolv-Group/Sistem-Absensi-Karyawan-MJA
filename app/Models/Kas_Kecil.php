@@ -10,10 +10,12 @@ class Kas_Kecil extends Model
 
     protected $fillable = [
         'id_unit',
+        'akun',
         'tanggal',
         'keterangan',
         'debit',
         'kredit',
         'nota',
+        'status',
     ];
 }

@@ -16,10 +16,13 @@ return new class extends Migration
 
             $table->foreignId('id_unit')->constrained('unit')->cascadeOnDelete();
             $table->string('nama_barang');
+            $table->string('keterangan')->nullable();
             $table->integer('jumlah')->default(0);
-            $table->year('tahun_perolehan');
+            $table->date('tahun_perolehan');
             $table->unsignedBigInteger('harga_perolehan')->default(0);
             $table->string('lokasi');
+
+            $table->integer('status')->default(1);
 
             $table->timestamps();
         });

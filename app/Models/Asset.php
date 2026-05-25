@@ -11,9 +11,11 @@ class Asset extends Model
     protected $fillable = [
         'id_unit',
         'nama_barang',
+        'keterangan',
         'jumlah',
         'tahun_perolehan',
         'harga_perolehan',
         'lokasi',
+        'status',
     ];
 }

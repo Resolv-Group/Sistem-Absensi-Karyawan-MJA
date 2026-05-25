@@ -15,10 +15,13 @@ return new class extends Migration
             $table->id();
 
             $table->foreignId('id_unit')->constrained('unit')->cascadeOnDelete();
-            $table->string('tanggal');
+            $table->string('akun');
+            $table->date('tanggal');
             $table->text('keterangan')->nullable();
             $table->unsignedInteger('debit')->default(0);
             $table->unsignedInteger('kredit')->default(0);
+
+            $table->integer('status')->default(1);
 
             $table->timestamps();
         });
