@@ -10,6 +10,8 @@ use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Imports\BoronganImport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class BoronganController extends Controller
 {
@@ -324,6 +326,44 @@ class BoronganController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Terjadi kesalahan saat memperbarui data: ' . $e->getMessage());
+        }
+    }
+
+    public function importExcel(Request $request)
+    {
+        // 1. Validasi File Excel
+        $request->validate([
+            'file_excel' => 'required|mimes:xlsx,xls,csv|max:10240', // Maksimal 10MB
+        ], [
+            'file_excel.required' => 'Pilih file Excel terlebih dahulu!',
+            'file_excel.mimes'    => 'Format file harus berupa .xlsx, .xls, atau .csv!',
+        ]);
+
+        // Gunakan Transaction agar jika terjadi error di tengah jalan, 
+        // data Kategori/Satuan yang terlanjur terbuat akan di-rollback (dibatalkan)
+        DB::beginTransaction();
+        try {
+            
+            // 2. Eksekusi Import
+            // Catatan: Jika form Anda memiliki input 'id_unit', panggil seperti ini:
+            // Excel::import(new BoronganImport($request->id_unit), $request->file('file_excel'));
+
+            $idUnit = $request->id_unit; 
+            
+            // Jika tidak ada 'id_unit' dari form, gunakan yang ini:
+            Excel::import(new BoronganImport($idUnit), $request->file('file_excel'));
+            
+            DB::commit(); // Simpan permanen ke database
+            
+            return redirect()->back()->with('success', 'Data Borongan beserta Kategori & Satuan berhasil di-import!');
+            
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Terjadi kesalahan format pada Excel. Pastikan format sesuai template.');
+            
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Gagal memproses file: ' . $e->getMessage());
         }
     }
 }
