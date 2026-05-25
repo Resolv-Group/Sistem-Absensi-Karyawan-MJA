@@ -5,11 +5,12 @@
 
         {{-- 1. HEADER SECTION (Unchanged) --}}
         @php
-            $isComplete = $unit->persentase_management_fee !== null &&
-            $unit->bpjs_kesehatan !== null &&
-            $unit->bpjs_naker !== null &&
-            $unit->umk !== null &&
-            $unit->tunjangan !== null;
+            $isComplete =
+                $unit->persentase_management_fee !== null &&
+                $unit->bpjs_kesehatan !== null &&
+                $unit->bpjs_naker !== null &&
+                $unit->umk !== null &&
+                $unit->tunjangan !== null;
         @endphp
         <div class="mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div>
@@ -57,30 +58,30 @@
                 </button>
             </div>
 
-            
+
         </div>
-        
+
         {{-- Note --}}
-        @if(!$isComplete)
+        @if (!$isComplete)
             <div class="mt-4 bg-yellow-50 border border-yellow-100 p-4 rounded-xl">
                 <p class="text-sm text-yellow-600 font-medium">*Harap perbarui unit ini sebelum menambahkan karyawan.</p>
-            
+
                 {{-- //list yang belum di isi  --}}
                 <p class="mt-2 text-sm text-yellow-600 font-medium">List yang belum diisi:</p>
                 <ul class="list-disc pl-6">
-                    @if($unit->persentase_management_fee == null)
+                    @if ($unit->persentase_management_fee == null)
                         <li class="text-sm text-yellow-600">Persentase Management Fee</li>
                     @endif
-                    @if($unit->bpjs_kesehatan == null)
+                    @if ($unit->bpjs_kesehatan == null)
                         <li class="text-sm text-yellow-600">BPJS Kesehatan</li>
                     @endif
-                    @if($unit->bpjs_naker == null)
+                    @if ($unit->bpjs_naker == null)
                         <li class="text-sm text-yellow-600">BPJS Naker</li>
                     @endif
-                    @if($unit->umk == null)
+                    @if ($unit->umk == null)
                         <li class="text-sm text-yellow-600">UMK</li>
                     @endif
-                    @if($unit->tunjangan == null)
+                    @if ($unit->tunjangan == null)
                         <li class="text-sm text-yellow-600">Tunjangan</li>
                     @endif
                 </ul>
@@ -91,7 +92,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10 mt-4">
 
             {{-- LEFT: Unit Profile --}}
-            <div class="lg:col-span-1">
+            <div class="lg:col-span-1" x-data="unitManager">
                 <div
                     class="bg-white rounded-[1.5rem] shadow-sm border border-gray-200 overflow-hidden h-full flex flex-col">
                     {{-- Banner Section --}}
@@ -228,19 +229,21 @@
                             <div class="h-8 w-px bg-slate-200"></div>
                             <div class="text-right">
                                 <p class="text-[9px] font-black text-slate-400 uppercase tracking-tighter">Mgmt Fee</p>
-                                <p class="text-sm font-black text-emerald-600">{{ $unit->persentase_management_fee ?? 0 }}%</p>
+                                <p class="text-sm font-black text-emerald-600">
+                                    {{ $unit->persentase_management_fee ?? 0 }}%</p>
                             </div>
                         </div>
 
                         {{-- 4. SAFE ACTIONS --}}
-                        <div class="mt-8" x-data="{}">
+                        <div class="mt-8">
                             @if ($unit->sistem_pengajian == 1)
                                 {{-- Layout untuk Sistem Harian (2 Tombol) --}}
                                 <div class="grid grid-cols-2 gap-3">
                                     <button type="button"
                                         onclick="checkUnitRequirements('{{ route('view.tambah.unit-pekerja', $unit->id) }}')"
                                         class="flex items-center justify-center gap-2 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-blue-500 hover:text-blue-600 transition active:scale-95 shadow-sm">
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
                                                 d="M12 4v16m8-8H4" />
                                         </svg>
@@ -255,6 +258,28 @@
                                         </svg>
                                         Unit
                                     </a>
+
+                                    {{-- Kas Kecil Trigger --}}
+                                    <button type="button" @click="open('kas')"
+                                        class="flex items-center justify-center gap-2 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-emerald-500 hover:text-emerald-600 transition shadow-sm">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        Kas Kecil
+                                    </button>
+
+                                    {{-- Asset Trigger --}}
+                                    <button type="button" @click="open('asset')"
+                                        class="flex items-center justify-center gap-2 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-blue-500 hover:text-blue-600 transition shadow-sm">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                        </svg>
+                                        Asset Unit
+                                    </button>
                                 </div>
                             @else
                                 {{-- Layout untuk Sistem Borongan (3 Tombol) --}}
@@ -281,6 +306,27 @@
                                             </svg>
                                             Borongan
                                         </button>
+
+                                        {{-- Kas Kecil Button --}}
+                                        <button type="button" @click="open('kas')"
+                                            class="flex items-center justify-center gap-2 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-emerald-500 hover:text-emerald-600 transition shadow-sm">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            Kas Kecil
+                                        </button>
+
+                                        <button type="button" @click="open('asset')"
+                                            class="flex items-center justify-center gap-2 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-blue-500 hover:text-blue-600 transition shadow-sm">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                                    d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                            </svg>
+                                            Asset Unit
+                                        </button>
                                     </div>
                                     <a href="{{ route('view.ubah.unit', $unit->id) }}"
                                         class="w-full flex items-center justify-center gap-2 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-blue-500 hover:text-blue-600 transition active:scale-95 shadow-sm">
@@ -293,6 +339,7 @@
                                     </a>
                                 </div>
                             @endif
+
                         </div>
                     </div>
 
@@ -308,6 +355,764 @@
                             class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] group-hover:text-blue-600">Lihat
                             MOU</span>
                     </a>
+                </div>
+
+                {{-- DYNAMIC CRUD MODAL --}}
+                <div x-show="showModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6" x-cloak>
+                    {{-- Overlay --}}
+                    <div x-show="showModal" x-transition.opacity @click="showModal = false"
+                        class="absolute inset-0 bg-slate-900/80 backdrop-blur-md"></div>
+
+                    <div x-show="showModal" x-transition:enter="transition ease-out duration-300"
+                        x-transition:enter-start="opacity-0 translate-y-8 scale-95"
+                        x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                        class="relative w-full max-w-4xl bg-white rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+
+                        {{-- HEADER --}}
+                        <div class="px-8 py-6 border-b border-slate-100 flex items-center justify-between"
+                            :class="activeType === 'kas' ? 'bg-emerald-50/50' : 'bg-blue-50/50'">
+                            <div>
+                                <h3 class="text-xl font-black text-slate-800 tracking-tight flex items-center gap-2">
+                                    <span
+                                        x-text="activeType === 'kas' ? 'Manajemen Kas Kecil' : 'Manajemen Asset Unit'"></span>
+                                </h3>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                {{-- Toggle Button --}}
+                                <button @click="view === 'list' ? openForm() : view = 'list'"
+                                    class="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all"
+                                    :class="view === 'list' ? 'bg-slate-800 text-white shadow-lg' :
+                                        'bg-slate-100 text-slate-500'">
+                                    <span x-text="view === 'list'  ? '+ Tambah Baru' : '← Lihat Daftar'"></span>
+                                </button>
+                                {{-- Close Button --}}
+                                <button @click="showModal = false"
+                                    class="p-2 text-slate-400 hover:text-rose-500 transition">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        {{-- CONTENT: LIST VIEW --}}
+                        <div x-show="view === 'list' && activeType === 'kas'"
+                            class="flex-1 overflow-y-auto p-4 bg-slate-50/30" x-transition>
+                            <table class="w-full text-left border-separate border-spacing-y-3">
+                                <thead>
+                                    <tr class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                                        <th class="px-4 py-2 w-10 text-center">
+                                            {{-- Select All logic using the $kasIds from Controller --}}
+                                            <input type="checkbox" @click="toggleSelectAll({{ json_encode($kasIds) }})"
+                                                :checked="selectedRows.length === {{ count($kasIds) }} && {{ count($kasIds) }} >
+                                                    0"
+                                                class="rounded-md border-slate-200 text-emerald-600 focus:ring-emerald-500 cursor-pointer">
+                                        </th>
+                                        <th class="px-4 py-2 w-32">Tanggal</th>
+                                        <th class="px-4 py-2 w-32">Akun</th>
+                                        <th class="px-4 py-2">Deskripsi</th>
+                                        <th class="px-4 py-2 text-right">Debit</th>
+                                        <th class="px-4 py-2 text-right">Kredit</th>
+                                        <th class="px-4 py-2 text-right">Saldo</th>
+                                        <th class="px-4 py-2 text-center w-28">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @php $runningSaldo = 0; @endphp
+                                    @forelse($kasKecil as $kas)
+                                        @php $runningSaldo += ($kas->debit - $kas->kredit); @endphp
+
+                                        <tr
+                                            class="group bg-white hover:shadow-xl hover:shadow-slate-200/50 transition-all">
+                                            {{-- Checkbox --}}
+                                            <td
+                                                class="px-4 py-4 rounded-l-2xl border-l border-y border-slate-100 text-center">
+                                                <input type="checkbox" value="{{ $kas->id }}"
+                                                    x-model="selectedRows"
+                                                    class="rounded-md border-slate-200 text-emerald-600 focus:ring-emerald-500 cursor-pointer">
+                                            </td>
+
+                                            {{-- Tanggal --}}
+                                            <td
+                                                class="px-4 py-4 border-y border-slate-100 text-xs font-bold text-slate-500 tracking-tighter">
+                                                {{ \Carbon\Carbon::parse($kas->tanggal)->format('d M Y') }}
+                                            </td>
+
+                                            {{-- Akun --}}
+                                            <td class="px-4 py-4 border-y border-slate-100">
+                                                <p class="text-sm font-black text-slate-800">{{ $kas->akun }}</p>
+                                            </td>
+
+                                            {{-- Deskripsi --}}
+                                            <td class="px-4 py-4 border-y border-slate-100">
+                                                <p class="text-sm font-black text-slate-800">{{ $kas->keterangan }}</p>
+                                                @if ($kas->nota)
+                                                    <a href="{{ route('kas-kecil.nota', $kas->id) }}" target="_blank"
+                                                        class="text-[9px] text-blue-500 font-bold uppercase hover:underline">
+                                                        📂 Lihat Lampiran
+                                                    </a>
+                                                @else
+                                                    <span
+                                                        class="text-[9px] text-slate-300 font-bold uppercase italic">Tanpa
+                                                        Nota</span>
+                                                @endif
+                                            </td>
+
+                                            {{-- Debit --}}
+                                            <td
+                                                class="px-4 py-4 border-y border-slate-100 text-right text-sm font-black {{ $kas->debit > 0 ? 'text-emerald-600' : 'text-slate-300' }}">
+                                                {{ $kas->debit > 0 ? number_format($kas->debit, 0, ',', '.') : '-' }}
+                                            </td>
+
+                                            {{-- Kredit --}}
+                                            <td
+                                                class="px-4 py-4 border-y border-slate-100 text-right text-sm font-black {{ $kas->kredit > 0 ? 'text-rose-600' : 'text-slate-300' }}">
+                                                {{ $kas->kredit > 0 ? number_format($kas->kredit, 0, ',', '.') : '-' }}
+                                            </td>
+
+                                            {{-- Running Saldo --}}
+                                            <td
+                                                class="px-4 py-4 border-y border-slate-100 text-right text-sm font-black text-slate-800 italic">
+                                                {{ number_format($runningSaldo, 0, ',', '.') }}
+                                            </td>
+
+                                            {{-- Actions --}}
+                                            <td
+                                                class="px-4 py-4 rounded-r-2xl border-r border-y border-slate-100 text-center">
+                                                <div
+                                                    class="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-all transform group-hover:scale-100 scale-90">
+                                                    {{-- Edit Button --}}
+                                                    <button @click="editEntries([{{ $kas->id }}])"
+                                                        title="Edit Transaksi"
+                                                        class="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-600 hover:text-white transition">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                            viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                        </svg>
+                                                    </button>
+                                                    {{-- Delete Button --}}
+                                                    <button
+                                                        onclick="confirmDeleteKas({{ $kas->id }}, {{ $unit->id }})"
+                                                        title="Hapus"
+                                                        class="p-2 bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-600 hover:text-white transition">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                            viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="8" class="py-20 text-center">
+                                                <div class="flex flex-col items-center opacity-20">
+                                                    <svg class="w-16 h-16 mb-4" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="1"
+                                                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                                    </svg>
+                                                    <p class="font-black uppercase tracking-widest text-sm">Belum ada
+                                                        transaksi</p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {{-- CONTENT: LIST VIEW (ASSET) --}}
+                        <div x-show="view === 'list' && activeType === 'asset'"
+                            class="flex-1 overflow-y-auto p-6 bg-slate-50/30" x-transition>
+
+                            <table class="w-full text-left border-separate border-spacing-y-3">
+                                <thead>
+                                    <tr class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                                        <th class="px-4 py-2 w-10 text-center">
+                                            {{-- Use Asset IDs for selection --}}
+                                            <input type="checkbox"
+                                                @click="toggleSelectAll({{ json_encode($assets->pluck('id')) }})"
+                                                :checked="selectedRows.length === {{ $assets->count() }} &&
+                                                    {{ $assets->count() }} > 0"
+                                                class="rounded-md border-slate-200 text-blue-600 focus:ring-blue-500 cursor-pointer">
+                                        </th>
+                                        <th class="px-4 py-2 w-12 text-center">No.</th>
+                                        <th class="px-4 py-2">Informasi Barang</th>
+                                        <th class="px-4 py-2 text-center">Qty</th>
+                                        <th class="px-4 py-2 text-center">Perolehan</th>
+                                        <th class="px-4 py-2 text-right">Nilai Asset (Rp)</th>
+                                        <th class="px-4 py-2 text-center">Lokasi</th>
+                                        <th class="px-4 py-2 text-center w-28">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse($assets as $a)
+                                        <tr
+                                            class="group bg-white hover:shadow-xl hover:shadow-blue-900/5 transition-all duration-300">
+                                            {{-- 1. Checkbox --}}
+                                            <td
+                                                class="px-4 py-4 rounded-l-2xl border-l border-y border-slate-100 text-center">
+                                                <input type="checkbox" value="{{ $a->id }}"
+                                                    x-model="selectedRows"
+                                                    class="rounded-md border-slate-200 text-blue-600 focus:ring-blue-500 cursor-pointer">
+                                            </td>
+
+                                            {{-- 2. Index --}}
+                                            <td class="px-4 py-4 border-y border-slate-100 text-center">
+                                                <span
+                                                    class="text-xs font-bold text-slate-300">#{{ $loop->iteration }}</span>
+                                            </td>
+
+                                            {{-- 3. Nama & Keterangan (Grouped) --}}
+                                            <td class="px-4 py-4 border-y border-slate-100">
+                                                <p class="text-sm font-black text-slate-800 leading-tight">
+                                                    {{ $a->nama_barang }}</p>
+                                                @if ($a->keterangan)
+                                                    <p
+                                                        class="text-[9px] text-slate-400 font-bold uppercase mt-1 tracking-tighter">
+                                                        {{ $a->keterangan }}</p>
+                                                @else
+                                                    <p
+                                                        class="text-[9px] text-slate-300 italic mt-1 uppercase tracking-tighter">
+                                                        No Description</p>
+                                                @endif
+                                            </td>
+
+                                            {{-- 4. Jumlah (Badge Style) --}}
+                                            <td class="px-4 py-4 border-y border-slate-100 text-center">
+                                                <span
+                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-black bg-blue-50 text-blue-600 border border-blue-100">
+                                                    {{ $a->jumlah }}
+                                                </span>
+                                            </td>
+
+                                            {{-- 5. Tahun Perolehan --}}
+                                            <td class="px-4 py-4 border-y border-slate-100 text-center">
+                                                <div
+                                                    class="text-[10px] font-black text-slate-500 uppercase tracking-widest bg-slate-100 px-2 py-1 rounded-md inline-block">
+                                                    {{ \Carbon\Carbon::parse($a->tahun_perolehan)->format('Y') }}
+                                                </div>
+                                            </td>
+
+                                            {{-- 6. Harga --}}
+                                            <td class="px-4 py-4 border-y border-slate-100 text-right">
+                                                <p class="text-sm font-black text-slate-700">
+                                                    {{ number_format($a->harga_perolehan, 0, ',', '.') }}
+                                                </p>
+                                            </td>
+
+                                            {{-- 7. Lokasi (Badge Style) --}}
+                                            <td class="px-4 py-4 border-y border-slate-100 text-center">
+                                                <span class="text-[10px] font-black uppercase text-slate-600">
+                                                    <svg class="w-3 h-3 inline-block mb-0.5 mr-0.5 text-slate-400"
+                                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                    </svg>
+                                                    {{ $a->lokasi }}
+                                                </span>
+                                            </td>
+
+                                            {{-- 8. Actions (Hover Reveal) --}}
+                                            <td
+                                                class="px-4 py-4 rounded-r-2xl border-r border-y border-slate-100 text-center">
+                                                <div
+                                                    class="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-all transform group-hover:scale-100 scale-90">
+                                                    <button @click="editEntries([{{ $a->id }}])"
+                                                        title="Edit Asset"
+                                                        class="p-2 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-600 hover:text-white transition shadow-sm">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                            viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                        </svg>
+                                                    </button>
+                                                    <button
+                                                        onclick="confirmDeleteAsset({{ $a->id }}, {{ $unit->id }})"
+                                                        title="Hapus Asset"
+                                                        class="p-2 bg-rose-50 text-rose-600 rounded-xl hover:bg-rose-600 hover:text-white transition shadow-sm">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                            viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="8" class="py-24 text-center">
+                                                <div class="flex flex-col items-center opacity-20">
+                                                    <svg class="w-16 h-16 mb-4" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="1"
+                                                            d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                                    </svg>
+                                                    <p class="font-black uppercase tracking-widest text-sm">Belum ada asset
+                                                        terdaftar</p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {{-- CONTENT: FORM VIEW (Multiple Rows) --}}
+                        <div x-show="view === 'form'" class="flex flex-col h-full overflow-hidden bg-slate-50/50">
+
+                            {{-- FIXED SUB-HEADER --}}
+                            <div
+                                class="px-8 py-4 bg-white border-b border-slate-100 flex justify-between items-center shadow-sm z-10">
+                                <div class="flex items-center gap-4">
+                                    <span
+                                        class="px-3 py-1 bg-slate-100 text-slate-500 rounded-lg text-[10px] font-black uppercase tracking-widest">
+                                        Draft: <span x-text="entries.length" class="text-slate-800"></span> Transaksi
+                                    </span>
+                                </div>
+                                <button type="button" @click="addRow()"
+                                    class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-700 transition shadow-lg shadow-blue-200">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                            d="M12 4v16m8-8H4" />
+                                    </svg>
+                                    Tambah Baris Baru
+                                </button>
+                            </div>
+
+                            {{-- SCROLLABLE FORM AREA --}}
+                            <div class="flex-1 overflow-y-auto p-8 custom-scrollbar">
+                                <form
+                                    :action="activeType === 'kas'
+                                        ?
+                                        (isEdit ? '{{ route('update.kas-kecil', $unit->id) }}' :
+                                            '{{ route('tambah.kas-kecil.post', $unit->id) }}') :
+                                        (isEdit ? '{{ route('update.asset', $unit->id) }}' :
+                                            '{{ route('tambah.asset.post', $unit->id) }}')"
+                                    method="POST" enctype="multipart/form-data" id="bulkForm">
+                                    @csrf
+                                    {{-- Laravel needs this to handle Update requests --}}
+                                    <template x-if="isEdit">
+                                        <input type="hidden" name="_method" value="PUT">
+                                    </template>
+
+                                    <template x-for="(entry, index) in entries" :key="index">
+                                        <div
+                                            class="relative p-8 bg-white rounded-[2.5rem] border border-slate-200 mb-8 transition-all hover:shadow-2xl hover:shadow-slate-200/50 group">
+
+                                            <input type="hidden" :name="activeType + '[' + index + '][id]'"
+                                                x-model="entry.id">
+
+                                            {{-- Badge & Floating Remove Button --}}
+                                            <div
+                                                class="absolute -top-3 left-8 px-4 py-1 bg-slate-800 text-white text-[9px] font-black uppercase tracking-widest rounded-full shadow-lg">
+                                                <span
+                                                    x-text="isEdit ? 'Update Item ID: ' + entry.id : 'Item #' + (index + 1)"></span>
+                                            </div>
+
+                                            <button type="button" x-show="entries.length > 1" @click="removeRow(index)"
+                                                class="absolute -top-3 -right-3 p-2 bg-rose-500 text-white rounded-full shadow-lg hover:scale-110 transition group-hover:rotate-90">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                            </button>
+
+                                            {{-- FORM FIELDS --}}
+                                            <template x-if="activeType === 'kas'">
+                                                <div class="space-y-6">
+                                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                        <div>
+                                                            <label
+                                                                class="block text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Tanggal</label>
+                                                            <input type="date" :name="'kas[' + index + '][tgl]'"
+                                                                x-model="entry.tgl"
+                                                                class="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-blue-500/10 focus:bg-white transition-all">
+                                                        </div>
+                                                        <div>
+                                                            <label
+                                                                class="block text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1 text-blue-600">File
+                                                                Lampiran / Nota</label>
+                                                            <input type="file" :name="'kas[' + index + '][nota]'"
+                                                                x-model="entry.nota"
+                                                                class="w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-blue-50 file:text-blue-600">
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <label
+                                                            class="block text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Akun</label>
+                                                        <input type="text" :name="'kas[' + index + '][akun]'"
+                                                            x-model="entry.akun" placeholder="Ketik akun di sini..."
+                                                            class="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-blue-500/10 focus:bg-white transition-all">
+                                                    </div>
+                                                    <div>
+                                                        <label
+                                                            class="block text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Deskripsi
+                                                            Transaksi</label>
+                                                        <input type="text" :name="'kas[' + index + '][ket]'"
+                                                            x-model="entry.keterangan"
+                                                            placeholder="Ketik keterangan di sini..."
+                                                            class="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-blue-500/10 focus:bg-white transition-all">
+                                                    </div>
+                                                    <div class="grid grid-cols-2 gap-6">
+                                                        {{-- DEBIT INPUT --}}
+                                                        <div
+                                                            class="p-6 bg-emerald-50/50 rounded-3xl border border-emerald-100 transition-all focus-within:border-emerald-400 focus-within:bg-white">
+                                                            <span
+                                                                class="text-[9px] font-black text-emerald-600 block mb-2 uppercase tracking-widest">Debit
+                                                                (Uang Masuk)</span>
+                                                            <div class="relative flex items-center">
+                                                                <span
+                                                                    class="text-sm font-black text-emerald-400 mr-2">Rp</span>
+                                                                <input type="text" x-model="entry.debit_display"
+                                                                    @input="handleRupiahInput(index, 'debit')"
+                                                                    placeholder="0"
+                                                                    class="w-full bg-transparent border-none p-0 text-xl font-black text-emerald-700 focus:ring-0">
+                                                                {{-- Hidden input to send raw number to Laravel --}}
+                                                                <input type="hidden" :name="'kas[' + index + '][debit]'"
+                                                                    :value="entry.debit">
+                                                            </div>
+                                                        </div>
+
+                                                        {{-- KREDIT INPUT --}}
+                                                        <div
+                                                            class="p-6 bg-rose-50/50 rounded-3xl border border-rose-100 transition-all focus-within:border-rose-400 focus-within:bg-white">
+                                                            <span
+                                                                class="text-[9px] font-black text-rose-600 block mb-2 uppercase tracking-widest">Kredit
+                                                                (Uang Keluar)</span>
+                                                            <div class="relative flex items-center">
+                                                                <span
+                                                                    class="text-sm font-black text-rose-400 mr-2">Rp</span>
+                                                                <input type="text" x-model="entry.kredit_display"
+                                                                    @input="handleRupiahInput(index, 'kredit')"
+                                                                    placeholder="0"
+                                                                    class="w-full bg-transparent border-none p-0 text-xl font-black text-rose-700 focus:ring-0">
+                                                                {{-- Hidden input to send raw number to Laravel --}}
+                                                                <input type="hidden" :name="'kas[' + index + '][kredit]'"
+                                                                    :value="entry.kredit">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </template>
+                                            {{-- ASSET FORM TEMPLATE --}}
+                                            <template x-if="activeType === 'asset'">
+                                                <div class="space-y-6">
+                                                    {{-- Row 1: Nama Barang --}}
+                                                    <div>
+                                                        <label
+                                                            class="block text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Nama
+                                                            Asset / Barang</label>
+                                                        <input type="text" :name="'asset[' + index + '][nama_barang]'"
+                                                            x-model="entry.nama_barang"
+                                                            placeholder="Contoh: Laptop MacBook Pro, Genset Honda..."
+                                                            required
+                                                            class="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-blue-500/10 focus:bg-white transition-all">
+                                                    </div>
+
+                                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                                        {{-- Jumlah --}}
+                                                        <div>
+                                                            <label
+                                                                class="block text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Jumlah
+                                                                (Qty)</label>
+                                                            <input type="number" :name="'asset[' + index + '][jumlah]'"
+                                                                x-model="entry.jumlah" min="1"
+                                                                class="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-blue-500/10 focus:bg-white transition-all">
+                                                        </div>
+                                                        {{-- Tanggal Perolehan --}}
+                                                        <div>
+                                                            <label
+                                                                class="block text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Tgl
+                                                                Perolehan</label>
+                                                            <input type="date"
+                                                                :name="'asset[' + index + '][tgl_perolehan]'"
+                                                                x-model="entry.tgl_perolehan" required
+                                                                class="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-blue-500/10 focus:bg-white transition-all">
+                                                        </div>
+                                                        {{-- Keterangan --}}
+                                                        <div>
+                                                            <label
+                                                                class="block text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Keterangan</label>
+                                                            <input type="text"
+                                                                :name="'asset[' + index + '][keterangan]'"
+                                                                x-model="entry.keterangan"
+                                                                class="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-blue-500/10 focus:bg-white transition-all">
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                        {{-- Harga Satuan --}}
+                                                        <div
+                                                            class="p-6 bg-blue-50/30 rounded-3xl border border-blue-100 focus-within:bg-white transition-all">
+                                                            <span
+                                                                class="text-[9px] font-black text-blue-600 block mb-2 uppercase tracking-widest">Harga
+                                                                Perolehan</span>
+                                                            <div class="flex items-center">
+                                                                <span
+                                                                    class="text-sm font-black text-blue-400 mr-2">Rp</span>
+                                                                <input type="text" x-model="entry.harga_display"
+                                                                    @input="handleRupiahInput(index, 'harga')"
+                                                                    placeholder="0"
+                                                                    class="w-full bg-transparent border-none p-0 text-xl font-black text-blue-700 focus:ring-0">
+                                                            </div>
+                                                            <input type="hidden" :name="'asset[' + index + '][harga]'"
+                                                                :value="entry.harga">
+                                                        </div>
+
+                                                        {{-- Lokasi --}}
+                                                        <div
+                                                            class="p-6 bg-slate-50 rounded-3xl border border-slate-100 focus-within:bg-white transition-all">
+                                                            <span
+                                                                class="text-[9px] font-black text-slate-400 block mb-2 uppercase tracking-widest">Lokasi
+                                                                Penempatan</span>
+                                                            <input type="text" :name="'asset[' + index + '][lokasi]'"
+                                                                x-model="entry.lokasi"
+                                                                placeholder="Contoh: Gudang Barat, Office Lt. 2..."
+                                                                class="w-full bg-transparent border-none p-0 text-sm font-bold text-slate-700 focus:ring-0">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </template>
+                                </form>
+                            </div>
+
+                            {{-- FIXED FOOTER SUMMARY DASHBOARD --}}
+                            <div class="px-8 py-6 bg-white border-t border-slate-100 flex flex-col md:flex-row items-center justify-between gap-6 shadow-[0_-10px_30px_rgba(0,0,0,0.03)]"
+                                x-cloak>
+
+                                {{-- Totals Area (Dynamic labels based on activeType) --}}
+                                <div class="flex flex-wrap gap-8">
+                                    {{-- COLUMN 1: Total Debit / Total Barang --}}
+                                    <div class="text-left">
+                                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1"
+                                            x-text="footerTotals.label1"></p>
+                                        <p class="text-base font-black"
+                                            :class="activeType === 'kas' ? 'text-emerald-600' : 'text-blue-600'">
+                                            <span x-show="footerTotals.isMoney1">Rp </span>
+                                            <span x-text="formatRupiah(footerTotals.val1)"></span>
+                                        </p>
+                                    </div>
+
+                                    {{-- COLUMN 2: Total Kredit / Total Perolehan --}}
+                                    <div class="text-left border-l border-slate-100 pl-8">
+                                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1"
+                                            x-text="footerTotals.label2"></p>
+                                        <p class="text-base font-black"
+                                            :class="activeType === 'kas' ? 'text-rose-600' : 'text-slate-800'">
+                                            Rp <span x-text="formatRupiah(footerTotals.val2)"></span>
+                                        </p>
+                                    </div>
+
+                                    {{-- COLUMN 3: Saldo (KAS ONLY) --}}
+                                    <div class="text-left border-l border-slate-100 pl-8"
+                                        x-show="footerTotals.label3 !== null">
+                                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1"
+                                            x-text="footerTotals.label3"></p>
+                                        <p class="text-base font-black text-slate-800"
+                                            :class="footerTotals.val3 < 0 ? 'text-rose-500' : 'text-slate-800'">
+                                            Rp <span x-text="formatRupiah(footerTotals.val3)"></span>
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <button type="submit" form="bulkForm"
+                                        class="flex items-center gap-3 px-10 py-5 bg-slate-900 text-white text-[11px] font-black uppercase tracking-[0.2em] rounded-2xl hover:bg-black transition active:scale-95 shadow-xl shadow-slate-200">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M5 13l4 4L19 7" />
+                                        </svg>
+                                        <span
+                                            x-text="isEdit ? 'Update Data' : 'Simpan ' + (activeType === 'kas' ? 'Transaksi' : 'Asset')"></span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- CONTENT: EXPORT SETTINGS (The Signature Form) --}}
+                        <div x-show="view === 'export_settings'"
+                            class="flex-1 flex flex-col h-full overflow-hidden bg-slate-50/50" x-transition>
+
+                            {{-- 1. HEADER (Fixed) --}}
+                            <div
+                                class="px-8 py-6 bg-white border-b border-slate-100 flex items-center justify-between shadow-sm z-20">
+                                <div class="flex items-center gap-4">
+                                    <button @click="view = 'list'"
+                                        class="group p-2 bg-slate-50 rounded-full hover:bg-slate-900 transition-all duration-300">
+                                        <svg class="w-5 h-5 text-slate-400 group-hover:text-white" fill="none"
+                                            stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                                d="M15 19l-7-7 7-7" />
+                                        </svg>
+                                    </button>
+                                    <div>
+                                        <h4 class="font-black text-slate-800 uppercase tracking-widest text-[11px]">
+                                            Konfigurasi Laporan</h4>
+                                        <p class="text-[9px] text-slate-400 font-bold uppercase tracking-tighter">Langkah
+                                            Terakhir sebelum Generate</p>
+                                    </div>
+                                </div>
+                                <div
+                                    class="px-3 py-1 bg-blue-50 text-blue-600 rounded-lg text-[10px] font-black uppercase tracking-widest border border-blue-100">
+                                    Format: <span x-text="exportFormat"></span>
+                                </div>
+                            </div>
+
+                            {{-- 2. BODY (Scrollable) --}}
+                            <div class="flex-1 overflow-y-auto p-10 custom-scrollbar">
+                                <div class="max-w-md mx-auto">
+                                    {{-- Icon Illustration --}}
+                                    <div class="text-center mb-12">
+                                        <div class="relative inline-block">
+                                            <div
+                                                class="w-24 h-24 bg-blue-600 text-white rounded-[2.5rem] flex items-center justify-center mx-auto mb-4 shadow-2xl shadow-blue-200 transform rotate-3">
+                                                <svg class="w-12 h-12" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="1.5"
+                                                        d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                                </svg>
+                                            </div>
+                                            {{-- Decorative Badge --}}
+                                            <div
+                                                class="absolute -bottom-2 -right-2 bg-emerald-500 text-white p-2 rounded-full shadow-lg border-4 border-white">
+                                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                                                    stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                                        d="M5 13l4 4L19 7" />
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        <h3 class="text-xl font-black text-slate-800 mt-4">Tanda Tangan Laporan</h3>
+                                        <p
+                                            class="text-xs text-slate-400 font-bold leading-relaxed max-w-[280px] mx-auto uppercase tracking-tighter mt-2">
+                                            Lengkapi nama penanggung jawab untuk bagian pengesahan dokumen.
+                                        </p>
+                                    </div>
+
+                                    {{-- SIGNATURE FORM --}}
+                                    <form action="{{ route('export.kas-kecil', $unit->id) }}" method="post"
+                                        enctype="multipart/form-data" id="exportFinalForm" target="_blank">
+                                        @csrf
+                                        <template x-for="id in selectedRows" :key="id">
+                                            <input type="hidden" name="kasKecilIds[]" :value="id">
+                                        </template>
+                                        <input type="hidden" name="format" :value="exportFormat">
+
+                                        <div class="space-y-8">
+                                            <div class="group">
+                                                <label
+                                                    class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1 group-focus-within:text-blue-500 transition-colors">Diajukan
+                                                    Oleh (Staff)</label>
+                                                <input type="text" name="diajukan" x-model="approvals.diajukan"
+                                                    placeholder="Masukkan nama pengaju..." required
+                                                    class="w-full px-7 py-5 bg-white border border-slate-100 rounded-[1.5rem] text-sm font-bold shadow-sm focus:ring-[12px] focus:ring-blue-500/5 focus:border-blue-400 focus:bg-white transition-all outline-none">
+                                            </div>
+                                            <div class="group">
+                                                <label
+                                                    class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1 group-focus-within:text-blue-500 transition-colors">Diperiksa
+                                                    Oleh (Manager)</label>
+                                                <input type="text" name="diperiksa" x-model="approvals.diperiksa"
+                                                    placeholder="Masukkan nama atasan..." required
+                                                    class="w-full px-7 py-5 bg-white border border-slate-100 rounded-[1.5rem] text-sm font-bold shadow-sm focus:ring-[12px] focus:ring-blue-500/5 focus:border-blue-400 focus:bg-white transition-all outline-none">
+                                            </div>
+                                            <div class="group">
+                                                <label
+                                                    class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1 group-focus-within:text-blue-500 transition-colors">Disetujui
+                                                    Oleh (Accounting)</label>
+                                                <input type="text" name="disetujui" x-model="approvals.disetujui"
+                                                    placeholder="Masukkan nama penyetuju..." required
+                                                    class="w-full px-7 py-5 bg-white border border-slate-100 rounded-[1.5rem] text-sm font-bold shadow-sm focus:ring-[12px] focus:ring-blue-500/5 focus:border-blue-400 focus:bg-white transition-all outline-none">
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            {{-- 3. FOOTER (Fixed & Premium Spacing) --}}
+                            <div
+                                class="px-10 py-10 bg-white border-t border-slate-100 flex items-center justify-between shadow-[0_-15px_50px_rgba(0,0,0,0.04)] z-20">
+                                <div class="hidden md:block">
+                                    <p class="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">Dokumen
+                                        Siap</p>
+                                    <p class="text-xs font-bold text-slate-500">Laporan Kas Kecil Unit</p>
+                                </div>
+
+                                <button type="submit" form="exportFinalForm"
+                                    @click="setTimeout(() => showModal = false, 800)"
+                                    class="group relative flex items-center gap-4 px-14 py-6 bg-slate-900 text-white text-[12px] font-black uppercase tracking-[0.3em] rounded-[2rem] hover:bg-black hover:px-16 transition-all duration-300 shadow-2xl shadow-slate-300 active:scale-95">
+                                    <span class="relative z-10">Generate Report</span>
+                                    <svg class="w-5 h-5 relative z-10 group-hover:translate-x-2 transition-transform duration-300"
+                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                            d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                    </svg>
+                                    {{-- Shine effect overlay --}}
+                                    <div
+                                        class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000">
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+
+                        <form id="exportAssetForm" action="{{ route('export.asset', $unit->id) }}" method="POST"
+                            target="_blank" style="display:none;">
+                            @csrf
+                            <template x-for="id in selectedRows">
+                                <input type="hidden" name="assetIds[]" :value="id">
+                            </template>
+                            <input type="hidden" name="format" value="excel">
+                        </form>
+                    </div>
+                </div>
+
+                <div x-show="showModal && view === 'list' && selectedRows.length > 0" x-cloak
+                    x-transition:enter="transition ease-out duration-300"
+                    x-transition:enter-start="opacity-0 translate-y-20" x-transition:enter-end="opacity-100 translate-y-0"
+                    class="fixed bottom-8 left-1/2 -translate-x-1/2 z-[200] w-[40%] bg-white rounded-xl shadow-2xl text-slate-600 px-8 py-4 shadow-[0_20px_50px_rgba(0,0,0,0.3)] border border-white/10 flex items-center gap-8 backdrop-blur-xl">
+                    <div class="flex items-center gap-4 border-r border-slate-200 pr-8">
+                        <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center font-black text-sm text-white shadow-lg shadow-blue-500/20"
+                            x-text="selectedRows.length"></div>
+                        <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Data Terpilih</p>
+                    </div>
+                    <div class="flex items-center gap-4 justify-between">
+                        <button @click="editEntries(selectedRows)"
+                            class="px-6 py-2 bg-blue-500 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-blue-600 transition shadow-lg">
+                            Ubah Terpilih
+                        </button>
+
+                        {{-- Dynamic Delete Button --}}
+                        <button type="button"
+                            @click="activeType === 'kas' ? confirmDeleteKas(selectedRows, {{ $unit->id }}) : confirmDeleteAsset(selectedRows, {{ $unit->id }})"
+                            class="px-6 py-2 bg-rose-500/10 text-rose-500 text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-rose-500 hover:text-white transition">
+                            Hapus Terpilih
+                        </button>
+
+                        {{-- Download Excel Button --}}
+                        <button type="button" @click="openExportSettings('excel')"
+                            class="px-6 py-2 bg-green-500/10 text-green-500 text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-green-500 hover:text-white transition">
+                            Export Excel (<span x-text="selectedRows.length"></span>)
+                        </button>
+                    </div>
+
                 </div>
             </div>
 
@@ -510,7 +1315,7 @@
                                     <span class="text-[11px] font-black text-slate-400 uppercase tracking-widest">BPJS
                                         Kesehatan</span>
                                 </div>
-                                <p class="text-sm font-black text-slate-800">{{ $unit->bpjs_kesehatan ?? 0}}% <span
+                                <p class="text-sm font-black text-slate-800">{{ $unit->bpjs_kesehatan ?? 0 }}% <span
                                         class="text-[9px] text-slate-300 font-bold ml-1 uppercase">UMK</span></p>
                             </div>
 
@@ -526,8 +1331,9 @@
                                     <span class="text-[11px] font-black text-slate-400 uppercase tracking-widest">BPJS
                                         Tenaga Kerja</span>
                                 </div>
-                                <p class="text-sm font-black text-slate-800 text-right">{{ $unit->bpjs_naker ?? 0 }}% <span
-                                        class="text-[9px] text-slate-300 font-bold ml-1 uppercase">UMK</span></p>
+                                <p class="text-sm font-black text-slate-800 text-right">{{ $unit->bpjs_naker ?? 0 }}%
+                                    <span class="text-[9px] text-slate-300 font-bold ml-1 uppercase">UMK</span>
+                                </p>
                             </div>
 
                             {{-- Mulai Kerjasama --}}
@@ -741,6 +1547,287 @@
             } else {
                 window.location.href = url;
             }
+        }
+
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('unitManager', () => ({
+                showModal: false,
+                activeType: 'kas',
+                view: 'list',
+                entries: [],
+                selectedRows: [],
+                isEdit: false,
+
+                allData: {!! json_encode($kasKecil, JSON_INVALID_UTF8_SUBSTITUTE) !!},
+                allDataAsset: {!! json_encode($assets ?? [], JSON_INVALID_UTF8_SUBSTITUTE) !!},
+
+                open(type) {
+                    this.activeType = type;
+                    this.view = 'list';
+                    this.showModal = true;
+                    this.selectedRows = [];
+                    this.isEdit = false;
+                },
+
+                openExportSettings(format) {
+                    this.exportFormat = format;
+
+                    if (this.activeType === 'kas') {
+                        // Kas Kecil needs signatures, show the extra view
+                        this.view = 'export_settings';
+                    } else {
+                        // Assets go straight to download
+                        this.$nextTick(() => {
+                            document.getElementById('exportAssetForm').submit();
+                        });
+                    }
+                },
+
+                approvals: {
+                    diajukan: '',
+                    diperiksa: '',
+                    disetujui: ''
+                },
+                exportFormat: 'excel', // 'pdf' or 'excel'
+
+                openForm() {
+                    this.isEdit = false;
+                    this.view = 'form';
+                    this.entries = [this.getEmptyRow()];
+                },
+
+                editEntries(ids) {
+                    this.isEdit = true;
+                    this.view = 'form';
+
+                    // Map the selected IDs to their full data objects based on activeType
+                    this.entries = ids.map(id => {
+                        if (this.activeType === 'kas') {
+                            const item = this.allData.find(d => d.id == id);
+                            return {
+                                id: item.id,
+                                tgl: item.tanggal,
+                                akun: item.akun,
+                                keterangan: item.keterangan,
+                                debit: item.debit,
+                                kredit: item.kredit,
+                                debit_display: this.formatRupiah(item.debit),
+                                kredit_display: this.formatRupiah(item.kredit),
+                            };
+                        } else {
+                            // ASSET MAPPING
+                            const item = this.allDataAsset.find(d => d.id == id);
+                            return {
+                                id: item.id,
+                                nama_barang: item.nama_barang,
+                                jumlah: item.jumlah,
+                                tgl_perolehan: item
+                                    .tahun_perolehan, // mapping DB field to form field
+                                keterangan: item.keterangan,
+                                harga: item.harga_perolehan, // mapping DB field to form field
+                                harga_display: this.formatRupiah(item.harga_perolehan),
+                                lokasi: item.lokasi
+                            };
+                        }
+                    });
+                },
+
+
+
+                getEmptyRow() {
+                    if (this.activeType === 'kas') {
+                        return {
+                            tgl: '',
+                            keterangan: '',
+                            debit: 0,
+                            kredit: 0,
+                            debit_display: '',
+                            kredit_display: '',
+                            akun: '',
+                            nota: ''
+                        };
+                    } else {
+                        return {
+                            id: null,
+                            nama_barang: '',
+                            jumlah: 1,
+                            harga: 0,
+                            harga_display: '',
+                            tahun_perolehan: '',
+                            lokasi: '',
+                            status: 0,
+                        };
+                    }
+                },
+
+                addRow() {
+                    this.entries.push(this.getEmptyRow());
+                },
+                removeRow(index) {
+                    if (this.entries.length > 1) this.entries.splice(index, 1);
+                },
+
+                // REAL-TIME RUPIAH FORMATTER FOR INPUTS
+                handleRupiahInput(index, field) {
+                    // 1. Get the value and strip everything except numbers
+                    let rawValue = this.entries[index][field + '_display'].replace(/\D/g, '');
+
+                    // 2. Store the raw number for calculations
+                    this.entries[index][field] = Number(rawValue) || 0;
+
+                    // 3. Format the display with dots
+                    this.entries[index][field + '_display'] = new Intl.NumberFormat('id-ID').format(
+                        rawValue);
+
+                    // 4. If input is empty, reset display
+                    if (rawValue === '') this.entries[index][field + '_display'] = '';
+                },
+
+                // Selection Helpers
+                toggleSelectAll(allIds) {
+                    if (this.selectedRows.length === allIds.length) {
+                        this.selectedRows = [];
+                    } else {
+                        this.selectedRows = allIds;
+                    }
+                },
+
+                // FOOTER TOTALS
+                get footerTotals() {
+                    if (this.activeType === 'kas') {
+                        let d = this.entries.reduce((sum, e) => sum + (e.debit || 0), 0);
+                        let k = this.entries.reduce((sum, e) => sum + (e.kredit || 0), 0);
+                        return {
+                            label1: 'Total Debit',
+                            val1: d,
+                            label2: 'Total Kredit',
+                            val2: k,
+                            label3: 'Saldo Baru',
+                            val3: d - k,
+                            isMoney1: true // Show "Rp"
+                        };
+                    } else {
+                        let q = this.entries.reduce((sum, e) => sum + (Number(e.jumlah) || 0), 0);
+                        let v = this.entries.reduce((sum, e) => sum + ((e.harga || 0)),
+                            0);
+                        return {
+                            label1: 'Total Barang',
+                            val1: q,
+                            label2: 'Total Perolehan',
+                            val2: v,
+                            label3: null, // This will trigger hiding the column
+                            val3: 0,
+                            isMoney1: false // Don't show "Rp" for quantity
+                        };
+                    }
+                },
+
+                formatRupiah(number) {
+                    return new Intl.NumberFormat('id-ID').format(number);
+                }
+            }))
+        });
+
+        function confirmDeleteKas(ids, unitId) {
+            const isBulk = Array.isArray(ids);
+            const count = isBulk ? ids.length : 1;
+
+            Swal.fire({
+                title: 'Hapus Data?',
+                text: `Apakah Anda yakin ingin menghapus ${count} transaksi ini?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444', // Tailwind red-500
+                cancelButtonColor: '#64748b', // Tailwind slate-500
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal',
+                customClass: {
+                    popup: 'rounded-[2rem]',
+                    confirmButton: 'rounded-xl px-6 py-3',
+                    cancelButton: 'rounded-xl px-6 py-3'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Perform the DELETE request
+                    fetch(`/unit/${unitId}/kas-kecil/destroy`, {
+                            method: 'DELETE',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                ids: ids
+                            })
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Terhapus!',
+                                text: data.message,
+                                showConfirmButton: false,
+                                timer: 1500,
+                                customClass: {
+                                    popup: 'rounded-[2rem]'
+                                }
+                            }).then(() => {
+                                location.reload(); // Reload to refresh the list
+                            });
+                        })
+                        .catch(() => {
+                            Swal.fire('Error', 'Terjadi kesalahan sistem', 'error');
+                        });
+                }
+            });
+        }
+
+        function confirmDeleteAsset(ids, unitId) {
+            const isBulk = Array.isArray(ids);
+            const count = isBulk ? ids.length : 1;
+
+            Swal.fire({
+                title: 'Hapus Asset?',
+                text: `Hapus ${count} barang dari inventaris unit?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal',
+                customClass: {
+                    popup: 'rounded-[2rem]',
+                    confirmButton: 'rounded-xl px-6 py-3',
+                    cancelButton: 'rounded-xl px-6 py-3'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/unit/${unitId}/asset/destroy`, {
+                            method: 'DELETE',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                ids: ids
+                            })
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Terhapus!',
+                                text: data.message,
+                                showConfirmButton: false,
+                                timer: 1500,
+                                customClass: {
+                                    popup: 'rounded-[2rem]'
+                                }
+                            }).then(() => location.reload());
+                        });
+                }
+            });
         }
     </script>
 @endsection

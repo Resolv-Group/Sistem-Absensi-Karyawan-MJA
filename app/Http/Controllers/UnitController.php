@@ -2,25 +2,26 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Asset;
 use App\Models\Borongan;
 use App\Models\Divisi;
 use App\Models\History;
 use App\Models\JabatanPKWT;
+use App\Models\Kas_Kecil;
 use App\Models\Kategori;
-use App\Models\Unit;
-use Illuminate\Http\Request;
-use App\Models\Staff;
-use Illuminate\Database\QueryException;
 use App\Models\MitraKerja;
 use App\Models\Pekerja;
 use App\Models\PicUnit;
 use App\Models\PKWT;
-use App\Models\Shift_Absen;
+use App\Models\Staff;
+use App\Models\Unit;
+use Illuminate\Database\QueryException;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class UnitController extends Controller
 {
-    function viewUnitMain(Request $request)
+    public function viewUnitMain(Request $request)
     {
         // --- 1. CALCULATE STATS (Top Cards) ---
         $totalUnit = Unit::count(); // total pekerja
@@ -86,7 +87,7 @@ class UnitController extends Controller
         return view('Unit.CRUD.tambah-unit', compact('picList', 'mitraKerjaList'));
     }
 
-    function tambahUnit(Request $request)
+    public function tambahUnit(Request $request)
     {
         try {
             $request->validate(
@@ -133,7 +134,6 @@ class UnitController extends Controller
                 ],
             );
 
-
             // ✅ Upload dokumen
             $dokumen = null;
             if ($request->hasFile('dokumen_mou')) {
@@ -173,7 +173,7 @@ class UnitController extends Controller
 
             return redirect()
                 ->route('view.tambah.unit')
-                ->with('success', 'Data Unit ' . $unit->nama_mitra . ' berhasil ditambahkan.');
+                ->with('success', 'Data Unit '.$unit->nama_mitra.' berhasil ditambahkan.');
         } catch (QueryException $e) {
             // Tangani error database dan kirim ke front-end melalui session error
             return back()
@@ -199,9 +199,8 @@ class UnitController extends Controller
             })
             ->exists();
 
-        if(in_array($user->role, ['admin', 'hrd']))
-        {}
-        elseif(! $isAllowed ) {
+        if (in_array($user->role, ['admin', 'hrd'])) {
+        } elseif (! $isAllowed) {
             abort(403, 'Anda tidak memiliki akses ke unit ini');
         }
 
@@ -228,6 +227,7 @@ class UnitController extends Controller
                 }
 
                 $borongan = $query->get();
+
                 return view('Unit.partials.borongan-table', compact('borongan', 'unit'))->render();
             }
 
@@ -260,6 +260,7 @@ class UnitController extends Controller
             }
 
             $pkwtPekerja = $query->get();
+
             return view('Unit.partials.harian-table', compact('pkwtPekerja', 'unit'))->render();
         }
 
@@ -281,7 +282,13 @@ class UnitController extends Controller
         $boronganKategori = Kategori::all();
         $jabatan = JabatanPKWT::all();
 
-        return view('Unit.detail-unit', compact('unit', 'historiUnit', 'pekerja', 'pkwtPekerja', 'borongan', 'divisions', 'boronganKategori', 'jabatan'));
+        $kasKecil = Kas_Kecil::where('id_unit', $id)->where('status', 1)->orderBy('tanggal', 'asc')->get();
+        $kasIds = $kasKecil->pluck('id')->toArray();
+
+        $assets = Asset::where('id_unit', $id)->where('status', 1)->orderBy('tahun_perolehan', 'asc')->get();
+        $assetIds = $assets->pluck('id')->toArray();
+
+        return view('Unit.detail-unit', compact('unit', 'historiUnit', 'pekerja', 'pkwtPekerja', 'borongan', 'divisions', 'boronganKategori', 'jabatan', 'kasKecil', 'kasIds', 'assets', 'assetIds'));
     }
 
     public function showDokumenMOU($id, Request $request)
@@ -290,7 +297,7 @@ class UnitController extends Controller
         $data = Unit::findOrFail($id);
 
         // 2. Check if blob exists
-        if (!$data->dokumen_mou) {
+        if (! $data->dokumen_mou) {
             abort(404, 'Dokumen tidak ditemukan.');
         }
 
@@ -303,19 +310,19 @@ class UnitController extends Controller
         $disposition = $request->has('download') ? 'attachment' : 'inline';
 
         // Generate a filename
-        $filename = 'dokumen-mitra-' . $id;
+        $filename = 'dokumen-mitra-'.$id;
 
         // 5. Return the binary data as a proper HTTP response
         return response($data->dokumen_mou)
             ->header('Content-Type', $mimeType)
-            ->header('Content-Disposition', $disposition . '; filename="' . $filename . '"');
+            ->header('Content-Disposition', $disposition.'; filename="'.$filename.'"');
     }
 
     public function showDokumenPKWT($id, Request $request)
     {
         $data = PKWT::findOrFail($id);
 
-        if (!$data->dokumen_pkwt) {
+        if (! $data->dokumen_pkwt) {
             abort(404, 'Dokumen tidak ditemukan.');
         }
 
@@ -324,14 +331,14 @@ class UnitController extends Controller
 
         $disposition = $request->has('download') ? 'attachment' : 'inline';
 
-        $filename = 'dokumen-pkwt-' . $id;
+        $filename = 'dokumen-pkwt-'.$id;
 
         return response($data->dokumen_pkwt)
             ->header('Content-Type', $mimeType)
-            ->header('Content-Disposition', $disposition . '; filename="' . $filename . '"');
+            ->header('Content-Disposition', $disposition.'; filename="'.$filename.'"');
     }
 
-    function ubahUnit(Request $request, $id)
+    public function ubahUnit(Request $request, $id)
     {
         $user = auth()->user(); // staff login
 
@@ -342,9 +349,8 @@ class UnitController extends Controller
             })
             ->exists();
 
-        if(in_array($user->role, ['admin', 'hrd']))
-        {}
-        elseif(! $isAllowed ) {
+        if (in_array($user->role, ['admin', 'hrd'])) {
+        } elseif (! $isAllowed) {
             abort(403, 'Anda tidak memiliki akses ke unit ini');
         }
 
@@ -359,7 +365,7 @@ class UnitController extends Controller
         return view('Unit.CRUD.ubah-unit', compact('unit', 'mitraKerjaList', 'selectedPicIds', 'picList'));
     }
 
-    function updateUnit(Request $request, $id)
+    public function updateUnit(Request $request, $id)
     {
         // dd($request->all());
         try {
@@ -447,20 +453,23 @@ class UnitController extends Controller
 
             // dd($unit);
             DB::commit();
+
             return redirect()->route('view.detail.unit', $unit->id)->with('success', 'Data unit berhasil diperbarui.');
         } catch (QueryException $e) {
             DB::rollBack();
+
             return back()
                 ->withInput()
                 ->withErrors([
-                    'database' => 'Terjadi kesalahan database: ' . $e->getMessage(),
+                    'database' => 'Terjadi kesalahan database: '.$e->getMessage(),
                 ]);
         } catch (\Exception $e) {
             DB::rollBack();
+
             return back()
                 ->withInput()
                 ->withErrors([
-                    'general' => 'Terjadi kesalahan sistem: ' . $e->getMessage(),
+                    'general' => 'Terjadi kesalahan sistem: '.$e->getMessage(),
                 ]);
         }
     }
@@ -469,7 +478,7 @@ class UnitController extends Controller
     {
         $unit = Unit::findOrFail($id);
 
-        $unit->status_aktif = !$unit->status_aktif;
+        $unit->status_aktif = ! $unit->status_aktif;
         $unit->save();
 
         return response()->json([
@@ -477,4 +486,211 @@ class UnitController extends Controller
         ]);
     }
 
+    public function storeBulkKas(Request $request, $id)
+    {
+        $dataEntries = $request->input('kas');
+
+        if (! $dataEntries || ! is_array($dataEntries)) {
+            return back()->with('error', 'Tidak ada data untuk disimpan.');
+        }
+
+        $savedCount = 0; // Better to count what is actually saved
+
+        foreach ($dataEntries as $index => $entry) {
+            // FIX: Match the key 'ket' from your dd()
+            if (empty($entry['tgl']) || empty($entry['ket'])) {
+                continue;
+            }
+
+            $filePath = null;
+            if ($request->hasFile("kas.$index.nota")) {
+                $file = $request->file("kas.$index.nota");
+
+                $filePath = file_get_contents($file->getRealPath());
+            }
+
+            // Use the correct keys here too
+            Kas_Kecil::create([
+                'id_unit' => $id,
+                'akun' => $entry['akun'],
+                'tanggal' => $entry['tgl'],
+                'keterangan' => $entry['ket'],   // Match 'ket' from form
+                'debit' => $entry['debit'],
+                'kredit' => $entry['kredit'],
+                'nota' => $filePath,
+            ]);
+
+            $savedCount++;
+        }
+
+        if ($savedCount === 0) {
+            return back()->with('error', 'Gagal menyimpan data. Pastikan semua kolom terisi.');
+        }
+
+        return back()->with('success', "Berhasil menyimpan $savedCount transaksi.");
+    }
+
+    public function updateBulkKas(Request $request, $id_unit)
+    {
+        // dump($request->all());
+        $dataEntries = $request->input('kas');
+        // dd($dataEntries);
+
+        if (! $dataEntries || ! is_array($dataEntries)) {
+            return back()->with('error', 'Tidak ada data untuk diperbarui.');
+        }
+
+        foreach ($dataEntries as $index => $entry) {
+            // Find the specific record by the ID sent in the hidden input
+            $kas = Kas_Kecil::where('id', $entry['id'])
+                ->where('id_unit', $id_unit)
+                ->first();
+
+            if ($kas) {
+                $updateData = [
+                    'tanggal' => $entry['tgl'],
+                    'akun' => $entry['akun'],
+                    'keterangan' => $entry['ket'],
+                    'debit' => $entry['debit'],
+                    'kredit' => $entry['kredit'],
+                    'updated_at' => now(),
+                ];
+
+                // Handle file upload only if a new file is selected
+                if ($request->hasFile("kas.$index.nota")) {
+                    $file = $request->file("kas.$index.nota");
+                    $updateData['nota'] = file_get_contents($file->getRealPath());
+                }
+
+                $kas->update($updateData);
+            }
+        }
+
+        return back()->with('success', 'Berhasil memperbarui '.count($dataEntries).' transaksi.');
+    }
+
+    public function showKasNota($id, Request $request)
+    {
+        $data = Kas_Kecil::findOrFail($id);
+
+        if (! $data->nota) {
+            abort(404, 'Nota tidak ditemukan.');
+        }
+
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $mimeType = $finfo->buffer($data->nota);
+        $disposition = $request->has('download') ? 'attachment' : 'inline';
+        $filename = 'nota-kecil-'.$id;
+
+        return response($data->nota)
+            ->header('Content-Type', $mimeType)
+            ->header('Content-Disposition', "$disposition; filename=\"$filename\"");
+    }
+
+    public function destroyKasKecil(Request $request, $id_unit)
+    {
+        // Ensure ids is always an array
+        $ids = is_array($request->ids) ? $request->ids : [$request->ids];
+
+        if (empty($ids)) {
+            return response()->json(['message' => 'Tidak ada data terpilih'], 400);
+        }
+
+        // Update status to 0 for the selected IDs belonging to this unit
+        Kas_Kecil::whereIn('id', $ids)
+            ->where('id_unit', $id_unit)
+            ->update(['status' => 0]);
+
+        return response()->json(['message' => 'Data berhasil dihapus']);
+    }
+
+    public function exportKasKecil(Request $request, $id)
+    {
+        dd($request->all());
+    }
+
+    public function storeBulkAsset(Request $request, $id)
+    {
+        $dataEntries = $request->input('asset');
+
+        if (! $dataEntries || ! is_array($dataEntries)) {
+            return back()->with('error', 'Tidak ada data untuk disimpan.');
+        }
+
+        $savedCount = 0;
+
+        foreach ($dataEntries as $index => $entry) {
+            // FIX: Match the key 'tgl_perolehan' from your Blade form
+            if (empty($entry['tgl_perolehan']) || empty($entry['nama_barang'])) {
+                continue;
+            }
+            // Map the form data to your database columns
+            Asset::create([
+                'id_unit' => $id,
+                'nama_barang' => $entry['nama_barang'],
+                'keterangan' => $entry['keterangan'] ?? '-',
+                'jumlah' => $entry['jumlah'] ?? 1,
+                'tahun_perolehan' => $entry['tgl_perolehan'], // Form uses 'tgl_perolehan'
+                'harga_perolehan' => $entry['harga'] ?? 0,    // Form uses 'harga'
+                'lokasi' => $entry['lokasi'] ?? '-',
+                'status' => 1, // Aktif
+            ]);
+
+            $savedCount++;
+        }
+
+        if ($savedCount === 0) {
+            return back()->with('error', 'Gagal menyimpan data. Pastikan Nama Barang dan Tanggal terisi.');
+        }
+
+        return back()->with('success', "Berhasil menyimpan $savedCount asset.");
+    }
+
+    public function updateBulkAsset(Request $request, $id)
+    {
+        $dataEntries = $request->input('asset');
+
+        if (! $dataEntries || ! is_array($dataEntries)) {
+            return back()->with('error', 'Tidak ada data asset untuk diperbarui.');
+        }
+
+        foreach ($dataEntries as $index => $entry) {
+            $asset = Asset::where('id', $entry['id'])
+                ->where('id_unit', $id)
+                ->first();
+
+            if ($asset) {
+                $updateData = [
+                    'nama_barang' => $entry['nama_barang'],
+                    'jumlah' => $entry['jumlah'],
+                    'tahun_perolehan' => $entry['tgl_perolehan'],
+                    'keterangan' => $entry['keterangan'],
+                    'harga_perolehan' => $entry['harga'],
+                    'lokasi' => $entry['lokasi'],
+                    'updated_at' => now(),
+                ];
+
+                $asset->update($updateData);
+            }
+        }
+
+        return back()->with('success', 'Berhasil memperbarui '.count($dataEntries).' data asset.');
+    }
+
+    public function destroyAsset(Request $request, $id_unit)
+    {
+        $ids = is_array($request->ids) ? $request->ids : [$request->ids];
+
+        \App\Models\Asset::whereIn('id', $ids)
+            ->where('id_unit', $id_unit)
+            ->update(['status' => 0]); // Soft delete logic
+
+        return response()->json(['message' => 'Asset berhasil dihapus']);
+    }
+
+    public function exportAsset(Request $request, $id_unit)
+    {
+        dd($request->all());
+
+    }
 }
