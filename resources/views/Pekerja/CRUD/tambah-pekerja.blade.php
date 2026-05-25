@@ -268,7 +268,7 @@
 
 
                         {{-- Status Perkawinan --}}
-                        <div x-data="{ open: false, selected: '{{ old('status_kawin') }}' || '', list: ['Belum Menikah', 'Menikah'] }" class="relative">
+                        <div x-data="{ open: false, selected: '{{ old('status_kawin') }}' || '', list: ['TK', 'K'] }" class="relative">
                             <label class="block text-sm font-bold text-gray-700 mb-1">Status Perkawinan</label>
 
                             <input type="hidden" name="status_kawin" x-model="selected">

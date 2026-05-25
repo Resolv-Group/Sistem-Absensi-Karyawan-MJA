@@ -55,7 +55,7 @@ return new class extends Migration
             $table->string('hubungan_emergency', 50);
             $table->string('telp_emergency', 30);
 
-            $table->string('ibu_kandung', 150);
+            $table->string('ibu_kandung', 150)->nullable();
 
             $table->timestamps();
         });

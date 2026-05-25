@@ -169,6 +169,9 @@ Route::middleware(['auth', 'role:pic,admin'])->group(function(){
 });
 
 Route::middleware(['auth', 'role:hrd,pic,admin,head_supervisor'])->group(function(){
+    //Import Pekerja-Borongan
+    Route::post('/pekerja/import', [PekerjaController::class, 'importExcel'])->name('pekerja.import');
+    Route::post('/borongan/import', [BoronganController::class, 'importExcel'])->name('borongan.import');
     //Unit -> Main - Detail
     //Filtered
     Route::get('/unit/detail/{id}', [UnitController::class, 'viewDetailUnit'])->name('view.detail.unit');

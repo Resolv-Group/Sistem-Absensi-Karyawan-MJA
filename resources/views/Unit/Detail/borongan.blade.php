@@ -229,6 +229,26 @@
                     </div>
                 </div>
 
+                <form action="{{ route('borongan.import') }}" method="POST" enctype="multipart/form-data" class="inline-block">
+                    @csrf
+                    
+                    {{-- Mengirimkan id_unit secara otomatis berdasarkan unit yang sedang dibuka --}}
+                    <input type="hidden" name="id_unit" value="{{ $unit->id }}">
+                    
+                    <label class="cursor-pointer px-4 py-2 bg-orange-600 text-white text-xs font-bold rounded-lg hover:bg-orange-700 transition flex items-center gap-2 shadow-sm">
+                        
+                        {{-- Icon Upload (Panah Atas) --}}
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                        </svg>
+                        
+                        Import Borongan
+                        
+                        {{-- Input File tersembunyi, langsung upload saat file dipilih --}}
+                        <input type="file" name="file_excel" class="hidden" accept=".xlsx, .xls, .csv" onchange="this.form.submit()">
+                    </label>
+                </form>
+
                 <button type="button"
                     onclick="checkUnitRequirements('{{ route('view.tambah.unit-borongan', $unit->id) }}')"
                     class="px-4 py-2 bg-orange-600 text-white text-xs font-bold rounded-lg hover:bg-orange-700 transition flex items-center gap-2 shadow-sm">
