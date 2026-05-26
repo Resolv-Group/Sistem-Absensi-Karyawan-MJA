@@ -260,7 +260,7 @@ class PKWTController extends Controller
                 'pekerja.*.days.*' => 'nullable|numeric|min:0|max:24',
                 'pekerja.*.dokumen_pkwt' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
             ]);
-
+            
             // Ambil PKWT
             $pkwt = PKWT::where('id', $pkwtId)->where('id_unit', $unitId)->firstOrFail();
 
