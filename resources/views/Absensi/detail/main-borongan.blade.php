@@ -48,11 +48,14 @@
     {{-- Error Alert Section --}}
     @if ($errors->any())
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
-            <div class="bg-red-50 border border-red-100 rounded-[2rem] p-5 shadow-sm shadow-red-100/50 flex items-start gap-4">
+            <div
+                class="bg-red-50 border border-red-100 rounded-[2rem] p-5 shadow-sm shadow-red-100/50 flex items-start gap-4">
                 {{-- Icon Container --}}
-                <div class="flex-shrink-0 w-10 h-10 bg-white rounded-2xl shadow-sm border border-red-100 flex items-center justify-center">
+                <div
+                    class="flex-shrink-0 w-10 h-10 bg-white rounded-2xl shadow-sm border border-red-100 flex items-center justify-center">
                     <svg class="w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                 </div>
 
@@ -69,7 +72,8 @@
                 </div>
 
                 {{-- Close Button (Optional) --}}
-                <button onclick="this.parentElement.parentElement.remove()" class="text-red-400 hover:text-red-600 transition-colors">
+                <button onclick="this.parentElement.parentElement.remove()"
+                    class="text-red-400 hover:text-red-600 transition-colors">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -90,45 +94,45 @@
         workerMap: @js($workerMap),
         rowItems: @js($existingBorongan),
         barangLookup: @js($barangLookup),
-
+    
         // --- Tunjangan ---
         showTunjanganModal: false,
         rowTunjangan: {},
         rowKeteranganTunjangan: {},
-
+    
         // --- Potongan ---
         showPotonganModal: false,
         rowPotongan: {},
         rowKeteranganPotongan: {},
-
+    
         currentIndex: 0,
         // Computed property to get current worker ID
         get currentWorkerId() {
             return this.selectedItems[this.currentIndex];
         },
-
+    
         formatRibuan(number) {
             if (!number) return '0';
             return new Intl.NumberFormat('id-ID').format(number);
         },
-
+    
         updatePrices(workerId, rIdx) {
             const row = this.rowItems[workerId][rIdx];
             const item = this.barangLookup[row.id_barang];
-
+    
             if (item && (row.max_rej_subkon === undefined || row.max_rej_subkon === null)) {
                 row.max_rej_subkon = item.max_rej_subkon;
             }
-
+    
             // 1. Calculate the current Total QTY
             const totalQTY = (parseInt(row.FD) || 0) +
                 (parseInt(row.act_rej) || 0) +
                 (parseInt(row.good_mc) || 0);
             row.totalQTY = totalQTY;
-
+    
             // 2. Hitung Max Reject yang Diizinkan (F9 di rumus Anda)
             row.act_rej_max = Math.round((row.max_rej_subkon / 100) * totalQTY);
-
+    
             // 3. Hitung Rej. MC Dibebankan (Rumus: =IF(F9>=G9;0;G9-F9))
             // F9 = row.act_rej_max | G9 = row.act_rej
             if (row.act_rej_max >= row.act_rej) {
@@ -136,13 +140,13 @@
             } else {
                 row.rej_mc_dibebankan = row.act_rej - row.act_rej_max;
             }
-
+    
             const totalBayar = row.FD + row.good_mc - row.rej_mc_dibebankan;
-
+    
             if (item && totalQTY > 0) {
                 // rumus: totalQTY * harga_unit
                 row.bayaranPerusahaan = totalBayar * item.harga_unit;
-
+    
                 // rumus: totalQTY * harga_pekerja
                 row.bayaranItem = totalBayar * item.harga_pekerja;
             } else {
@@ -151,10 +155,10 @@
                 row.bayaranItem = 0;
             }
         },
-
+    
         calculateAllExistingPrices() {
             if (!this.rowItems) return;
-
+    
             // Loop through every worker in the existing data
             Object.keys(this.rowItems).forEach(workerId => {
                 // Loop through every row for that worker
@@ -163,21 +167,21 @@
                 });
             });
         },
-
+    
         // Function to add a new row for a worker
         addBoronganRow(workerId) {
             if (!this.rowItems) this.rowItems = {};
             if (!this.rowItems[workerId]) this.rowItems[workerId] = [];
-
+    
             // Batasi jumlah baris berdasarkan jumlah barang yang tersedia
             const totalBarangTersedia = {{ count($barangs) }};
-
+    
             if (this.rowItems[workerId].length >= totalBarangTersedia) {
                 // Opsional: Anda bisa mengganti alert ini dengan toast notification yang lebih cantik
                 alert('Semua jenis barang sudah ditambahkan untuk pekerja ini.');
                 return;
             }
-
+    
             this.rowItems[workerId].push({
                 id_barang: '',
                 FD: 0,
@@ -194,18 +198,18 @@
                 fileName: null // Pastikan variabel ini konsisten dengan input file Anda
             });
         },
-
+    
         // Track the current page number
         currentPage: {{ $pkwtPekerja->currentPage() }},
-
+    
         allIds: {{ json_encode($pkwtPekerja->pluck('id')) }},
-
+    
         globalMasuk: '08:00',
         globalKeluar: '17:00',
         globalStatus: '6', // default absen
         rowStatus: {},
         rowCatatan: {},
-
+    
         applyGlobalTime() {
             this.selectedItems.forEach(id => {
                 const rowMasuk = document.getElementById('masuk-' + id);
@@ -214,78 +218,190 @@
                 if (rowKeluar) rowKeluar.value = this.globalKeluar;
             });
         },
+    
+        getEmptyRow() {
+            return {
+                id_barang: '',
+                FD: 0,
+                good_mc: 0,
+                act_rej: 0,
+                max_rej_subkon: 0,
+                act_rej_max: 0,
+                rej_mc_dibebankan: 0,
+                bayaranPerusahaan: 0,
+                bayaranItem: 0,
+                totalQTY: 0,
+                catatan: '',
+                fileName: null
+            };
+        },
+    
+        updateGroupPrices(rIdx) {
+            const row = this.groupRows[rIdx];
+            const item = this.barangLookup[row.id_barang];
+            if (item && (row.max_rej_subkon === undefined || row.max_rej_subkon === null)) {
+                row.max_rej_subkon = item.max_rej_subkon;
+            }
+    
+            const totalQTY = (parseInt(row.FD) || 0) + (parseInt(row.act_rej) || 0) + (parseInt(row.good_mc) || 0);
+            row.totalQTY = totalQTY;
+            row.act_rej_max = Math.round((row.max_rej_subkon / 100) * totalQTY);
+            row.rej_mc_dibebankan = row.act_rej_max >= row.act_rej ? 0 : row.act_rej - row.act_rej_max;
+    
+            const totalBayar = (parseInt(row.FD) || 0) + (parseInt(row.good_mc) || 0) - row.rej_mc_dibebankan;
+    
+            if (item && totalQTY > 0) {
+                row.bayaranPerusahaan = totalBayar * item.harga_unit;
+                row.bayaranItem = totalBayar * item.harga_pekerja;
+            } else {
+                row.bayaranPerusahaan = 0;
+                row.bayaranItem = 0;
+            }
+        },
+    
+        initGroupModal() {
+    // Check if first selected worker already has existing borongan data
+    const firstId = this.selectedItems[0];
+    const existingRows = this.rowItems[firstId];
 
+    if (existingRows && existingRows.length > 0 && existingRows[0].id_barang !== '') {
+        // Pre-fill from existing data (editing mode)
+        this.groupRows = JSON.parse(JSON.stringify(existingRows));
+    } else {
+        // Fresh start
+        this.groupRows = [this.getEmptyRow()];
+    }
+
+    // Point every selected worker's rowItems to the SAME groupRows array
+    this.selectedItems.forEach(id => {
+        this.rowItems[id] = this.groupRows;
+    });
+
+    this.showAbsenKelompokModal = true;
+},
+    
+        groupRows: [],
+    
+        // --- ADD THESE FUNCTIONS HERE ---
+        validateAbsen() {
+            const hasStatusHadir = this.selectedItems.some(id => this.rowStatus[id] == 1);
+            if (hasStatusHadir) {
+                Swal.fire({
+                    title: 'Gagal!',
+                    text: 'Terdapat pekerja dengan status Hadir yang belum diubah.',
+                    icon: 'error',
+                    confirmButtonColor: '#EF4444',
+                    customClass: { popup: 'rounded-[2rem]' }
+                });
+                return false;
+            }
+            return true;
+        },
+    
+        confirmSubmitGroup() {
+            if (!this.validateAbsen()) return;
+    
+            const firstId = this.selectedItems[0];
+            const rows = this.rowItems[firstId] || [];
+    
+            if (rows.length === 0 || rows[0].id_barang === '') {
+                Swal.fire({
+                    title: 'Data Kosong',
+                    text: 'Silakan pilih minimal satu barang untuk input kelompok.',
+                    icon: 'error',
+                    confirmButtonColor: '#EF4444',
+                    customClass: { popup: 'rounded-[2rem]' }
+                });
+                return;
+            }
+    
+            Swal.fire({
+                title: 'Simpan Data Kelompok?',
+                text: `Data ini akan diterapkan ke ${this.selectedItems.length} pekerja.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#EA580C',
+                confirmButtonText: 'Ya, Terapkan Semua',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.showLoading();
+                    this.$refs.groupForm.submit();
+                }
+            });
+        },
+    
+    
+    
         initStatusModal() {
             // Buat salinan objek baru untuk memicu reaktivitas
             let newStatus = { ...this.rowStatus };
             let newCatatan = { ...this.rowCatatan };
-
+    
             this.selectedItems.forEach(id => {
                 // Set default ke '2' (Cuti) jika datanya belum ada
                 if (!newStatus[id]) newStatus[id] = '2';
                 if (!newCatatan[id]) newCatatan[id] = '';
             });
-
+    
             this.rowStatus = newStatus;
             this.rowCatatan = newCatatan;
             this.showAbsenStatusModal = true;
         },
-
+    
         applyGlobalStatus() {
             this.selectedItems.forEach(id => {
                 this.rowStatus[id] = this.globalStatus;
             });
         },
-
+    
         toggleAll() {
             this.selectedItems = this.selectedItems.length === this.allIds.length ? [] : [...this.allIds];
         },
-
+    
         canShowTunjangan() {
             if (this.selectedItems.length === 0) return false;
             return this.selectedItems.every(id => {
                 return this.workerMap[id] && this.workerMap[id].has_absen === true;
             });
         },
-
+    
         canShowPotongan() {
             if (this.selectedItems.length === 0) return false;
             return this.selectedItems.every(id => {
                 return this.workerMap[id] && this.workerMap[id].has_absen === true;
             });
         },
-
+    
         initTunjanganModal() {
             // Data default dari Unit (Global)
             const unitConfig = (window.unitInfo && window.unitInfo.tunjanganConfig) ? window.unitInfo.tunjanganConfig : {};
             this.currentIndex = 0;
-
+    
             this.selectedItems.forEach(id => {
                 const worker = this.workerMap[id];
-
+    
                 if (!this.rowTunjangan[id]) {
                     let finalData = {};
-
+    
                     // 1. PRIORITAS UTAMA: Data yang sudah tersimpan di database untuk hari ini (Existing)
                     if (worker && worker.existing_tunjangan) {
                         finalData = JSON.parse(JSON.stringify(worker.existing_tunjangan));
                         this.rowKeteranganTunjangan[id] = worker.existing_keterangan_tunjangan || '';
-                    } 
-                    else {
+                    } else {
                         // 2. PRIORITAS KEDUA: Data dari Kontrak PKWT (Spesifik per pekerja)
                         // 3. PRIORITAS KETIGA: Data dari Config Unit (Global)
-                        
+    
                         // Cek apakah pkwt_tunjangan ada isinya
                         const hasPkwtData = worker.pkwt_tunjangan && Object.keys(worker.pkwt_tunjangan).length > 0;
                         const baseSource = hasPkwtData ? worker.pkwt_tunjangan : unitConfig;
-
+    
                         // Transformasi format
                         Object.keys(baseSource).forEach(key => {
                             let val = baseSource[key];
-                            
+    
                             // Handle jika data di PKWT berbentuk angka langsung atau objek
                             let nominalValue = (typeof val === 'object' && val !== null) ? val.nominal : val;
-
+    
                             finalData[key] = {
                                 qty: 1,
                                 nominal: nominalValue
@@ -293,35 +409,35 @@
                         });
                         this.rowKeteranganTunjangan[id] = '';
                     }
-
+    
                     this.rowTunjangan[id] = finalData;
                 }
             });
             this.showTunjanganModal = true;
         },
-
+    
         nextWorker() { if (this.currentIndex < this.selectedItems.length - 1) this.currentIndex++; },
         prevWorker() { if (this.currentIndex > 0) this.currentIndex--; },
-
+    
         calculateCategoryTotal(workerId, key) {
             const item = this.rowTunjangan[workerId][key];
             return (parseInt(item.qty) || 0) * (parseInt(item.nominal) || 0);
         },
-
+    
         calculateWorkerTotal(id) {
             const categories = this.rowTunjangan[id] || {};
             return Object.keys(categories).reduce((sum, key) => sum + this.calculateCategoryTotal(id, key), 0);
         },
-
+    
         calculateGrandTotal() {
             return this.selectedItems.reduce((sum, id) => sum + this.calculateWorkerTotal(id), 0);
         },
-
+    
         initPotonganModal() {
             this.currentIndex = 0;
             this.selectedItems.forEach(id => {
                 const worker = this.workerMap[id];
-
+    
                 // Auto-fill jika ada data lama
                 if (worker && worker.existing_potongan && worker.existing_potongan.length > 0) {
                     this.rowPotongan[id] = JSON.parse(JSON.stringify(worker.existing_potongan));
@@ -334,12 +450,12 @@
             });
             this.showPotonganModal = true;
         },
-
+    
         // Fungsi Tambah Baris Baru
         addPotonganRow(workerId) {
             this.rowPotongan[workerId].push({ nama: '', nominal: 0 });
         },
-
+    
         // Fungsi Hapus Baris
         removePotonganRow(workerId, index) {
             this.rowPotongan[workerId].splice(index, 1);
@@ -348,21 +464,21 @@
                 this.rowPotongan[workerId] = [{ nama: '', nominal: 0 }];
             }
         },
-
+    
         // Hitung total per pekerja
         calculatePotonganWorkerTotal(id) {
             const items = this.rowPotongan[id] || [];
             return items.reduce((sum, item) => sum + (parseInt(item.nominal) || 0), 0);
         },
-
+    
         // Hitung Grand Total (seluruh pekerja terpilih)
         calculatePotonganGrandTotal() {
             return this.selectedItems.reduce((sum, id) => sum + this.calculatePotonganWorkerTotal(id), 0);
         },
-
+    
         async updateTable(targetUrl = null) {
             let url;
-
+    
             if (targetUrl) {
                 // If called from Pagination Link
                 url = new URL(targetUrl);
@@ -373,7 +489,7 @@
             } else {
                 // If called from Typing Search/Filter
                 url = new URL(window.location.href);
-
+    
                 // Logic: If user is typing, we force page 1 to find results.
                 // If user cleared everything, we restore the saved currentPage.
                 if (!this.searchQuery && !this.filterVerifikasi && !this.filterStatus) {
@@ -382,31 +498,31 @@
                     url.searchParams.set('page', '1');
                 }
             }
-
+    
             // Apply all filters to the URL
             url.searchParams.set('search', this.searchQuery);
             url.searchParams.set('status', this.filterStatus);
             url.searchParams.set('statusVerif', this.filterVerifikasi);
-
+    
             try {
                 const response = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
                 const html = await response.text();
-
+    
                 document.getElementById('main-table-body').innerHTML = html;
-
+    
                 // Update the pagination links at the bottom
                 const newPagination = document.getElementById('new-pagination-provider');
                 const paginationContainer = document.getElementById('search-pagination');
                 if (newPagination && paginationContainer) {
                     paginationContainer.innerHTML = newPagination.innerHTML;
                 }
-
+    
                 // Sync IDs for Bulk Actions
                 const provider = document.getElementById('new-ids-provider-full');
                 if (provider) this.allIds = JSON.parse(provider.dataset.ids);
             } catch (error) { console.error(error); }
         },
-
+    
         resetFilters() {
             this.searchQuery = '';
             this.filterStatus = '';
@@ -414,7 +530,7 @@
             // This will trigger the $watch which calls updateTable()
             // Our logic inside updateTable will see filters are empty and restore Page 2
         },
-
+    
     }" x-init="calculateAllExistingPrices();
     $watch('searchQuery', () => updateTable());
     $watch('filterStatus', () => updateTable());
@@ -706,31 +822,36 @@
                             </div>
 
                             {{-- Floating Action Bar --}}
-                            <div x-show="selectedItems.length > 0"
-                                x-transition:enter="transition ease-out duration-300"
+                            <div x-show="selectedItems.length > 0" x-transition:enter="transition ease-out duration-300"
                                 x-transition:enter-start="opacity-0 translate-y-10"
                                 x-transition:enter-end="opacity-100 translate-y-0"
                                 x-transition:leave="transition ease-in duration-200"
                                 x-transition:leave-start="opacity-100 translate-y-0"
                                 x-transition:leave-end="opacity-0 translate-y-10"
-                                class="fixed bottom-8 left-1/2 -translate-x-1/2 z-[60] w-[95%] max-w-4xl" x-cloak>
+                                class="fixed bottom-8 left-1/2 -translate-x-1/2 z-[60] w-[105%] max-w-4xl" x-cloak>
 
-                                <div class="bg-white/70 backdrop-blur-xl border border-white/80 shadow-[0_20px_50px_rgba(0,0,0,0.1)] rounded-[2rem] px-6 py-4 flex items-center justify-between">
+                                <div
+                                    class="bg-white/70 backdrop-blur-xl border border-white/80 shadow-[0_20px_50px_rgba(0,0,0,0.1)] rounded-[2rem] px-6 py-4 flex items-center justify-between">
 
                                     <!-- Left Side: Selection Count & Reset -->
                                     <div class="flex items-center gap-4">
                                         <div class="relative">
-                                            <div class="bg-orange-600 text-white text-[11px] font-black h-8 w-8 rounded-xl shadow-lg shadow-orange-200 flex items-center justify-center">
+                                            <div
+                                                class="bg-orange-600 text-white text-[11px] font-black h-8 w-8 rounded-xl shadow-lg shadow-orange-200 flex items-center justify-center">
                                                 <span x-text="selectedItems.length"></span>
                                             </div>
                                             <div class="absolute -top-1 -right-1 flex h-3 w-3">
-                                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
-                                                <span class="relative inline-flex rounded-full h-3 w-3 bg-orange-500"></span>
+                                                <span
+                                                    class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                                                <span
+                                                    class="relative inline-flex rounded-full h-3 w-3 bg-orange-500"></span>
                                             </div>
                                         </div>
                                         <div class="flex flex-col">
-                                            <span class="text-sm font-black text-slate-800 leading-none">Pekerja Dipilih</span>
-                                            <button type="button" @click="selectedItems = []" class="text-[10px] font-bold text-slate-400 hover:text-rose-500 uppercase tracking-widest mt-1 transition-colors text-left outline-none">
+                                            <span class="text-sm font-black text-slate-800 leading-none">Pekerja
+                                                Dipilih</span>
+                                            <button type="button" @click="selectedItems = []"
+                                                class="text-[10px] font-bold text-slate-400 hover:text-rose-500 uppercase tracking-widest mt-1 transition-colors text-left outline-none">
                                                 Batalkan Semua
                                             </button>
                                         </div>
@@ -740,13 +861,28 @@
                                     <div class="flex items-center gap-2">
 
                                         <!-- 1. Absen (Primary Orange) -->
-                                        <button @click="showAbsenModal = true"
-                                            class="group flex items-center gap-2 px-4 py-2.5 bg-orange-50 hover:bg-orange-600 border border-orange-100 text-orange-700 hover:text-white rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all active:scale-95 shadow-sm">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                            </svg>
-                                            Absen
-                                        </button>
+<button 
+    x-show="!selectedItems.some(id => workerMap[id]?.is_individual)"
+    @click="initGroupModal()"
+    class="group flex items-center gap-2 px-4 py-2.5 bg-orange-50 hover:bg-orange-600 border border-orange-100 text-orange-700 hover:text-white rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all active:scale-95 shadow-sm">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857" />
+    </svg>
+    Kelompok Absen
+</button>
+
+<!-- Individual Absen: hide if ANY selected worker has group absen -->
+<button 
+    x-show="!selectedItems.some(id => workerMap[id]?.is_group)"
+    @click="showAbsenModal = true"
+    class="group flex items-center gap-2 px-4 py-2.5 bg-orange-50 hover:bg-orange-600 border border-orange-100 text-orange-700 hover:text-white rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all active:scale-95 shadow-sm">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+    Absen
+</button>
 
                                         <!-- 2. Tunjangan (Emerald) -->
                                         <button x-show="canShowTunjangan()"
@@ -781,8 +917,10 @@
                                         <!-- 4. Status Absen (Indigo) -->
                                         <button @click="initStatusModal()"
                                             class="group flex items-center gap-2 px-4 py-2.5 bg-indigo-50 hover:bg-indigo-600 border border-indigo-100 text-indigo-700 hover:text-white rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all active:scale-95 shadow-sm">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                                             </svg>
                                             Status
                                         </button>
@@ -798,7 +936,8 @@
 
                                 <form
                                     action="{{ route('absensi.borongan.bulk.update', ['id_unit' => $unit->id, 'date' => $date]) }}"
-                                    method="POST" enctype="multipart/form-data" x-ref="absenForm" x-data="absenFormHandler()"
+                                    method="POST" enctype="multipart/form-data" x-ref="absenForm"
+                                    x-data="absenFormHandler()"
                                     class="relative bg-white rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.1)] w-full max-w-6xl overflow-hidden flex flex-col max-h-[90vh] border border-gray-100">
                                     @csrf
                                     @method('PUT')
@@ -1118,9 +1257,11 @@
                                                                         <div class="grid grid-cols-3 gap-3">
                                                                             <!-- FD -->
                                                                             <div class="flex flex-col gap-1.5">
-                                                                                <label class="text-[12px] font-black text-slate-400 uppercase tracking-widest">FD</label>
+                                                                                <label
+                                                                                    class="text-[12px] font-black text-slate-400 uppercase tracking-widest">FD</label>
                                                                                 <input type="number" min="0"
-                                                                                    :name="'data[' + workerId + '][' + rIdx + '][FD]'"
+                                                                                    :name="'data[' + workerId + '][' + rIdx +
+                                                                                        '][FD]'"
                                                                                     :disabled="!row.id_barang"
                                                                                     x-model.number="row.FD"
                                                                                     @input="updatePrices(workerId, rIdx)"
@@ -1129,9 +1270,12 @@
 
                                                                             <!-- Good MC -->
                                                                             <div class="flex flex-col gap-1.5">
-                                                                                <label class="text-[12px] font-black text-emerald-500 uppercase tracking-widest">Good MC</label>
+                                                                                <label
+                                                                                    class="text-[12px] font-black text-emerald-500 uppercase tracking-widest">Good
+                                                                                    MC</label>
                                                                                 <input type="number" min="0"
-                                                                                    :name="'data[' + workerId + '][' + rIdx + '][good_mc]'"
+                                                                                    :name="'data[' + workerId + '][' + rIdx +
+                                                                                        '][good_mc]'"
                                                                                     :disabled="!row.id_barang"
                                                                                     x-model.number="row.good_mc"
                                                                                     @input="updatePrices(workerId, rIdx)"
@@ -1141,9 +1285,11 @@
 
                                                                             <!-- Act/Rej -->
                                                                             <div class="flex flex-col gap-1.5">
-                                                                                <label class="text-[12px] font-black text-slate-400 uppercase tracking-widest">Act/Rej</label>
+                                                                                <label
+                                                                                    class="text-[12px] font-black text-slate-400 uppercase tracking-widest">Act/Rej</label>
                                                                                 <input type="number" min="0"
-                                                                                    :name="'data[' + workerId + '][' + rIdx + '][act_rej]'"
+                                                                                    :name="'data[' + workerId + '][' + rIdx +
+                                                                                        '][act_rej]'"
                                                                                     :disabled="!row.id_barang"
                                                                                     x-model.number="row.act_rej"
                                                                                     @input="updatePrices(workerId, rIdx)"
@@ -1155,105 +1301,149 @@
                                                                         <div class="grid grid-cols-2 gap-3">
                                                                             <!-- Max Rej. Subkon -->
                                                                             <div class="flex flex-col gap-1.5">
-                                                                                <label class="text-[12px] font-black text-gray-500 uppercase tracking-widest">
-                                                                                    Max Rej. Subkon ( <span x-text="row.max_rej_subkon"></span>% )
+                                                                                <label
+                                                                                    class="text-[12px] font-black text-gray-500 uppercase tracking-widest">
+                                                                                    Max Rej. Subkon ( <span
+                                                                                        x-text="row.max_rej_subkon"></span>%
+                                                                                    )
                                                                                 </label>
 
                                                                                 <div class="relative flex items-center">
                                                                                     {{-- Input ini akan otomatis menampilkan hasil Math.round dari updatePrices --}}
-                                                                                    <input
-                                                                                        type="number"
+                                                                                    <input type="number"
                                                                                         @input="updatePrices(workerId, rIdx)"
                                                                                         readonly
-                                                                                        :name="'data[' + workerId + '][' + rIdx + '][act_rej_max]'"
+                                                                                        :name="'data[' + workerId + '][' +
+                                                                                            rIdx + '][act_rej_max]'"
                                                                                         x-model.number="row.act_rej_max"
                                                                                         :value="row.act_rej_max"
                                                                                         class="w-full bg-slate-100 border-transparent rounded-xl px-3 py-2 text-xs font-black text-slate-700 outline-none transition-all"
-                                                                                        placeholder="0"
-                                                                                    >
-                                                                                    <span class="absolute right-3 text-[10px] font-black text-slate-400 uppercase">Pcs</span>
+                                                                                        placeholder="0">
+                                                                                    <span
+                                                                                        class="absolute right-3 text-[10px] font-black text-slate-400 uppercase">Pcs</span>
                                                                                 </div>
                                                                             </div>
 
 
                                                                             <!-- Rej. MC Dibebankan -->
                                                                             <div class="flex flex-col gap-1.5">
-                                                                                <label class="text-[12px] font-black text-red-500 uppercase tracking-widest">
+                                                                                <label
+                                                                                    class="text-[12px] font-black text-red-500 uppercase tracking-widest">
                                                                                     Rej. MC Dibebankan
                                                                                 </label>
-                                                                                <input
-                                                                                    type="number"
+                                                                                <input type="number"
                                                                                     @input="updatePrices(workerId, rIdx)"
-                                                                                    readonly
-                                                                                    {{-- Pastikan name sesuai dengan field di database, misal: rej_mc_dibebankan --}}
-                                                                                    :name="'data[' + workerId + '][' + rIdx + '][rej_mc_dibebankan]'"
+                                                                                    readonly {{-- Pastikan name sesuai dengan field di database, misal: rej_mc_dibebankan --}}
+                                                                                    :name="'data[' + workerId + '][' + rIdx +
+                                                                                        '][rej_mc_dibebankan]'"
                                                                                     {{-- Hubungkan ke variabel hasil kalkulasi --}}
                                                                                     x-model.number="row.rej_mc_dibebankan"
                                                                                     class="bg-red-50 border-transparent rounded-xl px-3 py-2 text-xs font-black text-red-700 outline-none transition-all"
-                                                                                    placeholder="0"
-                                                                                >
+                                                                                    placeholder="0">
 
                                                                                 {{-- Info tambahan untuk user --}}
-                                                                                <span class="text-[10px] text-slate-400 mt-1 italic" x-show="row.rej_mc_dibebankan > 0">
-                                                                                    *Melebihi batas toleransi <span x-text="row.act_rej_max"></span> Pcs
+                                                                                <span
+                                                                                    class="text-[10px] text-slate-400 mt-1 italic"
+                                                                                    x-show="row.rej_mc_dibebankan > 0">
+                                                                                    *Melebihi batas toleransi <span
+                                                                                        x-text="row.act_rej_max"></span>
+                                                                                    Pcs
                                                                                 </span>
                                                                             </div>
                                                                         </div>
                                                                     </div>
 
                                                                     {{-- 2. TOTAL QUANTITY DISPLAY (Matches the UI Vibe) --}}
-                                                                    <div class="mt-4 p-4 rounded-2xl border-2 border-dashed border-slate-100 bg-slate-50/30">
-                                                                        <div class="grid grid-cols-2 gap-4 divide-x divide-slate-200">
+                                                                    <div
+                                                                        class="mt-4 p-4 rounded-2xl border-2 border-dashed border-slate-100 bg-slate-50/30">
+                                                                        <div
+                                                                            class="grid grid-cols-2 gap-4 divide-x divide-slate-200">
 
                                                                             {{-- Sisi Kiri: Total Produksi --}}
-                                                                            <div class="flex items-center justify-between pr-4">
+                                                                            <div
+                                                                                class="flex items-center justify-between pr-4">
                                                                                 <div class="flex items-center gap-3">
-                                                                                    <div class="p-2 bg-orange-100 rounded-lg">
-                                                                                        <svg class="w-4 h-4 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                                                                    <div
+                                                                                        class="p-2 bg-orange-100 rounded-lg">
+                                                                                        <svg class="w-4 h-4 text-orange-600"
+                                                                                            fill="none"
+                                                                                            viewBox="0 0 24 24"
+                                                                                            stroke="currentColor">
+                                                                                            <path stroke-linecap="round"
+                                                                                                stroke-linejoin="round"
+                                                                                                stroke-width="2.5"
+                                                                                                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                                                                                         </svg>
                                                                                     </div>
                                                                                     <div>
-                                                                                        <p class="text-[10px] font-black text-orange-400 uppercase tracking-widest leading-none">Total Produksi</p>
-                                                                                        <p class="text-[11px] font-bold text-slate-400 mt-1">QTY Akumulasi</p>
+                                                                                        <p
+                                                                                            class="text-[10px] font-black text-orange-400 uppercase tracking-widest leading-none">
+                                                                                            Total Produksi</p>
+                                                                                        <p
+                                                                                            class="text-[11px] font-bold text-slate-400 mt-1">
+                                                                                            QTY Akumulasi</p>
                                                                                     </div>
                                                                                 </div>
                                                                                 <div class="flex items-baseline gap-1">
-                                                                                    <span class="text-2xl font-black text-slate-700 tracking-tighter"
+                                                                                    <span
+                                                                                        class="text-2xl font-black text-slate-700 tracking-tighter"
                                                                                         x-text="(parseInt(row.FD) || 0) + (parseInt(row.act_rej) || 0) + (parseInt(row.good_mc) || 0)">
                                                                                     </span>
-                                                                                    <span class="text-[10px] font-black text-slate-400 uppercase">Pcs</span>
+                                                                                    <span
+                                                                                        class="text-[10px] font-black text-slate-400 uppercase">Pcs</span>
                                                                                 </div>
                                                                             </div>
 
                                                                             {{-- Sisi Kanan: Total yang Dibayar --}}
-                                                                            <div class="flex items-center justify-between pl-4">
+                                                                            <div
+                                                                                class="flex items-center justify-between pl-4">
                                                                                 <div class="flex items-center gap-3">
-                                                                                    <div class="p-2 bg-emerald-100 rounded-lg">
-                                                                                        <svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                                    <div
+                                                                                        class="p-2 bg-emerald-100 rounded-lg">
+                                                                                        <svg class="w-4 h-4 text-emerald-600"
+                                                                                            fill="none"
+                                                                                            viewBox="0 0 24 24"
+                                                                                            stroke="currentColor">
+                                                                                            <path stroke-linecap="round"
+                                                                                                stroke-linejoin="round"
+                                                                                                stroke-width="2.5"
+                                                                                                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                                                         </svg>
                                                                                     </div>
                                                                                     <div>
-                                                                                        <p class="text-[10px] font-black text-emerald-500 uppercase tracking-widest leading-none">Yang Dibayar</p>
-                                                                                        <p class="text-[11px] font-bold text-slate-400 mt-1">Barang Disetujui</p>
+                                                                                        <p
+                                                                                            class="text-[10px] font-black text-emerald-500 uppercase tracking-widest leading-none">
+                                                                                            Yang Dibayar</p>
+                                                                                        <p
+                                                                                            class="text-[11px] font-bold text-slate-400 mt-1">
+                                                                                            Barang Disetujui</p>
                                                                                     </div>
                                                                                 </div>
                                                                                 <div class="flex items-baseline gap-1">
-                                                                                    <span class="text-2xl font-black text-emerald-600 tracking-tighter"
+                                                                                    <span
+                                                                                        class="text-2xl font-black text-emerald-600 tracking-tighter"
                                                                                         x-text="(row.good_mc + row.FD - row.rej_mc_dibebankan)  || 0">
                                                                                     </span>
-                                                                                    <span class="text-[10px] font-black text-emerald-500 uppercase">Pcs</span>
+                                                                                    <span
+                                                                                        class="text-[10px] font-black text-emerald-500 uppercase">Pcs</span>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
 
                                                                         {{-- Hidden inputs for form submission --}}
-                                                                        <input type="hidden" :name="'data[' + workerId + '][' + rIdx + '][totalQTY]'"
-                                                                            :value="(parseInt(row.FD) || 0) + (parseInt(row.act_rej) || 0) + (parseInt(row.good_mc) || 0)">
+                                                                        <input type="hidden"
+                                                                            :name="'data[' + workerId + '][' + rIdx +
+                                                                                '][totalQTY]'"
+                                                                            :value="(parseInt(row.FD) || 0) + (parseInt(row
+                                                                                .act_rej) || 0) + (parseInt(row
+                                                                                .good_mc) || 0)">
 
-                                                                        <input type="hidden" :name="'data[' + workerId + '][' + rIdx + '][totalBayar]'"
-                                                                            :value="((parseInt(row.good_mc) || 0) + (parseInt(row.FD) || 0) - (parseInt(row.rej_mc_dibebankan) || 0))">
+                                                                        <input type="hidden"
+                                                                            :name="'data[' + workerId + '][' + rIdx +
+                                                                                '][totalBayar]'"
+                                                                            :value="((parseInt(row.good_mc) || 0) + (parseInt(
+                                                                                row.FD) || 0) - (parseInt(row
+                                                                                .rej_mc_dibebankan) || 0))">
                                                                     </div>
 
 
@@ -1427,6 +1617,405 @@
                                 </form>
                             </div>
 
+                            <!-- MODAL: KELOMPOK ABSEN (ONE FORM FOR ALL - SAME UI) -->
+                            <div x-show="showAbsenKelompokModal"
+                                class="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6" x-cloak>
+                                <div x-show="showAbsenKelompokModal" x-transition.opacity
+                                    @click="showAbsenKelompokModal = false"
+                                    class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm"></div>
+
+                                <form
+                                    action="{{ route('absensi.kelompok.borongan.bulk.update', ['id_unit' => $unit->id, 'date' => $date]) }}"
+                                    method="POST" enctype="multipart/form-data" x-ref="groupForm"
+                                    class="relative bg-white rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.1)] w-full max-w-6xl overflow-hidden flex flex-col max-h-[90vh] border border-gray-100">
+                                    @csrf
+                                    @method('PUT')
+                                    <input type="hidden" name="date" value="{{ $date }}">
+
+                                    {{-- HEADER --}}
+                                    <div
+                                        class="px-10 py-5 bg-slate-50/80 border-b border-gray-100 flex items-center justify-between">
+                                        <div class="flex items-center gap-4">
+                                            <div
+                                                class="w-10 h-10 bg-white rounded-xl shadow-sm border border-gray-100 flex items-center justify-center">
+                                                <svg class="w-5 h-5 text-orange-500" fill="none" viewBox="0 0 24 24"
+                                                    stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                                </svg>
+                                            </div>
+                                            <div>
+                                                <h1 class="text-base font-black text-slate-800 tracking-tight">Presensi
+                                                    Kelompok Borongan</h1>
+                                                <p
+                                                    class="text-[12px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">
+                                                    Input satu data untuk banyak pekerja sekaligus</p>
+                                            </div>
+                                        </div>
+                                        <button @click="showAbsenKelompokModal = false" type="button"
+                                            class="p-3 text-slate-300 hover:text-red-500 transition-colors">
+                                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+                                                stroke="currentColor">
+                                                <path stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    </div>
+
+                                    {{-- WORKERS LIST HEADER --}}
+                                    <div class="px-10 py-6 bg-white border-b border-gray-100">
+                                        <div class="flex items-start gap-6">
+                                            <div class="w-14 h-14 rounded-2xl bg-orange-600 text-white flex items-center justify-center text-xl font-black shadow-lg shadow-orange-200"
+                                                x-text="selectedItems.length"></div>
+                                            <div class="flex-1 min-w-0">
+                                                <h3
+                                                    class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">
+                                                    Anggota Kelompok Terpilih:</h3>
+                                                <div class="flex flex-wrap gap-2">
+                                                    <template x-for="id in selectedItems" :key="id">
+                                                        <span
+                                                            class="px-3 py-1.5 bg-slate-50 border border-slate-100 rounded-xl text-xs font-black text-slate-700 truncate max-w-[200px]"
+                                                            x-text="workerMap[id]?.nama"></span>
+                                                    </template>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {{-- FORM BODY --}}
+                                    {{-- FORM BODY --}}
+                                    <div class="flex-1 overflow-y-auto custom-scrollbar bg-gray-50/30 p-10">
+
+                                        {{-- Hidden: submit all selected worker IDs --}}
+                                        <template x-for="id in selectedItems" :key="'gid-' + id">
+                                            <input type="hidden" name="selected_ids[]" :value="id">
+                                        </template>
+
+                                        <div class="max-w-5xl mx-auto space-y-6">
+
+                                            {{-- Add Item Button --}}
+                                            <div class="flex justify-between items-center mb-4">
+                                                <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest">
+                                                    Daftar Hasil Borongan (Berlaku untuk semua pekerja terpilih)
+                                                </h4>
+                                                <button type="button" @click="groupRows.push(getEmptyRow())"
+                                                    :disabled="groupRows.length >= {{ count($barangs) }}"
+                                                    :class="groupRows.length >= {{ count($barangs) }} ?
+                                                        'opacity-50 cursor-not-allowed bg-gray-100 text-gray-400' :
+                                                        'bg-orange-50 text-orange-600 hover:bg-orange-600 hover:text-white'"
+                                                    class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all">
+                                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                                                        stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2.5" d="M12 4v16m8-8H4" />
+                                                    </svg>
+                                                    <span
+                                                        x-text="groupRows.length >= {{ count($barangs) }} ? 'Batas Barang Tercapai' : 'Tambah Baris Barang'"></span>
+                                                </button>
+                                            </div>
+
+                                            {{-- The Rows (loop over groupRows directly) --}}
+                                            <template x-for="(row, rIdx) in groupRows" :key="rIdx">
+                                                <div
+                                                    class="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm space-y-6 relative group">
+                                                    <button type="button" @click="groupRows.splice(rIdx, 1)"
+                                                        class="absolute top-4 right-4 p-2 text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all">
+                                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                                                            stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                        </svg>
+                                                    </button>
+
+                                                    <div class="grid grid-cols-12 gap-6">
+                                                        {{-- Col 1: Item & Quantities --}}
+                                                        <div class="col-span-12 lg:col-span-7 space-y-4">
+                                                            <div class="flex flex-col gap-1.5" x-data="{ open: false, search: '', options: {{ json_encode($barangs) }} }">
+                                                                <label
+                                                                    class="text-[12px] font-black text-slate-400 uppercase tracking-widest ml-1">Nama
+                                                                    Barang</label>
+                                                                <div class="relative">
+                                                                    <input type="hidden"
+                                                                        :name="'group_data[' + rIdx + '][id_barang]'"
+                                                                        x-model="row.id_barang">
+
+                                                                    <button type="button" @click="open = !open"
+                                                                        class="w-full flex items-center justify-between bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-white hover:border-orange-200 transition-all outline-none shadow-sm"
+                                                                        :class="open ?
+                                                                            'bg-white border-orange-400 ring-4 ring-orange-50' :
+                                                                            ''">
+                                                                        <span
+                                                                            :class="row.id_barang ? 'text-slate-700' :
+                                                                                'text-slate-400'"
+                                                                            x-text="options.find(b => b.id == row.id_barang)?.nama_item || '-- Pilih Barang --'"></span>
+                                                                        <svg class="w-4 h-4 text-slate-400 transition-transform duration-300"
+                                                                            :class="open ? 'rotate-180 text-orange-500' : ''"
+                                                                            fill="none" viewBox="0 0 24 24"
+                                                                            stroke="currentColor">
+                                                                            <path stroke-linecap="round"
+                                                                                stroke-linejoin="round" stroke-width="2.5"
+                                                                                d="M19 9l-7 7-7-7" />
+                                                                        </svg>
+                                                                    </button>
+
+                                                                    <div x-show="open" @click.outside="open = false"
+                                                                        class="absolute z-[120] w-full mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl overflow-hidden"
+                                                                        x-cloak>
+                                                                        <div
+                                                                            class="p-2 border-b border-slate-50 bg-slate-50/50">
+                                                                            <input type="text" x-model="search"
+                                                                                placeholder="Cari barang..."
+                                                                                class="w-full bg-white border-none rounded-lg px-3 py-2 text-xs font-medium focus:ring-1 focus:ring-orange-200 outline-none">
+                                                                        </div>
+                                                                        <ul
+                                                                            class="max-h-48 overflow-y-auto custom-scrollbar">
+                                                                            <template
+                                                                                x-for="item in options.filter(b =>
+                                            b.nama_item.toLowerCase().includes(search.toLowerCase()) &&
+                                            !groupRows.some(r => r !== row && r.id_barang == b.id)
+                                        )"
+                                                                                :key="item.id">
+                                                                                <li>
+                                                                                    <button type="button"
+                                                                                        @click="
+                                                        row.id_barang = item.id;
+                                                        row.max_rej_subkon = item.max_rej_subkon;
+                                                        row.FD = 0; row.act_rej = 0; row.good_mc = 0;
+                                                        row.rej_mc_dibebankan = 0; row.totalQTY = 0;
+                                                        open = false; search = '';
+                                                        updateGroupPrices(rIdx);
+                                                    "
+                                                                                        class="w-full text-left px-4 py-3 text-xs font-semibold transition-colors flex items-center justify-between"
+                                                                                        :class="row.id_barang == item.id ?
+                                                                                            'bg-orange-50 text-orange-700' :
+                                                                                            'text-slate-600 hover:bg-slate-50 hover:text-orange-600'">
+                                                                                        <span
+                                                                                            x-text="item.nama_item"></span>
+                                                                                        <svg x-show="row.id_barang == item.id"
+                                                                                            class="w-4 h-4 text-orange-500"
+                                                                                            fill="none"
+                                                                                            viewBox="0 0 24 24"
+                                                                                            stroke="currentColor">
+                                                                                            <path stroke-linecap="round"
+                                                                                                stroke-linejoin="round"
+                                                                                                stroke-width="3"
+                                                                                                d="M5 13l4 4L19 7" />
+                                                                                        </svg>
+                                                                                    </button>
+                                                                                </li>
+                                                                            </template>
+                                                                            <div x-show="options.filter(b =>
+                                            b.nama_item.toLowerCase().includes(search.toLowerCase()) &&
+                                            !groupRows.some(r => r !== row && r.id_barang == b.id)).length === 0"
+                                                                                class="px-4 py-8 text-center">
+                                                                                <p
+                                                                                    class="text-[12px] font-bold text-slate-300 uppercase tracking-widest">
+                                                                                    Tidak ada barang tersedia</p>
+                                                                            </div>
+                                                                        </ul>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            {{-- Quantity Inputs --}}
+                                                            <div class="space-y-4">
+                                                                <div class="grid grid-cols-3 gap-3">
+                                                                    <div class="flex flex-col gap-1.5">
+                                                                        <label
+                                                                            class="text-[12px] font-black text-slate-400 uppercase tracking-widest">FD</label>
+                                                                        <input type="number" min="0"
+                                                                            :name="'group_data[' + rIdx + '][FD]'"
+                                                                            :disabled="!row.id_barang"
+                                                                            x-model.number="row.FD"
+                                                                            @input="updateGroupPrices(rIdx)"
+                                                                            class="bg-slate-50 border-transparent rounded-xl px-3 py-2 text-xs font-bold focus:bg-white focus:ring-2 focus:ring-slate-200 outline-none transition-all">
+                                                                    </div>
+                                                                    <div class="flex flex-col gap-1.5">
+                                                                        <label
+                                                                            class="text-[12px] font-black text-emerald-500 uppercase tracking-widest">Good
+                                                                            MC</label>
+                                                                        <input type="number" min="0"
+                                                                            :name="'group_data[' + rIdx + '][good_mc]'"
+                                                                            :disabled="!row.id_barang"
+                                                                            x-model.number="row.good_mc"
+                                                                            @input="updateGroupPrices(rIdx)"
+                                                                            class="bg-slate-50 border-transparent rounded-xl px-3 py-2 text-xs font-bold focus:bg-white focus:ring-2 focus:ring-emerald-200 outline-none transition-all">
+                                                                    </div>
+                                                                    <div class="flex flex-col gap-1.5">
+                                                                        <label
+                                                                            class="text-[12px] font-black text-slate-400 uppercase tracking-widest">Act/Rej</label>
+                                                                        <input type="number" min="0"
+                                                                            :name="'group_data[' + rIdx + '][act_rej]'"
+                                                                            :disabled="!row.id_barang"
+                                                                            x-model.number="row.act_rej"
+                                                                            @input="updateGroupPrices(rIdx)"
+                                                                            class="bg-slate-50 border-transparent rounded-xl px-3 py-2 text-xs font-bold focus:bg-white focus:ring-2 focus:ring-slate-200 outline-none transition-all">
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="grid grid-cols-2 gap-3">
+                                                                    <div class="flex flex-col gap-1.5">
+                                                                        <label
+                                                                            class="text-[12px] font-black text-gray-500 uppercase tracking-widest">
+                                                                            Max Rej. Subkon ( <span
+                                                                                x-text="row.max_rej_subkon"></span>% )
+                                                                        </label>
+                                                                        <div class="relative flex items-center">
+                                                                            <input type="number" readonly
+                                                                                :name="'group_data[' + rIdx + '][act_rej_max]'"
+                                                                                x-model.number="row.act_rej_max"
+                                                                                class="w-full bg-slate-100 border-transparent rounded-xl px-3 py-2 text-xs font-black text-slate-700 outline-none">
+                                                                            <span
+                                                                                class="absolute right-3 text-[10px] font-black text-slate-400 uppercase">Pcs</span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="flex flex-col gap-1.5">
+                                                                        <label
+                                                                            class="text-[12px] font-black text-red-500 uppercase tracking-widest">Rej.
+                                                                            MC Dibebankan</label>
+                                                                        <input type="number" readonly
+                                                                            :name="'group_data[' + rIdx +
+                                                                                '][rej_mc_dibebankan]'"
+                                                                            x-model.number="row.rej_mc_dibebankan"
+                                                                            class="bg-red-50 border-transparent rounded-xl px-3 py-2 text-xs font-black text-red-700 outline-none">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            {{-- Totals Display --}}
+                                                            <div
+                                                                class="mt-4 p-4 rounded-2xl border-2 border-dashed border-slate-100 bg-slate-50/30">
+                                                                <div
+                                                                    class="grid grid-cols-2 gap-4 divide-x divide-slate-200">
+                                                                    <div class="flex items-center justify-between pr-4">
+                                                                        <p
+                                                                            class="text-[10px] font-black text-orange-400 uppercase tracking-widest">
+                                                                            Total Produksi</p>
+                                                                        <div class="flex items-baseline gap-1">
+                                                                            <span
+                                                                                class="text-2xl font-black text-slate-700"
+                                                                                x-text="(parseInt(row.FD)||0) + (parseInt(row.act_rej)||0) + (parseInt(row.good_mc)||0)"></span>
+                                                                            <span
+                                                                                class="text-[10px] font-black text-slate-400 uppercase">Pcs</span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="flex items-center justify-between pl-4">
+                                                                        <p
+                                                                            class="text-[10px] font-black text-emerald-500 uppercase tracking-widest">
+                                                                            Yang Dibayar</p>
+                                                                        <div class="flex items-baseline gap-1">
+                                                                            <span
+                                                                                class="text-2xl font-black text-emerald-600"
+                                                                                x-text="(row.good_mc + row.FD - row.rej_mc_dibebankan) || 0"></span>
+                                                                            <span
+                                                                                class="text-[10px] font-black text-emerald-500 uppercase">Pcs</span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <input type="hidden"
+                                                                    :name="'group_data[' + rIdx + '][totalQTY]'"
+                                                                    :value="(parseInt(row.FD) || 0) + (parseInt(row.act_rej) ||
+                                                                        0) + (parseInt(row.good_mc) || 0)">
+                                                                <input type="hidden"
+                                                                    :name="'group_data[' + rIdx + '][totalBayar]'"
+                                                                    :value="((parseInt(row.good_mc) || 0) + (parseInt(row.FD) ||
+                                                                        0) - (parseInt(row.rej_mc_dibebankan) || 0))">
+                                                            </div>
+
+                                                            {{-- Payment Fields --}}
+                                                            <div class="grid grid-cols-2 gap-3 mt-4">
+                                                                <div class="flex flex-col gap-1.5">
+                                                                    <label
+                                                                        class="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Tagihan
+                                                                        Perusahaan</label>
+                                                                    <div class="relative flex items-center">
+                                                                        <span
+                                                                            class="absolute left-3 text-[10px] font-black text-slate-400">Rp.</span>
+                                                                        <input type="text" readonly
+                                                                            :value="formatRibuan(row.bayaranPerusahaan)"
+                                                                            class="w-full bg-slate-100 border-transparent rounded-xl pl-10 pr-3 py-2 text-xs font-black text-slate-700 outline-none">
+                                                                        <input type="hidden"
+                                                                            :name="'group_data[' + rIdx +
+                                                                                '][bayaranPerusahaan]'"
+                                                                            x-model="row.bayaranPerusahaan">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="flex flex-col gap-1.5">
+                                                                    <label
+                                                                        class="text-[11px] font-black text-orange-600 uppercase tracking-widest ml-1">Bayaran
+                                                                        Pekerja</label>
+                                                                    <div class="relative flex items-center">
+                                                                        <span
+                                                                            class="absolute left-3 text-[10px] font-black text-orange-300">Rp.</span>
+                                                                        <input type="text" readonly
+                                                                            :value="formatRibuan(row.bayaranItem)"
+                                                                            class="w-full bg-orange-50 border border-orange-100 rounded-xl pl-10 pr-3 py-2 text-xs font-black text-orange-700 outline-none">
+                                                                        <input type="hidden"
+                                                                            :name="'group_data[' + rIdx + '][bayaranItem]'"
+                                                                            x-model="row.bayaranItem">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        {{-- Col 2: File & Note --}}
+                                                        <div class="col-span-12 lg:col-span-5 space-y-4">
+                                                            <div class="flex flex-col gap-1.5">
+                                                                <label
+                                                                    class="text-[12px] font-black text-slate-400 uppercase tracking-widest ml-1">Bukti
+                                                                    Surat Jalan</label>
+                                                                <div class="relative group/file">
+                                                                    <input type="file"
+                                                                        :name="'group_data[' + rIdx + '][buktiSuratJalan]'"
+                                                                        @change="const file = $event.target.files[0]; if(file) { row.fileName = file.name; }"
+                                                                        class="absolute inset-0 w-full h-full opacity-0 z-10 cursor-pointer">
+                                                                    <div class="flex items-center gap-3 px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl transition-all group-hover/file:bg-white group-hover/file:border-orange-200 shadow-sm"
+                                                                        :class="row.fileName ?
+                                                                            'border-orange-100 bg-orange-50/30' : ''">
+                                                                        <p class="text-xs font-semibold truncate"
+                                                                            :class="row.fileName ? 'text-slate-700' :
+                                                                                'text-slate-400'"
+                                                                            x-text="row.fileName || 'Pilih atau drop file surat jalan...'">
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="flex flex-col gap-1.5">
+                                                                <label
+                                                                    class="text-[12px] font-black text-slate-400 uppercase tracking-widest ml-1">Catatan</label>
+                                                                <textarea :name="'group_data[' + rIdx + '][catatan]'" rows="3" x-model="row.catatan"
+                                                                    placeholder="Tambahkan keterangan tambahan..."
+                                                                    class="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-2.5 text-xs font-semibold text-slate-700 focus:bg-white focus:ring-2 focus:ring-orange-100 focus:border-orange-400 outline-none transition-all resize-none shadow-sm placeholder:text-slate-300"></textarea>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </template>
+
+                                            {{-- Empty State --}}
+                                            <div x-show="groupRows.length === 0"
+                                                class="py-20 border-2 border-dashed border-gray-100 rounded-[2.5rem] flex flex-col items-center justify-center text-gray-300">
+                                                <p class="text-sm font-bold">Belum ada item ditambahkan</p>
+                                                <button type="button" @click="groupRows.push(getEmptyRow())"
+                                                    class="mt-4 text-xs font-black text-orange-600 uppercase tracking-widest hover:underline">Tambah
+                                                    Sekarang</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {{-- FOOTER --}}
+                                    <div
+                                        class="px-10 py-6 bg-white border-t border-gray-100 flex items-center justify-end gap-4 shadow-[0_-10px_40px_rgba(0,0,0,0.02)]">
+                                        <button type="button" @click="showAbsenKelompokModal = false"
+                                            class="px-6 py-3 text-xs font-black text-gray-400 uppercase tracking-widest hover:text-gray-600 transition">Batal</button>
+                                        <button type="button" @click="confirmSubmitGroup()"
+                                            class="px-12 py-4 bg-orange-600 text-white text-[11px] font-black uppercase tracking-[0.2em] rounded-2xl hover:bg-orange-700 shadow-xl shadow-orange-100 transition-all active:scale-95">Simpan
+                                            Data Kelompok</button>
+                                    </div>
+                                </form>
+                            </div>
+
+
                             <!-- MODAL: UPDATE STATUS ABSENSI -->
                             <div x-show="showAbsenStatusModal"
                                 class="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6" x-cloak>
@@ -1471,9 +2060,8 @@
                                     {{-- Scrollable Table Area --}}
                                     <form
                                         action="{{ route('absensi.borongan.bulk.update', ['id_unit' => $unit->id, 'date' => $date]) }}"
-                                        method="POST"
-                                        x-ref="absenForm"
-                                        x-data="absenFormHandler()" class="flex-1 overflow-y-auto custom-scrollbar bg-white p-10 pt-6">
+                                        method="POST" x-ref="absenForm" x-data="absenFormHandler()"
+                                        class="flex-1 overflow-y-auto custom-scrollbar bg-white p-10 pt-6">
                                         @csrf
                                         @method('PUT')
                                         <input type="hidden" name="date" value="{{ $date }}">
@@ -1533,7 +2121,8 @@
                                                                     class="flex items-center justify-between px-4 py-3 bg-white border border-gray-200 rounded-xl cursor-pointer hover:border-orange-400 transition-all shadow-sm">
 
                                                                     <span class="text-xs font-black"
-                                                                        :class="rowStatus[id] == 1 ? 'text-blue-600' : 'text-gray-700'"
+                                                                        :class="rowStatus[id] == 1 ? 'text-blue-600' :
+                                                                            'text-gray-700'"
                                                                         x-text="rowStatus[id] == 1 ? 'Hadir (Ubah ke...)' : (list.find(x => x.val == rowStatus[id])?.label || 'Pilih Status')">
                                                                     </span>
 
@@ -1559,7 +2148,8 @@
                                                                     </template>
                                                                 </div>
                                                                 <div x-show="rowStatus[id] == 1" class="mt-1">
-                                                                    <span class="text-[9px] font-bold text-amber-600 uppercase tracking-tighter">
+                                                                    <span
+                                                                        class="text-[9px] font-bold text-amber-600 uppercase tracking-tighter">
                                                                         ⚠️ Saat ini berstatus Hadir
                                                                     </span>
                                                                 </div>
@@ -1665,8 +2255,8 @@
                                     {{-- Main Area: reduced gap from 12 to 8, py from 10 to 6 --}}
                                     <form
                                         action="{{ route('absensi.bulk.store-tunjangan', ['id_unit' => $unit, 'date' => $date]) }}"
-                                        method="POST" enctype="multipart/form-data" x-ref="tunjPotForm" x-data="TunjPotFormHandler()"
-                                        class="flex-1 overflow-hidden flex flex-col">
+                                        method="POST" enctype="multipart/form-data" x-ref="tunjPotForm"
+                                        x-data="TunjPotFormHandler()" class="flex-1 overflow-hidden flex flex-col">
                                         @csrf
                                         @method('post')
 
@@ -1752,7 +2342,8 @@
                                                                                     <span
                                                                                         x-text="formatRibuan(rowTunjangan[id][key].nominal)"></span>
                                                                                     <svg class="w-3 h-3 opacity-30"
-                                                                                        fill="none" viewBox="0 0 24 24"
+                                                                                        fill="none"
+                                                                                        viewBox="0 0 24 24"
                                                                                         stroke="currentColor">
                                                                                         <path
                                                                                             d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
@@ -1810,7 +2401,8 @@
                                                 <button type="button" @click="showTunjanganModal = false"
                                                     class="text-[10px] font-black text-gray-400 uppercase tracking-widest px-4">Batal</button>
 
-                                                <button type="button" @click="confirmSubmitTunjPot()" x-show="currentIndex === selectedItems.length - 1"
+                                                <button type="button" @click="confirmSubmitTunjPot()"
+                                                    x-show="currentIndex === selectedItems.length - 1"
                                                     class="px-8 py-3.5 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all active:scale-95 flex items-center gap-2">
                                                     <span>Finalisasi & Simpan</span>
                                                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24"
@@ -1912,8 +2504,8 @@
 
                                     <form
                                         action="{{ route('absensi.bulk.store-potongan', ['id_unit' => $unit, 'date' => $date]) }}"
-                                        method="POST" enctype="multipart/form-data" x-ref="tunjPotForm" x-data="TunjPotFormHandler()"
-                                        class="flex-1 overflow-hidden flex flex-col">
+                                        method="POST" enctype="multipart/form-data" x-ref="tunjPotForm"
+                                        x-data="TunjPotFormHandler()" class="flex-1 overflow-hidden flex flex-col">
                                         @csrf
                                         @method('post')
                                         <input type="hidden" name="date" value="{{ $date }}">
@@ -2076,7 +2668,9 @@
                                                 <button type="button" @click="showPotonganModal = false"
                                                     class="text-[10px] font-black text-gray-400 uppercase tracking-widest px-4">Batal</button>
 
-                                                <button type="button" x-show="currentIndex === selectedItems.length - 1" @click="confirmSubmitTunjPot()"
+                                                <button type="button"
+                                                    x-show="currentIndex === selectedItems.length - 1"
+                                                    @click="confirmSubmitTunjPot()"
                                                     class="px-8 py-3.5 bg-rose-600 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl hover:bg-rose-700 shadow-lg shadow-rose-200 transition-all active:scale-95 flex items-center gap-2">
                                                     Simpan Semua
                                                 </button>
@@ -2130,7 +2724,8 @@
                 </div>
 
                 {{-- PAGINATION --}}
-                <div id="new-ids-provider-full" data-ids="{{ json_encode($pkwtPekerja->pluck('id')) }}" class="hidden">
+                <div id="new-ids-provider-full" data-ids="{{ json_encode($pkwtPekerja->pluck('id')) }}"
+                    class="hidden">
                 </div>
 
                 <div id="new-pagination-provider" class="rounded-3xl">
@@ -2167,11 +2762,11 @@
             }
         });
 
-    function absenFormHandler() {
-        return {
-            confirmSubmit() {
+        function absenFormHandler() {
+            return {
+                confirmSubmit() {
 
-                const hasStatusHadir = this.selectedItems.some(id => this.rowStatus[id] == 1);
+                    const hasStatusHadir = this.selectedItems.some(id => this.rowStatus[id] == 1);
 
                     if (hasStatusHadir) {
                         Swal.fire({
@@ -2183,63 +2778,63 @@
                         return; // Berhenti di sini, jangan submit
                     }
 
-                Swal.fire({
-                    title: 'Simpan Data Absensi?',
-                    text: 'Pastikan semua data sudah benar sebelum disimpan.',
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonColor: '#EA580C',
-                    cancelButtonColor: '#6b7280',
-                    confirmButtonText: 'Ya, Simpan',
-                    cancelButtonText: 'Batal',
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        Swal.fire({
-                            title: 'Menyimpan...',
-                            text: 'Mohon tunggu',
-                            allowOutsideClick: false,
-                            allowEscapeKey: false,
-                            didOpen: () => {
-                                Swal.showLoading()
-                            }
-                        })
+                    Swal.fire({
+                        title: 'Simpan Data Absensi?',
+                        text: 'Pastikan semua data sudah benar sebelum disimpan.',
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#EA580C',
+                        cancelButtonColor: '#6b7280',
+                        confirmButtonText: 'Ya, Simpan',
+                        cancelButtonText: 'Batal',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            Swal.fire({
+                                title: 'Menyimpan...',
+                                text: 'Mohon tunggu',
+                                allowOutsideClick: false,
+                                allowEscapeKey: false,
+                                didOpen: () => {
+                                    Swal.showLoading()
+                                }
+                            })
 
-                        this.$refs.absenForm.submit()
-                    }
-                })
+                            this.$refs.absenForm.submit()
+                        }
+                    })
+                }
             }
         }
-    }
 
-    function TunjPotFormHandler() {
-        return {
-            confirmSubmitTunjPot() {
-                Swal.fire({
-                    title: 'Finalisasi Data?',
-                    text: 'Pastikan semua data sudah benar sebelum disimpan. Setelah ini, data tidak dapat diubah lagi.',
-                    icon: 'warning',
-                    showCancelButton: true,
-                confirmButtonColor: '#10B981',
-                cancelButtonColor: '#6b7280',
-                confirmButtonText: 'Ya, Finalisasi & Simpan',
-                cancelButtonText: 'Batal',
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        Swal.fire({
-                            title: 'Menyimpan...',
-                            text: 'Mohon tunggu',
-                            allowOutsideClick: false,
-                            allowEscapeKey: false,
-                            didOpen: () => {
-                                Swal.showLoading()
-                            }
-                        })
+        function TunjPotFormHandler() {
+            return {
+                confirmSubmitTunjPot() {
+                    Swal.fire({
+                        title: 'Finalisasi Data?',
+                        text: 'Pastikan semua data sudah benar sebelum disimpan. Setelah ini, data tidak dapat diubah lagi.',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#10B981',
+                        cancelButtonColor: '#6b7280',
+                        confirmButtonText: 'Ya, Finalisasi & Simpan',
+                        cancelButtonText: 'Batal',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            Swal.fire({
+                                title: 'Menyimpan...',
+                                text: 'Mohon tunggu',
+                                allowOutsideClick: false,
+                                allowEscapeKey: false,
+                                didOpen: () => {
+                                    Swal.showLoading()
+                                }
+                            })
 
-                        this.$refs.tunjPotForm.submit()
-                    }
-                })
+                            this.$refs.tunjPotForm.submit()
+                        }
+                    })
+                }
             }
         }
-    }
     </script>
 @endsection

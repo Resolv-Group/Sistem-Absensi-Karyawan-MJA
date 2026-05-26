@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('detil_borongan', function (Blueprint $table) {
             $table->id();
 
-            $table->char('id_absensi');
+            $table->char('id_absensi')->nullable();
             $table->integer('id_barang');
             $table->integer('status_kehadiran')->default(0);
 

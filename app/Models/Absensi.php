@@ -14,15 +14,22 @@ class Absensi extends Model
         'tgl_absensi',
         'id_unit',
         'tipe',
-        'verifikasi'
+        'verifikasi',
     ];
 
-    public function detilHarian() {
+    public function detilHarian()
+    {
         return $this->hasOne(Detil_Harian::class, 'id_absensi', 'id');
     }
 
-    public function detilBorongan() {
+    public function detilBorongan()
+    {
         return $this->hasMany(Detil_Borongan::class, 'id_absensi', 'id');
+    }
+
+    public function absensiBorongan()
+    {
+        return $this->hasMany(Absensi_Borongan::class, 'id_absensi', 'id');
     }
 
     public function pekerja()
@@ -39,10 +46,25 @@ class Absensi extends Model
     {
         return $this->hasOne(Tunjangan::class, 'id_absensi');
     }
+
     public function potongan()
     {
         return $this->hasOne(Potongan::class, 'id_absensi');
     }
 
-    
+    // Absensi model — returns the correct detil regardless of group or individual
+    public function getEffectiveDetilBorongan()
+    {
+        // If this absensi has pivot records, it's a group absen
+        // → load detil FROM the pivot's detilBorongan
+        if ($this->absensiBorongan->isNotEmpty()) {
+            return $this->absensiBorongan
+                ->map(fn ($pivot) => $pivot->detilBorongan)
+                ->filter()
+                ->values();
+        }
+
+        // Otherwise individual — detil is directly on this absensi
+        return $this->detilBorongan;
+    }
 }
