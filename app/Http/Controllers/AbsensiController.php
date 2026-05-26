@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Absensi;
+use App\Models\Absensi_Borongan;
 use App\Models\Borongan;
 use App\Models\Detil_Borongan;
 use App\Models\Detil_Harian;
@@ -11,9 +12,9 @@ use App\Models\PKWT;
 use App\Models\Potongan;
 use App\Models\Tunjangan;
 use App\Models\Unit;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -44,7 +45,7 @@ class AbsensiController extends Controller
         // $units = $unitsQuery->paginate(10)->withQueryString();
 
         $units = Unit::with(['namaMitra'])
-            ->whereHas('picUnit', fn($q) => $q->where('id_pic', Auth::user()->staff->id))
+            ->whereHas('picUnit', fn ($q) => $q->where('id_pic', Auth::user()->staff->id))
             ->paginate(10)
             ->withQueryString();
 
@@ -145,9 +146,9 @@ class AbsensiController extends Controller
             $savedTunjangan = $savedAbsensi ? $savedAbsensi->tunjangan : null;
 
             // Decode tunjangan PKWT secara manual karena tidak menggunakan Casting di Model
-            $pkwtTunjanganRaw = $item->tunjangan; 
-            $pkwtTunjanganParsed = is_string($pkwtTunjanganRaw) 
-                ? json_decode($pkwtTunjanganRaw, true) 
+            $pkwtTunjanganRaw = $item->tunjangan;
+            $pkwtTunjanganParsed = is_string($pkwtTunjanganRaw)
+                ? json_decode($pkwtTunjanganRaw, true)
                 : $pkwtTunjanganRaw;
 
             $savedPotongan = $savedAbsensi ? $savedAbsensi->potongan : null;
@@ -159,7 +160,7 @@ class AbsensiController extends Controller
                 foreach ($kategoriArr as $key => $val) {
                     $uiPotongan[] = [
                         'nama' => str_replace('_', ' ', $key), // Balikkan ke nama asli (tanpa underscore)
-                        'nominal' => (int) $val
+                        'nominal' => (int) $val,
                     ];
                 }
             }
@@ -181,7 +182,7 @@ class AbsensiController extends Controller
                     'existing_catatan' => $savedDetail ? $savedDetail->catatan : '',
                     'existing_potongan' => $uiPotongan,
                     'existing_keterangan_potongan' => $savedPotongan?->keterangan ?? '',
-                    'pkwt_tunjangan' => $pkwtTunjanganParsed, 
+                    'pkwt_tunjangan' => $pkwtTunjanganParsed,
                     'existing_tunjangan' => $savedTunjangan ? $savedTunjangan->kategori : null,
                     'existing_keterangan_tunjangan' => $savedTunjangan?->keterangan ?? '',
                 ],
@@ -200,43 +201,46 @@ class AbsensiController extends Controller
         return view('Absensi.detail.main-harian', compact('unit', 'date', 'workerMap', 'pkwtPekerja', 'totalHadir'));
     }
 
-    function ViewBorongan(Request $request, $id_unit, $date)
+    public function ViewBorongan(Request $request, $id_unit, $date)
     {
         $unit = Unit::with(['namaMitra'])->findOrFail($id_unit);
 
-        // 1. Sync Attendance Records (Tetap pertahankan ini agar record absensi utama tercipta)
         $allPkwt = PKWT::with('pekerja')->where('id_unit', $id_unit)->get();
 
+        // Key by id_pekerja for quick lookup — with absensiBorongan eager loaded
         $existingAbsensi = Absensi::where('id_unit', $id_unit)
             ->where('tgl_absensi', $date)
-            ->with(['detilBorongan', 'tunjangan', 'potongan'])
+            ->with(['detilBorongan', 'tunjangan', 'potongan', 'absensiBorongan'])
             ->get()
             ->keyBy('id_pekerja');
 
         $barangs = Borongan::where('id_unit', $id_unit)->orderBy('nama_item', 'asc')->get();
         $barangLookup = $barangs->keyBy('id');
 
-        // dd($barangs);
-
-        // 2. Query Utama: Ambil PKWT + Pekerja + Absensi (pada tgl tsb) + detilBorongan
-
+        // In ViewBorongan, update the eager load:
         $pkwtQuery = PKWT::with([
-            'pekerja.absensi' => function ($q) use ($date, $id_unit) {
-                $q->where('tgl_absensi', $date)->where('id_unit', $id_unit)->with('detilBorongan');
+            'pekerja.absensiMany' => function ($q) use ($date, $id_unit) {
+                $q->where('tgl_absensi', $date)
+                    ->where('id_unit', $id_unit)
+                    ->with([
+                        'detilBorongan',
+                        'absensiBorongan.detilBorongan', // pivot → shared detil
+                        'tunjangan',
+                        'potongan',
+                    ]);
             },
         ])
             ->where('id_unit', $id_unit)
             ->where('status_aktif', 1);
 
-        // 3. Filter Pencarian (Nama/NIK)
         if ($request->filled('search')) {
             $search = $request->search;
             $pkwtQuery->whereHas('pekerja', function ($q) use ($search) {
-                $q->where('nama', 'like', "%{$search}%")->orWhere('nik', 'like', "%{$search}%");
+                $q->where('nama', 'like', "%{$search}%")
+                    ->orWhere('nik', 'like', "%{$search}%");
             });
         }
 
-        // Filter Status Aktif PKWT (bukan status absen)
         if ($request->filled('status')) {
             $status = $request->status;
             $pkwtQuery->whereHas('pekerja.absensiMany', function ($q) use ($status, $date, $id_unit) {
@@ -251,81 +255,131 @@ class AbsensiController extends Controller
         if ($request->filled('statusVerif')) {
             $status = $request->statusVerif;
             $pkwtQuery->whereHas('pekerja.absensiMany', function ($q) use ($status, $date, $id_unit) {
-                $q->where('tgl_absensi', $date)->where('id_unit', $id_unit)->where('verifikasi', $status);
+                $q->where('tgl_absensi', $date)
+                    ->where('id_unit', $id_unit)
+                    ->where('verifikasi', $status);
             });
         }
 
         $pkwtPekerja = $pkwtQuery->paginate(25)->withQueryString();
 
+        // Build existingBorongan for Alpine rowItems pre-fill
         $existingBorongan = [];
-
         foreach ($pkwtPekerja as $pkwt) {
-            $absensi = Absensi::where('id_pekerja', $pkwt->pekerja->id)->whereDate('tgl_absensi', $date)->where('id_unit', $pkwt->id_unit)->first();
-            if ($absensi && $absensi->detilBorongan->isNotEmpty()) {
-                $existingBorongan[$pkwt->id] = $absensi->detilBorongan
-                    ->map(function ($d) {
-                        return [
-                            'id_barang' => $d->id_barang,
-                            'FD' => $d->FD,
-                            'act_rej' => $d->act_rej,
-                            'good_mc' => $d->good_mc,
-                            'bayaranPerusahaan' => $d->bayaranPerusahaan,
-                            'bayaranItem' => $d->bayaranItem,
-                            'catatan' => $d->catatan,
-                            'fileName' => null,
-                        ];
-                    })
-                    ->values();
+            // ✅ Use the already-loaded $existingAbsensi collection — no extra query
+            $absensi = $existingAbsensi->get($pkwt->pekerja->id);
+
+            if ($absensi) {
+                // Check if this worker has GROUP absen — detil lives on the pivot absensi
+                if ($absensi->absensiBorongan->isNotEmpty()) {
+                    $groupAbsensi = $absensi->absensiBorongan->first();
+                    $rawDetil = $groupAbsensi->detilBorongan;
+
+                    // Handle both hasOne (single model) and hasMany (collection)
+                    $detilSource = $rawDetil instanceof \Illuminate\Database\Eloquent\Collection
+                        ? $rawDetil
+                        : collect($rawDetil ? [$rawDetil] : []);
+                } else {
+                    $detilSource = $absensi->detilBorongan;
+                }
+
+                if ($detilSource->isNotEmpty()) {
+                    $existingBorongan[$pkwt->id] = $detilSource
+                        ->map(function ($d) {
+                            return [
+                                'id_barang' => $d->id_barang,
+                                'FD' => $d->FD,
+                                'act_rej' => $d->act_rej,
+                                'good_mc' => $d->good_mc,
+                                'max_rej_subkon' => $d->max_rej_subkon ?? 0,
+                                'act_rej_max' => $d->max_rej_subkon ?? 0,
+                                'rej_mc_dibebankan' => $d->rej_mc_beban ?? 0,
+                                'bayaranPerusahaan' => $d->bayaranPerusahaan,
+                                'bayaranItem' => $d->bayaranItem,
+                                'catatan' => $d->catatan,
+                                'fileName' => null,
+                            ];
+                        })
+                        ->values();
+                }
             }
+
+            // if ($absensi && $absensi->detilBorongan->isNotEmpty()) {
+            //     $existingBorongan[$pkwt->id] = $absensi->detilBorongan
+            //         ->map(function ($d) {
+            //             return [
+            //                 'id_barang' => $d->id_barang,
+            //                 'FD' => $d->FD,
+            //                 'act_rej' => $d->act_rej,
+            //                 'good_mc' => $d->good_mc,
+            //                 'max_rej_subkon' => $d->max_rej_subkon ?? 0,
+            //                 'act_rej_max' => $d->max_rej_subkon ?? 0,
+            //                 'rej_mc_dibebankan' => $d->rej_mc_beban ?? 0,
+            //                 'bayaranPerusahaan' => $d->bayaranPerusahaan,
+            //                 'bayaranItem' => $d->bayaranItem,
+            //                 'catatan' => $d->catatan,
+            //                 'fileName' => null,
+            //             ];
+            //         })
+            //         ->values();
+            // }
         }
 
-        // 4. Handle AJAX Response
+        // Handle AJAX
         if ($request->ajax()) {
-            return view('Absensi.partials.main-borongan-table', compact('pkwtPekerja', 'unit', 'date', 'barangs', 'barangLookup', 'existingBorongan'))->render();
+            return view('Absensi.partials.main-borongan-table', compact(
+                'pkwtPekerja', 'unit', 'date', 'barangs', 'barangLookup', 'existingBorongan'
+            ))->render();
         }
 
-        // 5. Worker Map untuk Modal
+        // ✅ workerMap — $absensi now correctly resolved from $existingAbsensi
         $workerMap = $allPkwt->mapWithKeys(function ($item) use ($existingAbsensi) {
+            // ✅ FIX: resolve from the keyed collection, not undefined $absensi
             $savedAbsensi = $existingAbsensi->get($item->id_pekerja);
 
-            $savedTunjangan = $savedAbsensi ? $savedAbsensi->tunjangan : null;
+            $savedTunjangan = $savedAbsensi?->tunjangan;
 
-            // Decode tunjangan PKWT secara manual karena tidak menggunakan Casting di Model
-            $pkwtTunjanganRaw = $item->tunjangan; 
-            $pkwtTunjanganParsed = is_string($pkwtTunjanganRaw) 
-                ? json_decode($pkwtTunjanganRaw, true) 
+            $pkwtTunjanganRaw = $item->tunjangan;
+            $pkwtTunjanganParsed = is_string($pkwtTunjanganRaw)
+                ? json_decode($pkwtTunjanganRaw, true)
                 : $pkwtTunjanganRaw;
 
-            // Transformasi Potongan dari DB (Object) ke UI (Array) untuk auto-fill
             $uiPotongan = [];
-            $savedPotongan = $savedAbsensi ? $savedAbsensi->potongan : null;
+            $savedPotongan = $savedAbsensi?->potongan;
             if ($savedPotongan && $savedPotongan->kategori) {
-                $kategoriArr = is_array($savedPotongan->kategori) ? $savedPotongan->kategori : json_decode($savedPotongan->kategori, true);
+                $kategoriArr = is_array($savedPotongan->kategori)
+                    ? $savedPotongan->kategori
+                    : json_decode($savedPotongan->kategori, true);
                 foreach ($kategoriArr as $key => $val) {
                     $uiPotongan[] = [
                         'nama' => str_replace('_', ' ', $key),
-                        'nominal' => (int) $val
+                        'nominal' => (int) $val,
                     ];
                 }
             }
+
+            // ✅ FIX: is_group now correctly uses $savedAbsensi (not undefined $absensi)
+            $isGroup = $savedAbsensi
+                ? $savedAbsensi->absensiBorongan->isNotEmpty()
+                : false;
+
             return [
                 $item->id => [
                     'nama' => $item->pekerja->nama,
                     'nik' => $item->pekerja->nik,
                     'initials' => strtoupper(substr($item->pekerja->nama, 0, 2)),
-                    // FLAG UTAMA: Mengecek apakah record absensi sudah ada di DB
-                    'has_absen' => $savedAbsensi ? true : false,
 
-                    // Data untuk Modal Tunjangan
+                    'has_absen' => $savedAbsensi !== null,
+                    'is_group' => $isGroup,
+                    'is_individual' => $savedAbsensi !== null && ! $isGroup,
+
                     'existing_tunjangan' => $savedAbsensi?->tunjangan?->kategori ?? null,
                     'existing_keterangan_tunjangan' => $savedTunjangan?->keterangan ?? '',
                     'pkwt_tunjangan' => $pkwtTunjanganParsed,
 
-                    // Data untuk Modal Potongan
                     'existing_potongan' => $uiPotongan,
                     'existing_keterangan_potongan' => $savedPotongan?->keterangan ?? '',
 
-                    // Status kehadiran (ambil dari baris pertama detil borongan jika ada)
                     'existing_status' => $savedAbsensi?->detilBorongan->first()?->status_kehadiran ?? null,
                 ],
             ];
@@ -333,12 +387,13 @@ class AbsensiController extends Controller
 
         $totalHadir = Absensi::where('id_unit', $unit->id)
             ->where('tgl_absensi', $date)
-            ->whereHas('detilBorongan', function ($q) {
-                $q->where('status_kehadiran', 1);
-            })
+            ->whereHas('detilBorongan', fn ($q) => $q->where('status_kehadiran', 1))
             ->count();
 
-        return view('Absensi.detail.main-borongan', compact('unit', 'date', 'workerMap', 'pkwtPekerja', 'totalHadir', 'barangs', 'barangLookup', 'existingBorongan'));
+        return view('Absensi.detail.main-borongan', compact(
+            'unit', 'date', 'workerMap', 'pkwtPekerja',
+            'totalHadir', 'barangs', 'barangLookup', 'existingBorongan'
+        ));
     }
 
     public function bulkAbsensiUpdate(Request $request)
@@ -353,7 +408,7 @@ class AbsensiController extends Controller
         // Custom validation untuk pesan error yang lebih user-friendly
         $validator->after(function ($validator) use ($request) {
             foreach ($request->data as $pkwtId => $values) {
-                if (!isset($values['jam_aktual']) || $values['jam_aktual'] === '') {
+                if (! isset($values['jam_aktual']) || $values['jam_aktual'] === '') {
                     $pkwt = PKWT::with('pekerja')->find($pkwtId);
                     $nama = $pkwt?->pekerja?->nama ?? "Pekerja #$pkwtId";
                     $validator->errors()->add("data.$pkwtId", "Jam kerja $nama belum diisi.");
@@ -373,7 +428,7 @@ class AbsensiController extends Controller
 
             foreach ($request->data as $pkwtId => $values) {
                 $pkwt = PKWT::with('unit')->find($pkwtId);
-                if (!$pkwt) {
+                if (! $pkwt) {
                     continue;
                 }
 
@@ -384,7 +439,7 @@ class AbsensiController extends Controller
                 ])->first();
 
                 // 2. Jika Absensi belum ada, kita buat Parent-nya
-                if (!$absensi) {
+                if (! $absensi) {
                     // 1. Dapatkan atau Buat Parent Absensi
                     $absensi = Absensi::firstOrCreate(
                         ['id_pekerja' => $pkwt->id_pekerja, 'id_unit' => $pkwt->id_unit, 'tgl_absensi' => $date],
@@ -412,6 +467,7 @@ class AbsensiController extends Controller
                 // KONDISI 1: JIKA STATUS TERLARANG (5 atau 6)
                 if ($detil && in_array($detil->status_kehadiran, $statusTerlarang)) {
                     $statusLabel = $detil->status_kehadiran == 5 ? 'Rencana Cuti' : 'Absen';
+
                     return back()->with('error', "Gagal! Pekerja [{$pkwt->pekerja->nama}] berstatus {$statusLabel}. Ubah status kehadiran secara manual terlebih dahulu sebelum mengisi jam.")->withInput();
                 }
 
@@ -442,10 +498,12 @@ class AbsensiController extends Controller
             }
 
             DB::commit();
+
             return back()->with('success', 'Data jam kerja berhasil disimpan.');
         } catch (\Throwable $e) {
             DB::rollBack();
-            return back()->with('error', 'Gagal menyimpan data: ' . $e->getMessage());
+
+            return back()->with('error', 'Gagal menyimpan data: '.$e->getMessage());
         }
     }
 
@@ -472,7 +530,7 @@ class AbsensiController extends Controller
                 $jamKerja = $pkwt->hariKerja->firstWhere('hari', $dayName)->jam_kerja ?? 0;
 
                 // dd($jamKerja);
-                if (!$pkwt) {
+                if (! $pkwt) {
                     continue;
                 }
 
@@ -516,9 +574,11 @@ class AbsensiController extends Controller
             }
 
             DB::commit();
+
             return back()->with('success', 'Status presensi berhasil diperbarui.');
         } catch (\Throwable $e) {
             DB::rollBack();
+
             return back()->with('error', $e->getMessage());
         }
     }
@@ -539,7 +599,7 @@ class AbsensiController extends Controller
         try {
             foreach ($request->data as $pkwtId => $values) {
                 $pkwt = PKWT::with(['unit', 'pekerja'])->find($pkwtId);
-                if (!$pkwt) {
+                if (! $pkwt) {
                     continue;
                 }
 
@@ -549,8 +609,8 @@ class AbsensiController extends Controller
                     'tgl_absensi' => $request->date,
                 ])->first();
 
-                if (!$absensi) {
-                    throw new \Exception("Absensi untuk " . ($pkwt->pekerja->nama ?? 'Pekerja') . " belum dibuat pada tanggal tersebut.");
+                if (! $absensi) {
+                    throw new \Exception('Absensi untuk '.($pkwt->pekerja->nama ?? 'Pekerja').' belum dibuat pada tanggal tersebut.');
                 }
 
                 $kategoriArray = json_decode($values['kategori'], true);
@@ -569,8 +629,8 @@ class AbsensiController extends Controller
                     // UPDATE CASE - Only update updated_by
                     // ============================================
                     $existingTunjangan->update([
-                        'kategori'   => $kategoriArray,
-                        'total'      => (float) $values['total'],
+                        'kategori' => $kategoriArray,
+                        'total' => (float) $values['total'],
                         'keterangan' => $values['keterangan'] ?? null,
                         'updated_by' => Auth::id(),
                     ]);
@@ -583,8 +643,8 @@ class AbsensiController extends Controller
                         'id_pekerja' => $pkwt->id_pekerja,
                         'id_unit' => $pkwt->id_unit,
                         'id_absensi' => $absensi->id,
-                        'kategori'   => $kategoriArray,
-                        'total'      => (float) $values['total'],
+                        'kategori' => $kategoriArray,
+                        'total' => (float) $values['total'],
                         'keterangan' => $values['keterangan'] ?? null,
                         'updated_by' => Auth::id(),
                         'created_by' => Auth::id(),
@@ -593,11 +653,13 @@ class AbsensiController extends Controller
             }
 
             DB::commit();
+
             return back()->with('success', 'Data tunjangan berhasil disimpan.');
 
         } catch (\Throwable $e) {
             DB::rollBack();
-            return back()->with('error', 'Gagal menyimpan: ' . $e->getMessage())->withInput();
+
+            return back()->with('error', 'Gagal menyimpan: '.$e->getMessage())->withInput();
         }
     }
 
@@ -618,7 +680,7 @@ class AbsensiController extends Controller
         try {
             foreach ($request->data as $pkwtId => $values) {
                 $pkwt = PKWT::with(['unit', 'pekerja'])->find($pkwtId);
-                if (!$pkwt) {
+                if (! $pkwt) {
                     continue;
                 }
 
@@ -628,8 +690,8 @@ class AbsensiController extends Controller
                     'tgl_absensi' => $request->date,
                 ])->first();
 
-                if (!$absensi) {
-                    throw new \Exception("Absensi untuk " . ($pkwt->pekerja->nama ?? 'Pekerja') . " belum dibuat pada tanggal tersebut.");
+                if (! $absensi) {
+                    throw new \Exception('Absensi untuk '.($pkwt->pekerja->nama ?? 'Pekerja').' belum dibuat pada tanggal tersebut.');
                 }
 
                 $kategoriArray = json_decode($values['kategori'], true);
@@ -648,8 +710,8 @@ class AbsensiController extends Controller
                     // UPDATE CASE - Only update updated_by
                     // ============================================
                     $existingPotongan->update([
-                        'kategori'   => $kategoriArray,
-                        'total'      => (float) $values['total'],
+                        'kategori' => $kategoriArray,
+                        'total' => (float) $values['total'],
                         'keterangan' => $values['keterangan'] ?? null,
                         'updated_by' => Auth::id(),
                     ]);
@@ -662,8 +724,8 @@ class AbsensiController extends Controller
                         'id_pekerja' => $pkwt->id_pekerja,
                         'id_unit' => $pkwt->id_unit,
                         'id_absensi' => $absensi->id,
-                        'kategori'   => $kategoriArray,
-                        'total'      => (float) $values['total'],
+                        'kategori' => $kategoriArray,
+                        'total' => (float) $values['total'],
                         'keterangan' => $values['keterangan'] ?? null,
                         'updated_by' => Auth::id(),
                         'created_by' => Auth::id(),
@@ -672,11 +734,13 @@ class AbsensiController extends Controller
             }
 
             DB::commit();
+
             return back()->with('success', 'Data potongan berhasil disimpan.');
 
         } catch (\Throwable $e) {
             DB::rollBack();
-            return back()->with('error', 'Gagal menyimpan: ' . $e->getMessage())->withInput();
+
+            return back()->with('error', 'Gagal menyimpan: '.$e->getMessage())->withInput();
         }
     }
 
@@ -700,7 +764,7 @@ class AbsensiController extends Controller
         );
 
         $validator->after(function ($validator) use ($request) {
-            if (!$request->has('data') || !is_array($request->data)) {
+            if (! $request->has('data') || ! is_array($request->data)) {
                 return back()
                     ->withErrors(['data' => 'Data absensi tidak ditemukan atau format tidak valid.'])
                     ->withInput();
@@ -713,7 +777,7 @@ class AbsensiController extends Controller
                 }
 
                 // 🔒 PASTIKAN PAYLOAD PRODUKSI ADALAH ARRAY
-                if (!is_array($payload)) {
+                if (! is_array($payload)) {
                     continue;
                 }
 
@@ -721,46 +785,46 @@ class AbsensiController extends Controller
 
                 foreach ($payload as $rowIndex => $row) {
                     // ⛔ skip key non-produksi (jaga-jaga)
-                    if (!is_array($row)) {
+                    if (! is_array($row)) {
                         continue;
                     }
 
                     if (empty($row['id_barang'])) {
                         $missing['barang'] = 'barang';
                     }
-                    if (!isset($row['FD'])) {
+                    if (! isset($row['FD'])) {
                         $missing['FD'] = 'FD';
                     }
-                    if (!isset($row['act_rej'])) {
+                    if (! isset($row['act_rej'])) {
                         $missing['act_rej'] = 'ACT Reject';
                     }
-                    if (!isset($row['good_mc'])) {
+                    if (! isset($row['good_mc'])) {
                         $missing['good_mc'] = 'Good MC';
                     }
-                    if (!isset($row['totalQTY'])) {
+                    if (! isset($row['totalQTY'])) {
                         $missing['totalQTY'] = 'Total QTY';
                     }
-                    if (!isset($row['bayaranPerusahaan'])) {
+                    if (! isset($row['bayaranPerusahaan'])) {
                         $missing['bayaranPerusahaan'] = 'bayaran perusahaan';
                     }
-                    if (!isset($row['bayaranItem'])) {
+                    if (! isset($row['bayaranItem'])) {
                         $missing['bayaranItem'] = 'bayaran item';
                     }
-                    if (!isset($row['act_rej_max'])) {
+                    if (! isset($row['act_rej_max'])) {
                         $missing['act_rej_max'] = 'act rej max';
                     }
-                    if (!isset($row['rej_mc_dibebankan'])) {
+                    if (! isset($row['rej_mc_dibebankan'])) {
                         $missing['rej_mc_dibebankan'] = 'rej mc dibebankan';
                     }
                 }
 
-                if (!empty($missing)) {
+                if (! empty($missing)) {
                     $pkwt = PKWT::with('pekerja')->find($pkwtId);
                     $nama = $pkwt?->pekerja?->nama ?? "Pekerja #$pkwtId";
 
                     $fields = array_values($missing);
                     $last = array_pop($fields);
-                    $fieldText = $fields ? implode(', ', $fields) . ' dan ' . $last : $last;
+                    $fieldText = $fields ? implode(', ', $fields).' dan '.$last : $last;
 
                     $validator->errors()->add("data.$pkwtId", "Data borongan $nama belum lengkap. Mohon isi $fieldText.");
                 }
@@ -849,44 +913,166 @@ class AbsensiController extends Controller
             }
 
             DB::commit();
+
             return back()->with('success', 'Data absensi berhasil diperbarui.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Gagal menyimpan: ' . $e->getMessage());
+
+            return back()->with('error', 'Gagal menyimpan: '.$e->getMessage());
+        }
+    }
+
+    public function bulkKelompokAbsensiBoronganUpdate(Request $request, $id_unit, $date)
+    {
+        // dd($request->all());
+        // Validate incoming data
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'date' => 'required|date',
+                'selected_ids' => 'required|array|min:1',
+                'group_data' => 'required|array|min:1',
+                'group_data.*.id_barang' => 'required',
+                'group_data.*.buktiSuratJalan' => 'nullable|file|mimes:png,jpg,jpeg,pdf|max:2048',
+            ],
+            [
+                'date.required' => 'Tanggal tidak boleh kosong.',
+                'selected_ids.required' => 'Minimal pilih satu pekerja.',
+                'group_data.required' => 'Data produksi tidak boleh kosong.',
+                'group_data.*.id_barang.required' => 'Nama barang wajib dipilih untuk setiap baris.',
+                'group_data.*.buktiSuratJalan.mimes' => 'Bukti surat jalan harus berupa PDF / JPG / PNG.',
+                'group_data.*.buktiSuratJalan.max' => 'Ukuran bukti surat jalan maksimal 2MB.',
+            ],
+        );
+
+        if ($validator->fails()) {
+            return back()->withErrors($validator)->withInput();
+        }
+
+        DB::beginTransaction();
+
+        try {
+            $date = $request->date;
+            $selectedIds = $request->selected_ids; // array of PKWT IDs
+            $groupData = $request->group_data;    // shared production rows
+
+            // ─────────────────────────────────────────────────────────────
+            // STEP 1: Pre-build the borongan detail rows (shared data)
+            //         We'll create ONE Detil_Borongan per barang row,
+            //         then attach it to EACH worker's Absensi via pivot.
+            // ─────────────────────────────────────────────────────────────
+
+            // Collect the created Detil_Borongan IDs to attach later
+            // Shape: [ [detil_borongan_id, ...], ... ] — one set per barang row
+            $detilBoronganIds = [];
+
+            foreach ($groupData as $rowIndex => $row) {
+                // Read the uploaded file (if any) for this row
+                $fileContent = null;
+                if ($request->hasFile("group_data.$rowIndex.buktiSuratJalan")) {
+                    $fileContent = file_get_contents(
+                        $request->file("group_data.$rowIndex.buktiSuratJalan")->getRealPath()
+                    );
+                }
+
+                // Create ONE shared Detil_Borongan row per barang
+                // Note: id_absensi is NULL here — we link via pivot, not FK
+                $detil = Detil_Borongan::create([
+                    'id_absensi' => null, // will be linked via pivot
+                    'id_barang' => $row['id_barang'],
+                    'status_kehadiran' => 1,    // hadir otomatis
+                    'FD' => $row['FD'] ?? 0,
+                    'act_rej' => $row['act_rej'] ?? 0,
+                    'good_mc' => $row['good_mc'] ?? 0,
+                    'max_rej_subkon' => $row['act_rej_max'] ?? 0,
+                    'rej_mc_beban' => $row['rej_mc_dibebankan'] ?? 0,
+                    'bayaranPerusahaan' => $row['bayaranPerusahaan'] ?? 0,
+                    'bayaranItem' => $row['bayaranItem'] ?? 0,
+                    'buktiSuratJalan' => $fileContent,
+                    'catatan' => $row['catatan'] ?? null,
+                    'updated_by' => Auth::id(),
+                ]);
+
+                $detilBoronganIds[] = $detil->id;
+            }
+
+            // ─────────────────────────────────────────────────────────────
+            // STEP 2: For each selected worker, create/get their Absensi,
+            //         then attach all Detil_Borongan via pivot.
+            // ─────────────────────────────────────────────────────────────
+
+            foreach ($selectedIds as $pkwtId) {
+                $pkwt = PKWT::with('unit')->findOrFail($pkwtId);
+
+                // Create or get the Absensi record for this worker + date
+                $absensi = Absensi::firstOrCreate(
+                    [
+                        'id_pekerja' => $pkwt->id_pekerja,
+                        'id_unit' => $pkwt->id_unit,
+                        'tgl_absensi' => $date,
+                    ],
+                    [
+                        'id_pic' => Auth::user()->staff->id,
+                        'tipe' => $pkwt->unit->sistem_pengajian,
+                        'verifikasi' => 0,
+                    ],
+                );
+
+                // Clear old pivot links for this absensi (to allow re-submission)
+                Absensi_Borongan::where('id_absensi', $absensi->id)->delete();
+
+                // Attach each shared Detil_Borongan to this worker's Absensi
+                // This inserts rows into the pivot table: absensi_borongan
+                foreach ($detilBoronganIds as $detilId) {
+                    Absensi_Borongan::create([
+                        'id_absensi' => $absensi->id,
+                        'id_detil_borongan' => $detilId,
+                    ]);
+                }
+            }
+
+            DB::commit();
+
+            return back()->with('success', 'Data absensi kelompok berhasil disimpan.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return back()->with('error', 'Gagal menyimpan: '.$e->getMessage());
         }
     }
 
     public function getAdjustments(Request $request)
-{
-    try {
-        $workerIds = $request->worker_ids;
-        $start = $request->tanggal_mulai;
-        $end = $request->tanggal_akhir;
+    {
+        try {
+            $workerIds = $request->worker_ids;
+            $start = $request->tanggal_mulai;
+            $end = $request->tanggal_akhir;
 
-        $results = [];
+            $results = [];
 
-        foreach ($workerIds as $id) {
-            // Kita hitung berdasarkan relasi tgl_absensi di tabel absensi
-            $totalTunjangan = Tunjangan::where('id_pekerja', $id)
-                ->whereHas('absensi', function($q) use ($start, $end) {
-                    $q->whereBetween('tgl_absensi', [$start, $end]);
-                })->sum('total');
+            foreach ($workerIds as $id) {
+                // Kita hitung berdasarkan relasi tgl_absensi di tabel absensi
+                $totalTunjangan = Tunjangan::where('id_pekerja', $id)
+                    ->whereHas('absensi', function ($q) use ($start, $end) {
+                        $q->whereBetween('tgl_absensi', [$start, $end]);
+                    })->sum('total');
 
-            $totalPotongan = Potongan::where('id_pekerja', $id)
-                ->whereHas('absensi', function($q) use ($start, $end) {
-                    $q->whereBetween('tgl_absensi', [$start, $end]);
-                })->sum('total');
+                $totalPotongan = Potongan::where('id_pekerja', $id)
+                    ->whereHas('absensi', function ($q) use ($start, $end) {
+                        $q->whereBetween('tgl_absensi', [$start, $end]);
+                    })->sum('total');
 
-            $results[$id] = [
-                'pembayaran_lain' => (int)$totalPotongan,
-                'tunjangan_bayaran' => (int)$totalTunjangan
-            ];
+                $results[$id] = [
+                    'pembayaran_lain' => (int) $totalPotongan,
+                    'tunjangan_bayaran' => (int) $totalTunjangan,
+                ];
+            }
+
+            return response()->json($results);
+        } catch (\Exception $e) {
+            // Jika error, kirim pesan error dalam format JSON (bukan HTML)
+            return response()->json(['error' => $e->getMessage()], 500);
         }
-
-        return response()->json($results);
-    } catch (\Exception $e) {
-        // Jika error, kirim pesan error dalam format JSON (bukan HTML)
-        return response()->json(['error' => $e->getMessage()], 500);
     }
-}
 }
