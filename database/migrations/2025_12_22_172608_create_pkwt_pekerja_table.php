@@ -16,10 +16,10 @@ return new class extends Migration
             $table->id();
 
             $table->char('id_pekerja', 20);
-            $table->char('id_unit', 20);
+            $table->char('id_unit', 20)->nullable();
 
-            $table->integer('divisi_id');
-            $table->integer('jabatan_id');
+            $table->integer('divisi_id')->nullable();
+            $table->integer('jabatan_id')->nullable();
 
             $table->date('tgl_mulai_pkwt');
             $table->date('tgl_akhir_pkwt');

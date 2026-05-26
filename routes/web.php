@@ -119,6 +119,8 @@ Route::middleware(['auth', 'role:hrd,admin,head_supervisor,pic'])->group(functio
     // Route::get('/pekerja/dokumen/{id}', [PekerjaController::class, 'showDokumen'])->name('pekerja.dokumen.show');
     Route::get('/pkwt/dokumen/{id}', [PekerjaController::class, 'showPkwtDokumen'])->name('pkwt.dokumen.show'); // Route for specific PKWT records (Current and History)
     Route::put('/pekerja/toggle-status/{id}', [PekerjaController::class, 'toggleStatus']);
+
+    Route::post('/pekerja/histori-pkwt/tambah', [PekerjaController::class, 'TambahHistoriPKWT'])->name('pekerja.histori-pkwt.tambah');
 });
 
 Route::middleware(['auth', 'role:hrd,admin,akuntan,pic'])->group(function () {
