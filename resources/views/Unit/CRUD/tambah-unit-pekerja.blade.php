@@ -218,7 +218,7 @@
                                     </div>
 
                                     {{-- Divisi --}}
-                                    <div x-data="idCombobox(row, 'divisiId', window.divisiData, d => d.nama)" x-init="init()" class="relative">
+                                    {{-- <div x-data="idCombobox(row, 'divisiId', window.divisiData, d => d.nama)" x-init="init()" class="relative">
                                         <label
                                             class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Divisi
                                             Pekerja</label>
@@ -235,10 +235,10 @@
                                         </ul>
                                         <input type="hidden" :name="`pekerja[${index}][divisi_id]`"
                                             :value="row.divisiId">
-                                    </div>
+                                    </div> --}}
 
                                     {{-- Jabatan --}}
-                                    <div x-data="idCombobox(row, 'jabatanId', window.jabatanData, j => j.nama)" x-init="init()" class="relative">
+                                    {{-- <div x-data="idCombobox(row, 'jabatanId', window.jabatanData, j => j.nama)" x-init="init()" class="relative">
                                         <label
                                             class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Jabatan
                                             Pekerja</label>
@@ -255,6 +255,225 @@
                                         </ul>
                                         <input type="hidden" :name="`pekerja[${index}][jabatan_id]`"
                                             :value="row.jabatanId">
+                                    </div> --}}
+
+                                    {{-- Divisi --}}
+                                    <div x-data="idCombobox(row, 'divisiId', window.divisiData, d => d.nama)" x-init="init()" class="relative">
+                                        <div class="flex justify-between items-center mb-1">
+                                            <label class="block text-sm font-bold text-gray-700">Divisi</label>
+                                            <button type="button" @click="showModal = true"
+                                                class="text-[11px] flex items-center gap-1 text-blue-600 hover:text-blue-800 font-bold transition">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2.5" d="M12 4v16m8-8H4"></path>
+                                                </svg>
+                                                Tambah Baru
+                                            </button>
+                                        </div>
+
+                                        <div class="relative group">
+                                            <div
+                                                class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                                </svg>
+                                            </div>
+                                            <input type="text" x-model="search" @focus="open = true"
+                                                @click.outside="close()" placeholder="Cari atau pilih divisi..."
+                                                class="w-full pl-11 pr-10 rounded-xl border-none bg-gray-50 text-gray-900 focus:bg-white focus:ring-4 focus:ring-blue-100 transition py-3.5 px-4 text-sm font-bold shadow-sm"
+                                                autocomplete="off">
+                                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                                                @click="open = !open">
+                                                <svg class="w-4 h-4 text-gray-400 transition-transform duration-200"
+                                                    :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M19 9l-7 7-7-7"></path>
+                                                </svg>
+                                            </div>
+
+                                            <ul x-show="open" x-cloak
+                                                class="absolute z-50 w-full mt-2 bg-white border border-gray-100 rounded-2xl shadow-2xl max-h-48 overflow-y-auto py-2 custom-scrollbar">
+                                                <template x-for="item in filtered" :key="item.id">
+                                                    <li @click="select(item)"
+                                                        class="px-5 py-2.5 text-sm font-bold text-slate-600 hover:bg-blue-50 cursor-pointer transition-colors"
+                                                        x-text="item.nama"></li>
+                                                </template>
+                                            </ul>
+                                        </div>
+                                        <input type="hidden" :name="`pekerja[${index}][divisi_id]`"
+                                            :value="row.divisiId">
+
+                                        {{-- MODAL DIVISI (Matches Screenshot) --}}
+                                        <div x-show="showModal" x-cloak
+                                            class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                                            <div x-show="showModal" x-transition.opacity
+                                                class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
+                                            <div x-show="showModal" x-transition:enter="ease-out duration-300"
+                                                x-transition:enter-start="opacity-0 scale-95"
+                                                x-transition:enter-end="opacity-100 scale-100"
+                                                class="relative w-full max-w-md bg-white rounded-[2rem] shadow-2xl overflow-hidden border border-white">
+                                                <div
+                                                    class="px-8 py-6 border-b border-gray-50 flex items-center gap-4 bg-gray-50/30">
+                                                    <div class="p-3 bg-blue-50 text-blue-600 rounded-2xl"><svg
+                                                            class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                                                            stroke="currentColor" stroke-width="2.5">
+                                                            <path d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                                        </svg></div>
+                                                    <div>
+                                                        <h3 class="text-lg font-black text-slate-800">Tambah Divisi Baru
+                                                        </h3>
+                                                        <p
+                                                            class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                                                            Masukkan nama divisi baru.</p>
+                                                    </div>
+                                                </div>
+                                                <div class="p-8">
+                                                    <label
+                                                        class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Nama
+                                                        Divisi</label>
+                                                    <div class="relative">
+                                                        <div
+                                                            class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                                            <svg class="w-5 h-5 text-gray-300" fill="none"
+                                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    stroke-width="2"
+                                                                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                                            </svg>
+                                                        </div>
+                                                        <input type="text" x-model="newItemName"
+                                                            placeholder="Contoh: Operasional & Logistik"
+                                                            class="w-full pl-12 pr-4 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold focus:ring-4 focus:ring-blue-100 transition-all">
+                                                    </div>
+                                                    <p x-show="errorMessage" x-text="errorMessage"
+                                                        class="mt-3 text-red-500 text-[10px] font-bold uppercase ml-1"></p>
+                                                </div>
+                                                <div class="px-8 pb-8 flex justify-end gap-3">
+                                                    <button type="button" @click="showModal = false"
+                                                        class="px-6 py-3 text-xs font-black text-slate-400 uppercase tracking-widest hover:text-slate-600 transition">Batalkan</button>
+                                                    <button type="button" @click="saveNew('divisi')"
+                                                        :disabled="isLoading"
+                                                        class="px-8 py-3 bg-blue-600 text-white text-xs font-black uppercase tracking-widest rounded-xl shadow-lg shadow-blue-200 hover:bg-blue-700 transition active:scale-95 disabled:opacity-50">
+                                                        <span x-show="!isLoading">Simpan Data</span>
+                                                        <span x-show="isLoading">Menyimpan...</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {{-- 2. JABATAN PEKERJA --}}
+                                    <div x-data="idCombobox(row, 'jabatanId', window.jabatanData, j => j.nama)" x-init="init()" class="relative">
+                                        <div class="flex justify-between items-center mb-1">
+                                            <label class="block text-sm font-bold text-gray-700">Jabatan</label>
+                                            <button type="button" @click="showModal = true"
+                                                class="text-[11px] flex items-center gap-1 text-indigo-600 hover:text-indigo-800 font-bold transition">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2.5" d="M12 4v16m8-8H4"></path>
+                                                </svg>
+                                                Tambah Baru
+                                            </button>
+                                        </div>
+
+                                        <div class="relative group">
+                                            <div
+                                                class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                                </svg>
+                                            </div>
+                                            <input type="text" x-model="search" @focus="open = true"
+                                                @click.outside="close()" placeholder="Cari atau pilih jabatan..."
+                                                class="w-full pl-11 pr-10 rounded-xl border-none bg-gray-50 text-gray-900 focus:bg-white focus:ring-4 focus:ring-indigo-100 transition py-3.5 px-4 text-sm font-bold shadow-sm"
+                                                autocomplete="off">
+                                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                                                @click="open = !open">
+                                                <svg class="w-4 h-4 text-gray-400 transition-transform duration-200"
+                                                    :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M19 9l-7 7-7-7"></path>
+                                                </svg>
+                                            </div>
+
+                                            <ul x-show="open" x-cloak
+                                                class="absolute z-50 w-full mt-2 bg-white border border-gray-100 rounded-2xl shadow-2xl max-h-48 overflow-y-auto py-2 custom-scrollbar">
+                                                <template x-for="item in filtered" :key="item.id">
+                                                    <li @click="select(item)"
+                                                        class="px-5 py-2.5 text-sm font-bold text-slate-600 hover:bg-indigo-50 cursor-pointer transition-colors"
+                                                        x-text="item.nama"></li>
+                                                </template>
+                                            </ul>
+                                        </div>
+                                        <input type="hidden" :name="`pekerja[${index}][jabatan_id]`"
+                                            :value="row.jabatanId">
+
+                                        {{-- MODAL JABATAN (Matches Screenshot) --}}
+                                        <div x-show="showModal" x-cloak
+                                            class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                                            <div x-show="showModal" x-transition.opacity
+                                                class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
+                                            <div x-show="showModal" x-transition:enter="ease-out duration-300"
+                                                x-transition:enter-start="opacity-0 scale-95"
+                                                x-transition:enter-end="opacity-100 scale-100"
+                                                class="relative w-full max-w-md bg-white rounded-[2rem] shadow-2xl overflow-hidden border border-white">
+                                                <div
+                                                    class="px-8 py-6 border-b border-gray-50 flex items-center gap-4 bg-gray-50/30">
+                                                    <div class="p-3 bg-indigo-50 text-indigo-600 rounded-2xl"><svg
+                                                            class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                                                            stroke="currentColor" stroke-width="2.5">
+                                                            <path d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                                        </svg></div>
+                                                    <div>
+                                                        <h3 class="text-lg font-black text-slate-800">Tambah Jabatan Baru
+                                                        </h3>
+                                                        <p
+                                                            class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                                                            Masukkan nama jabatan baru.</p>
+                                                    </div>
+                                                </div>
+                                                <div class="p-8">
+                                                    <label
+                                                        class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Nama
+                                                        Jabatan</label>
+                                                    <div class="relative">
+                                                        <div
+                                                            class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                                            <svg class="w-5 h-5 text-gray-300" fill="none"
+                                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    stroke-width="2"
+                                                                    d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
+                                                                </path>
+                                                            </svg>
+                                                        </div>
+                                                        <input type="text" x-model="newItemName"
+                                                            placeholder="Contoh: Foreman retur"
+                                                            class="w-full pl-12 pr-4 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold focus:ring-4 focus:ring-indigo-100 transition-all">
+                                                    </div>
+                                                    <p x-show="errorMessage" x-text="errorMessage"
+                                                        class="mt-3 text-red-500 text-[10px] font-bold uppercase ml-1"></p>
+                                                </div>
+                                                <div class="px-8 pb-8 flex justify-end gap-3">
+                                                    <button type="button" @click="showModal = false"
+                                                        class="px-6 py-3 text-xs font-black text-slate-400 uppercase tracking-widest hover:text-slate-600 transition">Batalkan</button>
+                                                    <button type="button" @click="saveNew('jabatan')"
+                                                        :disabled="isLoading"
+                                                        class="px-8 py-3 bg-indigo-600 text-white text-xs font-black uppercase tracking-widest rounded-xl shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition active:scale-95 disabled:opacity-50">
+                                                        <span x-show="!isLoading">Simpan Data</span>
+                                                        <span x-show="isLoading">Menyimpan...</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -960,6 +1179,11 @@
                 search: '',
                 selectedId: row[field],
 
+                showModal: false,
+                newItemName: '',
+                isLoading: false,
+                errorMessage: '',
+
                 init() {
                     if (this.selectedId) {
                         const found = dataSource.find(i => i.id == this.selectedId);
@@ -989,6 +1213,62 @@
                         this.search = '';
                     }
                     this.open = false;
+                },
+
+                async saveNew(type) {
+                    if (!this.newItemName) {
+                        this.errorMessage = "Nama tidak boleh kosong";
+                        return;
+                    }
+
+                    this.isLoading = true;
+                    this.errorMessage = '';
+
+                    try {
+                        const response = await fetch(`/quick-store/${type}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                            },
+                            body: JSON.stringify({
+                                nama: this.newItemName
+                            })
+                        });
+
+                        const result = await response.json();
+
+                        if (result.success) {
+                            const newItem = {
+                                id: result.data.id,
+                                nama: result.data.nama
+                            };
+                            dataSource.push(newItem); // Push to global data
+                            this.select(newItem); // Auto-select in current row
+
+                            const capitalizedType = type.charAt(0).toUpperCase() + type.slice(1);
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: `${capitalizedType} baru "${this.newItemName}" telah ditambahkan.`,
+                timer: 2000,
+                showConfirmButton: false,
+                customClass: {
+                    popup: 'rounded-[2rem]',
+                }
+            });
+
+                            // Reset and Close
+                            this.showModal = false;
+                            this.newItemName = '';
+                        } else {
+                            this.errorMessage = result.message || "Gagal menyimpan data";
+                        }
+                    } catch (error) {
+                        this.errorMessage = "Terjadi kesalahan koneksi";
+                    } finally {
+                        this.isLoading = false;
+                    }
                 }
             }
         }
