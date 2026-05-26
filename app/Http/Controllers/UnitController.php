@@ -18,6 +18,9 @@ use App\Models\Unit;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Exports\KasKecilExport;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\AssetExport;
 
 class UnitController extends Controller
 {
@@ -606,7 +609,34 @@ class UnitController extends Controller
 
     public function exportKasKecil(Request $request, $id)
     {
-        dd($request->all());
+        // 1. Validasi Input
+        $request->validate([
+            'kasKecilIds' => 'required|array|min:1',
+            'format'      => 'required|in:excel,pdf',
+            'diajukan'    => 'required|string',
+            'diperiksa'   => 'required|string',
+            'disetujui'   => 'required|string',
+        ]);
+
+        // 2. Ambil data dari database yang ID-nya dikirim dari checkbox/tabel
+        $dataKasKecil = Kas_Kecil::whereIn('id', $request->kasKecilIds)
+                                ->orderBy('tanggal', 'asc') // Urutkan dari terlama ke terbaru
+                                ->get();
+
+        // 3. Eksekusi Export Excel
+        if ($request->format === 'excel') {
+            $namaFile = 'Laporan_Kas_Kecil_' . date('d_M_Y_Hi') . '.xlsx';
+
+            return Excel::download(
+                new KasKecilExport(
+                    $dataKasKecil,
+                    $request->diajukan,
+                    $request->diperiksa,
+                    $request->disetujui
+                ), 
+                $namaFile
+            );
+        }
     }
 
     public function storeBulkAsset(Request $request, $id)
@@ -690,7 +720,23 @@ class UnitController extends Controller
 
     public function exportAsset(Request $request, $id_unit)
     {
-        dd($request->all());
+        // 1. Validasi request parameter
+        $request->validate([
+            'assetIds' => 'required|array|min:1',
+            'format'   => 'required|in:excel',
+        ]);
 
+        // 2. Ambil data asset yang dicentang oleh user dan pastikan sesuai dengan id_unit saat ini
+        $dataAsset = Asset::whereIn('id', $request->assetIds)
+                        ->where('id_unit', $id_unit)
+                        ->orderBy('nama_barang', 'asc')
+                        ->get();
+
+        // 3. Eksekusi file download Excel
+        if ($request->format === 'excel') {
+            $namaFile = 'Laporan_Asset_Unit_' . $id_unit . '_' . date('d_M_Y_Hi') . '.xlsx';
+
+            return Excel::download(new AssetExport($dataAsset), $namaFile);
+        }
     }
 }
