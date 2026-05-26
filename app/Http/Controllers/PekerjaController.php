@@ -553,5 +553,73 @@ public function importExcel(Request $request)
         }
     }
 
+    public function TambahHistoriPKWT(Request $request)
+    {
+        // dd($request->all());
+        // 1. Validasi Input Dasar
+        $request->validate([
+            'id_pekerja'     => 'required|string', // Sesuaikan jika id_pekerja Anda char/string/integer
+            'tgl_mulai_pkwt' => 'required|date',
+            'tgl_akhir_pkwt' => 'required|date|after_or_equal:tgl_mulai_pkwt',
+            
+            // Dokumen bersifat opsional untuk masa lalu, sesuaikan jika ingin diwajibkan
+            'dokumen_pkwt'   => 'nullable|file|mimes:png,jpg,jpeg,pdf|max:2048', 
+            
+            // Boleh diisi jika HRD ingat data lama, jika tidak akan null
+            'id_unit'        => 'nullable|string', 
+            'divisi_id'      => 'nullable|integer',
+            'jabatan_id'     => 'nullable|integer',
+        ], [
+            'id_pekerja.required'     => 'ID Pekerja tidak ditemukan.',
+            'tgl_mulai_pkwt.required' => 'Tanggal mulai PKWT wajib diisi.',
+            'tgl_akhir_pkwt.required' => 'Tanggal akhir PKWT wajib diisi.',
+            'tgl_akhir_pkwt.after_or_equal' => 'Tanggal akhir tidak boleh lebih kecil dari tanggal mulai.',
+            'dokumen_pkwt.mimes'      => 'Format dokumen harus berupa PDF, JPG, atau PNG.',
+            'dokumen_pkwt.max'        => 'Ukuran dokumen maksimal 2MB.',
+        ]);
 
+        try {
+            DB::beginTransaction();
+
+            // 2. Pemrosesan File Dokumen (Bila Ada)
+            $dokumen = null;
+            $dokumenMime = null;
+            if ($request->hasFile('dokumen_pkwt')) {
+                $file = $request->file('dokumen_pkwt');
+                $dokumen = file_get_contents($file->getRealPath());
+                $dokumenMime = $file->getMimeType();
+            }
+
+            // 3. Simpan sebagai History (Status Aktif = 0)
+            PKWT::create([
+                'id_pekerja'     => $request->id_pekerja,
+                'id_unit'        => $request->id_unit ?? null,
+                'divisi_id'      => $request->divisi_id ?? null,
+                'jabatan_id'     => $request->jabatan_id ?? null,
+                
+                'tgl_mulai_pkwt' => $request->tgl_mulai_pkwt,
+                'tgl_akhir_pkwt' => $request->tgl_akhir_pkwt,
+                
+                'dokumen_pkwt'   => $dokumen,
+                'dokumen_mime'   => $dokumenMime,
+                
+                // KUNCI UTAMA: 0 menandakan ini adalah History/Log masa lalu
+                'status_aktif'   => 0, 
+                
+                // Field gaji akan otomatis terisi 0 berdasarkan nilai default di migration
+                // atau Anda bisa mendefinisikannya eksplisit di sini jika perlu
+            ]);
+
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Histori PKWT pekerja berhasil ditambahkan.');
+
+        } catch (QueryException $e) {
+            DB::rollBack();
+            return back()->withInput()->withErrors(['database' => 'Terjadi kesalahan database: ' . $e->getMessage()]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->withInput()->withErrors(['general' => 'Gagal memproses data: ' . $e->getMessage()]);
+        }
+    }
 }
