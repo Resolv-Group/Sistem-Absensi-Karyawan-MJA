@@ -15,7 +15,7 @@
                 <nav class="flex text-sm font-medium text-gray-500 mb-1">
                     <span class="hover:text-gray-700">Unit</span>
                     <span class="mx-2 text-gray-300">/</span>
-                <span class="text-blue-600">Tambah Borongan Unit</span>
+                    <span class="text-blue-600">Tambah Borongan Unit</span>
                 </nav>
                 <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Tambah Borongan Unit</h1>
             </div>
@@ -163,11 +163,8 @@
                                         </button>
                                     </div>
 
-                                    <input
-                                        type="hidden"
-                                        :name="`borongan[${index}][kategori]`"
-                                        x-model="row.kategoriId"
-                                    />
+                                    <input type="hidden" :name="`borongan[${index}][kategori]`"
+                                        x-model="row.kategoriId" />
 
                                     <div class="relative">
                                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -252,7 +249,7 @@
 
                                                     {{-- Modal Header --}}
                                                     <div
-                                                        class="px-6 py-5 border-b border-gray-100 flex items-center gap-3 bg-gray-50/50">
+                                                        class="px-8 py-6 border-b border-gray-50 flex items-center gap-4 bg-gray-50/30">
                                                         <div class="p-2 bg-blue-50 text-blue-600 rounded-lg">
                                                             <svg class="w-5 h-5" fill="none" stroke="currentColor"
                                                                 viewBox="0 0 24 24">
@@ -348,11 +345,8 @@
                                 <div>
                                     <label class="block text-sm font-bold text-gray-700 mb-1">Max Rej Subkon (%)</label>
                                     <div class="relative">
-                                        <input type="number"
-                                            :name="`borongan[${index}][max_reject]`"
-                                            x-model.number="row.max_reject"
-                                            min="0"
-                                            step="any"
+                                        <input type="number" :name="`borongan[${index}][max_reject]`"
+                                            x-model.number="row.max_reject" min="0" step="any"
                                             oninput="if(this.value < 0) this.value = Math.abs(this.value)"
                                             placeholder="0.00"
                                             class="w-full rounded-lg border-gray-300 bg-gray-50 text-gray-900 focus:bg-white focus:border-blue-500 focus:ring-blue-200 transition py-2.5 px-4 text-sm font-medium" />
@@ -363,7 +357,8 @@
                                 <div class="sm:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-6">
                                     {{-- 4. Gaji Unit --}}
                                     <div>
-                                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-2">Harga
+                                        <label
+                                            class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-2">Harga
                                             B.Unit</label>
                                         <div class="relative">
                                             <span
@@ -386,7 +381,8 @@
                                         <div class="relative">
                                             <span
                                                 class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-bold">Rp</span>
-                                            <input type="number" step="0.01" :name="`borongan[${index}][harga_pekerja]`"
+                                            <input type="number" step="0.01"
+                                                :name="`borongan[${index}][harga_pekerja]`"
                                                 x-model.number="row.harga_pekerja" @input="row.manual = true"
                                                 @blur="row.harga_pekerja = Number(row.harga_pekerja || 0).toFixed(2)"
                                                 class="w-full pl-10 rounded-xl border-gray-200 bg-gray-50 text-sm font-bold text-gray-900
@@ -413,14 +409,12 @@
                                             </button>
                                         </div>
 
-                                        <input
-                                            type="hidden"
-                                            :name="`borongan[${index}][satuan]`"
-                                            x-model="row.satuanId"
-                                        />
+                                        <input type="hidden" :name="`borongan[${index}][satuan]`"
+                                            x-model="row.satuanId" />
 
                                         <div class="relative">
-                                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <div
+                                                class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                                 <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor"
                                                     viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -438,8 +432,8 @@
                                             <div class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
                                                 @click="toggleDropdown()">
                                                 <svg class="w-4 h-4 text-gray-400 transition-transform duration-200"
-                                                    :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
+                                                    :class="open ? 'rotate-180' : ''" fill="none"
+                                                    stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                         d="M19 9l-7 7-7-7"></path>
                                                 </svg>
@@ -454,12 +448,13 @@
                                                     class="px-4 py-2.5 text-sm hover:bg-blue-50 hover:text-blue-600 cursor-pointer transition flex justify-between">
 
                                                     <span x-text="item.label"
-                                                        :class="selectedId == item.val ? 'font-bold text-blue-600' : 'text-gray-700'"></span>
+                                                        :class="selectedId == item.val ? 'font-bold text-blue-600' :
+                                                            'text-gray-700'"></span>
 
                                                     <svg x-show="selectedId == item.val" class="w-4 h-4 text-blue-600"
                                                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                            d="M5 13l4 4L19 7"></path>
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2" d="M5 13l4 4L19 7"></path>
                                                     </svg>
                                                 </li>
                                             </template>
@@ -483,7 +478,8 @@
                                                 x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
                                                 x-transition:leave="ease-in duration-200"
                                                 x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
-                                                class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm transition-opacity"></div>
+                                                class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm transition-opacity">
+                                            </div>
 
                                             {{-- MODAL POSITIONING WRAPPER --}}
                                             <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
@@ -507,7 +503,8 @@
                                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor"
                                                                     viewBox="0 0 24 24">
                                                                     <path stroke-linecap="round" stroke-linejoin="round"
-                                                                        stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                                                        stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6">
+                                                                    </path>
                                                                 </svg>
                                                             </div>
                                                             <div>
@@ -528,8 +525,8 @@
                                                                     class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                                                     <svg class="w-5 h-5 text-gray-400" fill="none"
                                                                         stroke="currentColor" viewBox="0 0 24 24">
-                                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                                            stroke-width="2"
+                                                                        <path stroke-linecap="round"
+                                                                            stroke-linejoin="round" stroke-width="2"
                                                                             d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
                                                                         </path>
                                                                     </svg>

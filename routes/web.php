@@ -208,6 +208,8 @@ Route::middleware(['auth', 'role:hrd,pic,admin,head_supervisor'])->group(functio
     Route::put('/unit/pekerja/bulk-update-divisi', [PKWTController::class, 'bulkUpdateDivisi'])->name('bulk.update.divisi');
     Route::put('/unit/pekerja/bulk-update-jabatan', [PKWTController::class, 'bulkUpdateJabatan'])->name('bulk.update.jabatan');
 
+    Route::post('/quick-store/{type}', [PKWTController::class, 'quickStore']);
+
     // Route::put('/unit/{unitId}/pekerja/{pekerjaId]/toggle-status/', [UnitController::class, 'toggleStatusPKWT']);
 
     // Unit -> Borongan

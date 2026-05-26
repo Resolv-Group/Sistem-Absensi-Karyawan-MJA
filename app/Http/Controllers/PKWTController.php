@@ -27,9 +27,8 @@ class PKWTController extends Controller
             })
             ->exists();
 
-        if(in_array($user->role, ['admin', 'hrd']))
-        {}
-        elseif(! $isAllowed ) {
+        if (in_array($user->role, ['admin', 'hrd'])) {
+        } elseif (! $isAllowed) {
             abort(403, 'Anda tidak memiliki akses ke unit ini');
         }
 
@@ -65,6 +64,7 @@ class PKWTController extends Controller
 
         return view('Unit.Pengajian.main-harian', compact('pkwtPekerja', 'unit', 'divisions', 'jabatan'));
     }
+
     public function viewTambahUnitHarian($id_unit)
     {
         $user = auth()->user(); // staff login
@@ -76,9 +76,8 @@ class PKWTController extends Controller
             })
             ->exists();
 
-        if(in_array($user->role, ['admin', 'hrd']))
-        {}
-        elseif(! $isAllowed ) {
+        if (in_array($user->role, ['admin', 'hrd'])) {
+        } elseif (! $isAllowed) {
             abort(403, 'Anda tidak memiliki akses ke unit ini');
         }
 
@@ -98,7 +97,7 @@ class PKWTController extends Controller
         return view('Unit.CRUD.tambah-unit-pekerja', compact('unitSelected', 'units', 'pekerjaList', 'divisiList', 'jabatanList'));
     }
 
-    function tambahPekerjaUnit(Request $request)
+    public function tambahPekerjaUnit(Request $request)
     {
         // dd($request->all()); // aktifkan hanya untuk debug
 
@@ -155,8 +154,8 @@ class PKWTController extends Controller
                     'pekerja.*.tgl_akhir_pkwt.required' => 'Tanggal akhir PKWT wajib diisi',
 
                     'pekerja.*.days.*.numeric' => 'Jam kerja harus berupa angka',
-                    'pekerja.*.days.*.min'     => 'Jam kerja tidak boleh kurang dari 0',
-                    'pekerja.*.days.*.max'     => 'Jam kerja tidak boleh lebih dari 24',
+                    'pekerja.*.days.*.min' => 'Jam kerja tidak boleh kurang dari 0',
+                    'pekerja.*.days.*.max' => 'Jam kerja tidak boleh lebih dari 24',
                 ],
             );
 
@@ -194,8 +193,8 @@ class PKWTController extends Controller
                 foreach ($data['days'] as $hari => $jam) {
                     // Gunakan Model PkwtHariKerja
                     PKWT_Hari_Kerja::create([
-                        'pkwt_id'   => $pkwt->id, // Ambil ID PKWT yang baru saja dibuat di atas
-                        'hari'      => $hari,      // 'mon', 'tue', dst (sesuai key array)
+                        'pkwt_id' => $pkwt->id, // Ambil ID PKWT yang baru saja dibuat di atas
+                        'hari' => $hari,      // 'mon', 'tue', dst (sesuai key array)
                         'jam_kerja' => $jam ?? 0,        // nilainya (0 - 24)
                     ]);
                 }
@@ -206,11 +205,13 @@ class PKWTController extends Controller
             return redirect()->route('view.detail.unit', $request->id_unit)->with('success', 'Pekerja berhasil ditambahkan ke unit.');
         } catch (QueryException $e) {
             DB::rollBack();
+
             return back()
                 ->withInput()
                 ->withErrors(['database' => $e->getMessage()]);
         } catch (\Exception $e) {
             DB::rollBack();
+
             return back()
                 ->withInput()
                 ->withErrors(['general' => $e->getMessage()]);
@@ -287,11 +288,11 @@ class PKWTController extends Controller
                 PKWT_Hari_Kerja::updateOrCreate(
                     [
                         'pkwt_id' => $pkwt->id, // Cari yang PKWT ID-nya ini
-                        'hari'    => $hari      // Dan harinya ini (mon, tue, dst)
+                        'hari' => $hari,      // Dan harinya ini (mon, tue, dst)
                     ],
                     [
                         'jam_kerja' => $jam ?? 0, // Update jam kerjanya
-                        'updated_at' => now()
+                        'updated_at' => now(),
                     ]
                 );
             }
@@ -319,7 +320,7 @@ class PKWTController extends Controller
         }
     }
 
-    function bulkUpdateStatus(Request $request)
+    public function bulkUpdateStatus(Request $request)
     {
         $request->validate([
             'ids' => 'required',
@@ -351,6 +352,7 @@ class PKWTController extends Controller
 
                     if ($conflict) {
                         DB::rollBack();
+
                         return back()->with('error', 'Gagal mengaktifkan. Pastikan pekerja tidak memiliki PKWT aktif di unit lain.');
                     }
                 }
@@ -362,17 +364,19 @@ class PKWTController extends Controller
                 ]);
 
                 $statusLabel = $request->status == 1 ? 'Aktif' : 'Nonaktif';
-                $message = 'Berhasil mengubah ' . count($ids) . " pekerja menjadi $statusLabel.";
+                $message = 'Berhasil mengubah '.count($ids)." pekerja menjadi $statusLabel.";
             } elseif ($request->action === 'delete') {
                 PKWT::whereIn('id', $ids)->delete();
-                $message = 'Berhasil menghapus ' . count($ids) . ' data pekerja.';
+                $message = 'Berhasil menghapus '.count($ids).' data pekerja.';
             }
 
             DB::commit();
+
             return back()->with('success', $message);
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+
+            return back()->with('error', 'Terjadi kesalahan: '.$e->getMessage());
         }
     }
 
@@ -387,7 +391,7 @@ class PKWTController extends Controller
             // You can handle 'apply_immediately' logic here if needed
         ]);
 
-        return back()->with('success', count($ids) . ' pekerja berhasil mendapatkan divisi baru.');
+        return back()->with('success', count($ids).' pekerja berhasil mendapatkan divisi baru.');
     }
 
     public function bulkUpdateJabatan(Request $request)
@@ -401,6 +405,22 @@ class PKWTController extends Controller
             // You can handle 'apply_immediately' logic here if needed
         ]);
 
-        return back()->with('success', count($ids) . ' pekerja berhasil mendapatkan jabatan baru.');
+        return back()->with('success', count($ids).' pekerja berhasil mendapatkan jabatan baru.');
+    }
+
+    public function quickStore(Request $request, $type)
+    {
+        $request->validate(['nama' => 'required|string|max:255']);
+
+        if ($type === 'divisi') {
+            $item = Divisi::create(['nama' => $request->nama]);
+        } else {
+            $item = JabatanPKWT::create(['nama' => $request->nama]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $item,
+        ]);
     }
 }
