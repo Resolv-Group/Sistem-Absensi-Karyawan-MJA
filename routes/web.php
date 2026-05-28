@@ -143,6 +143,8 @@ Route::middleware(['auth', 'role:hrd,admin,akuntan,pic'])->group(function () {
     Route::post('/export-summary-upah-harian', [PayrollController::class, 'SummaryUpahHarian'])->name('export.summary.upah.harian');
 
     Route::post('/payroll/get-adjustments', [AbsensiController::class, 'getAdjustments'])->name('payroll.get-adjustments');
+
+    Route::post('/export-borongan-kelompok', [PayrollController::class, 'ExportBoronganKelompok'])->name('export.borongan.kelompok');
 });
 
 Route::middleware(['auth', 'role:pic,admin'])->group(function () {

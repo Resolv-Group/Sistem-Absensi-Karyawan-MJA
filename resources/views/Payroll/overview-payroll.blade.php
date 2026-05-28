@@ -519,7 +519,7 @@
                         <input type="hidden" name="penanggung_jawab" value="{{ $payrollData['penanggung_jawab'] }}">
                         <input type="hidden" name="jabatan_pj" value="{{ $payrollData['jabatan_pj'] }}">
 
-
+                
                         @if ($payrollData['sistem_pengajian'] == 1)
                             <div class="flex gap-3">
                                 @php
@@ -555,17 +555,49 @@
                                     </svg>
                                     <span>Report Harian</span>
                                 </button>
-
+   
                             </div>
                         @endif
+
+                        @if ($payrollData['sistem_pengajian'] == 2)
+                            <div class="flex gap-3">
+                                
+                                @php
+                                    $payloadReportBorongan = [
+                                        'id_unit' => $payrollData['unit_id'],
+                                        'tgl_awal' => $payrollData['tanggal_mulai'],
+                                        'tgl_akhir' => $payrollData['tanggal_akhir'],
+                                        'grand_total' => $payrollData['grand_total'],
+                                        'workers_json' => $jsonWorkers, // Data JSON pekerja
+                                    ];
+                                @endphp
+
+                                <!-- Tombol Report Harian -->
+                                <button type="button"
+
+                                @click="open('', '{{ route('export.borongan.kelompok') }}', {{ json_encode($payloadReportBorongan) }})"
+                                    
+                                    class="inline-flex items-center gap-2.5 px-6 py-3.5 bg-slate-50 border border-slate-200 text-slate-500 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-white hover:border-emerald-500 hover:text-emerald-600 group transition-all shadow-sm active:scale-95">
+                                    
+                                    
+
+                                    <svg class="w-4 h-4 text-slate-400 group-hover:text-emerald-500 transition-colors" 
+                                        fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    <span>Report Bulk Borongan</span>
+                                </button>
+   
+                            </div>
+                        @endif
+                        
 
                         {{-- MULTI-STEP GENERATE COMPONENT (PREMIUM MODAL) --}}
                         <div x-data="generatePayroll({
                             workers: {{ json_encode(collect($payrollData['items'])->map(fn($item) => ['nama' => $item['nama'], 'status' => 'pending'])->values()->all()) }},
                             url: '{{ $payrollData['sistem_pengajian'] == 1 ? route('export.rincian.upah.harian') : route('export.rincian.upah.borongan') }}'
                              })" class="flex items-center">
-                            
-                            <!-- Main Trigger Button -->
+
                             <button type="button" @click="startGenerate()"
                                 class="group flex items-center gap-3 bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-3.5 rounded-xl font-black text-xs uppercase tracking-widest shadow-xl shadow-emerald-500/20 transition-all active:scale-95">
                                 Generate Rincian Upah
@@ -575,6 +607,7 @@
                                         d="M13 7l5 5-5 5M6 7l5 5-5 5" />
                                 </svg>
                             </button>
+                            
 
                             <!-- Modal Overlay -->
                             <div x-show="showModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-0" x-cloak>

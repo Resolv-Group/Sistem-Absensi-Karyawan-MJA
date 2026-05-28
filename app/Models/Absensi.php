@@ -67,4 +67,11 @@ class Absensi extends Model
         // Otherwise individual — detil is directly on this absensi
         return $this->detilBorongan;
     }
+
+    // Tambahkan fungsi ini di dalam class Model Absensi
+    public function detilBoronganKelompok()
+    {
+        // Ini akan mengambil data Detil Borongan melalui tabel perantara 'absensi_borongan'
+        return $this->belongsToMany(Detil_Borongan::class, 'absensi_borongan', 'id_absensi', 'id_detil_borongan');
+    }
 }
