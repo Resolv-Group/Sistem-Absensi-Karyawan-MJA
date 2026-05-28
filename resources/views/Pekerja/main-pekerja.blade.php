@@ -339,7 +339,7 @@
         4. MAIN TABLE
     ================================= --}}
     <div id="table-wrapper">
-        @include('pekerja.partials.pekerja-table')
+        @include('Pekerja.partials.pekerja-table')
     </div>
 @endsection
 
