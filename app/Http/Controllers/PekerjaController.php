@@ -68,11 +68,11 @@ class PekerjaController extends Controller
 
         // If AJAX request (from the search/filter script), return ONLY the table partial
         if ($request->ajax()) {
-            return view('pekerja.partials.pekerja-table', compact('pekerja'))->render();
+            return view('Pekerja.partials.pekerja-table', compact('pekerja'))->render();
         }
 
         // Otherwise return the full page
-        return view('pekerja.main-pekerja', compact('pekerja', 'totalPekerja', 'pekerjaBaru', 'tidakAktif'));
+        return view('Pekerja.main-pekerja', compact('pekerja', 'totalPekerja', 'pekerjaBaru', 'tidakAktif'));
     }
 
     function viewTambahPekerja()
