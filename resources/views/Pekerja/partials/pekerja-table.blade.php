@@ -29,7 +29,7 @@
             </thead>
 
             <tbody id="table-pekerja-body" class="bg-white divide-y divide-gray-200">
-                @include('pekerja.partials.table-body', ['pekerja' => $pekerja])
+                @include('Pekerja.partials.table-body', ['pekerja' => $pekerja])
 
 
             </tbody>
