@@ -90,9 +90,10 @@ class PayrollController extends Controller
     public function overviewPayroll(Request $request)
     {
         // dump($request->all());
-        // dd($id_unit);
+        // dd($request->all());
         $id_unit = $request->id_unit;
 
+       
         $unit = Unit::find($id_unit); // ⬅️ ambil unit
 
         $penanggungJawab = $request->input('penanggung_jawab'); 
@@ -105,6 +106,7 @@ class PayrollController extends Controller
         $allAdjustments = $request->input('adjustments', []);
 
         $isHarian = $unit->sistem_pengajian == 1;
+        $tipeAbsensi = $request->input('tipe_absensi', 'individu'); // <-- TAMBAHKAN INI
 
         $periode = Carbon::parse($tanggalMulai)->translatedFormat('d') . '—' . Carbon::parse($tanggalAkhir)->translatedFormat('d M Y');
 
@@ -127,11 +129,34 @@ class PayrollController extends Controller
             'penanggung_jawab' => $penanggungJawab,
             'jabatan_pj' => $jabatanPJ,
             'biaya_admin' => $biayaAdmin,
-            'items' => $workers->map(function ($w) use ($id_unit, $isHarian, $periode, $specificExclusions, $allAdjustments, $tanggalMulai, $tanggalAkhir, $biayaAdmin, $penanggungJawab, $jabatanPJ) {
+            'items' => $workers->map(function ($w) use ($id_unit, $isHarian, $periode, $specificExclusions, $allAdjustments, $tanggalMulai, $tanggalAkhir, $biayaAdmin, $penanggungJawab, $jabatanPJ, $tipeAbsensi)  {
                 // 1. Dapatkan list tanggal yang dikecualikan (potongan) untuk pekerja ini
                 $excludedDates = $specificExclusions->get($w->id) ? $specificExclusions->get($w->id)->pluck('date')->toArray() : [];
 
-                $relation = $isHarian ? 'detilHarian' : 'detilBorongan.borongan:id,harga_pekerja,nama_item';
+                // Ganti baris $relation lama Anda dengan ini:
+               // Kita ganti variabelnya menjadi bentuk Array agar bisa menampung banyak relasi
+                $relations = [];
+                if ($isHarian) {
+                    $relations[] = 'detilHarian';
+                } else {
+                    // LOAD KEDUANYA SEKALIGUS (Individu & Kelompok)
+                    $relations[] = 'detilBorongan.borongan:id,harga_pekerja,nama_item';
+                    $relations[] = 'detilBoronganKelompok.borongan:id,harga_pekerja,nama_item';
+                }
+
+                // Masukkan $relations ke dalam query (hilangkan tanda kurung siku [])
+                $absensiRecords = Absensi::with($relations)
+                    ->whereBetween('tgl_absensi', [$tanggalMulai, $tanggalAkhir])
+                    ->where('id_unit', $id_unit)
+                    ->where('id_pekerja', $w->id)
+                    ->whereNotIn('tgl_absensi', $excludedDates)
+                    ->get();if ($isHarian) {
+                    $relation = 'detilHarian';
+                } else {
+                    $relation = $tipeAbsensi === 'kelompok' 
+                                ? 'detilBoronganKelompok.borongan:id,harga_pekerja,nama_item' 
+                                : 'detilBorongan.borongan:id,harga_pekerja,nama_item';
+                }
 
                 // 2. Query ke tabel Absensi yang memiliki Detil Borongan
                 // Kita hitung record dalam range tanggal Mula-Selesai, dan TIDAK TERMASUK tanggal potongan
@@ -172,35 +197,32 @@ class PayrollController extends Controller
                     $tglAbsenSekarang = $absensi->tgl_absensi;
                     
                     $pkwtHariIni = $semuaPkwt->first(function ($p) use ($tglAbsenSekarang) {
-                        // CATATAN: Sesuaikan 'tanggal_mulai' dan 'tanggal_selesai' dengan nama kolom di DB Anda
                         $mulai = $p->tgl_mulai_pkwt; 
                         $selesai = $p->tgl_akhir_pkwt; 
                         
-                        // Jika PKWT memiliki tanggal selesai (kontrak lama)
                         if ($selesai) {
                             return $tglAbsenSekarang >= $mulai && $tglAbsenSekarang <= $selesai;
                         }
-                        // Jika PKWT tidak ada tanggal selesai (kontrak berjalan / yang terbaru)
                         return $tglAbsenSekarang >= $mulai;
                     });
 
-                    // Fallback (Jaga-jaga): Jika ternyata di tanggal tersebut tidak ada PKWT yg cocok, 
-                    // gunakan PKWT yg statusnya aktif saat ini
                     if (!$pkwtHariIni) {
                         $pkwtHariIni = $semuaPkwt->where('status_aktif', 1)->first();
                     }
 
-                    // Ambil rate gaji sesuai PKWT yang berlaku pada hari tersebut
                     $gajiHarianPkwt = $pkwtHariIni->gaji_harian ?? 0;
                     $gajiOvertimePkwt = $pkwtHariIni->gaji_overtime ?? 0;
+
+                    // ==========================================
+                    // 1. BLOK PERHITUNGAN HARIAN (JANGAN DIUBAH)
+                    // ==========================================
                     if ($isHarian) {
                         $detil = $absensi->detilHarian;
                         if ($detil) {
                             $totalJamKerja += (float) $detil->jam_kerja_harian;
                             $totalOvertime += (float) $detil->overtime;
 
-                            // --- LOGIKA PERHITUNGAN GAJI ---
-                            $jamNormal = (float) $detil->jam_kerja_normal; // Hindari division by zero
+                            $jamNormal = (float) $detil->jam_kerja_normal; 
                             $jamHarian = (float) $detil->jam_kerja_harian;
                             $jamOT = (float) $detil->overtime;
                             $gajiReguler = 0;
@@ -208,60 +230,78 @@ class PayrollController extends Controller
                             $statusDilindungi = [2,3,4];
                             $statusTidakDibayar = [5,6];
 
-
-                            //todo:: logika baru buat jam telat
                             if ($detil->hbn == 1) {
-                                // JIKA HBN: Semua jam_kerja_harian dihitung sebagai OVERTIME
-                                // Rumus: jam_harian * (gaji_overtime * 1.5)
                                 $gajiHariIni = $jamHarian * ($gajiOvertimePkwt * 1.5);
-
                                 $totalHBN += (float) $detil->overtime;
                                 $totalHBN_Salary += $gajiHariIni;
-                                // dump('Gaji Harian (jamharian*gajiovertime) = ', $gajiHariIni);
-                            }elseif (in_array($detil->status_kehadiran, $statusTidakDibayar)) {
-                                // TAMBAHAN: JIKA STATUS 5 ATAU 6, GAJI HARI INI = 0
+
+                            } elseif (in_array($detil->status_kehadiran, $statusTidakDibayar)) {
                                 $gajiHariIni = 0;
 
-                            }elseif (in_array($detil->status_kehadiran,$statusDilindungi) && $detil->isPaid == 1)
-                            {
+                            } elseif (in_array($detil->status_kehadiran, $statusDilindungi) && $detil->isPaid == 1) {
                                 $gajiHariIni += ($jamHarian/$jamNormal) * $gajiHarianPkwt;
 
-                            }else {
-                                // JIKA HARI NORMAL:
-                                // Rumus Reguler: jam_harian * gaji_harian
-                                if($jamHarian >= $jamNormal)
-                                {
+                            } else {
+                                // INI LOGIKA HARIAN NORMAL (Dikembalikan seperti semula)
+                                if($jamHarian >= $jamNormal) {
                                     $gajiReguler += $gajiHarianPkwt;
-                                    // dump($absensi->id,$gajiReguler);
-
-                                }elseif($jamNormal > $jamHarian)
-                                {
+                                } elseif($jamNormal > $jamHarian) {
                                     $gajiReguler += $gajiHarianPkwt - ( ($jamNormal - $jamHarian) * $gajiOvertimePkwt );
-                                    
                                 }
-                                // Rumus Overtime: jam_ot * gaji_overtime
                                 $gajiOT = $jamOT * $gajiOvertimePkwt;
-                                // dump('gajiOT (jamOT*gajiOvertimePkwt) = ',$gajiOT);
                                 $gajiHariIni = $gajiReguler + $gajiOT;
-                                // dump('gajiHariIni (gajiReguler*gajiOT) = ',$gajiHariIni);
-
                                 $totalOT_Salary += $gajiOT;
                             }
 
                             $hasilGajiHarian += $gajiHariIni;
                         }
-                    } else {
-                        foreach ($absensi->detilBorongan as $detil) {
-                            // Sesuai logika JS: totalQTY = FD + act_rej + good_mc
-                            $qtyPerBaris = ($detil->FD ?? 0) + ($detil->act_rej ?? 0) + ($detil->good_mc ?? 0);
-                            $totalQty += $qtyPerBaris;
-                            $tempQty += $qtyPerBaris;
+                    } 
+                    // ==========================================
+                    // 2. BLOK PERHITUNGAN BORONGAN
+                    // ==========================================
+                    // ==========================================
+                    // 2. BLOK PERHITUNGAN BORONGAN (GABUNGAN)
+                    // ==========================================
+                    // ==========================================
+                    // 2. BLOK PERHITUNGAN BORONGAN (GABUNGAN)
+                    // ==========================================
+                    else {
 
-                            // Sesuai logika JS: bayaranItem = totalQTY * harga_pekerja
-                            // Kita asumsikan kolom 'bayaranItem' sudah tersimpan di DB saat presensi
-                            $totalGajiBorongan += $detil->bayaranItem ?? 0;
+                        // A. PROSES BORONGAN INDIVIDU
+                        if ($tipeAbsensi !== 'kelompok') { 
+                            
 
-                            $tempQty = 0;
+                            foreach ($absensi->detilBorongan as $detil) {
+                                $qtyPerBaris = ($detil->FD ?? 0) + ($detil->act_rej ?? 0) + ($detil->good_mc ?? 0);
+                                $gajiPerBaris = $detil->bayaranItem ?? 0;
+
+                                $totalQty += $qtyPerBaris;
+                                $totalGajiBorongan += $gajiPerBaris;
+                            }
+                        }
+
+                        // B. PROSES BORONGAN KELOMPOK
+                        if ($tipeAbsensi !== 'individu') { 
+                            
+
+                            foreach ($absensi->detilBoronganKelompok as $detil) {
+                                $qtyPerBaris = ($detil->FD ?? 0) + ($detil->act_rej ?? 0) + ($detil->good_mc ?? 0);
+                                $gajiPerBaris = $detil->bayaranItem ?? 0;
+
+                                // LOGIKA KELOMPOK: Bagi rata jumlah barang & gaji sesuai jumlah orang
+                                $jumlahAnggota = \DB::table('absensi_borongan')
+                                                    ->where('id_detil_borongan', $detil->id)
+                                                    ->count();
+                                
+
+                                if ($jumlahAnggota > 0) {
+                                    $qtyPerBaris = $qtyPerBaris / $jumlahAnggota;
+                                    $gajiPerBaris = $gajiPerBaris / $jumlahAnggota;
+                                }
+
+                                $totalQty += $qtyPerBaris;
+                                $totalGajiBorongan += $gajiPerBaris;
+                            }
                         }
                     }
                 }
@@ -315,8 +355,6 @@ class PayrollController extends Controller
 
     function ExportDetailBorongan(Request $request)
     {
-        // dd($request->all());
-
         $exclusionDates = $request->input('exclusion_date', []);
         $tanggal_awal = Carbon::parse($request->tgl_awal);
         $tanggal_akhir = Carbon::parse($request->tgl_akhir);
@@ -1995,5 +2033,10 @@ class PayrollController extends Controller
                 'history_id' => $history->id
             ]);
         });
+    }
+
+    public function ExportBoronganKelompok(Request $request)
+    {
+        dd($request->all());
     }
 }
