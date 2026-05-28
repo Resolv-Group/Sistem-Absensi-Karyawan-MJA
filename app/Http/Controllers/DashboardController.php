@@ -44,7 +44,7 @@ class DashboardController extends Controller
         $today = Carbon::today();
 
         // 1. Hadir Hari Ini (Status 1)
-        $hadirHariIni = Detil_Harian::whereHas('absensi', function ($q) use ($today) {
+        $hadirHariIni = Detil_Harian::whereHas('Absensi', function ($q) use ($today) {
             $q->whereDate('tgl_absensi', $today);
         })
             ->where('status_kehadiran', 1)
