@@ -1,0 +1,35 @@
+# Redirect to the public folder (if not already in public_html)
+RewriteEngine On
+RewriteRule ^(.*)$ public/$1 [L]
+
+# Ensure that Laravel's front controller (index.php) handles all routes
+RewriteEngine On
+RewriteCond %{REQUEST_URI} !^/public/
+RewriteRule ^(.*)$ /public/$1 [L]
+
+# Redirect all requests to the index.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [L]
+
+# Handle static file caching for optimal performance
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresDefault "access plus 1 month"
+    ExpiresByType text/css "access plus 1 year"
+    ExpiresByType application/javascript "access plus 1 year"
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType application/font-woff "access plus 1 year"
+    ExpiresByType application/font-woff2 "access plus 1 year"
+</IfModule>
+
+# Set default index file (useful for some setups)
+DirectoryIndex index.php
+
+# Disable directory listing
+Options -Indexes
+
+# Handle 404 error
+ErrorDocument 404 /404.html
