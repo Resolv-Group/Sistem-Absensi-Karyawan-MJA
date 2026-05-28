@@ -1017,7 +1017,7 @@ class AbsensiController extends Controller
                         'verifikasi' => 0,
                     ],
                 );
-
+                
                 // Clear old pivot links for this absensi (to allow re-submission)
                 Absensi_Borongan::where('id_absensi', $absensi->id)->delete();
 
@@ -1075,4 +1075,6 @@ class AbsensiController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+
+
 }
