@@ -38,7 +38,7 @@
 
     @if ($pekerja->hasPages())
         <div id="search-pagination" class="border-t border-gray-200 bg-gray-50 px-4 py-3 sm:px-6">
-            {{ $pekerja->links('vendor.pagination.custom') }}
+            {{ $pekerja->links('vendor.Pagination.custom') }}
         </div>
     @endif
 </div>
