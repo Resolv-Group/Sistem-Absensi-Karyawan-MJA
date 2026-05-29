@@ -341,6 +341,6 @@
         <div id="new-ids-provider-full" data-ids="{{ json_encode($pkwtPekerja->pluck('id')) }}" class="hidden"></div>
         <div id="new-pagination-provider" class="hidden">
             @if ($pkwtPekerja->hasPages())
-                {{ $pkwtPekerja->links('vendor.pagination.custom') }}
+                {{ $pkwtPekerja->links('vendor.Pagination.custom') }}
             @endif
         </div>

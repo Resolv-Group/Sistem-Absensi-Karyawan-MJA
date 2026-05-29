@@ -39,7 +39,7 @@
 
                     // 1. Logic: Only check "Jam Kurang" on normal days (HBN = 0)
                     // because on holidays, any hour worked is usually considered extra/OT.
-                    $isShortShift = (!$isHbn && $realJam < $pkwtJam);
+                    $isShortShift = !$isHbn && $realJam < $pkwtJam;
 
                     // 2. Determine Color Priority: Red (Warning) > Indigo (Holiday) > Blue (Normal)
                     $mainColor = $isShortShift ? 'text-red-600' : ($isHbn ? 'text-indigo-600' : 'text-blue-600');
@@ -54,12 +54,13 @@
                     <span class="text-sm font-black {{ $mainColor }}">
                         {{ $realJam }}
 
-                        @if(!$isHbn)
+                        @if (!$isHbn)
                             {{-- Normal Day: Show divisor --}}
                             <span class="text-gray-400 font-bold text-xs">/ {{ $pkwtJam }} Jam</span>
                         @else
                             {{-- Holiday (HBN): Hide divisor --}}
-                            <span class="text-indigo-400 font-bold text-[10px] ml-1 uppercase tracking-tighter">/ Jam</span>
+                            <span class="text-indigo-400 font-bold text-[10px] ml-1 uppercase tracking-tighter">/
+                                Jam</span>
                         @endif
                     </span>
 
@@ -69,8 +70,10 @@
                     </span>
 
                     {{-- Optional: Small Payment Indicator if isPaid is active --}}
-                    @if($detil->isPaid == 1)
-                        <span class="text-[9px] font-bold text-emerald-500 uppercase leading-none mt-0.5 tracking-widest">Dibayar Penuh</span>
+                    @if ($detil->isPaid == 1)
+                        <span
+                            class="text-[9px] font-bold text-emerald-500 uppercase leading-none mt-0.5 tracking-widest">Dibayar
+                            Penuh</span>
                     @endif
                 </div>
             @else
@@ -136,11 +139,11 @@
                 @php
                     $colors = [
                         1 => 'bg-emerald-50 text-emerald-600 border-emerald-100', // Hadir
-                        2 => 'bg-blue-50 text-blue-600 border-blue-100',         // Izin
-                        3 => 'bg-purple-50 text-purple-600 border-purple-100',  // Cuti
-                        4 => 'bg-amber-50 text-amber-600 border-amber-100',     // Sakit
-                        5 => 'bg-cyan-50 text-cyan-600 border-cyan-100',        // Rencana Cuti
-                        6 => 'bg-red-50 text-red-600 border-red-100',           // Absen
+                        2 => 'bg-blue-50 text-blue-600 border-blue-100', // Izin
+                        3 => 'bg-purple-50 text-purple-600 border-purple-100', // Cuti
+                        4 => 'bg-amber-50 text-amber-600 border-amber-100', // Sakit
+                        5 => 'bg-cyan-50 text-cyan-600 border-cyan-100', // Rencana Cuti
+                        6 => 'bg-red-50 text-red-600 border-red-100', // Absen
                     ];
 
                     $labels = [
@@ -220,8 +223,10 @@
             <div class="flex flex-col items-center gap-1.5">
                 {{-- Row 1: Tunjangan Indicator --}}
                 @if ($absensi && $absensi->tunjangan)
-                    <div class="flex items-center gap-1 px-1.5 py-0.5 bg-emerald-50 text-emerald-600 rounded-md border border-emerald-100 shadow-sm" title="Ada Tunjangan">
-                        <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" stroke-width="4" viewBox="0 0 24 24">
+                    <div class="flex items-center gap-1 px-1.5 py-0.5 bg-emerald-50 text-emerald-600 rounded-md border border-emerald-100 shadow-sm"
+                        title="Ada Tunjangan">
+                        <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" stroke-width="4"
+                            viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                         </svg>
                         <span class="text-[8px] font-black uppercase tracking-tighter">Plus</span>
@@ -234,8 +239,10 @@
 
                 {{-- Row 2: Potongan Indicator --}}
                 @if ($absensi && $absensi->potongan)
-                    <div class="flex items-center gap-1 px-1.5 py-0.5 bg-rose-50 text-rose-600 rounded-md border border-rose-100 shadow-sm" title="Ada Potongan">
-                        <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" stroke-width="4" viewBox="0 0 24 24">
+                    <div class="flex items-center gap-1 px-1.5 py-0.5 bg-rose-50 text-rose-600 rounded-md border border-rose-100 shadow-sm"
+                        title="Ada Potongan">
+                        <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" stroke-width="4"
+                            viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                         </svg>
                         <span class="text-[8px] font-black uppercase tracking-tighter">Min</span>
@@ -266,7 +273,8 @@
                         {{-- Animated Icon Card (Blue) --}}
                         <div
                             class="relative w-32 h-32 bg-gradient-to-br from-blue-500 to-blue-600 rounded-[2.5rem] shadow-2xl shadow-blue-200 flex items-center justify-center animate-float-harian-main">
-                            <svg class="w-16 h-16 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg class="w-16 h-16 text-white" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
@@ -332,6 +340,6 @@
 <div id="new-ids-provider-full" data-ids="{{ json_encode($pkwtPekerja->pluck('id')) }}" class="hidden"></div>
 <div id="new-pagination-provider" class="hidden">
     @if ($pkwtPekerja->hasPages())
-        {{ $pkwtPekerja->links('vendor.pagination.custom') }}
+        {{ $pkwtPekerja->links('vendor.Pagination.custom') }}
     @endif
 </div>
