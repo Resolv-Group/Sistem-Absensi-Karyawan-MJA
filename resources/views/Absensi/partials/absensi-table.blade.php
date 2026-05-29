@@ -40,7 +40,7 @@
     @if ($units->hasPages())
         <!-- Ensure this ID matches the JS selector -->
         <div id="search-pagination" class="border-t border-gray-200 bg-gray-50 px-4 py-3 sm:px-6">
-            {{ $units->links('vendor.pagination.custom') }}
+            {{ $units->links('vendor.Pagination.custom') }}
         </div>
     @endif
 </div>
