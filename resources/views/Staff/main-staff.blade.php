@@ -321,7 +321,7 @@
     ================================= --}}
 
     <div id="table-wrapper">
-        @include('staff.partials.staff-table')
+        @include('Staff.partials.staff-table')
     </div>
 @endsection
 
