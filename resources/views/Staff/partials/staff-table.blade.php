@@ -53,7 +53,7 @@
                 </thead>
 
             <tbody id="table-staff-body" class="bg-white divide-y divide-gray-200">
-                @include('staff.partials.table-body', ['staff' => $staff])
+                @include('Staff.partials.table-body', ['staff' => $staff])
             </tbody>
         </table>
     </div>
