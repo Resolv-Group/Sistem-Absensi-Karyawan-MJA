@@ -3,6 +3,7 @@
 namespace App\Imports;
 
 use App\Models\Pekerja;
+use App\Models\PKWT; // ⬅️ TAMBAHKAN INI UNTUK MEMANGGIL MODEL PKWT
 use Carbon\Carbon;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
@@ -30,12 +31,12 @@ class PekerjaImport implements ToModel, WithHeadingRow
         $tanggalBergabung = $this->parseDate($row['tanggal_bergabung'] ?? null);
         $tanggalResign    = $this->parseDate($row['tanggal_resign'] ?? null);
         
-        // Update jika NIK sudah ada, Create jika NIK baru
-        return Pekerja::updateOrCreate(
+        // =========================================================================
+        // 1. BUAT/UPDATE DATA PEKERJA (Simpan ke Variabel $pekerja)
+        // =========================================================================
+        $pekerja = Pekerja::updateOrCreate(
             ['nik' => $row['nik']], // Kunci Pencarian Utama (Berdasarkan NIK)
             [
-                // 'kolom_di_database'   => $row['nama_header_excel_tanpa_spasi'],
-                
                 'id_pekerja'         => $row['id_pekerja'] ?? null,
                 'nama'               => $row['nama_lengkap'] ?? null,
                 'kpj'                => $row['bpjs_ketenagakerjaan'] ?? null, 
@@ -75,11 +76,45 @@ class PekerjaImport implements ToModel, WithHeadingRow
                 'ibu_kandung'        => $row['ibu_kandung'] ?? null,
             ]
         );
+
+        // =========================================================================
+        // 2. PROSES 50 KOLOM PKWT OTOMATIS (Simpan ke Tabel PKWT)
+        // =========================================================================
+        for ($i = 1; $i <= 50; $i++) {
+            // Di Excel judulnya "PKWT TGL MASUK 1", oleh Laravel otomatis dibaca "pkwt_tgl_masuk_1"
+            $keyMasuk  = 'pkwt_tgl_masuk_' . $i;
+            $keyKeluar = 'pkwt_tgl_keluar_' . $i;
+
+            // Jika kolom masuk dan keluar di Excel ada isinya
+            if (!empty($row[$keyMasuk]) && !empty($row[$keyKeluar])) {
+                
+                $parsedMasuk  = $this->parseDate($row[$keyMasuk]);
+                $parsedKeluar = $this->parseDate($row[$keyKeluar]);
+
+                // Jika format tanggal valid dan berhasil diproses
+                if ($parsedMasuk && $parsedKeluar) {
+                    PKWT::updateOrCreate(
+                        [
+                            // Syarat unik: Cari apakah PKWT di tanggal ini untuk pekerja ini sudah ada?
+                            // Kita pakai $pekerja->id_pekerja (Jika ada) atau $pekerja->id 
+                            'id_pekerja'     => $pekerja->id_pekerja ?? $pekerja->id, 
+                            'tgl_mulai_pkwt' => $parsedMasuk,
+                            'tgl_akhir_pkwt' => $parsedKeluar,
+                        ],
+                        [
+                            // Jika belum ada, buat baru dengan status_aktif = 0 (History)
+                            // Jika dokumen dan unit tidak ada di excel, akan otomatis null (aman)
+                            'status_aktif'   => 0, 
+                        ]
+                    );
+                }
+            }
+        }
+
+        // Kembalikan objek pekerja agar proses ToModel selesai dengan baik
+        return $pekerja;
     }
 
-    /**
-     * Fungsi untuk memastikan format tanggal masuk ke database (Y-m-d)
-     */
     /**
      * Fungsi untuk memastikan format tanggal masuk ke database (Y-m-d)
      */
