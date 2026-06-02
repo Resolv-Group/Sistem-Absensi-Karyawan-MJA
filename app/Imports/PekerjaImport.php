@@ -81,7 +81,7 @@ class PekerjaImport implements ToModel, WithHeadingRow
         // 2. PROSES 50 KOLOM PKWT OTOMATIS (Simpan ke Tabel PKWT)
         // =========================================================================
         for ($i = 1; $i <= 50; $i++) {
-            // Di Excel judulnya "PKWT TGL MASUK 1", oleh Laravel otomatis dibaca "pkwt_tgl_masuk_1"
+            
             $keyMasuk  = 'pkwt_tgl_masuk_' . $i;
             $keyKeluar = 'pkwt_tgl_keluar_' . $i;
 
@@ -95,15 +95,12 @@ class PekerjaImport implements ToModel, WithHeadingRow
                 if ($parsedMasuk && $parsedKeluar) {
                     PKWT::updateOrCreate(
                         [
-                            // Syarat unik: Cari apakah PKWT di tanggal ini untuk pekerja ini sudah ada?
-                            // Kita pakai $pekerja->id_pekerja (Jika ada) atau $pekerja->id 
-                            'id_pekerja'     => $pekerja->id_pekerja ?? $pekerja->id, 
+                            'id_pekerja'     => $pekerja->id, 
                             'tgl_mulai_pkwt' => $parsedMasuk,
                             'tgl_akhir_pkwt' => $parsedKeluar,
                         ],
                         [
-                            // Jika belum ada, buat baru dengan status_aktif = 0 (History)
-                            // Jika dokumen dan unit tidak ada di excel, akan otomatis null (aman)
+                            // Jika belum ada, buat baru dengan status history (0)
                             'status_aktif'   => 0, 
                         ]
                     );
