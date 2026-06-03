@@ -6,14 +6,14 @@
         showStatusModal: false,
         showFilterDropdown: false,
         statusValue: '1',
-
+    
         // States for Search & Filter
         searchQuery: '',
         filterKategori: '',
         filterStatus: '',
-
+    
         allIds: {{ $borongan->pluck('id') }},
-
+    
         toggleAll() {
             if (this.selectedItems.length === this.allIds.length) {
                 this.selectedItems = [];
@@ -21,28 +21,28 @@
                 this.selectedItems = [...this.allIds];
             }
         },
-
+    
         async updateTable() {
             const url = new URL(window.location.href);
             url.searchParams.set('target', 'borongan'); // <--- THIS ENSURES IT HITS THE CORRECT CONTROLLER IF
             url.searchParams.set('search', this.searchQuery);
             url.searchParams.set('kategori', this.filterKategori);
             url.searchParams.set('status', this.filterStatus);
-
+    
             try {
                 const response = await fetch(url, {
                     headers: { 'X-Requested-With': 'XMLHttpRequest' }
                 });
                 const html = await response.text();
                 document.getElementById('borongan-table-body').innerHTML = html;
-
+    
                 const provider = document.getElementById('borongan-ids-provider');
                 if (provider) { this.allIds = JSON.parse(provider.dataset.ids); }
             } catch (error) {
                 console.error('Error:', error);
             }
         },
-
+    
         resetFilters() {
             this.searchQuery = '';
             this.filterKategori = '';
@@ -57,7 +57,8 @@
         <div
             class="px-6 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gray-50/30">
             <div class="flex items-center gap-2">
-                <p class="text-sm text-gray-500">Menampilkan daftar borongan <span class="text-orange-600 font-medium"> 5 terbaru. </span></p>
+                <p class="text-sm text-gray-500">Menampilkan daftar borongan <span class="text-orange-600 font-medium"> 5
+                        terbaru. </span></p>
             </div>
             <div class="flex items-center gap-3 w-full sm:w-auto">
                 {{-- SEARCH INPUT --}}
@@ -68,7 +69,8 @@
                             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
 
-                    <input type="text" x-model.debounce.500ms="searchQuery" placeholder="Cari Nama Item.." title="Cari (Preview 5 data)"
+                    <input type="text" x-model.debounce.500ms="searchQuery" placeholder="Cari Nama Item.."
+                        title="Cari (Preview 5 data)"
                         class="w-full pl-9 pr-10 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-100 focus:border-orange-400 transition bg-white">
 
                     <div class="absolute right-3 top-1/2 -translate-y-1/2 cursor-help text-gray-300 hover:text-orange-500 transition-colors"
@@ -218,36 +220,37 @@
                             </div>
                             {{-- Info Helper for Preview Limitation --}}
                             <div class="mt-4 p-3 bg-orange-50 rounded-xl border border-orange-100 flex gap-3">
-                                <svg class="w-5 h-5 text-orange-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                <svg class="w-5 h-5 text-orange-500 flex-shrink-0 mt-0.5" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                                 <p class="text-[10px] text-orange-700 leading-relaxed">
-                                    <span class="font-bold">Mode Preview:</span> Pencarian ini hanya memindai <span class="font-bold">5 data terbaru</span>. Jika tidak ditemukan, silakan cek di halaman <span class="italic font-bold">Master Borongan</span>.
+                                    <span class="font-bold">Mode Preview:</span> Pencarian ini hanya memindai <span
+                                        class="font-bold">5 data terbaru</span>. Jika tidak ditemukan, silakan cek di
+                                    halaman <span class="italic font-bold">Master Borongan</span>.
                                 </p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <form action="{{ route('borongan.import') }}" method="POST" enctype="multipart/form-data" class="inline-block">
+                {{-- <form action="{{ route('borongan.import') }}" method="POST" enctype="multipart/form-data" class="inline-block">
                     @csrf
                     
-                    {{-- Mengirimkan id_unit secara otomatis berdasarkan unit yang sedang dibuka --}}
                     <input type="hidden" name="id_unit" value="{{ $unit->id }}">
                     
                     <label class="cursor-pointer px-4 py-2 bg-orange-600 text-white text-xs font-bold rounded-lg hover:bg-orange-700 transition flex items-center gap-2 shadow-sm">
                         
-                        {{-- Icon Upload (Panah Atas) --}}
                         <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                         </svg>
                         
                         Import Borongan
                         
-                        {{-- Input File tersembunyi, langsung upload saat file dipilih --}}
                         <input type="file" name="file_excel" class="hidden" accept=".xlsx, .xls, .csv" onchange="this.form.submit()">
                     </label>
-                </form>
+                </form> --}}
 
                 <button type="button"
                     onclick="checkUnitRequirements('{{ route('view.tambah.unit-borongan', $unit->id) }}')"
@@ -277,7 +280,8 @@
                             Item Borongan</th>
                         <th class="px-4 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Kategori
                         </th>
-                        <th class="px-4 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider text-center">Max Rej Subkon (%)
+                        <th class="px-4 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider text-center">
+                            Max Rej Subkon (%)
                         </th>
                         <th class="px-4 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Harga Client
                         </th>

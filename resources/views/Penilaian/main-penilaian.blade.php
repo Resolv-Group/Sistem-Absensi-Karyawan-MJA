@@ -3,10 +3,20 @@
 @section('content')
     <style>
         @keyframes float-harian-main {
-            0%, 100% { transform: translateY(0px) rotate(3deg); }
-            50% { transform: translateY(-12px) rotate(6deg); }
+
+            0%,
+            100% {
+                transform: translateY(0px) rotate(3deg);
+            }
+
+            50% {
+                transform: translateY(-12px) rotate(6deg);
+            }
         }
-        .animate-float-harian-main { animation: float-harian-main 4s ease-in-out infinite; }
+
+        .animate-float-harian-main {
+            animation: float-harian-main 4s ease-in-out infinite;
+        }
     </style>
 
     <div x-data="{
@@ -15,32 +25,36 @@
         showStatusModal: false,
         searchQuery: '',
         statusValue: '1',
-        hrdStatuses: {{ json_encode($pkwtPekerja->mapWithKeys(fn($item) => [$item->id => ($item->penilaian->first()->status_hrd ?? 0)])) }},
-
-        staffStatuses: {{ json_encode($pkwtPekerja->mapWithKeys(fn($item) => [
-            $item->id => $item->penilaian->first()?->status_staff ?? 0 
-        ])) }},
-
+        hrdStatuses: {{ json_encode($pkwtPekerja->mapWithKeys(fn($item) => [$item->id => $item->penilaian->first()->status_hrd ?? 0])) }},
+    
+        staffStatuses: {{ json_encode(
+            $pkwtPekerja->mapWithKeys(
+                fn($item) => [
+                    $item->id => $item->penilaian->first()?->status_staff ?? 0,
+                ],
+            ),
+        ) }},
+    
         // Track the current page number
         currentPage: {{ $pkwtPekerja->currentPage() }},
-
+    
         allIds: {{ json_encode($pkwtPekerja->pluck('id')) }},
         alreadyAssessed: @js($alreadyAssessedIds),
-
+    
         get hasSelectedAssessed() {
             return this.selectedItems.some(id => this.alreadyAssessed.includes(id));
         },
         get isSelectionClean() {
             return this.selectedItems.length > 0 && this.selectedItems.every(id => !this.alreadyAssessed.includes(id));
         },
-
+    
         toggleAll() {
             this.selectedItems = this.selectedItems.length === this.allIds.length ? [] : [...this.allIds];
         },
-
+    
         async updateTable(targetUrl = null) {
             let url;
-
+    
             if (targetUrl) {
                 // If called from Pagination Link
                 url = new URL(targetUrl);
@@ -51,45 +65,45 @@
             } else {
                 // If called from Typing Search/Filter
                 url = new URL(window.location.href);
-
+    
                 // Logic: If user is typing, we force page 1 to find results.
                 // If user cleared everything, we restore the saved currentPage.
-                if (!this.searchQuery ) {
+                if (!this.searchQuery) {
                     url.searchParams.set('page', this.currentPage);
                 } else {
                     url.searchParams.set('page', '1');
                 }
             }
-
+    
             // Apply all filters to the URL
             url.searchParams.set('search', this.searchQuery);
-
+    
             try {
                 const response = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
                 const html = await response.text();
-
+    
                 document.getElementById('main-table-body').innerHTML = html;
-
+    
                 // Update the pagination links at the bottom
                 const newPagination = document.getElementById('new-pagination-provider');
                 const paginationContainer = document.getElementById('search-pagination');
                 if (newPagination && paginationContainer) {
                     paginationContainer.innerHTML = newPagination.innerHTML;
                 }
-
+    
                 // Sync IDs for Bulk Actions
                 const provider = document.getElementById('new-ids-provider-full');
                 if (provider) this.allIds = JSON.parse(provider.dataset.ids);
             } catch (error) { console.error(error); }
         },
-
+    
         resetFilters() {
             this.searchQuery = '';
             this.filterStatus = '';
             // This will trigger the $watch which calls updateTable()
             // Our logic inside updateTable will see filters are empty and restore Page 2
         },
-
+    
     }" x-init="$watch('searchQuery', () => updateTable());">
 
         {{-- HEADER SECTION --}}
@@ -116,7 +130,8 @@
                                     class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
                                 <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
                             </span>
-                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Penilaian PKWT</span>
+                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Penilaian
+                                PKWT</span>
                         </div>
                     </div>
 
@@ -173,13 +188,9 @@
                                     Ternilai</p>
                                 <div class="flex items-end gap-1">
                                     <span
-                                        class="text-3xl font-black text-emerald-600 leading-none">{{ $unit->pkwt()
-                                            ->where('status_aktif', 1)
-                                            ->whereHas('penilaian', function ($q) use ($unit) {
+                                        class="text-3xl font-black text-emerald-600 leading-none">{{ $unit->pkwt()->where('status_aktif', 1)->whereHas('penilaian', function ($q) use ($unit) {
                                                 $q->where('id_unit', $unit->id);
-                                            })
-                                            ->count()
-                                        }}</span>
+                                            })->count() }}</span>
                                     <svg class="w-4 h-4 text-emerald-400 mb-1" fill="none" viewBox="0 0 24 24"
                                         stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
@@ -244,8 +255,10 @@
                                             <button type="button"
                                                 @click="window.location.href = '{{ route('view.buat.penilaian', $unit->id) }}?ids=' + selectedItems.join(',')"
                                                 class="flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-xl text-xs font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-200">
-                                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+                                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
+                                                    stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                                        d="M12 4v16m8-8H4" />
                                                 </svg>
                                                 Buat Penilaian Baru
                                             </button>
@@ -253,22 +266,28 @@
 
                                         {{-- 2. PESAN PERINGATAN (Muncul jika ada campuran atau semua sudah dinilai) --}}
                                         <template x-if="selectedItems.length > 0 && hasSelectedAssessed">
-                                            <div class="flex items-center gap-3 px-4 py-2 bg-orange-50 border border-orange-100 rounded-xl shadow-sm">
+                                            <div
+                                                class="flex items-center gap-3 px-4 py-2 bg-orange-50 border border-orange-100 rounded-xl shadow-sm">
                                                 {{-- Animated Icon --}}
                                                 <div class="flex-shrink-0 relative flex h-2 w-2">
-                                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
-                                                    <span class="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
+                                                    <span
+                                                        class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                                                    <span
+                                                        class="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
                                                 </div>
 
                                                 <div class="flex flex-col">
-                                                    <span class="text-[10px] font-black text-orange-700 uppercase tracking-tight">Pilihan Tidak Valid</span>
+                                                    <span
+                                                        class="text-[10px] font-black text-orange-700 uppercase tracking-tight">Pilihan
+                                                        Tidak Valid</span>
                                                     <p class="text-[9px] font-bold text-orange-500 leading-none mt-0.5">
                                                         Beberapa pekerja yang Anda pilih sudah memiliki data penilaian.
                                                     </p>
                                                 </div>
 
                                                 {{-- Action to fix --}}
-                                                <button @click="selectedItems = selectedItems.filter(id => !alreadyAssessed.includes(id))"
+                                                <button
+                                                    @click="selectedItems = selectedItems.filter(id => !alreadyAssessed.includes(id))"
                                                     class="ml-2 px-2 py-1 bg-white border border-orange-200 text-[9px] font-black text-orange-600 rounded-lg hover:bg-orange-600 hover:text-white transition-all uppercase">
                                                     batalkan pilihan yang sudah dinilai
                                                 </button>
@@ -276,24 +295,23 @@
                                         </template>
 
                                         {{-- Status Update Form --}}
-                                        <form action="{{ route('export.excel', $unit->id) }}"
-                                            method="POST"
-                                            class="inline"
-                                            {{-- Tombol hanya muncul jika:
+                                        <form action="{{ route('export.excel', $unit->id) }}" method="POST"
+                                            class="inline" {{-- Tombol hanya muncul jika:
                                                 1. Ada item yang dipilih (length > 0)
                                                 2. SEMUA id di selectedItems memiliki status_hrd == 1 --}}
                                             x-show="selectedItems.length > 0 && selectedItems.every(id => hrdStatuses[id] > 0 && staffStatuses[id] > 0)"
                                             x-transition:enter="transition ease-out duration-200"
                                             x-transition:enter-start="opacity-0 scale-95"
-                                            x-transition:enter-end="opacity-100 scale-100"
-                                            x-cloak>
+                                            x-transition:enter-end="opacity-100 scale-100" x-cloak>
 
                                             @csrf
-                                            <input type="hidden" name="worker_ids" :value="JSON.stringify(selectedItems)">
+                                            <input type="hidden" name="worker_ids"
+                                                :value="JSON.stringify(selectedItems)">
 
                                             <button type="submit"
                                                 class="flex items-center gap-1.5 px-4 py-2 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-xl text-xs font-bold hover:bg-emerald-600 hover:text-white transition-all shadow-sm">
-                                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
+                                                    stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                         d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                                 </svg>
@@ -408,8 +426,7 @@
                         </div>
                     </div>
 
-                    <a href="{{ asset('panduan/INDIKATOR PENILAIAN KINERJA.xls') }}"
-                        download target="_blank"
+                    <a href="{{ asset('panduan/INDIKATOR PENILAIAN KINERJA.xls') }}" download target="_blank"
                         class="inline-flex items-center justify-center gap-2 px-6 py-3
                                 bg-emerald-600 text-white font-bold rounded-2xl
                                 hover:bg-emerald-700 shadow-lg shadow-emerald-100
@@ -421,7 +438,7 @@
                                 d="M12 3v12m0 0l4-4m-4 4l-4-4M4 17h16" />
                         </svg>
 
-                            Unduh Panduan Penilaian
+                        Unduh Panduan Penilaian
                     </a>
 
                 </div>
@@ -459,7 +476,7 @@
 
                 <div id="new-pagination-provider" class="rounded-3xl">
                     @if ($pkwtPekerja->hasPages())
-                        {{ $pkwtPekerja->links('vendor.pagination.custom') }}
+                        {{ $pkwtPekerja->links('vendor.Pagination.custom') }}
                     @endif
                 </div>
             </div>

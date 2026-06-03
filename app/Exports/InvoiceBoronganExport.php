@@ -94,19 +94,19 @@ class InvoiceBoronganExport implements FromView, WithStyles, WithColumnWidths, W
     public function drawings()
     {
         $mja = new Drawing();
-        $mja->setPath(public_path('images\mja-logo-excel.png'));
+        $mja->setPath(public_path('images/mja-logo-excel.png'));
         $mja->setCoordinates('B1');
         $mja->setHeight(60); 
         $mja->setOffsetX(60); 
 
         $ars = new Drawing();
-        $ars->setPath(public_path('images\ISO.jpg'));
+        $ars->setPath(public_path('images/ISO.jpg'));
         $ars->setCoordinates('I1'); // Contoh posisi di area tanda tangan
         $ars->setHeight(60); 
         $ars->setOffsetX(70); 
 
         $iso = new Drawing();
-        $iso->setPath(public_path('images\ARS.png'));
+        $iso->setPath(public_path('images/ARS.png'));
         $iso->setCoordinates('J1'); // Contoh posisi di area tanda tangan
         $iso->setHeight(60); 
         $iso->setOffsetX(65); 

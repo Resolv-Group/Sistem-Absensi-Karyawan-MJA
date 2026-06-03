@@ -17,8 +17,8 @@ class AssetExport implements FromView, ShouldAutoSize
 
     public function view(): View
     {
-        return view('exports.asset', [
-            'assets' => $this->dataAsset
+        return view('Exports.asset', [
+            'assets' => $this->dataAsset,
         ]);
     }
 }

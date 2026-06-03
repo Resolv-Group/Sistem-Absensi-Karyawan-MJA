@@ -9,8 +9,11 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 class KasKecilExport implements FromView, ShouldAutoSize
 {
     protected $dataKasKecil;
+
     protected $diajukan;
+
     protected $diperiksa;
+
     protected $disetujui;
 
     // Menangkap data dari Controller
@@ -25,9 +28,9 @@ class KasKecilExport implements FromView, ShouldAutoSize
     public function view(): View
     {
         // Melempar data ke blade untuk di-render menjadi Excel
-        return view('exports.kas_kecil', [
-            'data'      => $this->dataKasKecil,
-            'diajukan'  => $this->diajukan,
+        return view('Exports.kas_kecil', [
+            'data' => $this->dataKasKecil,
+            'diajukan' => $this->diajukan,
             'diperiksa' => $this->diperiksa,
             'disetujui' => $this->disetujui,
         ]);
