@@ -32,6 +32,8 @@ class PayrollController extends Controller
 {
     function viewPayrollMain(Request $request)
     {
+        $user = Auth::user();
+        
         // --- 1. CALCULATE STATS (Top Cards) ---
         $totalUnit = Unit::count(); // total pekerja
         $unitBaru = Unit::where('created_at', '>=', now()->subMonth())->count(); // pekerja baru dari bulan lalu
@@ -41,6 +43,9 @@ class PayrollController extends Controller
 
         // --- 2. BUILD QUERY ---
         $query = Unit::query()
+            ->whereHas('picUnit', function ($q) use ($user) {
+                $q->where('id_pic', $user->id);
+            })
             ->with(['picUnit.staff', 'namaMitra', 'pkwt.pekerja.tunjangan', 'pkwt.pekerja.potongan']) // Eager load relasi yang diperlukan di modal
             ->withCount('pkwt');
 
