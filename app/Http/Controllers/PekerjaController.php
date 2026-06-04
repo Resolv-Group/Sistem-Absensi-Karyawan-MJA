@@ -544,12 +544,12 @@ public function importExcel(Request $request)
             DB::rollBack(); // Batalkan semua proses jika ada yang gagal
             
             // Opsional: Anda bisa melihat detail errornya dengan $e->failures()
-            return redirect()->back()->with('error', 'Terjadi kesalahan format pada baris tertentu di Excel. Pastikan format sesuai template.');
+            return redirect()->back()->with('import_errors', 'Terjadi kesalahan format pada baris tertentu di Excel. Pastikan format sesuai template.');
             
         } catch (\Exception $e) {
             DB::rollBack(); // Batalkan semua proses jika ada error umum
             
-            return redirect()->back()->with('error', 'Gagal memproses file: ' . $e->getMessage());
+            return redirect()->back()->with('import_errors', 'Gagal memproses file: ' . $e->getMessage());
         }
     }
 

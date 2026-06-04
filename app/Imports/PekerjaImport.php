@@ -55,8 +55,13 @@ class PekerjaImport implements ToModel, WithHeadingRow
 
     public function model(array $row)
     {
+        // =====================================================================
+        // AUTO CLEANER NIK: Hapus spasi dan tanda petik tunggal (') di awal NIK
+        // =====================================================================
+        $nikBersih = isset($row['nik']) ? trim(ltrim($row['nik'], "'")) : null;
+
         // Abaikan baris jika NIK kosong (mencegah error membaca baris kosong di ujung file)
-        if (empty($row['nik'])) {
+        if (empty($nikBersih)) {
             return null;
         }
 
@@ -65,8 +70,12 @@ class PekerjaImport implements ToModel, WithHeadingRow
         $tanggalBergabung = $this->parseDate($row['tanggal_bergabung'] ?? null);
         $tanggalResign    = $this->parseDate($row['tanggal_resign'] ?? null);
 
-        $pekerjaExisting = Pekerja::where('nik', $row['nik'])->first();
+        // Cek data pekerja di database menggunakan NIK yang sudah dibersihkan
+        $pekerjaExisting = Pekerja::where('nik', $nikBersih)->first();
         
+        // =========================================================================
+        // LOGIKA PENENTUAN ID PEKERJA
+        // =========================================================================
         if (!empty($row['id_pekerja'])) {
             // Skenario 1: Jika di Excel ada isinya, wajib pakai yang dari Excel
             $idPekerja = $row['id_pekerja'];
@@ -82,9 +91,9 @@ class PekerjaImport implements ToModel, WithHeadingRow
         // 1. BUAT/UPDATE DATA PEKERJA (Simpan ke Variabel $pekerja)
         // =========================================================================
         $pekerja = Pekerja::updateOrCreate(
-            ['nik' => $row['nik']], // Kunci Pencarian Utama (Berdasarkan NIK)
+            ['nik' => $nikBersih], // Kunci Pencarian Utama menggunakan NIK Bersih
             [
-                'id_pekerja'         => $row['id_pekerja'] ?? null,
+                'id_pekerja'         => $idPekerja, // Memasukkan hasil logika ID Pekerja
                 'nama'               => $row['nama_lengkap'] ?? null,
                 'kpj'                => $row['bpjs_ketenagakerjaan'] ?? null, 
                 'naker'              => $row['bpjs_kesehatan'] ?? null,       
@@ -98,8 +107,8 @@ class PekerjaImport implements ToModel, WithHeadingRow
                 'tgl_bergabung'      => $tanggalBergabung,
                 'tgl_resign'         => $tanggalResign,
                 
-                // Status Aktif Otomatis: Jika tgl_resign kosong, berarti status aktif (1). Jika ada isinya, tidak aktif (0).
-                'status_aktif'       => 1,
+                // Perbaikan minor: Sesuai komentarmu, jika tgl_resign kosong = 1, jika ada isinya = 0
+                'status_aktif'       => empty($tanggalResign) ? 1 : 0,
 
                 // Data Alamat
                 'alamat'             => $row['jalannama_gedung'] ?? null, 
