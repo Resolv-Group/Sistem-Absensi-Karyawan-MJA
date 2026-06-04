@@ -40,8 +40,8 @@ return new class extends Migration
             $table->date('tgl_lahir');
             $table->date('tgl_bergabung');
             $table->date('tgl_resign')->nullable();
-            $table->string('kpj',  11)->nullable();
-            $table->string('naker',  13)->nullable();
+            $table->string('kpj',  12)->nullable();
+            $table->string('naker',  14)->nullable();
 
             $table->boolean('kelamin')->comment('1=laki,0=perempuan');
             $table->string('status_kawin', 50);
@@ -51,9 +51,9 @@ return new class extends Migration
 
             $table->unsignedTinyInteger('anak')->default(0);
 
-            $table->string('nama_emergency', 150);
-            $table->string('hubungan_emergency', 50);
-            $table->string('telp_emergency', 30);
+            $table->string('nama_emergency', 150)->nullable();
+            $table->string('hubungan_emergency', 50)->nullable();
+            $table->string('telp_emergency', 30)->nullable();
 
             $table->string('ibu_kandung', 150)->nullable();
 

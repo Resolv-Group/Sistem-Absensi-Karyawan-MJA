@@ -11,6 +11,40 @@ use PhpOffice\PhpSpreadsheet\Shared\Date;
 
 class PekerjaImport implements ToModel, WithHeadingRow
 {
+    private $idPrefix;
+    private $currentIdCounter;
+
+    public function __construct()
+    {
+        // 1. Buat prefix berdasarkan hari ini: MJA + dmy (Contoh: MJA040625)
+        // d = Tanggal (2 digit), m = Bulan (2 digit), y = Tahun (2 digit)
+        $this->idPrefix = 'MJA' . now()->format('dmy');
+        
+        // 2. Cari data pekerja terakhir di database yang diinput pada HARI INI
+        $lastPekerja = Pekerja::where('id_pekerja', 'like', $this->idPrefix . '%')
+            ->orderBy('id_pekerja', 'desc')
+            ->first();
+
+        // 3. Jika ada, ambil 3 angka terakhirnya. Jika tidak ada, mulai dari 0.
+        if ($lastPekerja) {
+            $lastNumber = intval(substr($lastPekerja->id_pekerja, -3));
+            $this->currentIdCounter = $lastNumber;
+        } else {
+            $this->currentIdCounter = 0;
+        }
+    }
+
+    /**
+     * Fungsi untuk mencetak ID baru dengan menambahkan urutan (001, 002, dst)
+     */
+    private function generateIdPekerja()
+    {
+        $this->currentIdCounter++;
+        // Format angka menjadi 3 digit (contoh: 1 menjadi 001)
+        return $this->idPrefix . str_pad($this->currentIdCounter, 3, '0', STR_PAD_LEFT);
+    }
+
+
     /**
      * Memberitahu sistem bahwa judul kolom (header) ada di baris ke-4.
      */
@@ -30,6 +64,19 @@ class PekerjaImport implements ToModel, WithHeadingRow
         $tanggalLahir     = $this->parseDate($row['tanggal_lahir'] ?? null);
         $tanggalBergabung = $this->parseDate($row['tanggal_bergabung'] ?? null);
         $tanggalResign    = $this->parseDate($row['tanggal_resign'] ?? null);
+
+        $pekerjaExisting = Pekerja::where('nik', $row['nik'])->first();
+        
+        if (!empty($row['id_pekerja'])) {
+            // Skenario 1: Jika di Excel ada isinya, wajib pakai yang dari Excel
+            $idPekerja = $row['id_pekerja'];
+        } elseif ($pekerjaExisting && !empty($pekerjaExisting->id_pekerja)) {
+            // Skenario 2: Jika di Excel kosong, TAPI di database sudah pernah punya ID, pakai ID lamanya
+            $idPekerja = $pekerjaExisting->id_pekerja;
+        } else {
+            // Skenario 3: Jika di Excel kosong DAN ini adalah pekerja baru, buatkan ID MJA otomatis
+            $idPekerja = $this->generateIdPekerja();
+        }
         
         // =========================================================================
         // 1. BUAT/UPDATE DATA PEKERJA (Simpan ke Variabel $pekerja)
@@ -115,27 +162,57 @@ class PekerjaImport implements ToModel, WithHeadingRow
     /**
      * Fungsi untuk memastikan format tanggal masuk ke database (Y-m-d)
      */
+    /**
+     * AUTO CONVERTER TANGGAL: Mengubah segala bentuk tanggal berantakan menjadi Y-m-d (contoh: 2025-03-15)
+     */
     private function parseDate($value)
     {
-        if (!$value) return null;
+        // Jika kosong, langsung kembalikan null
+        if (empty($value)) return null;
         
+        $value = trim($value);
+
         try {
-            // 1. Cek jika formatnya adalah "Date" serial angka bawaan Excel (misal: 44000)
+            // 1. CEK ANGKA SERIAL EXCEL (Contoh hasil VLOOKUP atau copy-paste yang terbaca sebagai angka seperti 44000)
             if (is_numeric($value)) {
-                return Date::excelToDateTimeObject($value)->format('Y-m-d');
+                return \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($value)->format('Y-m-d');
             }
-            
-            // 2. Coba parsing normal (Untuk YYYY-MM-DD)
-            return Carbon::parse($value)->format('Y-m-d');
-            
+
+            // 2. TRANSLATOR BAHASA INDONESIA KE INGGRIS
+            // Carbon hanya paham bahasa Inggris, jadi kita paksa ubah teks Indonesia ke Inggris
+            $bulanIndo = [
+                'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 
+                'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember',
+                'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'
+            ];
+            $bulanInggris = [
+                'January', 'February', 'March', 'April', 'May', 'June', 
+                'July', 'August', 'September', 'October', 'November', 'December',
+                'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+            ];
+
+            // Ganti kata-katanya
+            $valueTranslated = str_ireplace($bulanIndo, $bulanInggris, $value);
+
+            // Bersihkan spasi ganda jika ada yang mengetik "07  April  2026"
+            $valueTranslated = preg_replace('/\s+/', ' ', $valueTranslated);
+
+            // 3. PARSING OTOMATIS (Akan memproses format seperti 2020-08-10, 07 April 2026, dll)
+            return Carbon::parse($valueTranslated)->format('Y-m-d');
+
         } catch (\Exception $e) {
-            // 3. JIKA GAGAL (KARENA FORMAT YYYY-DD-MM SEPERTI "1990-23-05")
+            
+            // 4. PLAN B: JIKA FORMATNYA TERBALIK (Contoh: DD/MM/YYYY seperti 31/12/2026 atau 31-12-2026)
             try {
-                // Paksa sistem untuk membaca dengan format Tahun-Tanggal-Bulan
-                return Carbon::createFromFormat('Y-d-m', trim($value))->format('Y-m-d');
+                // Ubah semua garis miring (/) menjadi strip (-) agar seragam
+                $valueCleaned = str_replace('/', '-', $value);
+                
+                // Paksa baca dengan format Tanggal-Bulan-Tahun
+                return Carbon::createFromFormat('d-m-Y', $valueCleaned)->format('Y-m-d');
+                
             } catch (\Exception $e2) {
-                // Jika masih gagal (mungkin isian teks ngawur), kembalikan null
-                return null; 
+                // Jika semua percobaan di atas gagal (berarti isi Excel-nya benar-benar bukan tanggal, misal: "Tidak Tahu")
+                return null;
             }
         }
     }

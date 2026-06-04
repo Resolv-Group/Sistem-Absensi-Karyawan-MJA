@@ -305,6 +305,29 @@
                 </div>
             </div>
 
+            @if(session('success'))
+                <div class="alert alert-success">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            @if(session('warning'))
+                <div class="alert alert-warning">
+                    {{ session('warning') }}
+                </div>
+            @endif
+
+            @if(session('import_errors'))
+                <div class="alert alert-danger">
+                    <strong>Perhatian! Berikut adalah daftar data yang gagal diimport:</strong>
+                    <ul class="mt-2 mb-0">
+                        @foreach(session('import_errors') as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             {{-- ADD BUTTON --}}
             <form action="{{ route('pekerja.import') }}" method="POST" enctype="multipart/form-data" class="inline-block">
                 @csrf
