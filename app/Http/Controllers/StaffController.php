@@ -160,6 +160,7 @@ class StaffController extends Controller
                     'email' => 'nullable|email',
                     'telp' => 'nullable|string|max:16',
                     'kpj' => 'required|string|max:13',
+                    'naker' => 'nullable|string|max:13',
 
                     'nama_rek' => 'nullable|string',
                     'rekening' => 'nullable|string|max:30',
@@ -282,6 +283,7 @@ class StaffController extends Controller
                 'email' => $request->email,
                 'telp' => $request->telp,
                 'kpj' => $request->kpj,
+                'naker' => $request->naker,
 
                 'rekening' => $request->rekening,
                 'nama_rek' => $request->nama_rek,
@@ -387,6 +389,7 @@ class StaffController extends Controller
                     'email' => 'nullable|email',
                     'telp' => 'nullable|string|max:16',
                     'kpj' => 'required|string|max:13',
+                    'naker' => 'nullable|string|max:13',
 
                     'nama_rek' => 'nullable|string',
                     'rekening' => 'nullable|string|max:30',

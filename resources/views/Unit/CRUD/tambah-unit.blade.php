@@ -561,60 +561,46 @@
                             {{-- BPJS Naker Fee --}}
                             <div>
                                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
-                                    BPJS Kesehatan Fee (%)
+                                    BPJS Kesehatan Fee
                                 </label>
 
                                 <div class="relative group">
                                     {{-- Input Field --}}
                                     <input type="number" name="bpjs_kesehatan" placeholder="0" min="0"
-                                        max="100" step="0.01"
+                                        max="100000000" step="1000" 
                                         class="block w-full rounded-xl border-gray-200 bg-gray-50
                    text-gray-900 font-bold text-sm placeholder-gray-400
                    focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10
                    transition-all duration-200 py-3 pl-4 pr-10">
 
-                                    {{-- Suffix Symbol --}}
-                                    <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
-                                        <span
-                                            class="text-gray-400 font-bold text-sm group-focus-within:text-blue-600 transition-colors duration-200">
-                                            %
-                                        </span>
-                                    </div>
                                 </div>
 
                                 {{-- Helper Text --}}
                                 <p class="mt-1.5 ml-1 text-[10px] text-gray-400">
-                                    Masukkan presentase BPJS Kesehatan fee (Ex: 2.5)
+                                    Masukkan presentase BPJS Kesehatan fee (Ex: 100000)
                                 </p>
                             </div>
 
                             {{-- BPJS Naker Fee --}}
                             <div>
                                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
-                                    BPJS Naker Fee (%)
+                                    BPJS Naker Fee
                                 </label>
 
                                 <div class="relative group">
                                     {{-- Input Field --}}
                                     <input type="number" name="bpjs_naker" placeholder="0" min="0"
-                                        max="100" step="0.01"
+                                        max="100000000" step="1000" 
                                         class="block w-full rounded-xl border-gray-200 bg-gray-50
                    text-gray-900 font-bold text-sm placeholder-gray-400
                    focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10
                    transition-all duration-200 py-3 pl-4 pr-10">
 
-                                    {{-- Suffix Symbol --}}
-                                    <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
-                                        <span
-                                            class="text-gray-400 font-bold text-sm group-focus-within:text-blue-600 transition-colors duration-200">
-                                            %
-                                        </span>
-                                    </div>
                                 </div>
 
                                 {{-- Helper Text --}}
                                 <p class="mt-1.5 ml-1 text-[10px] text-gray-400">
-                                    Masukkan presentase BPJS Naker fee (Ex: 2.5)
+                                    Masukkan presentase BPJS Naker fee (Ex: 100000)
                                 </p>
                             </div>
                         </div>

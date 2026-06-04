@@ -42,11 +42,20 @@ class PayrollController extends Controller
         $totalBorongan = Unit::where('sistem_pengajian', 2)->count();
 
         // --- 2. BUILD QUERY ---
+        // 1. Cek apakah user adalah HRD (Sesuaikan dengan nama kolom atau sistem role di aplikasimu)
+        // Contoh jika pakai kolom string biasa: $user->role === 'HRD'
+        // Contoh jika pakai Spatie Permission: $user->hasRole('HRD')
+        // Cek apakah role user ada di dalam array ['hrd', 'admin']
+        $isHrdOrAdmin = in_array($user->role, ['hrd', 'admin']); 
+
         $query = Unit::query()
-            ->whereHas('picUnit', function ($q) use ($user) {
-                $q->where('id_pic', $user->id);
+            // Dibaca: "Ketika user BUKAN HRD dan BUKAN Admin (!$isHrdOrAdmin), maka jalankan filter PIC"
+            ->when(!$isHrdOrAdmin, function ($query) use ($user) {
+                $query->whereHas('picUnit', function ($q) use ($user) {
+                    $q->where('id_pic', $user->id);
+                });
             })
-            ->with(['picUnit.staff', 'namaMitra', 'pkwt.pekerja.tunjangan', 'pkwt.pekerja.potongan']) // Eager load relasi yang diperlukan di modal
+            ->with(['picUnit.staff', 'namaMitra', 'pkwt.pekerja.tunjangan', 'pkwt.pekerja.potongan']) 
             ->withCount('pkwt');
 
         // A. Filter by Search (Name, NIK, KPJ)
@@ -640,7 +649,7 @@ class PayrollController extends Controller
         $Bidang = BidangUsaha::where('id', $MitraKerja->bidang_usaha_id)->first();
 
         $naker = $Unit->umk * $countBpjsNaker * 4.24/100;
-        $kesehatan = $Unit->umk * $countBpjsKesehatan * 4/100;;
+        $kesehatan = $Unit->umk * $countBpjsKesehatan * 4/100;
 
         $management_fee = round(($a * $Unit->persentase_management_fee) / 100);
         $ppn = round(($management_fee * 11) / 100);
