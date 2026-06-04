@@ -521,7 +521,7 @@ class PekerjaController extends Controller
         ]);
     }
 
-public function importExcel(Request $request)
+    public function importExcel(Request $request)
     {
         // 1. Validasi File
         $request->validate([
@@ -539,17 +539,22 @@ public function importExcel(Request $request)
             DB::commit(); // Simpan permanen ke database jika sukses semua
             
             return redirect()->back()->with('success', 'Data Pekerja berhasil di-import ke sistem!');
-            
         } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
-            DB::rollBack(); // Batalkan semua proses jika ada yang gagal
+            DB::rollBack();
             
-            // Opsional: Anda bisa melihat detail errornya dengan $e->failures()
-            return redirect()->back()->with('import_errors', 'Terjadi kesalahan format pada baris tertentu di Excel. Pastikan format sesuai template.');
-            
+            // Grab excel row errors and merge them into a clear string
+            $failures = [];
+            foreach ($e->failures() as $failure) {
+                $failures[] = "Baris " . $failure->row() . ": " . implode(', ', $failure->errors());
+            }
+            $errorString = 'Kesalahan format: ' . implode(' | ', $failures);    
+
+            return redirect()->back()->with('error', $errorString);
         } catch (\Exception $e) {
-            DB::rollBack(); // Batalkan semua proses jika ada error umum
+            DB::rollBack();
             
-            return redirect()->back()->with('import_errors', 'Gagal memproses file: ' . $e->getMessage());
+            // Ensure this returns a plain string string, not an array
+            return redirect()->back()->with('error', $e->getMessage());
         }
     }
 

@@ -285,10 +285,10 @@ class UnitController extends Controller
         $boronganKategori = Kategori::all();
         $jabatan = JabatanPKWT::all();
 
-        $kasKecil = Kas_Kecil::where('id_unit', $id)->where('status', 1)->orderBy('tanggal', 'asc')->get();
+        $kasKecil = Kas_Kecil::where('id_unit', $id)->whereIn('status', [1, 2])->orderBy('tanggal', 'asc')->get();
         $kasIds = $kasKecil->pluck('id')->toArray();
 
-        $assets = Asset::where('id_unit', $id)->where('status', 1)->orderBy('tahun_perolehan', 'asc')->get();
+        $assets = Asset::where('id_unit', $id)->whereIn('status', [1, 2])->orderBy('tahun_perolehan', 'asc')->get();
         $assetIds = $assets->pluck('id')->toArray();
 
         return view('Unit.detail-unit', compact('unit', 'historiUnit', 'pekerja', 'pkwtPekerja', 'borongan', 'divisions', 'boronganKategori', 'jabatan', 'kasKecil', 'kasIds', 'assets', 'assetIds'));
@@ -549,7 +549,7 @@ class UnitController extends Controller
                 ->where('id_unit', $id_unit)
                 ->first();
 
-            if ($kas) {
+            if ($kas && $kas->status != 2) {
                 $updateData = [
                     'tanggal' => $entry['tgl'],
                     'akun' => $entry['akun'],
@@ -602,6 +602,7 @@ class UnitController extends Controller
         // Update status to 0 for the selected IDs belonging to this unit
         Kas_Kecil::whereIn('id', $ids)
             ->where('id_unit', $id_unit)
+            ->where('status', '!=', 2)
             ->update(['status' => 0]);
 
         return response()->json(['message' => 'Data berhasil dihapus']);
@@ -689,7 +690,7 @@ class UnitController extends Controller
                 ->where('id_unit', $id)
                 ->first();
 
-            if ($asset) {
+            if ($asset && $asset->status != 2) {
                 $updateData = [
                     'nama_barang' => $entry['nama_barang'],
                     'jumlah' => $entry['jumlah'],
@@ -713,9 +714,46 @@ class UnitController extends Controller
 
         \App\Models\Asset::whereIn('id', $ids)
             ->where('id_unit', $id_unit)
+            ->where('status', '!=', 2)
             ->update(['status' => 0]); // Soft delete logic
 
         return response()->json(['message' => 'Asset berhasil dihapus']);
+    }
+
+    public function approveKasKecil(Request $request, $id_unit)
+    {
+        if (!in_array(auth()->user()->role, ['admin', 'hrd'])) {
+            return response()->json(['message' => 'Anda tidak memiliki hak akses untuk menyetujui data ini.'], 403);
+        }
+
+        $ids = is_array($request->ids) ? $request->ids : [$request->ids];
+        if (empty($ids)) {
+            return response()->json(['message' => 'Tidak ada data terpilih untuk disetujui.'], 400);
+        }
+
+        Kas_Kecil::whereIn('id', $ids)
+            ->where('id_unit', $id_unit)
+            ->update(['status' => 2]);
+
+        return response()->json(['message' => 'Transaksi kas kecil berhasil disetujui.']);
+    }
+
+    public function approveAsset(Request $request, $id_unit)
+    {
+        if (!in_array(auth()->user()->role, ['admin', 'hrd'])) {
+            return response()->json(['message' => 'Anda tidak memiliki hak akses untuk menyetujui data ini.'], 403);
+        }
+
+        $ids = is_array($request->ids) ? $request->ids : [$request->ids];
+        if (empty($ids)) {
+            return response()->json(['message' => 'Tidak ada data terpilih untuk disetujui.'], 400);
+        }
+
+        Asset::whereIn('id', $ids)
+            ->where('id_unit', $id_unit)
+            ->update(['status' => 2]);
+
+        return response()->json(['message' => 'Asset berhasil disetujui.']);
     }
 
     public function exportAsset(Request $request, $id_unit)

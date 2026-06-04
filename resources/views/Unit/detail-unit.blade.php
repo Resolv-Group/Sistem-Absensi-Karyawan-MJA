@@ -366,7 +366,7 @@
                     <div x-show="showModal" x-transition:enter="transition ease-out duration-300"
                         x-transition:enter-start="opacity-0 translate-y-8 scale-95"
                         x-transition:enter-end="opacity-100 translate-y-0 scale-100"
-                        class="relative w-full max-w-4xl bg-white rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+                        class="relative w-full max-w-4xl bg-white rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col min-h-[600px] max-h-[90vh]">
 
                         {{-- HEADER --}}
                         <div class="px-8 py-6 border-b border-slate-100 flex items-center justify-between"
@@ -376,6 +376,9 @@
                                     <span
                                         x-text="activeType === 'kas' ? 'Manajemen Kas Kecil' : 'Manajemen Asset Unit'"></span>
                                 </h3>
+                                <p class="text-xs text-slate-500 font-bold uppercase mt-1 tracking-tighter" x-show="view === 'list'">
+                                    periode <span x-text="formatPeriode()"></span> tertentu
+                                </p>
                             </div>
 
                             <div class="flex items-center gap-2">
@@ -397,10 +400,59 @@
                             </div>
                         </div>
 
+                        {{-- FILTERS BLOCK --}}
+                        <div x-show="view === 'list'" class="px-8 py-3 bg-slate-50 border-b border-slate-100 flex flex-wrap gap-4 items-center">
+                            <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Filter:</span>
+                            
+                            <!-- Month Selector -->
+                            <div class="relative" x-data="{ open: false }" @click.away="open = false">
+                                <button @click="open = !open" type="button" class="flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 text-slate-700 rounded-lg text-[10px] font-bold hover:bg-slate-50 transition shadow-sm">
+                                    <span>Bulan</span>
+                                    <span class="bg-blue-100 text-blue-600 px-1.5 py-0.2 rounded-full text-[9px]" x-show="selectedMonths.length > 0" x-text="selectedMonths.length"></span>
+                                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+                                <div x-show="open" class="absolute left-0 mt-2 w-56 bg-white border border-slate-200 rounded-xl shadow-xl z-50 p-2 space-y-1 max-h-60 overflow-y-auto">
+                                    <template x-for="m in monthsList" :key="m.value">
+                                        <label class="flex items-center gap-2 px-2 py-1 hover:bg-slate-50 rounded-md cursor-pointer">
+                                            <input type="checkbox" :value="m.value" x-model="selectedMonths" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                                            <span class="text-[11px] font-semibold text-slate-700" x-text="m.label"></span>
+                                        </label>
+                                    </template>
+                                </div>
+                            </div>
+
+                            <!-- Year Selector -->
+                            <div class="relative" x-data="{ open: false }" @click.away="open = false">
+                                <button @click="open = !open" type="button" class="flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 text-slate-700 rounded-lg text-[10px] font-bold hover:bg-slate-50 transition shadow-sm">
+                                    <span>Tahun</span>
+                                    <span class="bg-blue-100 text-blue-600 px-1.5 py-0.2 rounded-full text-[9px]" x-show="selectedYears.length > 0" x-text="selectedYears.length"></span>
+                                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+                                <div x-show="open" class="absolute left-0 mt-2 w-48 bg-white border border-slate-200 rounded-xl shadow-xl z-50 p-2 space-y-1 max-h-60 overflow-y-auto">
+                                    <template x-for="y in getYears()" :key="y">
+                                        <label class="flex items-center gap-2 px-2 py-1 hover:bg-slate-50 rounded-md cursor-pointer">
+                                            <input type="checkbox" :value="y" x-model="selectedYears" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                                            <span class="text-[11px] font-semibold text-slate-700" x-text="y"></span>
+                                        </label>
+                                    </template>
+                                </div>
+                            </div>
+
+                            <!-- Reset Button -->
+                            <button @click="selectedMonths = []; selectedYears = []" x-show="selectedMonths.length > 0 || selectedYears.length > 0" type="button" class="text-[10px] text-rose-500 hover:text-rose-700 font-black uppercase tracking-wider transition ml-2">
+                                Reset Filter
+                            </button>
+                        </div>
+
                         {{-- CONTENT: LIST VIEW --}}
                         <div x-show="view === 'list' && activeType === 'kas'"
                             class="flex-1 overflow-y-auto p-4 bg-slate-50/30" x-transition>
-                            <table class="w-full text-left border-separate border-spacing-y-3">
+                            <div class="overflow-x-auto w-full mb-4">
+                                <table class="w-full text-left border-separate border-spacing-y-3">
                                 <thead>
                                     <tr class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
                                         <th class="px-4 py-2 w-10 text-center">
@@ -425,7 +477,8 @@
                                         @php $runningSaldo += ($kas->debit - $kas->kredit); @endphp
 
                                         <tr
-                                            class="group bg-white hover:shadow-xl hover:shadow-slate-200/50 transition-all">
+                                            class="group bg-white hover:shadow-xl hover:shadow-slate-200/50 transition-all"
+                                            x-show="shouldShowRow('{{ $kas->tanggal }}')">
                                             {{-- Checkbox --}}
                                             <td
                                                 class="px-4 py-4 rounded-l-2xl border-l border-y border-slate-100 text-center">
@@ -481,32 +534,38 @@
                                             {{-- Actions --}}
                                             <td
                                                 class="px-4 py-4 rounded-r-2xl border-r border-y border-slate-100 text-center">
-                                                <div
-                                                    class="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-all transform group-hover:scale-100 scale-90">
-                                                    {{-- Edit Button --}}
-                                                    <button @click="editEntries([{{ $kas->id }}])"
-                                                        title="Edit Transaksi"
-                                                        class="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-600 hover:text-white transition">
-                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                            viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                stroke-width="2"
-                                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                                        </svg>
-                                                    </button>
-                                                    {{-- Delete Button --}}
-                                                    <button
-                                                        onclick="confirmDeleteKas({{ $kas->id }}, {{ $unit->id }})"
-                                                        title="Hapus"
-                                                        class="p-2 bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-600 hover:text-white transition">
-                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                            viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                stroke-width="2"
-                                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                        </svg>
-                                                    </button>
-                                                </div>
+                                                @if($kas->status == 2)
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-emerald-50 text-emerald-600 border border-emerald-100">
+                                                        ✓ Approved
+                                                    </span>
+                                                @else
+                                                    <div
+                                                        class="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-all transform group-hover:scale-100 scale-90">
+                                                        {{-- Edit Button --}}
+                                                        <button @click="editEntries([{{ $kas->id }}])"
+                                                            title="Edit Transaksi"
+                                                            class="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-600 hover:text-white transition">
+                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                                viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    stroke-width="2"
+                                                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                            </svg>
+                                                        </button>
+                                                        {{-- Delete Button --}}
+                                                        <button
+                                                            onclick="confirmDeleteKas({{ $kas->id }}, {{ $unit->id }})"
+                                                            title="Hapus"
+                                                            class="p-2 bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-600 hover:text-white transition">
+                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                                viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    stroke-width="2"
+                                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                            </svg>
+                                                        </button>
+                                                    </div>
+                                                @endif
                                             </td>
                                         </tr>
                                     @empty
@@ -527,13 +586,14 @@
                                     @endforelse
                                 </tbody>
                             </table>
+                            </div>
                         </div>
 
                         {{-- CONTENT: LIST VIEW (ASSET) --}}
                         <div x-show="view === 'list' && activeType === 'asset'"
                             class="flex-1 overflow-y-auto p-6 bg-slate-50/30" x-transition>
-
-                            <table class="w-full text-left border-separate border-spacing-y-3">
+                            <div class="overflow-x-auto w-full mb-4">
+                                <table class="w-full text-left border-separate border-spacing-y-3">
                                 <thead>
                                     <tr class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
                                         <th class="px-4 py-2 w-10 text-center">
@@ -556,7 +616,8 @@
                                 <tbody>
                                     @forelse($assets as $a)
                                         <tr
-                                            class="group bg-white hover:shadow-xl hover:shadow-blue-900/5 transition-all duration-300">
+                                            class="group bg-white hover:shadow-xl hover:shadow-blue-900/5 transition-all duration-300"
+                                            x-show="shouldShowRow('{{ $a->tahun_perolehan }}')">
                                             {{-- 1. Checkbox --}}
                                             <td
                                                 class="px-4 py-4 rounded-l-2xl border-l border-y border-slate-100 text-center">
@@ -598,7 +659,7 @@
                                             <td class="px-4 py-4 border-y border-slate-100 text-center">
                                                 <div
                                                     class="text-[10px] font-black text-slate-500 uppercase tracking-widest bg-slate-100 px-2 py-1 rounded-md inline-block">
-                                                    {{ \Carbon\Carbon::parse($a->tahun_perolehan)->format('Y') }}
+                                                    {{ \Carbon\Carbon::parse($a->tahun_perolehan)->format('d M Y') }}
                                                 </div>
                                             </td>
 
@@ -627,31 +688,37 @@
                                             {{-- 8. Actions (Hover Reveal) --}}
                                             <td
                                                 class="px-4 py-4 rounded-r-2xl border-r border-y border-slate-100 text-center">
-                                                <div
-                                                    class="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-all transform group-hover:scale-100 scale-90">
-                                                    <button @click="editEntries([{{ $a->id }}])"
-                                                        title="Edit Asset"
-                                                        class="p-2 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-600 hover:text-white transition shadow-sm">
-                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                            viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                stroke-width="2"
-                                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                                        </svg>
-                                                    </button>
-                                                    <button
-                                                        onclick="confirmDeleteAsset({{ $a->id }}, {{ $unit->id }})"
-                                                        title="Hapus Asset"
-                                                        class="p-2 bg-rose-50 text-rose-600 rounded-xl hover:bg-rose-600 hover:text-white transition shadow-sm">
-                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                            viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                stroke-width="2"
-                                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                        </svg>
-                                                    </button>
-                                                </div>
-                                            </td>
+                                                @if($a->status == 2)
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-emerald-50 text-emerald-600 border border-emerald-100">
+                                                        ✓ Approved
+                                                    </span>
+                                                @else
+                                                    <div
+                                                        class="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-all transform group-hover:scale-100 scale-90">
+                                                        <button @click="editEntries([{{ $a->id }}])"
+                                                            title="Edit Asset"
+                                                            class="p-2 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-600 hover:text-white transition shadow-sm">
+                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                                viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    stroke-width="2"
+                                                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                            </svg>
+                                                        </button>
+                                                        <button
+                                                            onclick="confirmDeleteAsset({{ $a->id }}, {{ $unit->id }})"
+                                                            title="Hapus Asset"
+                                                            class="p-2 bg-rose-50 text-rose-600 rounded-xl hover:bg-rose-600 hover:text-white transition shadow-sm">
+                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                                viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    stroke-width="2"
+                                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                            </svg>
+                                                        </button>
+                                                    </div>
+                                                @endif
+                                            </td></td>
                                         </tr>
                                     @empty
                                         <tr>
@@ -671,6 +738,7 @@
                                     @endforelse
                                 </tbody>
                             </table>
+                            </div>
                         </div>
 
                         {{-- CONTENT: FORM VIEW (Multiple Rows) --}}
@@ -1087,20 +1155,22 @@
                 <div x-show="showModal && view === 'list' && selectedRows.length > 0" x-cloak
                     x-transition:enter="transition ease-out duration-300"
                     x-transition:enter-start="opacity-0 translate-y-20" x-transition:enter-end="opacity-100 translate-y-0"
-                    class="fixed bottom-8 left-1/2 -translate-x-1/2 z-[200] w-[40%] bg-white rounded-xl shadow-2xl text-slate-600 px-8 py-4 shadow-[0_20px_50px_rgba(0,0,0,0.3)] border border-white/10 flex items-center gap-8 backdrop-blur-xl">
-                    <div class="flex items-center gap-4 border-r border-slate-200 pr-8">
+                    class="fixed bottom-8 left-1/2 -translate-x-1/2 z-[200] w-max max-w-[90vw] bg-white rounded-2xl shadow-2xl text-slate-600 px-6 py-4 border border-slate-100 flex items-center gap-6 backdrop-blur-xl shadow-[0_20px_50px_rgba(0,0,0,0.15)]">
+                    <div class="flex items-center gap-4 border-r border-slate-200 pr-6">
                         <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center font-black text-sm text-white shadow-lg shadow-blue-500/20"
                             x-text="selectedRows.length"></div>
                         <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Data Terpilih</p>
                     </div>
-                    <div class="flex items-center gap-4 justify-between">
+                    <div class="flex items-center gap-3 whitespace-nowrap">
                         <button @click="editEntries(selectedRows)"
+                            x-show="!hasApprovedSelected()"
                             class="px-6 py-2 bg-blue-500 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-blue-600 transition shadow-lg">
                             Ubah Terpilih
                         </button>
 
                         {{-- Dynamic Delete Button --}}
                         <button type="button"
+                            x-show="!hasApprovedSelected()"
                             @click="activeType === 'kas' ? confirmDeleteKas(selectedRows, {{ $unit->id }}) : confirmDeleteAsset(selectedRows, {{ $unit->id }})"
                             class="px-6 py-2 bg-rose-500/10 text-rose-500 text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-rose-500 hover:text-white transition">
                             Hapus Terpilih
@@ -1111,6 +1181,32 @@
                             class="px-6 py-2 bg-green-500/10 text-green-500 text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-green-500 hover:text-white transition">
                             Export Excel (<span x-text="selectedRows.length"></span>)
                         </button>
+
+                        {{-- Approve Button (Beside export excel, only for HRD/Admin and Kas Kecil) --}}
+                        @if(in_array(auth()->user()->role, ['admin', 'hrd']))
+                        {{-- Active approve button: shown when kas type AND no approved items selected --}}
+                        <button type="button" @click="approveSelected()"
+                            x-show="activeType === 'kas' && !hasApprovedSelected()"
+                            class="px-6 py-2 bg-emerald-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-emerald-700 transition shadow-lg">
+                            Approve (<span x-text="selectedRows.length"></span>)
+                        </button>
+                        {{-- Disabled approve button: shown when a selected item is already approved --}}
+                        <div x-show="activeType === 'kas' && hasApprovedSelected()"
+                            title="Terdapat data yang sudah disetujui dalam pilihan Anda"
+                            class="relative group">
+                            <button type="button" disabled
+                                class="px-6 py-2 bg-slate-200 text-slate-400 text-[10px] font-black uppercase tracking-widest rounded-xl cursor-not-allowed opacity-70 flex items-center gap-2">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                                </svg>
+                                Approve
+                            </button>
+                            {{-- Tooltip --}}
+                            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-80 px-3 py-2 bg-white rounded-2xl shadow-2xl text-slate-600 text-[11px] font-semibold rounded-2xl shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none text-center leading-relaxed">
+                                Ada data yang sudah <span class="text-emerald-400">disetujui</span> dalam pilihan Anda.
+                            </div>
+                        </div>
+                        @endif
                     </div>
 
                 </div>
@@ -1561,12 +1657,145 @@
                 allData: {!! json_encode($kasKecil, JSON_INVALID_UTF8_SUBSTITUTE) !!},
                 allDataAsset: {!! json_encode($assets ?? [], JSON_INVALID_UTF8_SUBSTITUTE) !!},
 
+                selectedMonths: [],
+                selectedYears: [],
+                monthsList: [
+                    { value: '01', label: 'Januari' },
+                    { value: '02', label: 'Februari' },
+                    { value: '03', label: 'Maret' },
+                    { value: '04', label: 'April' },
+                    { value: '05', label: 'Mei' },
+                    { value: '06', label: 'Juni' },
+                    { value: '07', label: 'Juli' },
+                    { value: '08', label: 'Agustus' },
+                    { value: '09', label: 'September' },
+                    { value: '10', label: 'Oktober' },
+                    { value: '11', label: 'November' },
+                    { value: '12', label: 'Desember' }
+                ],
+
+                getYears() {
+                    let dates = this.activeType === 'kas' 
+                        ? this.allData.map(d => d.tanggal) 
+                        : this.allDataAsset.map(d => d.tahun_perolehan);
+                    let years = dates.map(d => d ? d.substring(0, 4) : '').filter((v, i, a) => v && a.indexOf(v) === i);
+                    if (years.length === 0) {
+                        years = [new Date().getFullYear().toString()];
+                    }
+                    return years.sort();
+                },
+
+                formatPeriode() {
+                    let monthsStr = '';
+                    if (this.selectedMonths.length > 0) {
+                        monthsStr = this.selectedMonths.map(m => {
+                            const found = this.monthsList.find(item => item.value === m);
+                            return found ? found.label : '';
+                        }).join(', ');
+                    } else {
+                        monthsStr = 'Semua Bulan';
+                    }
+
+                    let yearsStr = '';
+                    if (this.selectedYears.length > 0) {
+                        yearsStr = this.selectedYears.join(', ');
+                    } else {
+                        yearsStr = 'Semua Tahun';
+                    }
+
+                    return `${monthsStr} ${yearsStr}`;
+                },
+
+                shouldShowRow(dateString) {
+                    if (!dateString) return true;
+                    let parts = dateString.split('-');
+                    if (parts.length < 3) return true;
+                    let year = parts[0];
+                    let month = parts[1]; // '01', '02', etc.
+
+                    if (this.selectedMonths.length > 0 && !this.selectedMonths.includes(month)) {
+                        return false;
+                    }
+                    if (this.selectedYears.length > 0 && !this.selectedYears.includes(year)) {
+                        return false;
+                    }
+                    return true;
+                },
+
+                hasApprovedSelected() {
+                    return this.selectedRows.some(id => {
+                        let item = this.activeType === 'kas'
+                            ? this.allData.find(d => d.id == id)
+                            : this.allDataAsset.find(d => d.id == id);
+                        return item && item.status == 2;
+                    });
+                },
+
+                approveSelected() {
+                    if (this.selectedRows.length === 0) return;
+
+                    const typeLabel = this.activeType === 'kas' ? 'Kas Kecil' : 'Asset';
+                    Swal.fire({
+                        title: 'Approve Data?',
+                        text: `Apakah Anda yakin ingin menyetujui ${this.selectedRows.length} ${typeLabel} terpilih?`,
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#10b981', // green-500
+                        cancelButtonColor: '#6b7280', // gray-500
+                        confirmButtonText: 'Ya, Setujui',
+                        cancelButtonText: 'Batal',
+                        customClass: {
+                            popup: 'rounded-[2rem]',
+                            confirmButton: 'rounded-xl px-6 py-3',
+                            cancelButton: 'rounded-xl px-6 py-3'
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            const url = this.activeType === 'kas' 
+                                ? `/unit/${this.allData[0] ? this.allData[0].id_unit : '{{ $unit->id }}'}/kas-kecil/approve`
+                                : `/unit/${this.allDataAsset[0] ? this.allDataAsset[0].id_unit : '{{ $unit->id }}'}/asset/approve`;
+
+                            fetch(url, {
+                                method: 'POST',
+                                headers: {
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                    'Content-Type': 'application/json',
+                                    'Accept': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    ids: this.selectedRows
+                                })
+                            })
+                            .then(res => res.json())
+                            .then(data => {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Berhasil!',
+                                    text: data.message,
+                                    showConfirmButton: false,
+                                    timer: 1500,
+                                    customClass: {
+                                        popup: 'rounded-[2rem]'
+                                    }
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            })
+                            .catch(() => {
+                                Swal.fire('Error', 'Terjadi kesalahan sistem', 'error');
+                            });
+                        }
+                    });
+                },
+
                 open(type) {
                     this.activeType = type;
                     this.view = 'list';
                     this.showModal = true;
                     this.selectedRows = [];
                     this.isEdit = false;
+                    this.selectedMonths = [];
+                    this.selectedYears = [];
                 },
 
                 openExportSettings(format) {

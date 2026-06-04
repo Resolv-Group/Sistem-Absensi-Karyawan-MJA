@@ -10,12 +10,17 @@
         @if(session('success'))
             show = true;
             type = 'success';
-            message = '{{ session('success') }}';
+            message = '{!! addslashes(session('success')) !!}';
             setTimeout(() => show = false, 7000);
         @elseif(session('error'))
             show = true;
             type = 'error';
-            message = '{{ session('error') }}';
+            message = '{!! is_array(session('error')) ? addslashes(implode(', ', session('error'))) : addslashes(session('error')) !!}';
+            setTimeout(() => show = false, 7000);
+        @elseif($errors->any())
+            show = true;
+            type = 'error';
+            message = '{!! addslashes($errors->first()) !!}';
             setTimeout(() => show = false, 7000);
         @endif
     "

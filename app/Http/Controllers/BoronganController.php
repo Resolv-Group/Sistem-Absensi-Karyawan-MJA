@@ -359,11 +359,20 @@ class BoronganController extends Controller
             
         } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
             DB::rollBack();
-            return redirect()->back()->with('error', 'Terjadi kesalahan format pada Excel. Pastikan format sesuai template.');
             
+            // Grab excel row errors and merge them into a clear string
+            $failures = [];
+            foreach ($e->failures() as $failure) {
+                $failures[] = "Baris " . $failure->row() . ": " . implode(', ', $failure->errors());
+            }
+            $errorString = 'Kesalahan format: ' . implode(' | ', $failures);    
+
+            return redirect()->back()->with('error', $errorString);
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('error', 'Gagal memproses file: ' . $e->getMessage());
+            
+            // Ensure this returns a plain string string, not an array
+            return redirect()->back()->with('error', $e->getMessage());
         }
     }
 }
