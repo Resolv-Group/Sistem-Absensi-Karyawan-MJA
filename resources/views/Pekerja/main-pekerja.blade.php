@@ -306,7 +306,7 @@
             </div>
 
             {{-- ADD BUTTON --}}
-            {{-- <form action="{{ route('pekerja.import') }}" method="POST" enctype="multipart/form-data" class="inline-block">
+            <form action="{{ route('pekerja.import') }}" method="POST" enctype="multipart/form-data" class="inline-block">
                 @csrf
                 
                 <label class="cursor-pointer inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">
@@ -319,7 +319,7 @@
                     
                     <input type="file" name="file_excel" class="hidden" accept=".xlsx, .xls, .csv" onchange="this.form.submit()">
                 </label>
-            </form> --}}
+            </form>
 
             <a href="{{ route('view.tambah.pekerja') }}"
                 class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">
