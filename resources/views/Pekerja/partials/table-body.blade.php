@@ -56,7 +56,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                     </svg>
-                    {{ ucwords(strtolower($p->kota)) }}
+                    {{ $p->pkwtAktif->unit->nama_unit ?? 'Belum ada penempatan' }}
                 </div>
 
                 <div class="flex items-center text-sm text-gray-900">

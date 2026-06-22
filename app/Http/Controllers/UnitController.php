@@ -81,6 +81,39 @@ class UnitController extends Controller
         return view('Unit.main-unit', compact('unit', 'totalUnit', 'unitBaru', 'totalHarian', 'totalBorongan', 'tidakAktif'));
     }
 
+    public function viewKasKecilAssetMain(Request $request)
+    {
+        // --- 1. CALCULATE STATS (Top Cards) ---
+        // For Kas Kecil & Asset, maybe just show stats about Kas & Asset or keep it simple. Let's just use unit count for now.
+        $totalUnit = Unit::count();
+        $totalKas = \App\Models\Kas_Kecil::where('status', '!=', 0)->count();
+        $totalAsset = \App\Models\Asset::where('status', '!=', 0)->count();
+
+        // --- 2. BUILD QUERY ---
+        $query = Unit::query()
+            ->with(['picUnit.staff', 'namaMitra', 'kasKecil', 'asset']);
+
+        $search = $request->input('search') ?? $request->input('q');
+
+        $query->when($search, function ($q) use ($search) {
+            $q->where(function ($sub) use ($search) {
+                $sub->where('nama_unit', 'LIKE', "%{$search}%");
+            });
+        });
+
+        $query->when($request->filled('status'), function ($q) use ($request) {
+            $q->where('status_aktif', $request->status);
+        });
+
+        $unit = $query->orderBy('created_at', 'desc')->paginate(10)->withQueryString();
+
+        if ($request->ajax()) {
+            return view('Unit.partials.kas-asset-table', compact('unit'))->render();
+        }
+
+        return view('Unit.main-kas-asset', compact('unit', 'totalUnit', 'totalKas', 'totalAsset'));
+    }
+
     public function viewTambahUnit()
     {
         $picList = Staff::select('id as val', 'nama as label')->where('jabatan', 'PIC')->get();

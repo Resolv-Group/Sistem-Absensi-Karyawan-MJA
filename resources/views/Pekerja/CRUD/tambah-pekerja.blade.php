@@ -40,7 +40,7 @@
 
         {{-- FORM CARD --}}
         <form id="formTambahPekerja" action="{{ route('tambah.pekerja.post') }}" method="POST"
-            enctype="multipart/form-data" class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+            enctype="multipart/form-data" class="bg-white rounded-2xl shadow-sm border border-gray-200">
             @csrf
 
             {{-- SECTION 1: Identitas Pribadi --}}
@@ -465,7 +465,7 @@
                         <div class="grid grid-cols-2 gap-4">
 
                             <!-- CUSTOM DROPDOWN BANK -->
-                            <div x-data="{ open: false, selected: '', banks: ['BCA', 'BRI', 'BNI', 'Mandiri', 'CIMB Niaga', 'BTN', 'Bank Permata', 'Bank Danamon', 'Bank Mega', 'Panin Bank', 'OCBC NISP', 'Maybank Indonesia', 'BSI', 'Bank Jago', 'SeaBank', 'Bank Neo Commerce'] }" class="relative">
+                            <div x-data="{ open: false, selected: '{{ old('nama_rek') }}' || '', banks: ['BCA', 'BRI', 'BNI', 'Mandiri', 'CIMB Niaga', 'BTN', 'Bank Permata', 'Bank Danamon', 'Bank Mega', 'Panin Bank', 'OCBC NISP', 'Maybank Indonesia', 'BSI', 'Bank Jago', 'SeaBank', 'Bank Neo Commerce'] }" class="relative">
 
                                 <label class="block text-sm font-bold text-gray-700 mb-1">Nama Bank</label>
 
@@ -656,6 +656,128 @@
                         <p class="text-red-600 text-xs mt-1">{{ $message }}</p>
                     @enderror
                 </div> --}}
+            </div>
+
+            <div class="border-t border-gray-100"></div>
+
+            {{-- SECTION 5: Penempatan Unit --}}
+            <div class="p-8 bg-blue-50/30" x-data="{
+                penempatan: {{ old('penempatan_unit') ? 'true' : 'false' }},
+                mitras: {{ $mitras->toJson() }},
+                selectedMitraId: '{{ old('id_mitra') }}',
+                selectedUnitId: '{{ old('id_unit') }}',
+                searchMitra: '',
+                searchUnit: '',
+                openMitra: false,
+                openUnit: false,
+                get units() {
+                    if (!this.selectedMitraId) return [];
+                    const mitra = this.mitras.find(m => m.id == this.selectedMitraId);
+                    return mitra ? mitra.units : [];
+                },
+                get selectedMitraName() {
+                    const m = this.mitras.find(m => m.id == this.selectedMitraId);
+                    return m ? m.nama_mitra : 'Pilih Mitra Kerja';
+                },
+                get selectedUnitName() {
+                    const u = this.units.find(u => u.id == this.selectedUnitId);
+                    return u ? u.nama_unit : 'Pilih Unit';
+                },
+                get filteredMitras() {
+                    if (this.searchMitra === '') return this.mitras;
+                    return this.mitras.filter(m => m.nama_mitra.toLowerCase().includes(this.searchMitra.toLowerCase()));
+                },
+                get filteredUnits() {
+                    if (this.searchUnit === '') return this.units;
+                    return this.units.filter(u => u.nama_unit.toLowerCase().includes(this.searchUnit.toLowerCase()));
+                }
+            }">
+                <div class="flex items-center gap-3 mb-6 pb-4 border-b border-blue-100">
+                    <div class="p-2 bg-blue-100 text-blue-600 rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                        </svg>
+                    </div>
+                    <h2 class="text-lg font-semibold text-gray-900">Penempatan Unit (Opsional)</h2>
+                </div>
+
+                <div class="mb-5 flex items-center">
+                    <input id="penempatan_unit" name="penempatan_unit" type="checkbox" value="1" x-model="penempatan"
+                        class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer">
+                    <label for="penempatan_unit" class="ml-3 block text-sm font-bold text-gray-700 cursor-pointer">
+                        Tempatkan Pekerja ke Unit?
+                    </label>
+                </div>
+
+                <div x-show="penempatan" x-transition.opacity.duration.300ms class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {{-- Mitra Kerja --}}
+                    <div class="relative">
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Mitra Kerja</label>
+                        <input type="hidden" name="id_mitra" :value="selectedMitraId">
+                        
+                        <div @click="openMitra = !openMitra" @click.outside="openMitra = false"
+                            class="border border-gray-400 bg-white rounded-lg py-2.5 px-3 cursor-pointer flex justify-between items-center hover:border-blue-500 transition">
+                            <span x-text="selectedMitraName" class="text-gray-900"></span>
+                            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </div>
+
+                        <div x-show="openMitra" class="absolute w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-xl z-50 overflow-hidden">
+                            <div class="p-2 border-b border-gray-200">
+                                <input type="text" x-model="searchMitra" placeholder="Cari Mitra Kerja..." @click.stop
+                                    class="w-full text-sm border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 p-2">
+                            </div>
+                            <ul class="max-h-48 overflow-y-auto">
+                                <template x-for="mitra in filteredMitras" :key="mitra.id">
+                                    <li @click="selectedMitraId = mitra.id; selectedUnitId = ''; openMitra = false; searchMitra = ''"
+                                        class="px-3 py-2 text-sm hover:bg-blue-600 hover:text-white cursor-pointer transition">
+                                        <span x-text="mitra.nama_mitra"></span>
+                                    </li>
+                                </template>
+                                <li x-show="filteredMitras.length === 0" class="px-3 py-2 text-sm text-gray-500 text-center">
+                                    Tidak ditemukan
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    {{-- Unit --}}
+                    <div class="relative">
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Unit</label>
+                        <input type="hidden" name="id_unit" :value="selectedUnitId">
+                        
+                        <div @click="if(selectedMitraId) openUnit = !openUnit" @click.outside="openUnit = false"
+                            class="border rounded-lg py-2.5 px-3 flex justify-between items-center transition"
+                            :class="selectedMitraId ? 'border-gray-400 bg-white cursor-pointer hover:border-blue-500' : 'border-gray-200 bg-gray-100 cursor-not-allowed'">
+                            <span x-text="selectedMitraId ? selectedUnitName : 'Pilih Mitra Kerja Terlebih Dahulu'" 
+                                :class="selectedMitraId ? 'text-gray-900' : 'text-gray-400'"></span>
+                            <svg class="w-4 h-4" :class="selectedMitraId ? 'text-gray-500' : 'text-gray-300'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </div>
+
+                        <div x-show="openUnit && selectedMitraId" class="absolute w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-xl z-50 overflow-hidden">
+                            <div class="p-2 border-b border-gray-200">
+                                <input type="text" x-model="searchUnit" placeholder="Cari Unit..." @click.stop
+                                    class="w-full text-sm border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 p-2">
+                            </div>
+                            <ul class="max-h-48 overflow-y-auto">
+                                <template x-for="u in filteredUnits" :key="u.id">
+                                    <li @click="selectedUnitId = u.id; openUnit = false; searchUnit = ''"
+                                        class="px-3 py-2 text-sm hover:bg-blue-600 hover:text-white cursor-pointer transition">
+                                        <span x-text="u.nama_unit"></span>
+                                    </li>
+                                </template>
+                                <li x-show="filteredUnits.length === 0" class="px-3 py-2 text-sm text-gray-500 text-center">
+                                    Tidak ditemukan
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             {{-- FOOTER / ACTIONS --}}

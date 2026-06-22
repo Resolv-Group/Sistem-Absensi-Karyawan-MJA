@@ -93,8 +93,9 @@ class PKWTController extends Controller
         $pekerjaList = Pekerja::select('id', 'nama', 'nik', 'kpj', 'naker')->whereNotIn('id', $assignedWorkerIds)->get();
         $divisiList = Divisi::select('id', 'nama')->get();
         $jabatanList = JabatanPKWT::select('id', 'nama')->get();
+        $pekerja_id = request('pekerja_id');
 
-        return view('Unit.CRUD.tambah-unit-pekerja', compact('unitSelected', 'units', 'pekerjaList', 'divisiList', 'jabatanList'));
+        return view('Unit.CRUD.tambah-unit-pekerja', compact('unitSelected', 'units', 'pekerjaList', 'divisiList', 'jabatanList', 'pekerja_id'));
     }
 
     public function tambahPekerjaUnit(Request $request)

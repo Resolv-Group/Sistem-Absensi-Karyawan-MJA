@@ -143,6 +143,8 @@ Route::middleware(['auth', 'role:hrd,admin,akuntan,pic'])->group(function () {
     Route::post('/export-summary-upah-harian', [PayrollController::class, 'SummaryUpahHarian'])->name('export.summary.upah.harian');
 
     Route::post('/payroll/get-adjustments', [AbsensiController::class, 'getAdjustments'])->name('payroll.get-adjustments');
+    Route::get('/kas-kecil-asset', [UnitController::class, 'viewKasKecilAssetMain'])->name('view.kas-kecil-asset');
+
 });
 
 Route::middleware(['auth', 'role:pic,admin'])->group(function () {
@@ -158,6 +160,10 @@ Route::middleware(['auth', 'role:pic,admin'])->group(function () {
     // Absensi -> Tunjangan
     Route::post('/absensi/{id_unit}/harian/{date}/bulk-update-tunjangan', [AbsensiController::class, 'bulkAbsensiUpdateTunjangan'])->name('absensi.bulk.store-tunjangan');
     Route::post('/absensi/{id_unit}/harian/{date}/bulk-update-potongan', [AbsensiController::class, 'bulkAbsensiUpdatePotongan'])->name('absensi.bulk.store-potongan');
+
+    // Akuntan
+    // Route::group(['middleware' => ['role:admin,superadmin,akuntan']], function () {
+    // });
 
     // Penilaian
     // Filtered

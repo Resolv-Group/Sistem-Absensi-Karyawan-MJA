@@ -30,6 +30,7 @@ $(document).ready(function () {
         // Check if any filter is active for the badge
         const hasFilter =
             $("#statusFilter").val() !== "" ||
+            $("#unitFilter").val() !== "" ||
             $("#startDate").val() !== "" ||
             $("#endDate").val() !== "";
 
@@ -47,6 +48,7 @@ $(document).ready(function () {
             data: {
                 search: $("#searchInput").val(),
                 status: $("#statusFilter").val(),
+                unit: $("#unitFilter").val(),
                 start_date: $("#startDate").val(),
                 end_date: $("#endDate").val(),
             },
@@ -72,11 +74,12 @@ $(document).ready(function () {
     });
 
     // Trigger fetch on filter changes
-    $("#statusFilter, #startDate, #endDate").on("change", fetchPekerja);
+    $("#statusFilter, #unitFilter, #startDate, #endDate").on("change", fetchPekerja);
 
     // Reset Button
     $("#resetFilters").on("click", function () {
         $("#statusFilter").val("");
+        $("#unitFilter").val("");
         $("#startDate").val("");
         $("#endDate").val("");
         fetchPekerja();

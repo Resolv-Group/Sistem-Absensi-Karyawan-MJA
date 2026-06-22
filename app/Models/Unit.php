@@ -140,4 +140,14 @@ class Unit extends Model
         // 'id_unit' is the foreign key on the borongan table
         return $this->hasMany(Penilaian_Pkwt::class, 'id_unit');
     }
+
+    public function kasKecil()
+    {
+        return $this->hasMany(Kas_Kecil::class, 'id_unit', 'id');
+    }
+
+    public function asset()
+    {
+        return $this->hasMany(Asset::class, 'id_unit', 'id');
+    }
 }

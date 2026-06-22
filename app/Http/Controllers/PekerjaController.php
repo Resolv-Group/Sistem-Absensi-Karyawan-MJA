@@ -10,6 +10,7 @@ use Illuminate\Validation\Rule;
 use App\Models\History;
 use App\Models\Penilaian_Pkwt;
 use App\Models\PKWT;
+use App\Models\MitraKerja;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use App\Imports\PekerjaImport;
@@ -20,31 +21,87 @@ class PekerjaController extends Controller
 {
     public function viewPekerjaMain(Request $request)
     {
-        // --- 1. CALCULATE STATS (Top Cards) ---
-        $totalPekerja = Pekerja::count();
-        $pekerjaBaru  = Pekerja::whereMonth('created_at', Carbon::now()->month)
-                            ->whereYear('created_at', Carbon::now()->year)
-                            ->count();
-        $tidakAktif   = Pekerja::where('status_aktif', '!=', '1')->count();
+        $user = Auth::user();
+        $pic = $user->staff; // Your Staff model
+
+        // --- 1. DETERMINE ACCESS SCOPE ---
+        $isGlobalUser = false;
+        $assignedUnitIds = [];
+
+        // Check if user has global access (Adjust 'admin' or 'superadmin' to match your role system)
+        if (in_array($user->role, ['admin', 'superadmin', 'hrd'])) {
+            $isGlobalUser = true;
+        }else {
+            // If not a global user, they MUST have a staff profile
+            if (!$pic) {
+                return redirect()->back()->with('error', 'Profil Staff tidak ditemukan.');
+            }
+
+            // Fetch unit IDs assigned to this PIC from 'pic_unit'
+            $assignedUnitIds = DB::table('pic_unit')
+                                ->where('id_pic', $pic->id) // Adjust if PK is id_pic or id_staff
+                                ->pluck('id_unit')
+                                ->toArray();
+
+            // If a restricted user has no assigned units, block access
+            if (empty($assignedUnitIds)) {
+                return redirect()->back()->with('error', 'Anda belum ditugaskan ke unit manapun.');
+            }
+        }
 
 
-        // --- 2. BUILD QUERY ---
-        $query = Pekerja::with(['pkwtAktif']);
+        // --- 2. CALCULATE STATS (Top Cards) ---
+        // Start base queries for counters
+        $totalQuery = Pekerja::query();
+        $baruQuery  = Pekerja::whereMonth('created_at', Carbon::now()->month)->whereYear('created_at', Carbon::now()->year);
+        $aktifQuery = Pekerja::where('status_aktif', '!=', '1');
+
+        // Apply unit scope if user is a restricted PIC
+        if (!$isGlobalUser) {
+            $totalQuery->whereHas('pkwtAktif', function ($q) use ($assignedUnitIds) {
+                $q->whereIn('id_unit', $assignedUnitIds);
+            });
+            $baruQuery->whereHas('pkwtAktif', function ($q) use ($assignedUnitIds) {
+                $q->whereIn('id_unit', $assignedUnitIds);
+            });
+            $aktifQuery->whereHas('pkwtAktif', function ($q) use ($assignedUnitIds) {
+                $q->whereIn('id_unit', $assignedUnitIds);
+            });
+        }
+
+        $totalPekerja = $totalQuery->count();
+        $pekerjaBaru  = $baruQuery->count();
+        $tidakAktif   = $aktifQuery->count();
+
+
+        // --- 3. BUILD MAIN QUERY ---
+        $query = Pekerja::with(['pkwtAktif.unit']);
+
+        // Enforce unit scope only if NOT a global user
+        if (!$isGlobalUser) {
+            $query->whereHas('pkwtAktif', function ($q) use ($assignedUnitIds) {
+                $q->whereIn('id_unit', $assignedUnitIds);
+            });
+        }
 
         // A. Filter by Search (Name, NIK, KPJ)
-        // We check for 'search' (from new JS) or 'q' (fallback)
         $search = $request->input('search') ?? $request->input('q');
-
         $query->when($search, function ($q) use ($search) {
             $q->where(function ($sub) use ($search) {
                 $sub->where('nama', 'LIKE', "%{$search}%")
                     ->orWhere('nik', 'LIKE', "%{$search}%")
-                    ->orWhere('kpj', 'LIKE', "%{$search}%"); // Ensure column name is 'no_kpj' or 'kpj' based on your DB
+                    ->orWhere('kpj', 'LIKE', "%{$search}%");
+            });
+        });
+
+        // D. Filter by Unit
+        $query->when($request->filled('unit'), function ($q) use ($request) {
+            $q->whereHas('pkwtAktif', function ($sub) use ($request) {
+                $sub->where('id_unit', $request->unit);
             });
         });
 
         // B. Filter by Status (Exact Match)
-        // We use $request->filled() to ensure we don't filter if value is empty/null
         $query->when($request->filled('status'), function ($q) use ($request) {
             $q->where('status_aktif', $request->status);
         });
@@ -58,26 +115,32 @@ class PekerjaController extends Controller
             $q->whereDate('tgl_bergabung', '<=', $request->end_date);
         });
 
-        // --- 3. FETCH DATA ---
+
+        // --- 4. FETCH DATA ---
         $pekerja = $query->orderBy('created_at', 'desc')
                         ->paginate(10)
                         ->withQueryString();
 
+        $unitsQuery = \App\Models\Unit::select('id', 'nama_unit')->where('status_aktif', 1);
+        if (!$isGlobalUser) {
+            $unitsQuery->whereIn('id', $assignedUnitIds);
+        }
+        $unitsList = $unitsQuery->get();
 
-        // --- 4. RETURN RESPONSE ---
-
-        // If AJAX request (from the search/filter script), return ONLY the table partial
+        // --- 5. RETURN RESPONSE ---
         if ($request->ajax()) {
             return view('Pekerja.partials.pekerja-table', compact('pekerja'))->render();
         }
 
-        // Otherwise return the full page
-        return view('Pekerja.main-pekerja', compact('pekerja', 'totalPekerja', 'pekerjaBaru', 'tidakAktif'));
+        return view('Pekerja.main-pekerja', compact('pekerja', 'totalPekerja', 'pekerjaBaru', 'tidakAktif', 'unitsList'));
     }
 
     function viewTambahPekerja()
     {
-        return view('Pekerja.CRUD.tambah-pekerja');
+        $mitras = MitraKerja::with(['units' => function($q) {
+            $q->where('status_aktif', 1);
+        }])->where('status_aktif', 1)->get();
+        return view('Pekerja.CRUD.tambah-pekerja', compact('mitras'));
     }
 
     public function showDokumen($id, Request $request)
@@ -341,6 +404,12 @@ class PekerjaController extends Controller
                 'status_aktif' => 1,
             ]);
 
+            if ($request->has('penempatan_unit') && $request->penempatan_unit == '1' && $request->filled('id_unit')) {
+                return redirect()
+                    ->route('view.tambah.unit-pekerja', ['id' => $request->id_unit, 'pekerja_id' => $pekerja->id])
+                    ->with('success', 'Data Pekerja ' . $pekerja->nama . ' berhasil ditambahkan. Silakan lanjutkan penempatan unit.');
+            }
+
             return redirect()
                 ->route('view.tambah.pekerja')
                 ->with('success', 'Data Pekerja ' . $pekerja->nama . ' berhasil ditambahkan.');
@@ -535,24 +604,24 @@ class PekerjaController extends Controller
         try {
             // 2. Eksekusi proses Import menggunakan class PekerjaImport
             Excel::import(new PekerjaImport, $request->file('file_excel'));
-            
+
             DB::commit(); // Simpan permanen ke database jika sukses semua
-            
+
             return redirect()->back()->with('success', 'Data Pekerja berhasil di-import ke sistem!');
         } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
             DB::rollBack();
-            
+
             // Grab excel row errors and merge them into a clear string
             $failures = [];
             foreach ($e->failures() as $failure) {
                 $failures[] = "Baris " . $failure->row() . ": " . implode(', ', $failure->errors());
             }
-            $errorString = 'Kesalahan format: ' . implode(' | ', $failures);    
+            $errorString = 'Kesalahan format: ' . implode(' | ', $failures);
 
             return redirect()->back()->with('error', $errorString);
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             // Ensure this returns a plain string string, not an array
             return redirect()->back()->with('error', $e->getMessage());
         }
@@ -566,12 +635,12 @@ class PekerjaController extends Controller
             'id_pekerja'     => 'required|string', // Sesuaikan jika id_pekerja Anda char/string/integer
             'tgl_mulai_pkwt' => 'required|date',
             'tgl_akhir_pkwt' => 'required|date|after_or_equal:tgl_mulai_pkwt',
-            
+
             // Dokumen bersifat opsional untuk masa lalu, sesuaikan jika ingin diwajibkan
-            'dokumen_pkwt'   => 'nullable|file|mimes:png,jpg,jpeg,pdf|max:2048', 
-            
+            'dokumen_pkwt'   => 'nullable|file|mimes:png,jpg,jpeg,pdf|max:2048',
+
             // Boleh diisi jika HRD ingat data lama, jika tidak akan null
-            'id_unit'        => 'nullable|string', 
+            'id_unit'        => 'nullable|string',
             'divisi_id'      => 'nullable|integer',
             'jabatan_id'     => 'nullable|integer',
         ], [
@@ -601,16 +670,16 @@ class PekerjaController extends Controller
                 'id_unit'        => $request->id_unit ?? null,
                 'divisi_id'      => $request->divisi_id ?? null,
                 'jabatan_id'     => $request->jabatan_id ?? null,
-                
+
                 'tgl_mulai_pkwt' => $request->tgl_mulai_pkwt,
                 'tgl_akhir_pkwt' => $request->tgl_akhir_pkwt,
-                
+
                 'dokumen_pkwt'   => $dokumen,
                 'dokumen_mime'   => $dokumenMime,
-                
+
                 // KUNCI UTAMA: 0 menandakan ini adalah History/Log masa lalu
-                'status_aktif'   => 0, 
-                
+                'status_aktif'   => 0,
+
                 // Field gaji akan otomatis terisi 0 berdasarkan nilai default di migration
                 // atau Anda bisa mendefinisikannya eksplisit di sini jika perlu
             ]);

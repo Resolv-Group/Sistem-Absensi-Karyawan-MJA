@@ -974,7 +974,7 @@
                         overtime: 0,
                         rate_hbn: 0,
                         gaji_hbn: 0, // Inisialisasi
-                        workerId: '',
+                        workerId: '{{ $pekerja_id ?? "" }}',
                         divisiId: null,
                         jabatanId: null,
                         kpj: '',

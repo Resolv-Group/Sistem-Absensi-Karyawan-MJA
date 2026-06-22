@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('header')
-    <x-header title="Daftar Pekerja" subtitle="List semua karyawan" breadcrumbs="Pekerja Manajemen" />
+    <x-header title="Daftar Unit" subtitle="Ringkasan statistik dan daftar unit kerja." breadcrumbs="Unit Manajemen" />
 @endsection
 
 @section('content')
@@ -31,16 +31,14 @@
     {{-- ================================
         1. STATS OVERVIEW CARD
     ================================= --}}
-
+    {{-- 1. HEADER & DATE INDICATOR --}}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-
-        {{-- CARD 1: TOTAL UNIT --}}
-        <div
+<div
             class="bg-white rounded-2xl p-5 border border-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-lg hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">
             <div class="flex justify-between items-start z-10 relative">
                 <div>
-                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Total Pekerja</p>
-                    <h3 class="text-3xl font-extrabold text-gray-900">{{ $totalPekerja }}</h3>
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Total Unit</p>
+                    <h3 class="text-3xl font-extrabold text-gray-900">{{ $totalUnit }}</h3>
                 </div>
                 <div
                     class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform">
@@ -56,16 +54,14 @@
             </div>
         </div>
 
-        {{-- CARD 2: UNIT BARU --}}
+        {{-- CARD 2: TOTAL KAS --}}
         <div
             class="bg-white rounded-2xl p-5 border border-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-lg hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">
             <div class="flex justify-between items-start z-10 relative">
                 <div>
-                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Pekerja Baru</p>
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Total Transaksi Kas</p>
                     <div class="flex items-baseline gap-2">
-                        <h3 class="text-3xl font-extrabold text-gray-900">{{ $pekerjaBaru }}</h3>
-                        <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-md">Bulan
-                            Ini</span>
+                        <h3 class="text-3xl font-extrabold text-gray-900">{{ $totalKas }}</h3>
                     </div>
                 </div>
                 <div
@@ -80,25 +76,24 @@
             </div>
         </div>
 
-        {{-- CARD 5: TIDAK AKTIF --}}
-        {{-- On small screens, span full width to fill gap --}}
+        {{-- CARD 3: TOTAL ASSET --}}
         <div
-            class="bg-white rounded-2xl p-5 border border-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-lg hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group sm:col-span-2 lg:col-span-1">
+            class="bg-white rounded-2xl p-5 border border-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-lg hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">
             <div class="flex justify-between items-start z-10 relative">
                 <div>
-                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Tidak Aktif</p>
-                    <h3 class="text-3xl font-extrabold text-gray-900">{{ $tidakAktif }}</h3>
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Total Asset</p>
+                    <h3 class="text-3xl font-extrabold text-gray-900">{{ $totalAsset }}</h3>
                 </div>
                 <div
-                    class="w-10 h-10 rounded-xl bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center text-red-600 group-hover:scale-110 transition-transform">
+                    class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-50 to-purple-100 flex items-center justify-center text-purple-600 group-hover:scale-110 transition-transform">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                            d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10" />
                     </svg>
                 </div>
             </div>
             <div
-                class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-red-500 to-red-300 opacity-0 group-hover:opacity-100 transition-opacity">
+                class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 to-purple-300 opacity-0 group-hover:opacity-100 transition-opacity">
             </div>
         </div>
 
@@ -134,18 +129,18 @@
                             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                 </div>
-                <input id="searchInput" type="text" data-url="{{ route('view.pekerja') }}"
+                <input id="searchInput" type="text" data-url="{{ route('view.unit') }}"
                     class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg bg-white text-sm placeholder-gray-400
                        focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition shadow-sm"
-                    placeholder="Cari pekerja...">
+                    placeholder="Cari unit...">
             </div>
 
             {{-- FILTER TOGGLE BUTTON --}}
             <div class="relative">
                 <button id="filterToggleBtn"
                     class="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                     </svg>
@@ -179,8 +174,8 @@
                             selected: '',
                             list: [
                                 { val: '', label: 'Semua Status' },
-                                { val: '1', label: 'Aktif Bekerja' },
-                                { val: '0', label: 'Tidak Aktif / Resign' }
+                                { val: '1', label: 'Aktif' },
+                                { val: '0', label: 'Tidak Aktif' }
                             ]
                         }" x-init="$watch('selected', value => {
                             // This bridges Alpine to your existing jQuery Search script
@@ -197,7 +192,7 @@
                             {{-- Trigger Button --}}
                             <div @click="open = !open" @click.outside="open = false"
                                 class="relative block w-full pl-9 pr-3 py-2.5 text-sm bg-gray-50 border border-transparent rounded-xl text-gray-700
-               cursor-pointer hover:bg-gray-100 transition flex justify-between items-center group-focus-within:ring-2 group-focus-within:ring-blue-100 group-focus-within:bg-white">
+                                    cursor-pointer hover:bg-gray-100 transition flex justify-between items-center group-focus-within:ring-2 group-focus-within:ring-blue-100 group-focus-within:bg-white">
 
                                 {{-- Left Icon (User) --}}
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -254,107 +249,95 @@
                             </div>
                         </div>
 
-                        {{-- Unit Filter (Alpine Custom Dropdown) --}}
                         <div x-data="{
-        open: false,
-        selected: '',
-        search: '',
-        list: [
-            { val: '', label: 'Semua Unit' },
-            @foreach($unitsList as $unit)
-            { val: '{{ $unit->id }}', label: '{{ $unit->nama_unit }}' },
-            @endforeach
-        ],
-        // Getter to automatically filter items based on search input
-        get filteredList() {
-            if (this.search.trim() === '') return this.list;
-            return this.list.filter(item => 
-                item.label.toLowerCase().includes(this.search.toLowerCase())
-            );
-        }
-    }" 
-    x-init="$watch('selected', value => {
-        $('#unitFilter').val(value).trigger('change');
-    })" 
-    class="relative group">
+                            open: false,
+                            selected: '',
+                            list: [
+                                { val: '', label: 'Semua Tipe Pengajian' },
+                                { val: '1', label: 'Harian' },
+                                { val: '2', label: 'Borongan' }
+                            ]
+                        }" x-init="$watch('selected', value => {
+                            // This bridges Alpine to your existing jQuery Search script
+                            $('#pengajianFilter').val(value).trigger('change');
+                        })" class="relative group">
 
-    <label class="block text-[10px] uppercase tracking-wider font-bold text-gray-400 mb-1.5">
-        Unit Penempatan
-    </label>
+                            <label class="block text-[10px] uppercase tracking-wider font-bold text-gray-400 mb-1.5">
+                                Tipe Pengajian
+                            </label>
 
-    <input type="hidden" id="unitFilter" :value="selected">
+                            {{-- Hidden Input for the jQuery Script to read --}}
+                            <input type="hidden" id="pengajianFilter" :value="selected">
 
-    <div @click="open = !open" @click.outside="open = false; search = ''"
-        class="relative block w-full pl-9 pr-3 py-2.5 text-sm bg-gray-50 border border-transparent rounded-xl text-gray-700 cursor-pointer hover:bg-gray-100 transition flex justify-between items-center group-focus-within:ring-2 group-focus-within:ring-blue-100 group-focus-within:bg-white">
+                            {{-- Trigger Button --}}
+                            <div @click="open = !open" @click.outside="open = false"
+                                class="relative block w-full pl-9 pr-3 py-2.5 text-sm bg-gray-50 border border-transparent rounded-xl text-gray-700
+                                    cursor-pointer hover:bg-gray-100 transition flex justify-between items-center group-focus-within:ring-2 group-focus-within:ring-blue-100 group-focus-within:bg-white">
 
-        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <svg class="h-4 w-4 text-gray-400 group-hover:text-blue-500 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-            </svg>
-        </div>
+                                {{-- Left Icon (User) --}}
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <svg class="h-4 w-4 text-gray-400 group-hover:text-blue-500 transition" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
 
-        <span class="truncate font-medium" x-text="list.find(x => x.val == selected)?.label || 'Semua Unit'"></span>
+                                {{-- Selected Text --}}
+                                <span class="truncate font-medium"
+                                    x-text="list.find(x => x.val == selected)?.label || 'Semua Status'">
+                                </span>
 
-        <svg class="w-4 h-4 text-gray-400 transition-transform duration-200" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-        </svg>
-    </div>
+                                {{-- Right Chevron --}}
+                                <svg class="w-4 h-4 text-gray-400 transition-transform duration-200"
+                                    :class="{ 'rotate-180': open }" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </div>
 
-    <div x-show="open" 
-        x-transition:enter="transition ease-out duration-100"
-        class="absolute w-full mt-1 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden z-[60]">
-        
-        <div class="p-2 border-b border-gray-100 sticky top-0 bg-white z-10">
-            <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
-                    <svg class="h-3.5 w-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                </div>
-                <input 
-                    type="text" 
-                    x-model="search"
-                    @click.stop
-                    placeholder="Cari unit..." 
-                    class="w-full pl-8 pr-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-blue-400 focus:bg-white transition"
-                >
-            </div>
-        </div>
+                            {{-- Dropdown List --}}
+                            <div x-show="open" x-transition:enter="transition ease-out duration-100"
+                                x-transition:enter-start="transform opacity-0 scale-95"
+                                x-transition:enter-end="transform opacity-100 scale-100"
+                                x-transition:leave="transition ease-in duration-75"
+                                x-transition:leave-start="transform opacity-100 scale-100"
+                                x-transition:leave-end="transform opacity-0 scale-95"
+                                class="absolute w-full mt-1 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden z-[60]">
 
-        <ul class="max-h-60 overflow-y-auto py-1">
-            <template x-if="filteredList.length === 0">
-                <li class="px-4 py-3 text-xs text-gray-400 text-center italic">
-                    Unit tidak ditemukan
-                </li>
-            </template>
+                                <ul class="max-h-60 overflow-y-auto py-1">
+                                    <template x-for="item in list" :key="item.val">
+                                        <li @click="selected = item.val; open = false"
+                                            class="px-4 py-2.5 text-sm cursor-pointer transition flex items-center gap-2"
+                                            :class="selected == item.val ? 'bg-blue-50 text-blue-700 font-semibold' :
+                                                'text-gray-700 hover:bg-gray-50 hover:text-gray-900'">
 
-            <template x-for="item in filteredList" :key="item.val">
-                <li @click="selected = item.val; open = false; search = ''"
-                    class="px-4 py-2.5 text-sm cursor-pointer transition flex items-center gap-2"
-                    :class="selected == item.val ? 'bg-blue-50 text-blue-700 font-semibold' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'">
+                                            {{-- Checkmark Icon (Visible if selected) --}}
+                                            <svg x-show="selected == item.val" class="w-4 h-4 text-blue-600"
+                                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M5 13l4 4L19 7" />
+                                            </svg>
+                                            {{-- Spacer if not selected --}}
+                                            <span x-show="selected != item.val" class="w-4 h-4"></span>
 
-                    <svg x-show="selected == item.val" class="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span x-show="selected != item.val" class="w-4 h-4"></span>
-
-                    <span x-text="item.label"></span>
-                </li>
-            </template>
-        </ul>
-    </div>
-</div>
+                                            <span x-text="item.label"></span>
+                                        </li>
+                                    </template>
+                                </ul>
+                            </div>
+                        </div>
 
                         {{-- Date Range (Visual Grouping) --}}
-                        <div>
+                        {{-- <div>
                             <label
                                 class="block text-[10px] uppercase tracking-wider font-bold text-gray-400 mb-1.5">Tanggal
-                                Bergabung</label>
+                                Masa Berakhir</label>
 
                             <div class="flex items-center gap-2">
 
-                                {{-- Start Date --}}
-                                <div class="relative flex-1 min-w-0 group"> {{-- Added min-w-0 here --}}
+                                <div class="relative flex-1 min-w-0 group">
                                     <div
                                         class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none z-10">
                                         <svg class="h-4 w-4 text-gray-400 group-focus-within:text-blue-500 transition"
@@ -370,7 +353,6 @@
 
                                 <span class="text-gray-300">-</span>
 
-                                {{-- End Date --}}
                                 <div class="relative flex-1 min-w-0 group">
                                     <div
                                         class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none z-10">
@@ -385,7 +367,7 @@
                        focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 hover:bg-gray-100 transition placeholder-gray-400 relative z-0">
                                 </div>
                             </div>
-                        </div>
+                        </div> --}}
 
                     </div>
 
@@ -397,30 +379,13 @@
             </div>
 
             {{-- ADD BUTTON --}}
-            @if(auth()->check() && auth()->user()->role === 'admin')
-                <form action="{{ route('pekerja.import') }}" method="POST" enctype="multipart/form-data" class="inline-block">
-                    @csrf
-                    
-                    <label class="cursor-pointer inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">
-                        
-                        <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                        </svg>
-                        
-                        Import Excel
-                        
-                        <input type="file" name="file_excel" class="hidden" accept=".xlsx, .xls, .csv" onchange="this.form.submit()">
-                    </label>
-                </form>
-            @endif
-
-            <a href="{{ route('view.tambah.pekerja') }}"
+            <a href="{{ route('view.tambah.unit') }}"
                 class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">
                 <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                 </svg>
-                Pekerja
+                Unit
             </a>
         </div>
     </div>
@@ -429,10 +394,10 @@
         4. MAIN TABLE
     ================================= --}}
     <div id="table-wrapper">
-        @include('Pekerja.partials.pekerja-table')
+        @include('Unit.partials.kas-asset-table')
     </div>
 @endsection
 
 @section('scripts')
-    <script src="/js/main-pekerja.js"></script>
+    <script src="/js/main-unit.js"></script>
 @endsection
