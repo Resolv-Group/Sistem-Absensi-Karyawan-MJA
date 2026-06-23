@@ -263,11 +263,18 @@
                         <div x-data="{
                             open: false,
                             selected: '',
-                            list: [{ val: '', label: 'Semua Unit' }].concat(window.__unitList || [])
+                            search: '',
+                            list: [{ val: '', label: 'Semua Unit' }].concat(window.__unitList || []),
+                            get filteredList() {
+                                if (!this.search) return this.list;
+                                return this.list.filter(item => 
+                                    item.label.toLowerCase().includes(this.search.toLowerCase())
+                                );
+                            }
                         }" x-init="$watch('selected', value => {
                             document.getElementById('unitFilter').value = value;
                             if (typeof window.fetchPekerja === 'function') window.fetchPekerja();
-                        })" class="relative group">
+                        }); $watch('open', value => { if (!value) search = ''; })" class="relative group">
 
                             <label class="block text-[10px] uppercase tracking-wider font-bold text-gray-400 mb-1.5">
                                 Unit / Penempatan
@@ -311,10 +318,25 @@
                                 x-transition:leave="transition ease-in duration-75"
                                 x-transition:leave-start="transform opacity-100 scale-100"
                                 x-transition:leave-end="transform opacity-0 scale-95"
-                                class="absolute w-full mt-1 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden z-[60]">
+                                class="absolute w-full mt-1 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden z-[60] flex flex-col">
+
+                                {{-- Search Input Field --}}
+                                <div class="p-2 border-b border-gray-100 sticky top-0 bg-white" @click.stop>
+                                    <div class="relative">
+                                        <input type="text"
+                                            x-model="search"
+                                            placeholder="Cari unit..."
+                                            class="w-full pl-8 pr-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:bg-white transition">
+                                        <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
+                                            <svg class="h-3.5 w-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
 
                                 <ul class="max-h-60 overflow-y-auto py-1">
-                                    <template x-for="item in list" :key="item.val">
+                                    <template x-for="item in filteredList" :key="item.val">
                                         <li @click="selected = item.val; open = false"
                                             class="px-4 py-2.5 text-sm cursor-pointer transition flex items-center gap-2"
                                             :class="selected == item.val ? 'bg-blue-50 text-blue-700 font-semibold' :
@@ -332,6 +354,11 @@
                                             <span x-text="item.label"></span>
                                         </li>
                                     </template>
+                                    
+                                    {{-- Empty State --}}
+                                    <li x-show="filteredList.length === 0" class="px-4 py-3 text-xs text-center text-gray-400">
+                                        Unit tidak ditemukan
+                                    </li>
                                 </ul>
                             </div>
                         </div>
