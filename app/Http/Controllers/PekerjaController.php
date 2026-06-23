@@ -11,6 +11,7 @@ use App\Models\History;
 use App\Models\Penilaian_Pkwt;
 use App\Models\PKWT;
 use App\Models\MitraKerja;
+use App\Models\Unit;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use App\Imports\PekerjaImport;
@@ -94,35 +95,22 @@ class PekerjaController extends Controller
             });
         });
 
-        // D. Filter by Unit
-        $query->when($request->filled('unit'), function ($q) use ($request, $isGlobalUser, $assignedUnitIds) {
-            $requestedUnitId = $request->unit;
-
-            if (!$isGlobalUser) {
-                // Jika PIC mencoba memfilter unit, cek apakah unit tersebut miliknya
-                if (in_array($requestedUnitId, $assignedUnitIds)) {
-                    $q->whereHas('pkwtAktif', function ($sub) use ($requestedUnitId) {
-                        $sub->where('id_unit', $requestedUnitId);
-                    });
-                } else {
-                    // Jika PIC memasukkan ID unit yang bukan miliknya di URL, 
-                    // kita paksa query ini mengembalikan hasil kosong (security)
-                    $q->whereRaw('1 = 0'); 
-                }
-            } else {
-                // Admin/HRD bebas memfilter unit apa saja
-                $q->whereHas('pkwtAktif', function ($sub) use ($requestedUnitId) {
-                    $sub->where('id_unit', $requestedUnitId);
-                });
-            }
-        });
+        
 
         // B. Filter by Status (Exact Match)
         $query->when($request->filled('status'), function ($q) use ($request) {
             $q->where('status_aktif', $request->status);
         });
 
-        // C. Filter by Date Range (Tanggal Bergabung)
+        // C. Filter by Unit
+        $query->when($request->filled('unit'), function ($q) use ($request) {
+            $q->whereHas('pkwtAktif', function ($sub) use ($request) {
+                $sub->where('id_unit', $request->unit);
+            });
+        });
+
+
+        // D. Filter by Date Range (Tanggal Bergabung)
         $query->when($request->start_date, function ($q) use ($request) {
             $q->whereDate('tgl_bergabung', '>=', $request->start_date);
         });
@@ -137,21 +125,20 @@ class PekerjaController extends Controller
                         ->paginate(10)
                         ->withQueryString();
 
-        $unitsQuery = \App\Models\Unit::select('id', 'nama_unit')->where('status_aktif', 1);
 
+        // --- 5. FETCH UNITS FOR FILTER DROPDOWN ---
+        $unitQuery = Unit::where('status_aktif', 1)->orderBy('nama_unit');
         if (!$isGlobalUser) {
-            // PIC hanya melihat daftar unit miliknya di dropdown filter
-            $unitsQuery->whereIn('id', $assignedUnitIds);
+            $unitQuery->whereIn('id', $assignedUnitIds);
         }
+        $units = $unitQuery->get(['id', 'nama_unit']);
 
-        $unitsList = $unitsQuery->orderBy('nama_unit', 'asc')->get();
-
-        // --- 5. RETURN RESPONSE ---
+        // --- 6. RETURN RESPONSE ---
         if ($request->ajax()) {
             return view('Pekerja.partials.pekerja-table', compact('pekerja'))->render();
         }
 
-        return view('Pekerja.main-pekerja', compact('pekerja', 'totalPekerja', 'pekerjaBaru', 'tidakAktif', 'unitsList'));
+        return view('Pekerja.main-pekerja', compact('pekerja', 'totalPekerja', 'pekerjaBaru', 'tidakAktif', 'units'));
     }
 
     public function viewTambahPekerja()
