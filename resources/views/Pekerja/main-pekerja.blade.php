@@ -254,40 +254,17 @@
                             </div>
                         </div>
 
-                        {{-- Unit Filter (Alpine Custom Dropdown) --}}
-                        <div x-data="{
-                            open: false,
-                            selected: '',
-                            search: '',
-                            list: [
-                                { val: '', label: 'Semua Unit' },
-                                @foreach ($unitsList as $unit)
-                                { val: '{{ $unit->id }}', label: '{{ $unit->nama_unit }}' }, 
-                                @endforeach
-                            ],
-                            get filteredList() {
-                                if (this.search.trim() === '') return this.list;
-                                return this.list.filter(item =>
-                                    item.label.toLowerCase().includes(this.search.toLowerCase())
-                                );
-                            }
-                        }" x-init="$watch('selected', value => {
-                            console.log('Alpine Unit Filter selected changed to:', value);
-                            const el = document.getElementById('unitFilter');
-                            if (el) {
-                                el.value = value;
-                                el.dispatchEvent(new Event('change', { bubbles: true }));
-                            }
-                            
-                        })" class="relative group">
+                        {{-- Unit Filter (jQuery Custom Dropdown) --}}
+                        <div class="relative group" id="unitDropdownWrapper">
 
                             <label class="block text-[10px] uppercase tracking-wider font-bold text-gray-400 mb-1.5">
                                 Unit Penempatan
                             </label>
 
-                            <input type="hidden" id="unitFilter" :value="selected">
+                            <input type="hidden" id="unitFilter" value="">
 
-                            <div @click="open = !open" @click.outside="open = false; search = ''"
+                            {{-- Trigger Button --}}
+                            <div id="unitDropdownTrigger"
                                 class="relative block w-full pl-9 pr-3 py-2.5 text-sm bg-gray-50 border border-transparent rounded-xl text-gray-700 cursor-pointer hover:bg-gray-100 transition flex justify-between items-center group-focus-within:ring-2 group-focus-within:ring-blue-100 group-focus-within:bg-white">
 
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -298,20 +275,20 @@
                                     </svg>
                                 </div>
 
-                                <span class="truncate font-medium"
-                                    x-text="list.find(x => x.val == selected)?.label || 'Semua Unit'"></span>
+                                <span id="unitDropdownLabel" class="truncate font-medium">Semua Unit</span>
 
-                                <svg class="w-4 h-4 text-gray-400 transition-transform duration-200"
-                                    :class="{ 'rotate-180': open }" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
+                                <svg id="unitDropdownChevron" class="w-4 h-4 text-gray-400 transition-transform duration-200"
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M19 9l-7 7-7-7" />
                                 </svg>
                             </div>
 
-                            <div x-show="open" x-transition:enter="transition ease-out duration-100"
-                                class="absolute w-full mt-1 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden z-[60]">
+                            {{-- Dropdown Menu --}}
+                            <div id="unitDropdownMenu"
+                                class="hidden absolute w-full mt-1 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden z-[60]">
 
+                                {{-- Search Input --}}
                                 <div class="p-2 border-b border-gray-100 sticky top-0 bg-white z-10">
                                     <div class="relative">
                                         <div
@@ -322,35 +299,45 @@
                                                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                             </svg>
                                         </div>
-                                        <input type="text" x-model="search" @click.stop placeholder="Cari unit..."
+                                        <input type="text" id="unitDropdownSearch" placeholder="Cari unit..."
                                             class="w-full pl-8 pr-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-blue-400 focus:bg-white transition">
                                     </div>
                                 </div>
 
-                                <ul class="max-h-60 overflow-y-auto py-1">
-                                    <template x-if="filteredList.length === 0">
-                                        <li class="px-4 py-3 text-xs text-gray-400 text-center italic">
-                                            Unit tidak ditemukan
-                                        </li>
-                                    </template>
+                                {{-- Options List --}}
+                                <ul id="unitDropdownOptions" class="max-h-60 overflow-y-auto py-1">
+                                    {{-- Default: Semua Unit (initially selected) --}}
+                                    <li class="unit-option px-4 py-2.5 text-sm cursor-pointer transition flex items-center gap-2 bg-blue-50 text-blue-700 font-semibold"
+                                        data-value="">
+                                        <svg class="w-4 h-4 text-blue-600 unit-check" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M5 13l4 4L19 7" />
+                                        </svg>
+                                        <span class="w-4 h-4 unit-spacer hidden"></span>
+                                        <span class="unit-label">Semua Unit</span>
+                                    </li>
 
-                                    <template x-for="item in filteredList" :key="item.val">
-                                        <li @click="selected = item.val; open = false; search = ''"
-                                            class="px-4 py-2.5 text-sm cursor-pointer transition flex items-center gap-2"
-                                            :class="selected == item.val ? 'bg-blue-50 text-blue-700 font-semibold' :
-                                                'text-gray-700 hover:bg-gray-50 hover:text-gray-900'">
-
-                                            <svg x-show="selected == item.val" class="w-4 h-4 text-blue-600"
-                                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M5 13l4 4L19 7" />
+                                    {{-- Server-rendered unit options --}}
+                                    @foreach ($unitsList as $unit)
+                                        <li class="unit-option px-4 py-2.5 text-sm cursor-pointer transition flex items-center gap-2 text-gray-700 hover:bg-gray-50 hover:text-gray-900"
+                                            data-value="{{ $unit->id }}">
+                                            <svg class="w-4 h-4 text-blue-600 unit-check hidden" fill="none"
+                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    stroke-width="2" d="M5 13l4 4L19 7" />
                                             </svg>
-                                            <span x-show="selected != item.val" class="w-4 h-4"></span>
-
-                                            <span x-text="item.label"></span>
+                                            <span class="w-4 h-4 unit-spacer"></span>
+                                            <span class="unit-label">{{ $unit->nama_unit }}</span>
                                         </li>
-                                    </template>
+                                    @endforeach
                                 </ul>
+
+                                {{-- Empty State --}}
+                                <div id="unitDropdownEmpty"
+                                    class="hidden px-4 py-3 text-xs text-gray-400 text-center italic">
+                                    Unit tidak ditemukan
+                                </div>
                             </div>
                         </div>
 
