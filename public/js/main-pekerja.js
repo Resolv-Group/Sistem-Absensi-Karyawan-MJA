@@ -66,6 +66,9 @@ $(document).ready(function () {
         });
     }
 
+    // Expose globally so Alpine's $watch can call it directly
+    window.fetchPekerja = fetchPekerja;
+
     // Live Search with Debounce
     let debounceTimer;
     $("#searchInput").on("keyup", function () {

@@ -183,8 +183,8 @@
                                 { val: '0', label: 'Tidak Aktif / Resign' }
                             ]
                         }" x-init="$watch('selected', value => {
-                            // This bridges Alpine to your existing jQuery Search script
-                            $('#statusFilter').val(value).trigger('change');
+                            document.getElementById('statusFilter').value = value;
+                            if (typeof window.fetchPekerja === 'function') window.fetchPekerja();
                         })" class="relative group">
 
                             <label class="block text-[10px] uppercase tracking-wider font-bold text-gray-400 mb-1.5">
@@ -254,18 +254,19 @@
                             </div>
                         </div>
 
+                        {{-- Unit data for Alpine (safe encoding via script tag) --}}
+                        <script>
+                            window.__unitList = @json($units->map(fn($u) => ['val' => (string)$u->id, 'label' => $u->nama_unit])->values());
+                        </script>
+
                         {{-- Unit Filter (Alpine Custom Dropdown) --}}
                         <div x-data="{
                             open: false,
                             selected: '',
-                            list: [
-                                { val: '', label: 'Semua Unit' },
-                                @foreach($units as $unit)
-                                    { val: '{{ $unit->id }}', label: '{{ $unit->nama_unit }}' },
-                                @endforeach
-                            ]
+                            list: [{ val: '', label: 'Semua Unit' }].concat(window.__unitList || [])
                         }" x-init="$watch('selected', value => {
-                            $('#unitFilter').val(value).trigger('change');
+                            document.getElementById('unitFilter').value = value;
+                            if (typeof window.fetchPekerja === 'function') window.fetchPekerja();
                         })" class="relative group">
 
                             <label class="block text-[10px] uppercase tracking-wider font-bold text-gray-400 mb-1.5">
