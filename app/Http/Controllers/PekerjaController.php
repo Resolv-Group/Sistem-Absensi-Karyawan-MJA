@@ -95,10 +95,26 @@ class PekerjaController extends Controller
         });
 
         // D. Filter by Unit
-        $query->when($request->filled('unit'), function ($q) use ($request) {
-            $q->whereHas('pkwtAktif', function ($sub) use ($request) {
-                $sub->where('id_unit', $request->unit);
-            });
+        $query->when($request->filled('unit'), function ($q) use ($request, $isGlobalUser, $assignedUnitIds) {
+            $requestedUnitId = $request->unit;
+
+            if (!$isGlobalUser) {
+                // Jika PIC mencoba memfilter unit, cek apakah unit tersebut miliknya
+                if (in_array($requestedUnitId, $assignedUnitIds)) {
+                    $q->whereHas('pkwtAktif', function ($sub) use ($requestedUnitId) {
+                        $sub->where('id_unit', $requestedUnitId);
+                    });
+                } else {
+                    // Jika PIC memasukkan ID unit yang bukan miliknya di URL, 
+                    // kita paksa query ini mengembalikan hasil kosong (security)
+                    $q->whereRaw('1 = 0'); 
+                }
+            } else {
+                // Admin/HRD bebas memfilter unit apa saja
+                $q->whereHas('pkwtAktif', function ($sub) use ($requestedUnitId) {
+                    $sub->where('id_unit', $requestedUnitId);
+                });
+            }
         });
 
         // B. Filter by Status (Exact Match)
@@ -122,10 +138,13 @@ class PekerjaController extends Controller
                         ->withQueryString();
 
         $unitsQuery = \App\Models\Unit::select('id', 'nama_unit')->where('status_aktif', 1);
+
         if (!$isGlobalUser) {
+            // PIC hanya melihat daftar unit miliknya di dropdown filter
             $unitsQuery->whereIn('id', $assignedUnitIds);
         }
-        $unitsList = $unitsQuery->get();
+
+        $unitsList = $unitsQuery->orderBy('nama_unit', 'asc')->get();
 
         // --- 5. RETURN RESPONSE ---
         if ($request->ajax()) {

@@ -272,6 +272,7 @@
                                 );
                             }
                         }" x-init="$watch('selected', value => {
+                            console.log('Alpine Unit Filter selected changed to:', value);
                             $('#unitFilter').val(value).trigger('change');
                         })" class="relative group">
 
