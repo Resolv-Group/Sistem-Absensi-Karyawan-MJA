@@ -11,7 +11,6 @@ use App\Models\History;
 use App\Models\Penilaian_Pkwt;
 use App\Models\PKWT;
 use App\Models\MitraKerja;
-use App\Models\Unit;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use App\Imports\PekerjaImport;
@@ -85,32 +84,25 @@ class PekerjaController extends Controller
             });
         }
 
-        // A. Filter by Search (Name, NIK, KPJ)
+        // A. Filter by Search (Name, NIK, KPJ, Unit Name)
         $search = $request->input('search') ?? $request->input('q');
         $query->when($search, function ($q) use ($search) {
             $q->where(function ($sub) use ($search) {
                 $sub->where('nama', 'LIKE', "%{$search}%")
                     ->orWhere('nik', 'LIKE', "%{$search}%")
-                    ->orWhere('kpj', 'LIKE', "%{$search}%");
+                    ->orWhere('kpj', 'LIKE', "%{$search}%")
+                    ->orWhereHas('pkwtAktif.unit', function ($u) use ($search) {
+                        $u->where('nama_unit', 'LIKE', "%{$search}%");
+                    });
             });
         });
-
-        
 
         // B. Filter by Status (Exact Match)
         $query->when($request->filled('status'), function ($q) use ($request) {
             $q->where('status_aktif', $request->status);
         });
 
-        // C. Filter by Unit
-        $query->when($request->filled('unit'), function ($q) use ($request) {
-            $q->whereHas('pkwtAktif', function ($sub) use ($request) {
-                $sub->where('id_unit', $request->unit);
-            });
-        });
-
-
-        // D. Filter by Date Range (Tanggal Bergabung)
+        // C. Filter by Date Range (Tanggal Bergabung)
         $query->when($request->start_date, function ($q) use ($request) {
             $q->whereDate('tgl_bergabung', '>=', $request->start_date);
         });
@@ -126,19 +118,12 @@ class PekerjaController extends Controller
                         ->withQueryString();
 
 
-        // --- 5. FETCH UNITS FOR FILTER DROPDOWN ---
-        $unitQuery = Unit::where('status_aktif', 1)->orderBy('nama_unit');
-        if (!$isGlobalUser) {
-            $unitQuery->whereIn('id', $assignedUnitIds);
-        }
-        $units = $unitQuery->get(['id', 'nama_unit']);
-
-        // --- 6. RETURN RESPONSE ---
+        // --- 5. RETURN RESPONSE ---
         if ($request->ajax()) {
             return view('Pekerja.partials.pekerja-table', compact('pekerja'))->render();
         }
 
-        return view('Pekerja.main-pekerja', compact('pekerja', 'totalPekerja', 'pekerjaBaru', 'tidakAktif', 'units'));
+        return view('Pekerja.main-pekerja', compact('pekerja', 'totalPekerja', 'pekerjaBaru', 'tidakAktif'));
     }
 
     public function viewTambahPekerja()
