@@ -256,94 +256,97 @@
 
                         {{-- Unit Filter (Alpine Custom Dropdown) --}}
                         <div x-data="{
-        open: false,
-        selected: '',
-        search: '',
-        list: [
-            { val: '', label: 'Semua Unit' },
-            @foreach($unitsList as $unit)
-            { val: '{{ $unit->id }}', label: '{{ $unit->nama_unit }}' },
-            @endforeach
-        ],
-        // Getter to automatically filter items based on search input
-        get filteredList() {
-            if (this.search.trim() === '') return this.list;
-            return this.list.filter(item => 
-                item.label.toLowerCase().includes(this.search.toLowerCase())
-            );
-        }
-    }" 
-    x-init="$watch('selected', value => {
-        $('#unitFilter').val(value).trigger('change');
-    })" 
-    class="relative group">
+                            open: false,
+                            selected: '',
+                            search: '',
+                            list: [
+                                { val: '', label: 'Semua Unit' },
+                                @foreach ($unitsList as $unit)
+                                { val: '{{ $unit->id }}', label: '{{ $unit->nama_unit }}' }, 
+                                @endforeach
+                            ],
+                            get filteredList() {
+                                if (this.search.trim() === '') return this.list;
+                                return this.list.filter(item =>
+                                    item.label.toLowerCase().includes(this.search.toLowerCase())
+                                );
+                            }
+                        }" x-init="$watch('selected', value => {
+                            $('#unitFilter').val(value).trigger('change');
+                        })" class="relative group">
 
-    <label class="block text-[10px] uppercase tracking-wider font-bold text-gray-400 mb-1.5">
-        Unit Penempatan
-    </label>
+                            <label class="block text-[10px] uppercase tracking-wider font-bold text-gray-400 mb-1.5">
+                                Unit Penempatan
+                            </label>
 
-    <input type="hidden" id="unitFilter" :value="selected">
+                            <input type="hidden" id="unitFilter" :value="selected">
 
-    <div @click="open = !open" @click.outside="open = false; search = ''"
-        class="relative block w-full pl-9 pr-3 py-2.5 text-sm bg-gray-50 border border-transparent rounded-xl text-gray-700 cursor-pointer hover:bg-gray-100 transition flex justify-between items-center group-focus-within:ring-2 group-focus-within:ring-blue-100 group-focus-within:bg-white">
+                            <div @click="open = !open" @click.outside="open = false; search = ''"
+                                class="relative block w-full pl-9 pr-3 py-2.5 text-sm bg-gray-50 border border-transparent rounded-xl text-gray-700 cursor-pointer hover:bg-gray-100 transition flex justify-between items-center group-focus-within:ring-2 group-focus-within:ring-blue-100 group-focus-within:bg-white">
 
-        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <svg class="h-4 w-4 text-gray-400 group-hover:text-blue-500 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-            </svg>
-        </div>
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <svg class="h-4 w-4 text-gray-400 group-hover:text-blue-500 transition" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                    </svg>
+                                </div>
 
-        <span class="truncate font-medium" x-text="list.find(x => x.val == selected)?.label || 'Semua Unit'"></span>
+                                <span class="truncate font-medium"
+                                    x-text="list.find(x => x.val == selected)?.label || 'Semua Unit'"></span>
 
-        <svg class="w-4 h-4 text-gray-400 transition-transform duration-200" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-        </svg>
-    </div>
+                                <svg class="w-4 h-4 text-gray-400 transition-transform duration-200"
+                                    :class="{ 'rotate-180': open }" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </div>
 
-    <div x-show="open" 
-        x-transition:enter="transition ease-out duration-100"
-        class="absolute w-full mt-1 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden z-[60]">
-        
-        <div class="p-2 border-b border-gray-100 sticky top-0 bg-white z-10">
-            <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
-                    <svg class="h-3.5 w-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                </div>
-                <input 
-                    type="text" 
-                    x-model="search"
-                    @click.stop
-                    placeholder="Cari unit..." 
-                    class="w-full pl-8 pr-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-blue-400 focus:bg-white transition"
-                >
-            </div>
-        </div>
+                            <div x-show="open" x-transition:enter="transition ease-out duration-100"
+                                class="absolute w-full mt-1 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden z-[60]">
 
-        <ul class="max-h-60 overflow-y-auto py-1">
-            <template x-if="filteredList.length === 0">
-                <li class="px-4 py-3 text-xs text-gray-400 text-center italic">
-                    Unit tidak ditemukan
-                </li>
-            </template>
+                                <div class="p-2 border-b border-gray-100 sticky top-0 bg-white z-10">
+                                    <div class="relative">
+                                        <div
+                                            class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
+                                            <svg class="h-3.5 w-3.5 text-gray-400" fill="none" viewBox="0 0 24 24"
+                                                stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                            </svg>
+                                        </div>
+                                        <input type="text" x-model="search" @click.stop placeholder="Cari unit..."
+                                            class="w-full pl-8 pr-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-blue-400 focus:bg-white transition">
+                                    </div>
+                                </div>
 
-            <template x-for="item in filteredList" :key="item.val">
-                <li @click="selected = item.val; open = false; search = ''"
-                    class="px-4 py-2.5 text-sm cursor-pointer transition flex items-center gap-2"
-                    :class="selected == item.val ? 'bg-blue-50 text-blue-700 font-semibold' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'">
+                                <ul class="max-h-60 overflow-y-auto py-1">
+                                    <template x-if="filteredList.length === 0">
+                                        <li class="px-4 py-3 text-xs text-gray-400 text-center italic">
+                                            Unit tidak ditemukan
+                                        </li>
+                                    </template>
 
-                    <svg x-show="selected == item.val" class="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span x-show="selected != item.val" class="w-4 h-4"></span>
+                                    <template x-for="item in filteredList" :key="item.val">
+                                        <li @click="selected = item.val; open = false; search = ''"
+                                            class="px-4 py-2.5 text-sm cursor-pointer transition flex items-center gap-2"
+                                            :class="selected == item.val ? 'bg-blue-50 text-blue-700 font-semibold' :
+                                                'text-gray-700 hover:bg-gray-50 hover:text-gray-900'">
 
-                    <span x-text="item.label"></span>
-                </li>
-            </template>
-        </ul>
-    </div>
-</div>
+                                            <svg x-show="selected == item.val" class="w-4 h-4 text-blue-600"
+                                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M5 13l4 4L19 7" />
+                                            </svg>
+                                            <span x-show="selected != item.val" class="w-4 h-4"></span>
+
+                                            <span x-text="item.label"></span>
+                                        </li>
+                                    </template>
+                                </ul>
+                            </div>
+                        </div>
 
                         {{-- Date Range (Visual Grouping) --}}
                         <div>
@@ -397,19 +400,24 @@
             </div>
 
             {{-- ADD BUTTON --}}
-            @if(auth()->check() && auth()->user()->role === 'admin')
-                <form action="{{ route('pekerja.import') }}" method="POST" enctype="multipart/form-data" class="inline-block">
+            @if (auth()->check() && auth()->user()->role === 'admin')
+                <form action="{{ route('pekerja.import') }}" method="POST" enctype="multipart/form-data"
+                    class="inline-block">
                     @csrf
-                    
-                    <label class="cursor-pointer inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">
-                        
-                        <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+
+                    <label
+                        class="cursor-pointer inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">
+
+                        <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                         </svg>
-                        
+
                         Import Excel
-                        
-                        <input type="file" name="file_excel" class="hidden" accept=".xlsx, .xls, .csv" onchange="this.form.submit()">
+
+                        <input type="file" name="file_excel" class="hidden" accept=".xlsx, .xls, .csv"
+                            onchange="this.form.submit()">
                     </label>
                 </form>
             @endif
