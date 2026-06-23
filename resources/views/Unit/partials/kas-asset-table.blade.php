@@ -22,7 +22,10 @@
                         Tipe Pengajian
                     </th>
                     <th class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">
-                        Total Pekerja
+                        Total Kas Kecil
+                    </th>
+                    <th class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">
+                        Total Asset
                     </th>
                     <th class="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">
                         Status

@@ -541,7 +541,8 @@
                                         class="block w-full rounded-xl border-gray-200 bg-gray-50
                    text-gray-900 font-bold text-sm placeholder-gray-400
                    focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10
-                   transition-all duration-200 py-3 pl-4 pr-10">
+                   transition-all duration-200 py-3 pl-4 pr-10"
+                                        value="{{ old('persentase_management_fee') }}">
 
                                     {{-- Suffix Symbol --}}
                                     <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
@@ -571,7 +572,8 @@
                                         class="block w-full rounded-xl border-gray-200 bg-gray-50
                    text-gray-900 font-bold text-sm placeholder-gray-400
                    focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10
-                   transition-all duration-200 py-3 pl-4 pr-10">
+                   transition-all duration-200 py-3 pl-4 pr-10"
+                                        value="{{ old('bpjs_kesehatan') }}">
 
                                 </div>
 
@@ -594,7 +596,8 @@
                                         class="block w-full rounded-xl border-gray-200 bg-gray-50
                    text-gray-900 font-bold text-sm placeholder-gray-400
                    focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10
-                   transition-all duration-200 py-3 pl-4 pr-10">
+                   transition-all duration-200 py-3 pl-4 pr-10"
+                                        value="{{ old('bpjs_naker') }}">
 
                                 </div>
 
@@ -877,6 +880,31 @@
                     nama: '',
                     value: '', // Nilai mentah (angka)
                     display: '' // Nilai tampilan (format rupiah)
+                },
+
+                init() {
+                    let oldTunjangan = @json(old('tunjangan'));
+                    if (oldTunjangan) {
+                        try {
+                            let parsed = typeof oldTunjangan === 'string' ? JSON.parse(oldTunjangan) : oldTunjangan;
+                            this.tunjanganList = Object.entries(parsed).map(([key, val]) => {
+                                let name = key.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+                                return {
+                                    nama: name,
+                                    value: val
+                                };
+                            });
+                        } catch (e) {
+                            console.error(e);
+                        }
+                    } else {
+                        // Default values
+                        this.tunjanganList = [
+                            { nama: 'Score', value: 0 },
+                            { nama: 'Jarak', value: 0 },
+                            { nama: 'Driver', value: 0 }
+                        ];
+                    }
                 },
 
                 // Format angka ke ribuan (1000 -> 1.000)

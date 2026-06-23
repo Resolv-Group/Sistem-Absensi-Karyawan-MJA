@@ -366,7 +366,7 @@
                     <div x-show="showModal" x-transition:enter="transition ease-out duration-300"
                         x-transition:enter-start="opacity-0 translate-y-8 scale-95"
                         x-transition:enter-end="opacity-100 translate-y-0 scale-100"
-                        class="relative w-full max-w-4xl bg-white rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col min-h-[600px] max-h-[90vh]">
+                        class="relative w-full max-w-6xl bg-white rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col min-h-[600px] max-h-[90vh]">
 
                         {{-- HEADER --}}
                         <div class="px-8 py-6 border-b border-slate-100 flex items-center justify-between"
@@ -442,8 +442,39 @@
                                 </div>
                             </div>
 
+                            <!-- Status Selector -->
+                            <div class="relative" x-data="{ open: false }" @click.away="open = false">
+                                <button @click="open = !open" type="button" class="flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 text-slate-700 rounded-lg text-[10px] font-bold hover:bg-slate-50 transition shadow-sm">
+                                    <span>Status</span>
+                                    <span class="bg-blue-100 text-blue-600 px-1.5 py-0.2 rounded-full text-[9px]" x-show="selectedStatus !== ''" x-text="selectedStatus === 'approved' ? 'Approved' : 'Pending'"></span>
+                                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+                                <div x-show="open" class="absolute left-0 mt-2 w-40 bg-white border border-slate-200 rounded-xl shadow-xl z-50 p-2 space-y-1">
+                                    <button type="button" @click="selectedStatus = ''; open = false" class="w-full text-left px-2 py-1.5 hover:bg-slate-50 rounded-md text-[11px] font-semibold text-slate-700 flex items-center justify-between">
+                                        <span>Semua Status</span>
+                                        <svg x-show="selectedStatus === ''" class="w-3.5 h-3.5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </button>
+                                    <button type="button" @click="selectedStatus = 'pending'; open = false" class="w-full text-left px-2 py-1.5 hover:bg-slate-50 rounded-md text-[11px] font-semibold text-slate-700 flex items-center justify-between">
+                                        <span>Pending</span>
+                                        <svg x-show="selectedStatus === 'pending'" class="w-3.5 h-3.5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </button>
+                                    <button type="button" @click="selectedStatus = 'approved'; open = false" class="w-full text-left px-2 py-1.5 hover:bg-slate-50 rounded-md text-[11px] font-semibold text-slate-700 flex items-center justify-between">
+                                        <span>Approved</span>
+                                        <svg x-show="selectedStatus === 'approved'" class="w-3.5 h-3.5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+
                             <!-- Reset Button -->
-                            <button @click="selectedMonths = []; selectedYears = []" x-show="selectedMonths.length > 0 || selectedYears.length > 0" type="button" class="text-[10px] text-rose-500 hover:text-rose-700 font-black uppercase tracking-wider transition ml-2">
+                            <button @click="selectedMonths = []; selectedYears = []; selectedStatus = ''" x-show="selectedMonths.length > 0 || selectedYears.length > 0 || selectedStatus !== ''" type="button" class="text-[10px] text-rose-500 hover:text-rose-700 font-black uppercase tracking-wider transition ml-2">
                                 Reset Filter
                             </button>
                         </div>
@@ -468,6 +499,7 @@
                                         <th class="px-4 py-2 text-right">Debit</th>
                                         <th class="px-4 py-2 text-right">Kredit</th>
                                         <th class="px-4 py-2 text-right">Saldo</th>
+                                        <th class="px-4 py-2 text-center w-28">Status</th>
                                         <th class="px-4 py-2 text-center w-28">Aksi</th>
                                     </tr>
                                 </thead>
@@ -478,7 +510,7 @@
 
                                         <tr
                                             class="group bg-white hover:shadow-xl hover:shadow-slate-200/50 transition-all"
-                                            x-show="shouldShowRow('{{ $kas->tanggal }}')">
+                                            x-show="shouldShowRow('{{ $kas->tanggal }}', {{ $kas->status }})">
                                             {{-- Checkbox --}}
                                             <td
                                                 class="px-4 py-4 rounded-l-2xl border-l border-y border-slate-100 text-center">
@@ -531,13 +563,24 @@
                                                 {{ number_format($runningSaldo, 0, ',', '.') }}
                                             </td>
 
-                                            {{-- Actions --}}
-                                            <td
-                                                class="px-4 py-4 rounded-r-2xl border-r border-y border-slate-100 text-center">
+                                            {{-- Status --}}
+                                            <td class="px-4 py-4 border-y border-slate-100 text-center">
                                                 @if($kas->status == 2)
                                                     <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-emerald-50 text-emerald-600 border border-emerald-100">
                                                         ✓ Approved
                                                     </span>
+                                                @else
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-amber-50 text-amber-600 border border-amber-100">
+                                                        Pending
+                                                    </span>
+                                                @endif
+                                            </td>
+
+                                            {{-- Actions --}}
+                                            <td
+                                                class="px-4 py-4 rounded-r-2xl border-r border-y border-slate-100 text-center">
+                                                @if($kas->status == 2)
+                                                    <span class="text-xs text-slate-400 italic">Locked</span>
                                                 @else
                                                     <div
                                                         class="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-all transform group-hover:scale-100 scale-90">
@@ -570,7 +613,7 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="8" class="py-20 text-center">
+                                            <td colspan="9" class="py-20 text-center">
                                                 <div class="flex flex-col items-center opacity-20">
                                                     <svg class="w-16 h-16 mb-4" fill="none" stroke="currentColor"
                                                         viewBox="0 0 24 24">
@@ -584,6 +627,16 @@
                                             </td>
                                         </tr>
                                     @endforelse
+                                    <tr x-show="allData.length > 0 && !hasFilteredKas()" x-cloak>
+                                        <td colspan="9" class="py-20 text-center">
+                                            <div class="flex flex-col items-center opacity-20">
+                                                <svg class="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                                                </svg>
+                                                <p class="font-black uppercase tracking-widest text-sm">Data tidak tersedia dengan filter saat ini</p>
+                                            </div>
+                                        </td>
+                                    </tr>
                                 </tbody>
                             </table>
                             </div>
@@ -610,6 +663,7 @@
                                         <th class="px-4 py-2 text-center">Perolehan</th>
                                         <th class="px-4 py-2 text-right">Nilai Asset (Rp)</th>
                                         <th class="px-4 py-2 text-center">Lokasi</th>
+                                        <th class="px-4 py-2 text-center w-28">Status</th>
                                         <th class="px-4 py-2 text-center w-28">Aksi</th>
                                     </tr>
                                 </thead>
@@ -617,7 +671,7 @@
                                     @forelse($assets as $a)
                                         <tr
                                             class="group bg-white hover:shadow-xl hover:shadow-blue-900/5 transition-all duration-300"
-                                            x-show="shouldShowRow('{{ $a->tahun_perolehan }}')">
+                                            x-show="shouldShowRow('{{ $a->tahun_perolehan }}', {{ $a->status }})">
                                             {{-- 1. Checkbox --}}
                                             <td
                                                 class="px-4 py-4 rounded-l-2xl border-l border-y border-slate-100 text-center">
@@ -685,13 +739,24 @@
                                                 </span>
                                             </td>
 
-                                            {{-- 8. Actions (Hover Reveal) --}}
-                                            <td
-                                                class="px-4 py-4 rounded-r-2xl border-r border-y border-slate-100 text-center">
+                                            {{-- Status --}}
+                                            <td class="px-4 py-4 border-y border-slate-100 text-center">
                                                 @if($a->status == 2)
                                                     <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-emerald-50 text-emerald-600 border border-emerald-100">
                                                         ✓ Approved
                                                     </span>
+                                                @else
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-amber-50 text-amber-600 border border-amber-100">
+                                                        Pending
+                                                    </span>
+                                                @endif
+                                            </td>
+
+                                            {{-- 8. Actions (Hover Reveal) --}}
+                                            <td
+                                                class="px-4 py-4 rounded-r-2xl border-r border-y border-slate-100 text-center">
+                                                @if($a->status == 2)
+                                                    <span class="text-xs text-slate-400 italic">Locked</span>
                                                 @else
                                                     <div
                                                         class="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-all transform group-hover:scale-100 scale-90">
@@ -718,11 +783,11 @@
                                                         </button>
                                                     </div>
                                                 @endif
-                                            </td></td>
+                                            </td>
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="8" class="py-24 text-center">
+                                            <td colspan="9" class="py-24 text-center">
                                                 <div class="flex flex-col items-center opacity-20">
                                                     <svg class="w-16 h-16 mb-4" fill="none" stroke="currentColor"
                                                         viewBox="0 0 24 24">
@@ -736,6 +801,16 @@
                                             </td>
                                         </tr>
                                     @endforelse
+                                    <tr x-show="allDataAsset.length > 0 && !hasFilteredAssets()" x-cloak>
+                                        <td colspan="9" class="py-24 text-center">
+                                            <div class="flex flex-col items-center opacity-20">
+                                                <svg class="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                                                </svg>
+                                                <p class="font-black uppercase tracking-widest text-sm">Data tidak tersedia dengan filter saat ini</p>
+                                            </div>
+                                        </td>
+                                    </tr>
                                 </tbody>
                             </table>
                             </div>
@@ -1182,16 +1257,16 @@
                             Export Excel (<span x-text="selectedRows.length"></span>)
                         </button>
 
-                        {{-- Approve Button (Beside export excel, only for HRD/Admin and Kas Kecil) --}}
-                        @if(in_array(auth()->user()->role, ['admin', 'hrd']))
-                        {{-- Active approve button: shown when kas type AND no approved items selected --}}
+                        {{-- Approve Button (Beside export excel, only for HRD/Admin/Akuntan and Kas Kecil/Asset) --}}
+                        @if(in_array(auth()->user()->role, ['admin', 'hrd', 'akuntan']))
+                        {{-- Active approve button: shown when no approved items selected --}}
                         <button type="button" @click="approveSelected()"
-                            x-show="activeType === 'kas' && !hasApprovedSelected()"
+                            x-show="!hasApprovedSelected()"
                             class="px-6 py-2 bg-emerald-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-emerald-700 transition shadow-lg">
                             Approve (<span x-text="selectedRows.length"></span>)
                         </button>
                         {{-- Disabled approve button: shown when a selected item is already approved --}}
-                        <div x-show="activeType === 'kas' && hasApprovedSelected()"
+                        <div x-show="hasApprovedSelected()"
                             title="Terdapat data yang sudah disetujui dalam pilihan Anda"
                             class="relative group">
                             <button type="button" disabled
@@ -1339,7 +1414,6 @@
                     @endif
                 </div>
 
-                {{-- B. Contract Details (Colorful & Visual) --}}
                 {{-- B. Aturan Payroll & Masa Berlaku (Optimized Design) --}}
                 <div class="bg-white rounded-[1.5rem] shadow-sm border border-gray-200 p-6">
                     {{-- Header --}}
@@ -1659,6 +1733,7 @@
 
                 selectedMonths: [],
                 selectedYears: [],
+                selectedStatus: '',
                 monthsList: [
                     { value: '01', label: 'Januari' },
                     { value: '02', label: 'Februari' },
@@ -1706,7 +1781,7 @@
                     return `${monthsStr} ${yearsStr}`;
                 },
 
-                shouldShowRow(dateString) {
+                shouldShowRow(dateString, status = null) {
                     if (!dateString) return true;
                     let parts = dateString.split('-');
                     if (parts.length < 3) return true;
@@ -1719,7 +1794,19 @@
                     if (this.selectedYears.length > 0 && !this.selectedYears.includes(year)) {
                         return false;
                     }
+                    if (status !== null) {
+                        if (this.selectedStatus === 'approved' && status != 2) return false;
+                        if (this.selectedStatus === 'pending' && status == 2) return false;
+                    }
                     return true;
+                },
+
+                hasFilteredKas() {
+                    return this.allData.some(kas => this.shouldShowRow(kas.tanggal, kas.status));
+                },
+
+                hasFilteredAssets() {
+                    return this.allDataAsset.some(a => this.shouldShowRow(a.tahun_perolehan, a.status));
                 },
 
                 hasApprovedSelected() {
@@ -1796,6 +1883,7 @@
                     this.isEdit = false;
                     this.selectedMonths = [];
                     this.selectedYears = [];
+                    this.selectedStatus = '';
                 },
 
                 openExportSettings(format) {

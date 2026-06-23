@@ -131,9 +131,26 @@
             </span>
         </td>
 
-        {{-- 6. STAT (Total Workers) --}}
-        <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-600 font-medium">
-            {{ $u->pkwt_count }}
+        {{-- 6. STAT (Total Kas Kecil & Total Asset) --}}
+        <td class="px-6 py-4 whitespace-nowrap text-center">
+            @php
+                $activeKasUnit = $u->kasKecil->where('status', '!=', 0);
+                $totalKasCountUnit = $activeKasUnit->count();
+                $grandTotalKasUnit = $activeKasUnit->sum('debit') - $activeKasUnit->sum('kredit');
+            @endphp
+            <div class="text-xs font-bold text-gray-900">{{ $totalKasCountUnit }} Transaksi</div>
+            <div class="text-[11px] text-emerald-600 font-black mt-1">Rp {{ number_format($grandTotalKasUnit, 0, ',', '.') }}</div>
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-center">
+            @php
+                $activeAssetUnit = $u->asset->where('status', '!=', 0);
+                $totalAssetCountUnit = $activeAssetUnit->count();
+                $grandTotalAssetUnit = $activeAssetUnit->sum(function($a) {
+                    return $a->jumlah * $a->harga_perolehan;
+                });
+            @endphp
+            <div class="text-xs font-bold text-gray-900">{{ $totalAssetCountUnit }} Barang</div>
+            <div class="text-[11px] text-blue-600 font-black mt-1">Rp {{ number_format($grandTotalAssetUnit, 0, ',', '.') }}</div>
         </td>
 
         {{-- 7. STATUS --}}
@@ -155,9 +172,10 @@
 
         {{-- 8. ACTIONS --}}
         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-            <div class="flex justify-end gap-2" x-data="unitManager_{{ $u->id }}">
-                {{-- Kas Kecil --}}
-                <button type="button" @click="open('kas')"
+            <div class="flex justify-end gap-2" x-data>
+                {{-- Kas Kecil Button --}}
+                <button type="button" 
+                    @click="$dispatch('open-unit-modal', { type: 'kas', unitId: {{ $u->id }}, unitName: '{{ addslashes($u->nama_unit) }}' })"
                     class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg transition-all hover:shadow-sm group"
                     title="Kas Kecil">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -166,8 +184,9 @@
                     <span class="hidden sm:inline">Kas Kecil</span>
                 </button>
 
-                {{-- Asset --}}
-                <button type="button" @click="open('asset')"
+                {{-- Asset Button --}}
+                <button type="button" 
+                    @click="$dispatch('open-unit-modal', { type: 'asset', unitId: {{ $u->id }}, unitName: '{{ addslashes($u->nama_unit) }}' })"
                     class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg transition-all hover:shadow-sm group"
                     title="Asset">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -180,7 +199,7 @@
     </tr>
 @empty
     <tr>
-        <td colspan="7" class="px-6 py-10 text-center text-gray-500">
+        <td colspan="9" class="px-6 py-10 text-center text-gray-500">
             <div class="flex flex-col items-center justify-center">
                 <svg class="w-12 h-12 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

@@ -144,7 +144,7 @@ Route::middleware(['auth', 'role:hrd,admin,akuntan,pic'])->group(function () {
 
     Route::post('/payroll/get-adjustments', [AbsensiController::class, 'getAdjustments'])->name('payroll.get-adjustments');
     Route::get('/kas-kecil-asset', [UnitController::class, 'viewKasKecilAssetMain'])->name('view.kas-kecil-asset');
-
+    Route::get('/unit/detail/{id}/data', [UnitController::class, 'getUnitData'])->name('unit.data');
 });
 
 Route::middleware(['auth', 'role:pic,admin'])->group(function () {
@@ -189,24 +189,33 @@ Route::middleware(['auth', 'role:hrd,pic,admin,head_supervisor'])->group(functio
     Route::put('/unit/ubah/{id}', [UnitController::class, 'updateUnit'])->name('update.unit');
     Route::put('/unit/detail/{id}/shifts', [ShiftAbsenController::class, 'update'])->name('unit.shifts.update');
 
+
+    // Unit -> Status
+    Route::put('/unit/toggle-status/{id}', [UnitController::class, 'toggleStatus']);
+});
+
+Route::middleware(['auth', 'role:hrd,pic,admin,head_supervisor,akuntan'])->group(function () {
+    // Unit -> Asset (Approve & Export)
+    Route::post('/unit/detail/{id}/asset/export', [UnitController::class, 'exportAsset'])->name('export.asset');
+    Route::post('/unit/{id_unit}/asset/approve', [UnitController::class, 'approveAsset'])->name('asset.approve');
+
     // Unit -> Asset
     Route::post('/unit/detail/{id}/asset', [UnitController::class, 'storeBulkAsset'])->name('tambah.asset.post');
     Route::put('/unit/detail/{id}/asset', [UnitController::class, 'updateBulkAsset'])->name('update.asset');
     Route::delete('/unit/{id_unit}/asset/destroy', [UnitController::class, 'destroyAsset'])->name('asset.destroy');
-    Route::post('/unit/detail/{id}/asset/export', [UnitController::class, 'exportAsset'])->name('export.asset');
-    Route::post('/unit/{id_unit}/asset/approve', [UnitController::class, 'approveAsset'])->name('asset.approve');
 
     // Unit -> Kas Kecil
     Route::post('/unit/detail/{id}/kas-kecil', [UnitController::class, 'storeBulkKas'])->name('tambah.kas-kecil.post');
     Route::put('/unit/detail/{id}/kas-kecil', [UnitController::class, 'updateBulkKas'])->name('update.kas-kecil');
     Route::delete('/unit/{id_unit}/kas-kecil/destroy', [UnitController::class, 'destroyKasKecil'])->name('kas-kecil.destroy');
+
+    // Unit -> Kas Kecil (Approve, Export & Nota)
     Route::get('/unit/{id}/kas-kecil/nota', [UnitController::class, 'showKasNota'])->name('kas-kecil.nota');
     Route::post('/unit/detail/{id}/kas-kecil/export', [UnitController::class, 'exportKasKecil'])->name('export.kas-kecil');
     Route::post('/unit/{id_unit}/kas-kecil/approve', [UnitController::class, 'approveKasKecil'])->name('kas-kecil.approve');
+});
 
-    // Unit -> Status
-    Route::put('/unit/toggle-status/{id}', [UnitController::class, 'toggleStatus']);
-
+Route::middleware(['auth', 'role:hrd,pic,admin,head_supervisor'])->group(function () {
     // Unit -> PKWT
     // Filtered
     Route::get('/unit/{id}/daftar-pkwt', [PKWTController::class, 'viewPKWTMain'])->name('view.pkwt');

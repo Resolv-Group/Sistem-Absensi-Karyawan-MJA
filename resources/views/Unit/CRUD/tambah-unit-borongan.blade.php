@@ -751,27 +751,53 @@
 
         const managementFee = {{ $unitSelected->persentase_management_fee ?? 0 }} / 100;
 
-        // 2. FORM LOGIC
         function boronganForm() {
-            return {
-                borongan: [{
+            const oldBorongan = @json(old('borongan'));
+            let initialBorongan = [];
+
+            if (oldBorongan && Array.isArray(oldBorongan) && oldBorongan.length > 0) {
+                initialBorongan = oldBorongan.map((item, idx) => {
+                    const unitPrice = parseFloat(item.harga_unit) || 0;
+                    const expectedPekerjaPrice = Math.round(unitPrice * (1 - managementFee) * 100) / 100;
+                    const actualPekerjaPrice = parseFloat(item.harga_pekerja) || 0;
+                    const isManual = Math.abs(expectedPekerjaPrice - actualPekerjaPrice) > 0.01;
+
+                    return {
+                        id: idx + 1,
+                        kategoriId: item.kategori || null,
+                        nama_item: item.nama_item || '',
+                        max_reject: item.max_reject || '',
+                        harga_unit: item.harga_unit || 0,
+                        harga_pekerja: item.harga_pekerja || 0,
+                        satuanId: item.satuan || '',
+                        manual: isManual,
+                    };
+                });
+            } else {
+                initialBorongan = [{
                     id: Date.now(),
                     kategoriId: null,
                     nama_item: '',
+                    max_reject: '',
                     harga_unit: 0,
                     harga_pekerja: 0,
-                    satuan: '',
+                    satuanId: '',
                     manual: false,
-                }],
+                }];
+            }
+
+            return {
+                borongan: initialBorongan,
 
                 addRow() {
                     this.borongan.push({
                         id: Date.now(),
                         kategoriId: null,
                         nama_item: '',
+                        max_reject: '',
                         harga_unit: 0,
                         harga_pekerja: 0,
-                        satuan: '',
+                        satuanId: '',
                         manual: false,
                     });
                 },

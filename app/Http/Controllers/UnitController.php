@@ -84,10 +84,16 @@ class UnitController extends Controller
     public function viewKasKecilAssetMain(Request $request)
     {
         // --- 1. CALCULATE STATS (Top Cards) ---
-        // For Kas Kecil & Asset, maybe just show stats about Kas & Asset or keep it simple. Let's just use unit count for now.
         $totalUnit = Unit::count();
-        $totalKas = \App\Models\Kas_Kecil::where('status', '!=', 0)->count();
-        $totalAsset = \App\Models\Asset::where('status', '!=', 0)->count();
+        $activeKas = \App\Models\Kas_Kecil::where('status', '!=', 0);
+        $totalKasCount = $activeKas->count();
+        $grandTotalKasValue = $activeKas->sum('debit') - $activeKas->sum('kredit');
+
+        $activeAsset = \App\Models\Asset::where('status', '!=', 0);
+        $totalAssetCount = $activeAsset->count();
+        $grandTotalAssetValue = $activeAsset->get()->sum(function ($a) {
+            return $a->jumlah * $a->harga_perolehan;
+        });
 
         // --- 2. BUILD QUERY ---
         $query = Unit::query()
@@ -111,7 +117,7 @@ class UnitController extends Controller
             return view('Unit.partials.kas-asset-table', compact('unit'))->render();
         }
 
-        return view('Unit.main-kas-asset', compact('unit', 'totalUnit', 'totalKas', 'totalAsset'));
+        return view('Unit.main-kas-asset', compact('unit', 'totalUnit', 'totalKasCount', 'grandTotalKasValue', 'totalAssetCount', 'grandTotalAssetValue'));
     }
 
     public function viewTambahUnit()
@@ -755,7 +761,7 @@ class UnitController extends Controller
 
     public function approveKasKecil(Request $request, $id_unit)
     {
-        if (!in_array(auth()->user()->role, ['admin', 'hrd'])) {
+        if (!in_array(auth()->user()->role, ['admin', 'hrd', 'akuntan'])) {
             return response()->json(['message' => 'Anda tidak memiliki hak akses untuk menyetujui data ini.'], 403);
         }
 
@@ -773,7 +779,7 @@ class UnitController extends Controller
 
     public function approveAsset(Request $request, $id_unit)
     {
-        if (!in_array(auth()->user()->role, ['admin', 'hrd'])) {
+        if (!in_array(auth()->user()->role, ['admin', 'hrd', 'akuntan'])) {
             return response()->json(['message' => 'Anda tidak memiliki hak akses untuk menyetujui data ini.'], 403);
         }
 
@@ -808,6 +814,32 @@ class UnitController extends Controller
             $namaFile = 'Laporan_Asset_Unit_' . $id_unit . '_' . date('d_M_Y_Hi') . '.xlsx';
 
             return Excel::download(new AssetExport($dataAsset), $namaFile);
+        }
+    }
+
+       public function getUnitData($id)
+    {
+        try {
+            // It is safer to use the exact model names
+            $kasKecil = Kas_Kecil::where('id_unit', $id)
+                ->whereIn('status', [1, 2])
+                ->select('id', 'id_unit', 'akun', 'tanggal', 'keterangan', 'debit', 'kredit', 'status')
+                ->selectRaw('CASE WHEN nota IS NULL THEN 0 ELSE 1 END as nota')
+                ->orderBy('tanggal', 'asc')
+                ->get();
+
+            $assets = Asset::where('id_unit', $id)
+                ->whereIn('status', [1, 2])
+                ->orderBy('tahun_perolehan', 'asc')
+                ->get();
+            
+            return response()->json([
+                'kasKecil' => $kasKecil,
+                'assets' => $assets
+            ]);
+        } catch (\Exception $e) {
+            // This will return the actual error message as JSON if it crashes
+            return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 }

@@ -737,7 +737,7 @@
                                             class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Mulai
                                             Berlaku PKWT</label>
                                         <input type="date" :name="`pekerja[${index}][tgl_mulai_pkwt]`"
-                                            value="{{ now()->toDateString() }}"
+                                            x-model="row.tgl_mulai_pkwt"
                                             class="w-full px-5 py-4 text-sm font-bold text-slate-600 bg-slate-50 border-none rounded-xl focus:ring-4 focus:ring-slate-100 focus:bg-white transition-all shadow-sm">
                                     </div>
                                     <div class="space-y-2">
@@ -745,6 +745,7 @@
                                             class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Berakhir
                                             Berlaku PKWT</label>
                                         <input type="date" :name="`pekerja[${index}][tgl_akhir_pkwt]`"
+                                            x-model="row.tgl_akhir_pkwt"
                                             class="w-full px-5 py-4 text-sm font-bold text-slate-600 bg-slate-50 border-none rounded-xl focus:ring-4 focus:ring-slate-100 focus:bg-white transition-all shadow-sm">
                                     </div>
 
@@ -966,33 +967,80 @@
                 return JSON.parse(JSON.stringify(config)); // Deep clone agar referensi memori berbeda
             };
 
-            return {
-                rows: [{
-                        id: 1,
-                        gaji: 0,
-                        gaji_bulanan: 0, // Inisialisasi
-                        overtime: 0,
-                        rate_hbn: 0,
-                        gaji_hbn: 0, // Inisialisasi
-                        workerId: '{{ $pekerja_id ?? "" }}',
-                        divisiId: null,
-                        jabatanId: null,
-                        kpj: '',
-                        naker: '',
-                        bpjsKesehatan: 0,
-                        bpjsNaker: 0,
+            const oldPekerja = @json(old('pekerja'));
+            let initialRows = [];
+
+            if (oldPekerja && Array.isArray(oldPekerja) && oldPekerja.length > 0) {
+                initialRows = oldPekerja.map((item, idx) => {
+                    const p = window.workersData ? window.workersData.find(w => w.id == item.id_pekerja) : null;
+                    let parsedTunjangan = createFreshTunjangan();
+                    if (item.tunjangan) {
+                        try {
+                            parsedTunjangan = typeof item.tunjangan === 'string' ? JSON.parse(item.tunjangan) : item.tunjangan;
+                        } catch (e) {
+                            console.error('Error parsing old tunjangan:', e);
+                        }
+                    }
+                    return {
+                        id: idx + 1,
+                        gaji: item.gaji_harian || 0,
+                        gaji_bulanan: item.gaji_bulanan || 0,
+                        overtime: item.gaji_overtime || 0,
+                        rate_hbn: item.rate_hbn ?? 1.5,
+                        gaji_hbn: item.gaji_hbn || 0,
+                        workerId: item.id_pekerja || '',
+                        divisiId: item.divisi_id || null,
+                        jabatanId: item.jabatan_id || null,
+                        kpj: p ? (p.kpj || '') : '',
+                        naker: p ? (p.naker || '') : '',
+                        bpjsKesehatan: item.bpjs_kesehatan || 0,
+                        bpjsNaker: item.bpjs_naker || 0,
                         days: {
-                            mon: 0,
-                            tue: 0,
-                            wed: 0,
-                            thu: 0,
-                            fri: 0,
-                            sat: 0,
-                            sun: 0
+                            mon: item.days?.mon ?? '',
+                            tue: item.days?.tue ?? '',
+                            wed: item.days?.wed ?? '',
+                            thu: item.days?.thu ?? '',
+                            fri: item.days?.fri ?? '',
+                            sat: item.days?.sat ?? '',
+                            sun: item.days?.sun ?? ''
                         },
-                        tunjangan: createFreshTunjangan(),
-                    } // Added fields
-                ],
+                        tunjangan: parsedTunjangan,
+                        tgl_mulai_pkwt: item.tgl_mulai_pkwt || '{{ now()->toDateString() }}',
+                        tgl_akhir_pkwt: item.tgl_akhir_pkwt || '',
+                    };
+                });
+            } else {
+                initialRows = [{
+                    id: 1,
+                    gaji: 0,
+                    gaji_bulanan: 0,
+                    overtime: 0,
+                    rate_hbn: 1.5,
+                    gaji_hbn: 0,
+                    workerId: '{{ $pekerja_id ?? "" }}',
+                    divisiId: null,
+                    jabatanId: null,
+                    kpj: '',
+                    naker: '',
+                    bpjsKesehatan: 0,
+                    bpjsNaker: 0,
+                    days: {
+                        mon: '',
+                        tue: '',
+                        wed: '',
+                        thu: '',
+                        fri: '',
+                        sat: '',
+                        sun: ''
+                    },
+                    tunjangan: createFreshTunjangan(),
+                    tgl_mulai_pkwt: '{{ now()->toDateString() }}',
+                    tgl_akhir_pkwt: '',
+                }];
+            }
+
+            return {
+                rows: initialRows,
 
                 calculateSalaryComponents(row) {
                     const bulanan = parseFloat(row.gaji_bulanan) || 0;
@@ -1087,6 +1135,8 @@
                             sun: ''
                         },
                         tunjangan: createFreshTunjangan(),
+                        tgl_mulai_pkwt: '{{ now()->toDateString() }}',
+                        tgl_akhir_pkwt: '',
                     };
 
                     this.calculateBpjs(row);

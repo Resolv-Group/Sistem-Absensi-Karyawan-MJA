@@ -574,7 +574,7 @@
                         <div class="grid grid-cols-2 gap-4">
 
                             <!-- CUSTOM DROPDOWN BANK -->
-                            <div x-data="{ open: false, selected: '', banks: ['BCA', 'BRI', 'BNI', 'Mandiri', 'CIMB Niaga', 'BTN', 'Bank Permata', 'Bank Danamon', 'Bank Mega', 'Panin Bank', 'OCBC NISP', 'Maybank Indonesia', 'BSI', 'Bank Jago', 'SeaBank', 'Bank Neo Commerce'] }" class="relative">
+                            <div x-data="{ open: false, selected: '{{ old('nama_rek') }}' || '', banks: ['BCA', 'BRI', 'BNI', 'Mandiri', 'CIMB Niaga', 'BTN', 'Bank Permata', 'Bank Danamon', 'Bank Mega', 'Panin Bank', 'OCBC NISP', 'Maybank Indonesia', 'BSI', 'Bank Jago', 'SeaBank', 'Bank Neo Commerce'] }" class="relative">
 
                                 <label class="block text-sm font-bold text-gray-700 mb-1">Nama Bank</label>
 
