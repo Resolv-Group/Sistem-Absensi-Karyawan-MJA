@@ -273,7 +273,12 @@
                             }
                         }" x-init="$watch('selected', value => {
                             console.log('Alpine Unit Filter selected changed to:', value);
-                            $('#unitFilter').val(value).trigger('change');
+                            const el = document.getElementById('unitFilter');
+                            if (el) {
+                                el.value = value;
+                                el.dispatchEvent(new Event('change', { bubbles: true }));
+                            }
+                            
                         })" class="relative group">
 
                             <label class="block text-[10px] uppercase tracking-wider font-bold text-gray-400 mb-1.5">
