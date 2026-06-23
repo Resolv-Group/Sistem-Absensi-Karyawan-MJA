@@ -254,35 +254,19 @@
                             </div>
                         </div>
 
-                        {{-- Unit Filter (Alpine Searchable Dropdown) --}}
+                        {{-- Unit Filter (Alpine Custom Dropdown) --}}
                         <div x-data="{
                             open: false,
                             selected: '',
-                            searchQuery: '',
-                            units: @js($units->map(fn($u) => ['val' => (string)$u->id, 'label' => $u->nama_unit])->toArray()),
-                            get filteredUnits() {
-                                if (!this.searchQuery) return this.units;
-                                const q = this.searchQuery.toLowerCase();
-                                return this.units.filter(u => u.label.toLowerCase().includes(q));
-                            },
-                            get selectedLabel() {
-                                if (!this.selected) return 'Semua Unit';
-                                const found = this.units.find(u => u.val === this.selected);
-                                return found ? found.label : 'Semua Unit';
-                            },
-                            selectUnit(val) {
-                                this.selected = val;
-                                this.open = false;
-                                this.searchQuery = '';
-                            },
-                            clearSelection() {
-                                this.selected = '';
-                                this.searchQuery = '';
-                                this.open = false;
-                            }
+                            list: [
+                                { val: '', label: 'Semua Unit' },
+                                @foreach($units as $unit)
+                                    { val: '{{ $unit->id }}', label: '{{ $unit->nama_unit }}' },
+                                @endforeach
+                            ]
                         }" x-init="$watch('selected', value => {
                             $('#unitFilter').val(value).trigger('change');
-                        })" class="relative group" id="unitFilterWrapper">
+                        })" class="relative group">
 
                             <label class="block text-[10px] uppercase tracking-wider font-bold text-gray-400 mb-1.5">
                                 Unit / Penempatan
@@ -292,8 +276,8 @@
                             <input type="hidden" id="unitFilter" :value="selected">
 
                             {{-- Trigger Button --}}
-                            <div @click="open = !open"
-                                class="relative block w-full pl-9 pr-8 py-2.5 text-sm bg-gray-50 border border-transparent rounded-xl text-gray-700
+                            <div @click="open = !open" @click.outside="open = false"
+                                class="relative block w-full pl-9 pr-3 py-2.5 text-sm bg-gray-50 border border-transparent rounded-xl text-gray-700
                cursor-pointer hover:bg-gray-100 transition flex justify-between items-center group-focus-within:ring-2 group-focus-within:ring-blue-100 group-focus-within:bg-white">
 
                                 {{-- Left Icon (Building) --}}
@@ -306,30 +290,21 @@
                                 </div>
 
                                 {{-- Selected Text --}}
-                                <span class="truncate font-medium" x-text="selectedLabel"></span>
+                                <span class="truncate font-medium"
+                                    x-text="list.find(x => x.val == selected)?.label || 'Semua Unit'">
+                                </span>
 
-                                {{-- Right: Clear button or Chevron --}}
-                                <div class="absolute inset-y-0 right-0 pr-2.5 flex items-center gap-1">
-                                    {{-- Clear button (X) - only when a unit is selected --}}
-                                    <button x-show="selected" @click.stop="clearSelection()"
-                                        class="p-0.5 rounded-full hover:bg-gray-200 transition" type="button">
-                                        <svg class="w-3.5 h-3.5 text-gray-400 hover:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                        </svg>
-                                    </button>
-                                    {{-- Chevron --}}
-                                    <svg class="w-4 h-4 text-gray-400 transition-transform duration-200"
-                                        :class="{ 'rotate-180': open }" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 9l-7 7-7-7" />
-                                    </svg>
-                                </div>
+                                {{-- Right Chevron --}}
+                                <svg class="w-4 h-4 text-gray-400 transition-transform duration-200"
+                                    :class="{ 'rotate-180': open }" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7" />
+                                </svg>
                             </div>
 
                             {{-- Dropdown List --}}
-                            <div x-show="open" @click.outside="open = false; searchQuery = ''"
-                                x-transition:enter="transition ease-out duration-100"
+                            <div x-show="open" x-transition:enter="transition ease-out duration-100"
                                 x-transition:enter-start="transform opacity-0 scale-95"
                                 x-transition:enter-end="transform opacity-100 scale-100"
                                 x-transition:leave="transition ease-in duration-75"
@@ -337,55 +312,25 @@
                                 x-transition:leave-end="transform opacity-0 scale-95"
                                 class="absolute w-full mt-1 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden z-[60]">
 
-                                {{-- Search Input --}}
-                                <div class="p-2 border-b border-gray-100">
-                                    <div class="relative">
-                                        <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
-                                            <svg class="h-3.5 w-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                            </svg>
-                                        </div>
-                                        <input type="text" x-model="searchQuery" @click.stop
-                                            x-ref="unitSearchInput"
-                                            class="block w-full pl-8 pr-3 py-2 text-xs bg-gray-50 border border-transparent rounded-lg text-gray-700
-                                               focus:bg-white focus:border-blue-300 focus:ring-1 focus:ring-blue-100 transition placeholder-gray-400"
-                                            placeholder="Cari unit...">
-                                    </div>
-                                </div>
-
-                                {{-- Options List --}}
-                                <ul class="max-h-48 overflow-y-auto py-1">
-
-                                    {{-- "Semua Unit" option --}}
-                                    <li @click="selectUnit('')"
-                                        class="px-4 py-2.5 text-sm cursor-pointer transition flex items-center gap-2"
-                                        :class="selected === '' ? 'bg-blue-50 text-blue-700 font-semibold' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'">
-                                        <svg x-show="selected === ''" class="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                        </svg>
-                                        <span x-show="selected !== ''" class="w-4 h-4"></span>
-                                        <span>Semua Unit</span>
-                                    </li>
-
-                                    {{-- Dynamic unit options --}}
-                                    <template x-for="item in filteredUnits" :key="item.val">
-                                        <li @click="selectUnit(item.val)"
+                                <ul class="max-h-60 overflow-y-auto py-1">
+                                    <template x-for="item in list" :key="item.val">
+                                        <li @click="selected = item.val; open = false"
                                             class="px-4 py-2.5 text-sm cursor-pointer transition flex items-center gap-2"
-                                            :class="selected === item.val ? 'bg-blue-50 text-blue-700 font-semibold' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'">
-                                            <svg x-show="selected === item.val" class="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                            :class="selected == item.val ? 'bg-blue-50 text-blue-700 font-semibold' :
+                                                'text-gray-700 hover:bg-gray-50 hover:text-gray-900'">
+
+                                            {{-- Checkmark Icon (Visible if selected) --}}
+                                            <svg x-show="selected == item.val" class="w-4 h-4 text-blue-600"
+                                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M5 13l4 4L19 7" />
                                             </svg>
-                                            <span x-show="selected !== item.val" class="w-4 h-4"></span>
+                                            {{-- Spacer if not selected --}}
+                                            <span x-show="selected != item.val" class="w-4 h-4"></span>
+
                                             <span x-text="item.label"></span>
                                         </li>
                                     </template>
-
-                                    {{-- No results --}}
-                                    <li x-show="filteredUnits.length === 0 && searchQuery"
-                                        class="px-4 py-3 text-xs text-center text-gray-400">
-                                        Tidak ditemukan unit untuk "<span x-text="searchQuery"></span>"
-                                    </li>
                                 </ul>
                             </div>
                         </div>

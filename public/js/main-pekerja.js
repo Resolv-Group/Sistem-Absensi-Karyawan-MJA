@@ -84,24 +84,14 @@ $(document).ready(function () {
         $("#endDate").val("");
 
         // Reset Alpine.js dropdown states
-        const statusEl = document.querySelector('[x-data]#statusFilter')?.closest('[x-data]');
-        if (statusEl && statusEl.__x) {
-            statusEl.__x.$data.selected = '';
-        } else {
-            // Alpine v3 approach
-            document.querySelectorAll('[x-data]').forEach(el => {
-                if (el._x_dataStack) {
-                    const data = el._x_dataStack[0];
-                    if (data.hasOwnProperty('selected') && data.hasOwnProperty('list')) {
-                        data.selected = '';
-                    }
-                    if (data.hasOwnProperty('selected') && data.hasOwnProperty('units')) {
-                        data.selected = '';
-                        data.searchQuery = '';
-                    }
+        document.querySelectorAll('[x-data]').forEach(el => {
+            if (el._x_dataStack) {
+                const data = el._x_dataStack[0];
+                if (data.hasOwnProperty('selected')) {
+                    data.selected = '';
                 }
-            });
-        }
+            }
+        });
 
         fetchPekerja();
         $filterDropdown.addClass("hidden"); // Close dropdown on reset
