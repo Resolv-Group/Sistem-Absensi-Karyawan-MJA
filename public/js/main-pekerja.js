@@ -27,7 +27,8 @@ $(document).ready(function () {
     const $tableWrapper = $("#table-wrapper");
 
     function fetchPekerja() {
-        console.log('fetchPekerja triggered. Selected Unit:', $("#unitFilter").val());
+        console.log('fetchPekerja triggered. Selected status:', $("#statusFilter").val()); 
+        console.log('fetchPekerja triggered. Selected Unit:', $("#unitFilter").val()); 
         // Check if any filter is active for the badge
         const hasFilter =
             $("#statusFilter").val() !== "" ||
