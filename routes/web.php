@@ -181,6 +181,10 @@ Route::middleware(['auth', 'role:hrd,pic,admin,head_supervisor'])->group(functio
     // Import Pekerja-Borongan
     Route::post('/pekerja/import', [PekerjaController::class, 'importExcel'])->name('pekerja.import');
     Route::post('/borongan/import', [BoronganController::class, 'importExcel'])->name('borongan.import');
+    // Import MitraKerja
+    Route::post('/mitra-kerja/import', [MitraKerjaController::class, 'importExcel'])->name('mitra.kerja.import');
+    // Staff MitraKerja
+    Route::post('/staff/import', [StaffController::class, 'importExcel'])->name('staff.import');
     // Unit -> Main - Detail
     // Filtered
     Route::get('/unit/detail/{id}', [UnitController::class, 'viewDetailUnit'])->name('view.detail.unit');

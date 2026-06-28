@@ -9,6 +9,9 @@ use App\Models\PKWT;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Imports\MitraKerjaImport;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\DB;
 
 class MitraKerjaController extends Controller
 {
@@ -255,5 +258,39 @@ class MitraKerjaController extends Controller
                 ? 'Mitra Kerja berhasil diaktifkan'
                 : 'Mitra Kerja berhasil dinonaktifkan'
         ]);
+    }
+
+    public function importExcel(Request $request)
+    {
+        // 1. Validasi File
+        $request->validate([
+            'file_excel' => 'required|mimes:xlsx,xls,csv|max:10240'
+        ], [
+            'file_excel.required' => 'Pilih file Excel terlebih dahulu!',
+            'file_excel.mimes'    => 'Format file harus berupa .xlsx, .xls, atau .csv!',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            // 2. Eksekusi proses Import menggunakan class MitraKerjaImport
+            Excel::import(new MitraKerjaImport, $request->file('file_excel'));
+            
+            DB::commit(); 
+            
+            return redirect()->back()->with('success', 'Data Mitra Kerja berhasil di-import ke sistem!');
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            DB::rollBack();
+            
+            $failures = [];
+            foreach ($e->failures() as $failure) {
+                $failures[] = "Baris " . $failure->row() . ": " . implode(', ', $failure->errors());
+            }
+            $errorString = 'Kesalahan format: ' . implode(' | ', $failures);    
+
+            return redirect()->back()->with('error', $errorString);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', $e->getMessage());
+        }
     }
 }

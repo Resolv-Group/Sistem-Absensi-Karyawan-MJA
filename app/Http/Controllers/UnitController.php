@@ -241,7 +241,7 @@ class UnitController extends Controller
             })
             ->exists();
 
-        if (in_array($user->role, ['admin', 'hrd'])) {
+        if (in_array($user->role, ['admin', 'hrd', 'akuntan'])) {
         } elseif (! $isAllowed) {
             abort(403, 'Anda tidak memiliki akses ke unit ini');
         }

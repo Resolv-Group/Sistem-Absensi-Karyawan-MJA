@@ -12,6 +12,9 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Imports\StaffImport;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\DB;
 
 class StaffController extends Controller
 {
@@ -651,5 +654,41 @@ class StaffController extends Controller
                 ? 'Staff berhasil diaktifkan'
                 : 'Staff berhasil dinonaktifkan'
         ]);
+    }
+
+    public function importExcel(Request $request)
+    {
+        // 1. Validasi File Excel
+        $request->validate([
+            'file_excel' => 'required|mimes:xlsx,xls,csv|max:10240'
+        ], [
+            'file_excel.required' => 'Pilih file Excel terlebih dahulu!',
+            'file_excel.mimes'    => 'Format file harus berupa .xlsx, .xls, atau .csv!',
+            'file_excel.max'      => 'Ukuran file maksimal 10MB.',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            // 2. Eksekusi Import
+            // Kita pass object request ke import class, karena kita mungkin butuh session untuk flash akun_info
+            Excel::import(new StaffImport, $request->file('file_excel'));
+            
+            DB::commit(); 
+            
+            return redirect()->back()->with('success', 'Data Staff beserta Akun berhasil di-import ke sistem!');
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            DB::rollBack();
+            
+            $failures = [];
+            foreach ($e->failures() as $failure) {
+                $failures[] = "Baris " . $failure->row() . ": " . implode(', ', $failure->errors());
+            }
+            $errorString = 'Kesalahan format: ' . implode(' | ', $failures);    
+
+            return redirect()->back()->with('error', $errorString);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', $e->getMessage());
+        }
     }
 }

@@ -22,13 +22,13 @@ return new class extends Migration
 
             $table->integer('bidang_usaha_id');       // Bidang Usaha (bisa FK nanti)
 
-            $table->string('telp_perusahaan', 20); // Telp Perusahaan
+            $table->string('telp_perusahaan', 20)->nullable(); // Telp Perusahaan
             
             $table->boolean('status_aktif')->default(1); // Status Aktif
-            $table->string('status_mou');          // Status MoU
-            $table->string('status_pajak');        // Status Pajak
+            $table->string('status_mou')->nullable();          // Status MoU
+            $table->string('status_pajak')->nullable();        // Status Pajak
 
-            $table->date('tgl_mulai_kerjasama');   // Tgl Mulai Kerjasama
+            $table->date('tgl_mulai_kerjasama')->nullable();   // Tgl Mulai Kerjasama
             $table->date('tgl_akhir_mou')->nullable(); // Tgl Akhir MoU
 
             $table->timestamps();
