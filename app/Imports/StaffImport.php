@@ -93,7 +93,7 @@ class StaffImport implements ToModel, WithHeadingRow
             ]
         );
 
-        // =========================================================================
+// =========================================================================
         // 3. LOGIKA PEMBUATAN AKUN (USER)
         // =========================================================================
         $roleMapping = [
@@ -105,14 +105,15 @@ class StaffImport implements ToModel, WithHeadingRow
 
         $jabatan = $staff->jabatan;
 
-        // Cek apakah jabatan masuk di daftar yang boleh punya akun DAN apakah emailnya ada
-        if ($jabatan && array_key_exists($jabatan, $roleMapping) && !empty($staff->email)) {
+        // Syarat wajib: Jabatan valid, email TIDAK kosong, dan tanggal lahir TIDAK kosong
+        if ($jabatan && array_key_exists($jabatan, $roleMapping) && !empty($staff->email) && !empty($tglLahir)) {
             
-            $existingUser = User::where('email', $staff->email)->first();
+            // Menggunakan query() untuk menghindari error pembacaan parameter di editor
+            $existingUser = User::query()->where('email', $staff->email)->first();
             
             if (!$existingUser) {
-                // Gunakan format tgl_lahir d-m-Y sebagai password default
-                $plainPassword = $tglLahir ? Carbon::parse($tglLahir)->format('d-m-Y') : '12345678';
+                // Karena kita sudah memastikan $tglLahir ada, langsung parse saja
+                $plainPassword = Carbon::parse($tglLahir)->format('d-m-Y');
                 $password = Hash::make($plainPassword);
 
                 $user = User::create([
@@ -123,8 +124,7 @@ class StaffImport implements ToModel, WithHeadingRow
                     'staff_id' => $staff->id,
                 ]);
 
-                // Flash session: Karena import excel berjalan looping berulang kali per baris, 
-                // kita kumpulkan informasi pembuatan akun ke dalam sebuah array di Session.
+                // Flash session: Kumpulkan informasi pembuatan akun ke dalam Array.
                 $info = 'Akun Staff (' . $user->name . ') dibuat! Username: ' . $user->email . ' | Password: ' . $plainPassword;
                 Session::push('akun_info_import', $info); 
             }
