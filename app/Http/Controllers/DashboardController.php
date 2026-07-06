@@ -13,9 +13,27 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\QueryException;
+use Illuminate\Validation\ValidationException;
 
 class DashboardController extends Controller
 {
+    /**
+     * Terjemahkan error code MySQL ke pesan ramah pengguna.
+     */
+    private function translateDbError(QueryException $e): string
+    {
+        $errorCode = $e->errorInfo[1] ?? null;
+
+        return match ($errorCode) {
+            1062 => 'Data yang Anda masukkan sudah ada di sistem. Mohon periksa kembali data yang bersifat unik(tidak boleh sama).',
+            1452 => 'Data referensi tidak valid. Pastikan data terkait masih terdaftar di sistem.',
+            1048 => 'Terdapat kolom wajib yang belum diisi. Mohon lengkapi seluruh data yang diperlukan.',
+            1406 => 'Data yang dimasukkan terlalu panjang. Mohon persingkat input Anda.',
+            1264 => 'Nilai angka yang dimasukkan di luar batas yang diizinkan. Mohon periksa kembali.',
+            default => 'Terjadi kesalahan saat menyimpan data. Silakan coba lagi atau hubungi administrator.',
+        };
+    }
     function viewDashboardMain()
     {
         $totalPekerja = Pekerja::count();
@@ -262,9 +280,14 @@ class DashboardController extends Controller
 
             // 3. Kembalikan ke halaman sebelumnya dengan pesan sukses
             return back()->with('success', 'Penilaian untuk ' . $penilaian->pekerja->nama . ' berhasil diverifikasi.');
+        } catch (QueryException $e) {
+            \Log::error('verifyPenilaianHrd DB Error: ' . $e->getMessage());
+            return back()->with('error', $this->translateDbError($e));
+        } catch (ValidationException $e) {
+            throw $e;
         } catch (\Exception $e) {
-            // Tangani jika terjadi error
-            return back()->with('error', 'Gagal memverifikasi penilaian: ' . $e->getMessage());
+            \Log::error('verifyPenilaianHrd General Error: ' . $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan sistem. Silakan coba lagi atau hubungi administrator.');
         }
     }
 }

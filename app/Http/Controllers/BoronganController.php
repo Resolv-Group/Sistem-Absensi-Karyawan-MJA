@@ -10,11 +10,28 @@ use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 use App\Imports\BoronganImport;
 use Maatwebsite\Excel\Facades\Excel;
 
 class BoronganController extends Controller
 {
+    /**
+     * Terjemahkan error code MySQL ke pesan ramah pengguna.
+     */
+    private function translateDbError(QueryException $e): string
+    {
+        $errorCode = $e->errorInfo[1] ?? null;
+
+        return match ($errorCode) {
+            1062 => 'Data yang Anda masukkan sudah ada di sistem. Mohon periksa kembali data yang bersifat unik(tidak boleh sama).',
+            1452 => 'Data referensi tidak valid. Pastikan data terkait masih terdaftar di sistem.',
+            1048 => 'Terdapat kolom wajib yang belum diisi. Mohon lengkapi seluruh data yang diperlukan.',
+            1406 => 'Data yang dimasukkan terlalu panjang. Mohon persingkat input Anda.',
+            1264 => 'Nilai angka yang dimasukkan di luar batas yang diizinkan. Mohon periksa kembali.',
+            default => 'Terjadi kesalahan saat menyimpan data. Silakan coba lagi atau hubungi administrator.',
+        };
+    }
     public function viewBoronganMain(Request $request, $id_unit)
     {
         $user = auth()->user(); // staff login
@@ -140,14 +157,19 @@ class BoronganController extends Controller
             return redirect()->route('view.detail.unit', $request->id_unit)->with('success', 'Borongan berhasil ditambahkan ke unit.');
         } catch (QueryException $e) {
             DB::rollBack();
+            Log::error('TambahBoronganUnit DB Error: ' . $e->getMessage());
             return back()
                 ->withInput()
-                ->withErrors(['database' => $e->getMessage()]);
+                ->withErrors(['database' => $this->translateDbError($e)]);
+        } catch (ValidationException $e) {
+            DB::rollBack();
+            throw $e;
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error('TambahBoronganUnit General Error: ' . $e->getMessage());
             return back()
                 ->withInput()
-                ->withErrors(['general' => $e->getMessage()]);
+                ->withErrors(['general' => 'Terjadi kesalahan sistem. Silakan coba lagi atau hubungi administrator.']);
         }
     }
 
@@ -205,15 +227,24 @@ class BoronganController extends Controller
             DB::commit();
 
             return redirect()->route('view.detail.unit', $unitId)->with('success', 'Borongan berhasil diperbarui');
+        } catch (QueryException $e) {
+            DB::rollBack();
+            Log::error('Gagal update borongan unit DB', [
+                'borongan_id' => $boronganId,
+                'unit_id' => $unitId,
+                'error' => $e->getMessage(),
+            ]);
+            return back()->withInput()->with('error', $this->translateDbError($e));
+        } catch (ValidationException $e) {
+            DB::rollBack();
+            throw $e;
         } catch (\Throwable $e) {
             DB::rollBack();
-
             Log::error('Gagal update borongan unit', [
                 'borongan_id' => $boronganId,
                 'unit_id' => $unitId,
                 'error' => $e->getMessage(),
             ]);
-
             return back()->withInput()->with('error', 'Terjadi kesalahan saat memperbarui borongan');
         }
     }
@@ -258,13 +289,20 @@ class BoronganController extends Controller
             DB::commit();
 
             return back()->with('success', 'Data borongan berhasil diperbarui.');
+        } catch (QueryException $e) {
+            DB::rollBack();
+            Log::error('BulkUpdateBorongan DB Error: ' . $e->getMessage());
+            return back()->withInput()->withErrors(['error' => $this->translateDbError($e)]);
+        } catch (ValidationException $e) {
+            DB::rollBack();
+            throw $e;
         } catch (\Throwable $e) {
             DB::rollBack();
-
+            Log::error('BulkUpdateBorongan General Error: ' . $e->getMessage());
             return back()
                 ->withInput()
                 ->withErrors([
-                    'error' => $e->getMessage(),
+                    'error' => 'Terjadi kesalahan sistem. Silakan coba lagi atau hubungi administrator.',
                 ]);
         }
     }
@@ -323,9 +361,14 @@ class BoronganController extends Controller
             DB::commit();
             return back()->with('success', $message);
 
+        } catch (QueryException $e) {
+            DB::rollBack();
+            Log::error('BulkUpdateStatus Borongan DB Error: ' . $e->getMessage());
+            return back()->with('error', $this->translateDbError($e));
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Terjadi kesalahan saat memperbarui data: ' . $e->getMessage());
+            Log::error('BulkUpdateStatus Borongan General Error: ' . $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan saat memperbarui data. Silakan coba lagi atau hubungi administrator.');
         }
     }
 
@@ -370,9 +413,8 @@ class BoronganController extends Controller
             return redirect()->back()->with('error', $errorString);
         } catch (\Exception $e) {
             DB::rollBack();
-            
-            // Ensure this returns a plain string string, not an array
-            return redirect()->back()->with('error', $e->getMessage());
+            Log::error('ImportExcel Borongan General Error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat import data. Silakan coba lagi atau hubungi administrator.');
         }
     }
 }

@@ -17,9 +17,27 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Database\QueryException;
+use Illuminate\Validation\ValidationException;
 
 class AbsensiController extends Controller
 {
+    /**
+     * Terjemahkan error code MySQL ke pesan ramah pengguna.
+     */
+    private function translateDbError(QueryException $e): string
+    {
+        $errorCode = $e->errorInfo[1] ?? null;
+
+        return match ($errorCode) {
+            1062 => 'Data yang Anda masukkan sudah ada di sistem. Mohon periksa kembali data yang bersifat unik(tidak boleh sama).',
+            1452 => 'Data referensi tidak valid. Pastikan data terkait masih terdaftar di sistem.',
+            1048 => 'Terdapat kolom wajib yang belum diisi. Mohon lengkapi seluruh data yang diperlukan.',
+            1406 => 'Data yang dimasukkan terlalu panjang. Mohon persingkat input Anda.',
+            1264 => 'Nilai angka yang dimasukkan di luar batas yang diizinkan. Mohon periksa kembali.',
+            default => 'Terjadi kesalahan saat menyimpan data. Silakan coba lagi atau hubungi administrator.',
+        };
+    }
     public function viewAbsensiMain(Request $request)
     {
         $user = Auth::user();
@@ -500,10 +518,17 @@ class AbsensiController extends Controller
             DB::commit();
 
             return back()->with('success', 'Data jam kerja berhasil disimpan.');
+        } catch (QueryException $e) {
+            DB::rollBack();
+            \Log::error('BulkAbsensiUpdate DB Error: ' . $e->getMessage());
+            return back()->with('error', $this->translateDbError($e))->withInput();
+        } catch (ValidationException $e) {
+            DB::rollBack();
+            throw $e;
         } catch (\Throwable $e) {
             DB::rollBack();
-
-            return back()->with('error', 'Gagal menyimpan data: '.$e->getMessage());
+            \Log::error('BulkAbsensiUpdate General Error: ' . $e->getMessage());
+            return back()->with('error', 'Gagal menyimpan data: Terjadi kesalahan sistem. Silakan coba lagi.')->withInput();
         }
     }
 
@@ -576,10 +601,17 @@ class AbsensiController extends Controller
             DB::commit();
 
             return back()->with('success', 'Status presensi berhasil diperbarui.');
+        } catch (QueryException $e) {
+            DB::rollBack();
+            \Log::error('BulkAbsensiUpdateStatus DB Error: ' . $e->getMessage());
+            return back()->with('error', $this->translateDbError($e))->withInput();
+        } catch (ValidationException $e) {
+            DB::rollBack();
+            throw $e;
         } catch (\Throwable $e) {
             DB::rollBack();
-
-            return back()->with('error', $e->getMessage());
+            \Log::error('BulkAbsensiUpdateStatus General Error: ' . $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan sistem saat memperbarui status presensi.');
         }
     }
 
@@ -656,10 +688,17 @@ class AbsensiController extends Controller
 
             return back()->with('success', 'Data tunjangan berhasil disimpan.');
 
+        } catch (QueryException $e) {
+            DB::rollBack();
+            \Log::error('BulkAbsensiUpdateTunjangan DB Error: ' . $e->getMessage());
+            return back()->with('error', $this->translateDbError($e))->withInput();
+        } catch (ValidationException $e) {
+            DB::rollBack();
+            throw $e;
         } catch (\Throwable $e) {
             DB::rollBack();
-
-            return back()->with('error', 'Gagal menyimpan: '.$e->getMessage())->withInput();
+            \Log::error('BulkAbsensiUpdateTunjangan General Error: ' . $e->getMessage());
+            return back()->with('error', 'Gagal menyimpan: Terjadi kesalahan sistem. Silakan coba lagi.')->withInput();
         }
     }
 
@@ -737,10 +776,17 @@ class AbsensiController extends Controller
 
             return back()->with('success', 'Data potongan berhasil disimpan.');
 
+        } catch (QueryException $e) {
+            DB::rollBack();
+            \Log::error('BulkAbsensiUpdatePotongan DB Error: ' . $e->getMessage());
+            return back()->with('error', $this->translateDbError($e))->withInput();
+        } catch (ValidationException $e) {
+            DB::rollBack();
+            throw $e;
         } catch (\Throwable $e) {
             DB::rollBack();
-
-            return back()->with('error', 'Gagal menyimpan: '.$e->getMessage())->withInput();
+            \Log::error('BulkAbsensiUpdatePotongan General Error: ' . $e->getMessage());
+            return back()->with('error', 'Gagal menyimpan: Terjadi kesalahan sistem. Silakan coba lagi.')->withInput();
         }
     }
 
@@ -915,10 +961,17 @@ class AbsensiController extends Controller
             DB::commit();
 
             return back()->with('success', 'Data absensi berhasil diperbarui.');
+        } catch (QueryException $e) {
+            DB::rollBack();
+            \Log::error('BulkAbsensiBoronganUpdate DB Error: ' . $e->getMessage());
+            return back()->with('error', $this->translateDbError($e))->withInput();
+        } catch (ValidationException $e) {
+            DB::rollBack();
+            throw $e;
         } catch (\Exception $e) {
             DB::rollBack();
-
-            return back()->with('error', 'Gagal menyimpan: '.$e->getMessage());
+            \Log::error('BulkAbsensiBoronganUpdate General Error: ' . $e->getMessage());
+            return back()->with('error', 'Gagal menyimpan: Terjadi kesalahan sistem. Silakan coba lagi.')->withInput();
         }
     }
 
@@ -1035,10 +1088,17 @@ class AbsensiController extends Controller
 
             return back()->with('success', 'Data absensi kelompok berhasil disimpan.');
 
+        } catch (QueryException $e) {
+            DB::rollBack();
+            \Log::error('BulkKelompokAbsensiBoronganUpdate DB Error: ' . $e->getMessage());
+            return back()->with('error', $this->translateDbError($e))->withInput();
+        } catch (ValidationException $e) {
+            DB::rollBack();
+            throw $e;
         } catch (\Exception $e) {
             DB::rollBack();
-
-            return back()->with('error', 'Gagal menyimpan: '.$e->getMessage());
+            \Log::error('BulkKelompokAbsensiBoronganUpdate General Error: ' . $e->getMessage());
+            return back()->with('error', 'Gagal menyimpan: Terjadi kesalahan sistem. Silakan coba lagi.')->withInput();
         }
     }
 

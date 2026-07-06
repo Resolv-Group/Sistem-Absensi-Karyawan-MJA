@@ -9,12 +9,29 @@ use App\Models\PKWT;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 use App\Imports\MitraKerjaImport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\DB;
 
 class MitraKerjaController extends Controller
 {
+    /**
+     * Terjemahkan error code MySQL ke pesan ramah pengguna.
+     */
+    private function translateDbError(QueryException $e): string
+    {
+        $errorCode = $e->errorInfo[1] ?? null;
+
+        return match ($errorCode) {
+            1062 => 'Data yang Anda masukkan sudah ada di sistem. Mohon periksa kembali data yang bersifat unik.',
+            1452 => 'Data referensi tidak valid. Pastikan data terkait masih terdaftar di sistem.',
+            1048 => 'Terdapat kolom wajib yang belum diisi. Mohon lengkapi seluruh data yang diperlukan.',
+            1406 => 'Data yang dimasukkan terlalu panjang. Mohon persingkat input Anda.',
+            1264 => 'Nilai angka yang dimasukkan di luar batas yang diizinkan. Mohon periksa kembali.',
+            default => 'Terjadi kesalahan saat menyimpan data. Silakan coba lagi atau hubungi administrator.',
+        };
+    }
     function viewMitraKerjaMain(Request $request)
     {
         // --- 1. CALCULATE STATS (Top Cards) ---
@@ -115,6 +132,14 @@ class MitraKerjaController extends Controller
                 [
                     'nama_mitra.required' => 'Nama mitra wajib diisi',
                     'kota.required' => 'Kota wajib diisi',
+                    'bidang_usaha_id.required' => 'Bidang usaha wajib diisi',
+                    'pimpinan.required' => 'Pimpinan wajib diisi',
+                    'telp_perusahaan.required' => 'No telepon perusahaan wajib diisi',
+                    'status_pajak.required' => 'Status pajak wajib diisi',
+                    'tgl_mulai_kerjasama.required' => 'Tanggal mulai kerjasama wajib diisi',
+                    'tgl_akhir_mou.required' => 'Tanggal akhir MoU wajib diisi',
+                    'status_mou.required' => 'Status MoU wajib diisi',
+                    'alamat' => 'alamat wajib diisi',
                     'foto.image' => 'foto harus berupa gambar',
                     'foto.max' => 'Ukuran foto maksimal 2MB',
                 ],
@@ -150,15 +175,17 @@ class MitraKerjaController extends Controller
                 ->route('view.tambah.mitra-kerja')
                 ->with('success', 'Data Mitra Kerja ' . $mitraKerja->nama_mitra . ' berhasil ditambahkan.');
         } catch (QueryException $e) {
-            // Tangani error database dan kirim ke front-end melalui session error
+            \Log::error('TambahMitraKerja DB Error: ' . $e->getMessage());
             return back()
                 ->withInput()
-                ->withErrors(['database' => $e->getMessage()]);
+                ->withErrors(['database' => $this->translateDbError($e)]);
+        } catch (ValidationException $e) {
+            throw $e;
         } catch (\Exception $e) {
-            // Tangani error umum dan kirim ke front-end melalui session error
+            \Log::error('TambahMitraKerja General Error: ' . $e->getMessage());
             return back()
                 ->withInput()
-                ->withErrors(['general' => $e->getMessage()]);
+                ->withErrors(['general' => 'Terjadi kesalahan sistem. Silakan coba lagi atau hubungi administrator.']);
         }
     }
 
@@ -197,10 +224,18 @@ class MitraKerjaController extends Controller
                 'foto' => 'nullable|image|mimes:png,jpg,jpeg|max:2048',
             ],
             [
-                'nama_mitra.required' => 'Nama mitra wajib diisi',
-                'kota.required' => 'Kota wajib diisi',
-                'foto.image' => 'foto harus berupa gambar',
-                'foto.max' => 'Ukuran foto maksimal 2MB',
+                    'nama_mitra.required' => 'Nama mitra wajib diisi',
+                    'kota.required' => 'Kota wajib diisi',
+                    'bidang_usaha_id.required' => 'Bidang usaha wajib diisi',
+                    'pimpinan.required' => 'Pimpinan wajib diisi',
+                    'telp_perusahaan.required' => 'No telepon perusahaan wajib diisi',
+                    'status_pajak.required' => 'Status pajak wajib diisi',
+                    'tgl_mulai_kerjasama.required' => 'Tanggal mulai kerjasama wajib diisi',
+                    'tgl_akhir_mou.required' => 'Tanggal akhir MoU wajib diisi',
+                    'status_mou.required' => 'Status MoU wajib diisi',
+                    'alamat' => 'alamat wajib diisi',
+                    'foto.image' => 'foto harus berupa gambar',
+                    'foto.max' => 'Ukuran foto maksimal 2MB',
             ],
         );
 
@@ -234,15 +269,15 @@ class MitraKerjaController extends Controller
                 ->route('view.detail.mitra-kerja', $id)
                 ->with('success', 'Data Mitra Kerja ' . $mitraKerja->nama_mitra . ' berhasil diperbarui.');
         } catch (QueryException $e) {
-            // Tangani error database dan kirim ke front-end melalui session error
+            \Log::error('UpdateMitraKerja DB Error: ' . $e->getMessage());
             return back()
                 ->withInput()
-                ->withErrors(['database' => $e->getMessage()]);
+                ->withErrors(['database' => $this->translateDbError($e)]);
         } catch (\Exception $e) {
-            // Tangani error umum dan kirim ke front-end melalui session error
+            \Log::error('UpdateMitraKerja General Error: ' . $e->getMessage());
             return back()
                 ->withInput()
-                ->withErrors(['general' => $e->getMessage()]);
+                ->withErrors(['general' => 'Terjadi kesalahan sistem. Silakan coba lagi atau hubungi administrator.']);
         }
     }
 
@@ -290,7 +325,8 @@ class MitraKerjaController extends Controller
             return redirect()->back()->with('error', $errorString);
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('error', $e->getMessage());
+            \Log::error('ImportExcelMitraKerja General Error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat import data. Silakan coba lagi atau hubungi administrator.');
         }
     }
 }

@@ -7,6 +7,7 @@ use App\Models\Pekerja;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use App\Models\History;
 use App\Models\Penilaian_Pkwt;
 use App\Models\PKWT;
@@ -20,6 +21,22 @@ use Illuminate\Support\Facades\DB;
 
 class PekerjaController extends Controller
 {
+    /**
+     * Terjemahkan error code MySQL ke pesan ramah pengguna.
+     */
+    private function translateDbError(QueryException $e): string
+    {
+        $errorCode = $e->errorInfo[1] ?? null;
+
+        return match ($errorCode) {
+            1062 => 'Data yang Anda masukkan sudah ada di sistem. Mohon periksa kembali NIK atau data lainnya yang bersifat unik(tidak boleh sama).',
+            1452 => 'Data referensi tidak valid. Pastikan data terkait masih terdaftar di sistem.',
+            1048 => 'Terdapat kolom wajib yang belum diisi. Mohon lengkapi seluruh data yang diperlukan.',
+            1406 => 'Data yang dimasukkan terlalu panjang. Mohon persingkat input Anda.',
+            1264 => 'Nilai angka yang dimasukkan di luar batas yang diizinkan. Mohon periksa kembali.',
+            default => 'Terjadi kesalahan saat menyimpan data. Silakan coba lagi atau hubungi administrator.',
+        };
+    }
     public function viewPekerjaMain(Request $request)
     {
         $user = Auth::user();
@@ -314,7 +331,7 @@ class PekerjaController extends Controller
                     'telp_emergency' => 'required|string|max:16',
                     'hubungan_emergency' => 'required|string',
 
-                    'ibu_kandung' => 'string|max:255',
+                    'ibu_kandung' => 'nullable|string|max:255',
 
                     'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
                     // 'dokumen' => 'nullable|image|mimes:png,jpg,jpeg,pdf|max:2048',
@@ -446,15 +463,17 @@ class PekerjaController extends Controller
                 ->route('view.tambah.pekerja')
                 ->with('success', 'Data Pekerja ' . $pekerja->nama . ' berhasil ditambahkan.');
         } catch (QueryException $e) {
-            // Tangani error database dan kirim ke front-end melalui session error
+            \Log::error('TambahPekerja DB Error: ' . $e->getMessage());
             return back()
                 ->withInput()
-                ->withErrors(['database' => $e->getMessage()]);
+                ->withErrors(['database' => $this->translateDbError($e)]);
+        } catch (ValidationException $e) {
+            throw $e;
         } catch (\Exception $e) {
-            // Tangani error umum dan kirim ke front-end melalui session error
+            \Log::error('TambahPekerja General Error: ' . $e->getMessage());
             return back()
                 ->withInput()
-                ->withErrors(['general' => $e->getMessage()]);
+                ->withErrors(['general' => 'Terjadi kesalahan sistem. Silakan coba lagi atau hubungi administrator.']);
         }
     }
 
@@ -467,137 +486,147 @@ class PekerjaController extends Controller
 
     public function updatePekerja(Request $request, $id)
     {
-        $pekerja = Pekerja::findOrFail($id);
+        try {
+            $pekerja = Pekerja::findOrFail($id);
 
-        $request->validate(
-            [
-                'nama' => 'required|string|max:255',
-                'id_pekerja' => 'nullable|string',
+            $request->validate(
+                [
+                    'nama' => 'required|string|max:255',
+                    'id_pekerja' => 'nullable|string',
 
-                'nik' => ['required', 'digits:16', Rule::unique('pekerja', 'nik')->ignore($id)],
+                    'nik' => ['required', 'digits:16', Rule::unique('pekerja', 'nik')->ignore($id)],
 
-                'no_kk' => ['required', 'digits:16', Rule::unique('pekerja', 'no_kk')->ignore($id)],
+                    'no_kk' => ['required', 'digits:16', Rule::unique('pekerja', 'no_kk')->ignore($id)],
 
-                'tempat_lahir' => 'required|string|max:100',
-                'tgl_lahir' => 'required|date',
-                'kelamin' => 'required|boolean',
-                'pendidikan' => 'required|string',
-                'status_kawin' => 'required|string',
-                'anak' => 'nullable|integer|min:0',
-                'tgl_bergabung' => 'required|date',
-                'tgl_resign' => 'nullable|date',
+                    'tempat_lahir' => 'required|string|max:100',
+                    'tgl_lahir' => 'required|date',
+                    'kelamin' => 'required|boolean',
+                    'pendidikan' => 'required|string',
+                    'status_kawin' => 'required|string',
+                    'anak' => 'nullable|integer|min:0',
+                    'tgl_bergabung' => 'required|date',
+                    'tgl_resign' => 'nullable|date',
 
-                'alamat' => 'required|string',
-                'desa' => 'required|string',
-                'rt' => 'nullable|integer',
-                'rw' => 'nullable|integer',
-                'kota' => 'required|string',
-                'kecamatan' => 'required|string',
-                'provinsi' => 'required|string',
+                    'alamat' => 'required|string',
+                    'desa' => 'required|string',
+                    'rt' => 'nullable|integer',
+                    'rw' => 'nullable|integer',
+                    'kota' => 'required|string',
+                    'kecamatan' => 'required|string',
+                    'provinsi' => 'required|string',
 
-                'email' => 'nullable|email',
-                'telp' => 'nullable|string|max:16',
+                    'email' => 'nullable|email',
+                    'telp' => 'nullable|string|max:16',
 
-                'nama_rek' => 'nullable|string',
-                'rekening' => 'nullable|string|max:30',
-                'kpj' => 'nullable|string|max:11',
-                'naker' => 'nullable|string|max:13',
+                    'nama_rek' => 'nullable|string',
+                    'rekening' => 'nullable|string|max:30',
+                    'kpj' => 'nullable|string|max:11',
+                    'naker' => 'nullable|string|max:13',
 
-                'nama_emergency' => 'required|string|max:255',
-                'telp_emergency' => 'required|string|max:16',
-                'hubungan_emergency' => 'required|string',
+                    'nama_emergency' => 'required|string|max:255',
+                    'telp_emergency' => 'required|string|max:16',
+                    'hubungan_emergency' => 'required|string',
 
-                'ibu_kandung' => 'string|max:255',
+                    'ibu_kandung' => 'string|max:255',
 
-                'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            ],
-            [
-                // Identitas
-                'nama.required' => 'Nama tidak boleh kosong.',
-                'nama.max' => 'Nama maksimal 255 karakter.',
+                    'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+                ],
+                [
+                    // Identitas
+                    'nama.required' => 'Nama tidak boleh kosong.',
+                    'nama.max' => 'Nama maksimal 255 karakter.',
 
-                'nik.required' => 'NIK wajib diisi.',
-                'nik.digits' => 'NIK harus 16 digit angka.',
-                'nik.unique' => 'NIK sudah terdaftar, gunakan NIK lain.',
+                    'nik.required' => 'NIK wajib diisi.',
+                    'nik.digits' => 'NIK harus 16 digit angka.',
+                    'nik.unique' => 'NIK sudah terdaftar, gunakan NIK lain.',
 
-                'no_kk.required' => 'No KK wajib diisi.',
-                'no_kk.digits' => 'No KK harus 16 digit angka.',
+                    'no_kk.required' => 'No KK wajib diisi.',
+                    'no_kk.digits' => 'No KK harus 16 digit angka.',
 
-                'tempat_lahir.required' => 'Tempat lahir wajib diisi.',
-                'tempat_lahir.max' => 'Tempat lahir maksimal 100 karakter.',
+                    'tempat_lahir.required' => 'Tempat lahir wajib diisi.',
+                    'tempat_lahir.max' => 'Tempat lahir maksimal 100 karakter.',
 
-                'tgl_lahir.required' => 'Tanggal lahir wajib diisi.',
-                'tgl_lahir.date' => 'Tanggal lahir tidak valid.',
+                    'tgl_lahir.required' => 'Tanggal lahir wajib diisi.',
+                    'tgl_lahir.date' => 'Tanggal lahir tidak valid.',
 
-                'kelamin.required' => 'Jenis kelamin wajib dipilih.',
-                'kelamin.boolean' => 'Format jenis kelamin tidak valid.',
+                    'kelamin.required' => 'Jenis kelamin wajib dipilih.',
+                    'kelamin.boolean' => 'Format jenis kelamin tidak valid.',
 
-                'pendidikan.required' => 'Pendidikan wajib diisi.',
-                'status_kawin.required' => 'Status perkawinan wajib diisi.',
+                    'pendidikan.required' => 'Pendidikan wajib diisi.',
+                    'status_kawin.required' => 'Status perkawinan wajib diisi.',
 
-                'anak.integer' => 'Jumlah anak harus angka.',
-                'anak.min' => 'Minimal nilai anak adalah 0.',
+                    'anak.integer' => 'Jumlah anak harus angka.',
+                    'anak.min' => 'Minimal nilai anak adalah 0.',
 
-                'tgl_bergabung.required' => 'Tanggal bergabung wajib diisi.',
-                'tgl_bergabung.date' => 'Tanggal bergabung tidak valid.',
+                    'tgl_bergabung.required' => 'Tanggal bergabung wajib diisi.',
+                    'tgl_bergabung.date' => 'Tanggal bergabung tidak valid.',
 
-                'tgl_resign.date' => 'Tanggal resign tidak valid.',
+                    'tgl_resign.date' => 'Tanggal resign tidak valid.',
 
-                // Alamat
-                'alamat.required' => 'Alamat wajib diisi.',
-                'desa.required' => 'Desa wajib diisi.',
-                'rt.integer' => 'RT harus berupa angka.',
-                'rw.integer' => 'RW harus berupa angka.',
-                'kota.required' => 'Kota wajib diisi.',
-                'kecamatan.required' => 'Kecamatan wajib diisi.',
-                'provinsi.required' => 'Provinsi wajib diisi.',
+                    // Alamat
+                    'alamat.required' => 'Alamat wajib diisi.',
+                    'desa.required' => 'Desa wajib diisi.',
+                    'rt.integer' => 'RT harus berupa angka.',
+                    'rw.integer' => 'RW harus berupa angka.',
+                    'kota.required' => 'Kota wajib diisi.',
+                    'kecamatan.required' => 'Kecamatan wajib diisi.',
+                    'provinsi.required' => 'Provinsi wajib diisi.',
 
-                // Kontak
-                'email.email' => 'Format email tidak valid.',
-                'telp.max' => 'No telepon maksimal 16 karakter.',
-                'kpj' => 'KPJ maksimal 13 karakter',
+                    // Kontak
+                    'email.email' => 'Format email tidak valid.',
+                    'telp.max' => 'No telepon maksimal 16 karakter.',
+                    'kpj' => 'KPJ maksimal 13 karakter',
 
-                // Bank
-                'rekening.max' => 'No rekening maksimal 30 karakter.',
+                    // Bank
+                    'rekening.max' => 'No rekening maksimal 30 karakter.',
 
-                // Emergency
-                'nama_emergency.required' => 'Nama kontak darurat wajib diisi.',
-                'telp_emergency.required' => 'No telepon darurat wajib diisi.',
-                'telp_emergency.max' => 'No telepon darurat maksimal 16 karakter.',
-                'hubungan_emergency.required' => 'Hubungan dengan kontak darurat wajib diisi.',
+                    // Emergency
+                    'nama_emergency.required' => 'Nama kontak darurat wajib diisi.',
+                    'telp_emergency.required' => 'No telepon darurat wajib diisi.',
+                    'telp_emergency.max' => 'No telepon darurat maksimal 16 karakter.',
+                    'hubungan_emergency.required' => 'Hubungan dengan kontak darurat wajib diisi.',
 
-                // Foto
-                'foto.image' => 'File foto harus berupa gambar.',
-                'foto.mimes' => 'Format foto harus jpg/jpeg/png.',
-                'foto.max' => 'Ukuran foto maksimal 2MB.',
-            ],
-        );
+                    // Foto
+                    'foto.image' => 'File foto harus berupa gambar.',
+                    'foto.mimes' => 'Format foto harus jpg/jpeg/png.',
+                    'foto.max' => 'Ukuran foto maksimal 2MB.',
+                ],
+            );
 
-        $data = $request->except('foto', '_token', '_method');
+            $data = $request->except('foto', '_token', '_method');
 
-        if ($request->remove_foto == '1') {
-            $pekerja->foto = null;
+            if ($request->remove_foto == '1') {
+                $pekerja->foto = null;
+            }
+
+            // ✅ JIKA FOTO DIGANTI
+            if ($request->hasFile('foto')) {
+                $foto = file_get_contents($request->file('foto')->getRealPath());
+                $pekerja->foto = $foto;
+            }
+
+            // ✅ UPDATE DATA
+            $pekerja->update($data);
+
+            History::create([
+                'foreign_id' => $pekerja->id,
+                'nama_tabel' => 'pekerja', // konsisten
+                'updated_by' => auth()->id() ?? 0,
+                'jabatan' => optional(auth()->user()->staff)->jabatan ?? 'system',
+                'when' => now(),
+            ]);
+
+            // ✅ KEMBALI KE DETAIL PEKERJA (LEBIH BAGUS DARIPADA KE LIST)
+            return redirect()->route('view.detail.pekerja', $id)->with('success', 'Data pekerja berhasil diperbarui');
+        } catch (QueryException $e) {
+            \Log::error('UpdatePekerja DB Error: ' . $e->getMessage());
+            return back()->withInput()->with('error', $this->translateDbError($e));
+        } catch (ValidationException $e) {
+            throw $e;
+        } catch (\Exception $e) {
+            \Log::error('UpdatePekerja General Error: ' . $e->getMessage());
+            return back()->withInput()->with('error', 'Terjadi kesalahan sistem. Silakan coba lagi atau hubungi administrator.');
         }
-
-        // ✅ JIKA FOTO DIGANTI
-        if ($request->hasFile('foto')) {
-            $foto = file_get_contents($request->file('foto')->getRealPath());
-            $pekerja->foto = $foto;
-        }
-
-        // ✅ UPDATE DATA
-        $pekerja->update($data);
-
-        History::create([
-            'foreign_id' => $pekerja->id,
-            'nama_tabel' => 'pekerja', // konsisten
-            'updated_by' => auth()->id() ?? 0,
-            'jabatan' => optional(auth()->user()->staff)->jabatan ?? 'system',
-            'when' => now(),
-        ]);
-
-        // ✅ KEMBALI KE DETAIL PEKERJA (LEBIH BAGUS DARIPADA KE LIST)
-        return redirect()->route('view.detail.pekerja', $id)->with('success', 'Data pekerja berhasil diperbarui');
     }
 
     public function toggleStatus($id)
@@ -653,9 +682,8 @@ class PekerjaController extends Controller
             return redirect()->back()->with('error', $errorString);
         } catch (\Exception $e) {
             DB::rollBack();
-
-            // Ensure this returns a plain string string, not an array
-            return redirect()->back()->with('error', $e->getMessage());
+            \Log::error('ImportExcelPekerja General Error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat import data. Silakan coba lagi atau hubungi administrator.');
         }
     }
 
@@ -722,10 +750,15 @@ class PekerjaController extends Controller
 
         } catch (QueryException $e) {
             DB::rollBack();
-            return back()->withInput()->withErrors(['database' => 'Terjadi kesalahan database: ' . $e->getMessage()]);
+            \Log::error('TambahHistoriPKWT DB Error: ' . $e->getMessage());
+            return back()->withInput()->withErrors(['database' => $this->translateDbError($e)]);
+        } catch (ValidationException $e) {
+            DB::rollBack();
+            throw $e;
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->withInput()->withErrors(['general' => 'Gagal memproses data: ' . $e->getMessage()]);
+            \Log::error('TambahHistoriPKWT General Error: ' . $e->getMessage());
+            return back()->withInput()->withErrors(['general' => 'Terjadi kesalahan sistem. Silakan coba lagi atau hubungi administrator.']);
         }
     }
 }

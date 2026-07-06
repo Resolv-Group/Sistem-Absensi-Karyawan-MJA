@@ -11,11 +11,28 @@ use App\Models\Unit;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 use function Symfony\Component\Clock\now;
 
 class PKWTController extends Controller
 {
+    /**
+     * Terjemahkan error code MySQL ke pesan ramah pengguna.
+     */
+    private function translateDbError(QueryException $e): string
+    {
+        $errorCode = $e->errorInfo[1] ?? null;
+
+        return match ($errorCode) {
+            1062 => 'Data yang Anda masukkan sudah ada di sistem. Mohon periksa kembali data yang bersifat unik.',
+            1452 => 'Data referensi tidak valid. Pastikan data terkait masih terdaftar di sistem.',
+            1048 => 'Terdapat kolom wajib yang belum diisi. Mohon lengkapi seluruh data yang diperlukan.',
+            1406 => 'Data yang dimasukkan terlalu panjang. Mohon persingkat input Anda.',
+            1264 => 'Nilai angka yang dimasukkan di luar batas yang diizinkan. Mohon periksa kembali.',
+            default => 'Terjadi kesalahan saat menyimpan data. Silakan coba lagi atau hubungi administrator.',
+        };
+    }
     public function viewPKWTMain(Request $request, $id_unit)
     {
         $user = auth()->user(); // staff login
@@ -206,16 +223,21 @@ class PKWTController extends Controller
             return redirect()->route('view.detail.unit', $request->id_unit)->with('success', 'Pekerja berhasil ditambahkan ke unit.');
         } catch (QueryException $e) {
             DB::rollBack();
+            \Log::error('TambahPekerjaUnit DB Error: ' . $e->getMessage());
 
             return back()
                 ->withInput()
-                ->withErrors(['database' => $e->getMessage()]);
+                ->withErrors(['database' => $this->translateDbError($e)]);
+        } catch (ValidationException $e) {
+            DB::rollBack();
+            throw $e;
         } catch (\Exception $e) {
             DB::rollBack();
+            \Log::error('TambahPekerjaUnit General Error: ' . $e->getMessage());
 
             return back()
                 ->withInput()
-                ->withErrors(['general' => $e->getMessage()]);
+                ->withErrors(['general' => 'Terjadi kesalahan sistem. Silakan coba lagi atau hubungi administrator.']);
         }
     }
 
@@ -310,14 +332,23 @@ class PKWTController extends Controller
             DB::commit();
 
             return redirect()->route('view.detail.unit', $unitId)->with('success', 'Data PKWT berhasil diperbarui');
-        } catch (\Exception $e) {
+        } catch (QueryException $e) {
             DB::rollBack();
+            \Log::error('UpdateUnitPekerja DB Error: ' . $e->getMessage());
 
             return back()
                 ->withInput()
-                ->withErrors([
-                    'error' => $e->getMessage(),
-                ]);
+                ->withErrors(['error' => $this->translateDbError($e)]);
+        } catch (ValidationException $e) {
+            DB::rollBack();
+            throw $e;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('UpdateUnitPekerja General Error: ' . $e->getMessage());
+
+            return back()
+                ->withInput()
+                ->withErrors(['error' => 'Terjadi kesalahan sistem. Silakan coba lagi atau hubungi administrator.']);
         }
     }
 
@@ -374,10 +405,14 @@ class PKWTController extends Controller
             DB::commit();
 
             return back()->with('success', $message);
+        } catch (QueryException $e) {
+            DB::rollBack();
+            \Log::error('BulkUpdateStatus DB Error: ' . $e->getMessage());
+            return back()->with('error', $this->translateDbError($e));
         } catch (\Exception $e) {
             DB::rollBack();
-
-            return back()->with('error', 'Terjadi kesalahan: '.$e->getMessage());
+            \Log::error('BulkUpdateStatus General Error: ' . $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan sistem. Silakan coba lagi atau hubungi administrator.');
         }
     }
 

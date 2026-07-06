@@ -13,12 +13,29 @@ use App\Models\Unit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\QueryException;
 use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
 
 class PenilaianController extends Controller
 {
+    /**
+     * Terjemahkan error code MySQL ke pesan ramah pengguna.
+     */
+    private function translateDbError(QueryException $e): string
+    {
+        $errorCode = $e->errorInfo[1] ?? null;
+
+        return match ($errorCode) {
+            1062 => 'Data yang Anda masukkan sudah ada di sistem. Mohon periksa kembali data yang bersifat unik.',
+            1452 => 'Data referensi tidak valid. Pastikan data terkait masih terdaftar di sistem.',
+            1048 => 'Terdapat kolom wajib yang belum diisi. Mohon lengkapi seluruh data yang diperlukan.',
+            1406 => 'Data yang dimasukkan terlalu panjang. Mohon persingkat input Anda.',
+            1264 => 'Nilai angka yang dimasukkan di luar batas yang diizinkan. Mohon periksa kembali.',
+            default => 'Terjadi kesalahan saat menyimpan data. Silakan coba lagi atau hubungi administrator.',
+        };
+    }
     //Ambil periode PKWT hampir habis → filter → pagination → tandai yang sudah dinilai → tampilkan (AJAX / full view)
     public function viewPenilaianMain(Request $request, $id_unit)
     {
@@ -202,10 +219,13 @@ class PenilaianController extends Controller
             });
 
             return redirect()->route('view.penilaian', $request->id_unit)->with('success', 'Penilaian berhasil disimpan.');
+        } catch (QueryException $e) {
+            report($e);
+            return back()->withInput()->with('error', $this->translateDbError($e));
         } catch (\Throwable $e) {
             report($e);
-
-            return back()->withInput()->with('error', $e->getMessage());
+            \Log::error('BuatPenilaian Error: ' . $e->getMessage());
+            return back()->withInput()->with('error', 'Terjadi kesalahan sistem. Silakan coba lagi atau hubungi administrator.');
         }
     }
 
@@ -326,9 +346,14 @@ class PenilaianController extends Controller
             DB::commit();
 
             return redirect()->route('view.penilaian', $id_unit)->with('success', 'Data penilaian berhasil diperbarui.');
+        } catch (QueryException $e) {
+            DB::rollBack();
+            \Log::error('UbahPenilaian DB Error: ' . $e->getMessage());
+            return back()->with('error', $this->translateDbError($e));
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+            \Log::error('UbahPenilaian General Error: ' . $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan sistem. Silakan coba lagi atau hubungi administrator.');
         }
     }
 }

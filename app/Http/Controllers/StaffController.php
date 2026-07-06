@@ -7,6 +7,7 @@ use App\Models\Staff;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use App\Models\History;
 use App\Models\User;
 use Carbon\Carbon;
@@ -18,33 +19,23 @@ use Illuminate\Support\Facades\DB;
 
 class StaffController extends Controller
 {
-    // function viewStaffMain(Request $request)
-    // {
-    //     $totalStaff = Staff::count(); // total pekerja
-    //     $staffBaru = Staff::where('created_at', '>=', now()->subMonth())->count(); // pekerja baru dari bulan lalu
-    //     $tidakAktif = Staff::where('status_aktif', '!=', '1')->count(); // pekerja tidak aktif
+    /**
+     * Terjemahkan error code MySQL ke pesan ramah pengguna.
+     */
+    private function translateDbError(QueryException $e): string
+    {
+        $errorCode = $e->errorInfo[1] ?? null;
 
-    //     // 1. Capture the search query
-    //     $q = $request->input('q');
+        return match ($errorCode) {
+            1062 => 'Data yang Anda masukkan sudah ada di sistem. Mohon periksa kembali NIK, KPJ, atau data lainnya yang bersifat unik(tidak boleh sama).',
+            1452 => 'Data referensi tidak valid. Pastikan data terkait masih terdaftar di sistem.',
+            1048 => 'Terdapat kolom wajib yang belum diisi. Mohon lengkapi seluruh data yang diperlukan.',
+            1406 => 'Data yang dimasukkan terlalu panjang. Mohon persingkat input Anda.',
+            1264 => 'Nilai angka yang dimasukkan di luar batas yang diizinkan. Mohon periksa kembali.',
+            default => 'Terjadi kesalahan saat menyimpan data. Silakan coba lagi atau hubungi administrator.',
+        };
+    }
 
-    //     // 2. Query the database with the filter
-    //     $staff = Staff::when($q, function ($query) use ($q) {
-    //         $query
-    //             ->where('nama', 'LIKE', "%$q%")
-    //             ->orWhere('nik', 'LIKE', "%$q%")
-    //             ->orWhere('kpj', 'LIKE', "%$q%")
-    //             ->Where('status_aktif', 1);
-    //     })
-    //         ->orderBy('created_at', 'desc')
-    //         ->paginate(10)
-    //         ->withQueryString(); // Keeps the search term in the pagination links
-
-    //     // 3. If it's an AJAX request (from JS), return ONLY the table partial
-    //     if ($request->ajax()) {
-    //         return view('staff.partials.staff-table', compact('staff'))->render();
-    //     }
-    //     return view('Staff.main-staff', compact('staff', 'totalStaff', 'staffBaru', 'tidakAktif'));
-    // }
     function viewStaffMain(Request $request)
     {
         // --- 1. CALCULATE STATS (Top Cards) ---
@@ -178,7 +169,7 @@ class StaffController extends Controller
                     'telp_emergency' => 'required|string|max:16',
                     'hubungan_emergency' => 'required|string',
 
-                    'ibu_kandung' => 'string|max:255',
+                    'ibu_kandung' => 'required|string|max:255',
 
                     'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
                 ],
@@ -244,6 +235,8 @@ class StaffController extends Controller
                     'telp_emergency.required' => 'No telepon darurat wajib diisi.',
                     'telp_emergency.max' => 'No telepon darurat maksimal 16 karakter.',
                     'hubungan_emergency.required' => 'Hubungan dengan kontak darurat wajib diisi.',
+
+                    'ibu_kandung.required' => 'Nama Ibu Kandung wajib diisi.',  
 
                     // Foto
                     'foto.image' => 'File foto harus berupa gambar.',
@@ -341,14 +334,17 @@ class StaffController extends Controller
                 session()->flash('akun_info', 'Akun dibuat! Username: ' . $user->email . ' | Password: ' . $plainPassword);
             }
             
-            session()->flash('akun_info', 'Akun dibuat! Username: ' . $user->email . ' | Password: ' . $plainPassword);
             return redirect()
                 ->route('view.tambah.staff')
                 ->with('success', 'Data Staff ' . $staff->nama . ' berhasil ditambahkan.');
         } catch (QueryException $e) {
-            return back()->with('error', 'Terjadi kesalahan query: ' . $e->getMessage());
+            \Log::error('TambahStaff DB Error: ' . $e->getMessage());
+            return back()->withInput()->with('error', $this->translateDbError($e));
+        } catch (ValidationException $e) {
+            throw $e;
         } catch (\Exception $e) {
-            return back()->with('error', 'Gagal menyimpan: ' . $e->getMessage());
+            \Log::error('TambahStaff General Error: ' . $e->getMessage());
+            return back()->withInput()->with('error', 'Terjadi kesalahan sistem. Silakan coba lagi atau hubungi administrator.');
         }
     }
 
@@ -536,9 +532,13 @@ class StaffController extends Controller
 
             return redirect()->route('view.detail.staff', $id)->with('success', 'Data staff berhasil diperbarui');
         } catch (QueryException $e) {
-            return back()->with('error', 'Terjadi kesalahan query: ' . $e->getMessage());
+            \Log::error('UpdateStaff DB Error: ' . $e->getMessage());
+            return back()->withInput()->with('error', $this->translateDbError($e));
+        } catch (ValidationException $e) {
+            throw $e;
         } catch (\Exception $e) {
-            return back()->with('error', 'Gagal menyimpan: ' . $e->getMessage());
+            \Log::error('UpdateStaff General Error: ' . $e->getMessage());
+            return back()->withInput()->with('error', 'Terjadi kesalahan sistem. Silakan coba lagi atau hubungi administrator.');
         }
 
     }
@@ -626,11 +626,13 @@ class StaffController extends Controller
 
             return redirect()->route('view.detail.staff', $id)->with('success', 'Data staff berhasil diperbarui');
         } catch (QueryException $e) {
-            // If the DB fails, we catch it here so Laravel doesn't try to render the blob
-            // We only return the text message, not the binary data
-            return back()->with('error', 'Terjadi kesalahan query: ' . $e->getMessage());
+            \Log::error('UpdateProfilStaff DB Error: ' . $e->getMessage());
+            return back()->withInput()->with('error', $this->translateDbError($e));
+        } catch (ValidationException $e) {
+            throw $e;
         } catch (\Exception $e) {
-            return back()->with('error', 'Gagal menyimpan: ' . $e->getMessage());
+            \Log::error('UpdateProfilStaff General Error: ' . $e->getMessage());
+            return back()->withInput()->with('error', 'Terjadi kesalahan sistem. Silakan coba lagi atau hubungi administrator.');
         }
     }
 
@@ -688,7 +690,8 @@ class StaffController extends Controller
             return redirect()->back()->with('error', $errorString);
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('error', $e->getMessage());
+            \Log::error('ImportExcel General Error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat import data. Silakan coba lagi atau hubungi administrator.');
         }
     }
 }
