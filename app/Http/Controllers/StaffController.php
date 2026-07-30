@@ -86,7 +86,7 @@ class StaffController extends Controller
 
         // If AJAX request (from the search/filter script), return ONLY the table partial
         if ($request->ajax()) {
-            return view('staff.partials.staff-table', compact('staff'))->render();
+            return view('Staff.partials.staff-table', compact('staff'))->render();
         }
 
         // Otherwise return the full page
