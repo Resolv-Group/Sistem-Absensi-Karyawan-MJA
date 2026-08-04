@@ -38,9 +38,18 @@ class LoginController extends Controller
         // ✅ CEK LOGIN
         if (Auth::attempt($credentials)) {
 
-            $request->session()->regenerate();
-
             $user = Auth::user();
+
+            // Cek status_akun (jika 0 maka tidak bisa login)
+            if (isset($user->status_akun) && (int) $user->status_akun === 0) {
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                return back()->with('error', 'Akun Anda tidak aktif / tidak memiliki akses untuk login.');
+            }
+
+            $request->session()->regenerate();
 
             return redirect()->route('view.dashboard');
 

@@ -207,7 +207,7 @@ class PenilaianController extends Controller
                         'sikap' => $data['sikap'],
                         'total' => $data['total_skor'],
 
-                        'status_staff' => 0,
+                        'status_pic' => 0,
                         'status_hrd' => 0,
                         'status_aktif' => 1,
 
@@ -252,7 +252,7 @@ class PenilaianController extends Controller
 
         $picId = $data->first()->created_by ?? null;
         $hrdId = $data->first()->status_hrd ?? null;
-        $supervisorId = $data->first()->status_staff ?? null;
+        $supervisorId = $data->first()->status_pic ?? null;
 
         // Cari di tabel Staff berdasarkan ID yang didapat
         $pic = Staff::where('id', $picId)->first();
@@ -340,7 +340,7 @@ class PenilaianController extends Controller
 
                 // Reset status verifikasi jika data diubah (Opsional, agar HRD meninjau ulang)
                 'status_hrd' => 0,
-                'status_staff' => 0,
+                'status_pic' => 0,
             ]);
 
             DB::commit();

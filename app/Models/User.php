@@ -25,6 +25,7 @@ class User extends Authenticatable
         
         'role',
         'staff_id',
+        'status_akun',
     ];
 
     /**

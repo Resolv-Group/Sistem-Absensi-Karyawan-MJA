@@ -24,7 +24,7 @@ return new class extends Migration
             $table->integer('sikap');
             $table->integer('total');
 
-            $table->integer('status_staff');
+            $table->integer('status_pic');
             $table->integer('status_hrd');
             $table->integer('status_aktif');
 

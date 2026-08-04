@@ -20,13 +20,16 @@ return new class extends Migration
             $table->string('password');
 
             // ROLE USER
-            $table->enum('role', ['pic', 'akuntan', 'hrd', 'admin', 'staff', 'head_supervisor'])->default('pic');
+            // $table->enum('role', ['pic', 'akuntan', 'hrd', 'admin', 'staff', 'head_supervisor'])->default('pic');
+            $table->string('role', 100)->default('staff');
 
             // RELASI KE STAFF (BOLEH NULL JIKA ADMIN)
             $table->foreignId('staff_id')
                   ->nullable()
                   ->constrained('staff')
                   ->nullOnDelete();
+
+            $table->unsignedTinyInteger('status_akun')->default(1)->comment('1=can login, 0=cannot login');
 
             // LARAVEL DEFAULT
             $table->rememberToken();

@@ -81,6 +81,7 @@ Route::middleware(['auth', 'role:hrd,akuntan,admin'])->group(function () {
     Route::get('/daftar-staff', [StaffController::class, 'viewStaffMain'])->name('view.staff');
     Route::get('/staff/tambah', [StaffController::class, 'viewTambahStaff'])->name('view.tambah.staff');
     Route::post('/tambah-staff', [StaffController::class, 'tambahStaff'])->name('tambah.staff.post');
+    Route::post('/jabatan/store', [StaffController::class, 'storeJabatan'])->name('jabatan.store');
 });
 
 Route::middleware(['auth', 'role:hrd,admin,head_supervisor'])->group(function () {

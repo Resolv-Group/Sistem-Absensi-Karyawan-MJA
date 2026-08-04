@@ -33,8 +33,8 @@ return new class extends Migration
             $table->string('rekening', 50)->nullable();
             $table->string('nama_rek', 50)->nullable();
 
-            $table->unsignedTinyInteger('rt')->nullable();
-            $table->unsignedTinyInteger('rw')->nullable();
+            $table->char('rt',3)->nullable();
+            $table->char('rw',3)->nullable();
         
             $table->string('tempat_lahir', 100);
             $table->date('tgl_lahir');

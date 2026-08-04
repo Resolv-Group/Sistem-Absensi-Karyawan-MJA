@@ -350,10 +350,37 @@
 
                     {{-- 1. Jabatan --}}
                     <div x-data="{
-                        open: false,
-                        selected: '{{ old('jabatan', $staff->jabatan ?? '') }}',
-                        list: ['Staff', 'Supervisor', 'Manager', 'Direktur', 'HRD', 'IT', 'Akuntan', 'PIC']
-                    }" class="relative">
+                            open: false,
+                            selected: '{{ old('jabatan', $staff->jabatan ?? '') }}',
+                            list: {{ json_encode($jabatanList->values()->all()) }},
+                            showAdd: false,
+                            newJabatan: '',
+                            async addNew() {
+                                const trimmed = this.newJabatan.trim();
+                                if (!trimmed) return;
+                                try {
+                                    const res = await fetch('{{ route('jabatan.store') }}', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
+                                        },
+                                        body: JSON.stringify({ nama: trimmed })
+                                    });
+                                    const data = await res.json();
+                                    if (data.success && !this.list.includes(data.nama)) {
+                                        this.list.push(data.nama);
+                                    }
+                                    this.selected = data.nama ?? trimmed;
+                                } catch(e) {
+                                    if (!this.list.includes(trimmed)) this.list.push(trimmed);
+                                    this.selected = trimmed;
+                                }
+                                this.newJabatan = '';
+                                this.showAdd = false;
+                                this.open = false;
+                            }
+                        }" class="relative">
 
                         <label class="block text-sm font-bold text-gray-700 mb-1">Jabatan</label>
 
@@ -370,7 +397,7 @@
                             </svg>
                         </div>
 
-                        <ul x-show="open" @click.outside="open=false" x-transition.opacity.duration.200ms
+                        <ul x-show="open" @click.outside="open=false; showAdd=false" x-transition.opacity.duration.200ms
                             class="absolute w-full mt-1 border border-gray-200 bg-white rounded-lg shadow-xl overflow-y-auto max-h-60 z-50">
                             <template x-for="item in list" :key="item">
                                 <li @click="selected=item; open=false"
@@ -378,6 +405,23 @@
                                     x-text="item">
                                 </li>
                             </template>
+                            {{-- Add new jabatan row --}}
+                            <li class="border-t border-gray-100">
+                                <div x-show="!showAdd" @click.stop="showAdd=true"
+                                    class="flex items-center gap-2 px-3 py-2.5 text-sm text-blue-600 hover:bg-blue-50 cursor-pointer transition">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                    Tambah Jabatan Baru
+                                </div>
+                                <div x-show="showAdd" @click.stop class="flex gap-1 px-2 py-2">
+                                    <input x-model="newJabatan" @keydown.enter.prevent="addNew()"
+                                        type="text" placeholder="Nama jabatan baru..."
+                                        class="flex-1 rounded border border-gray-300 text-sm px-2 py-1 focus:outline-none focus:border-blue-400">
+                                    <button type="button" @click.prevent="addNew()"
+                                        class="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition">Simpan</button>
+                                    <button type="button" @click.prevent="showAdd=false"
+                                        class="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded hover:bg-gray-200 transition">Batal</button>
+                                </div>
+                            </li>
                         </ul>
                         @error('jabatan')
                             <p class="text-red-600 text-xs mt-1">{{ $message }}</p>
@@ -747,7 +791,25 @@
                         </div>
                     </div>
                 </div>
+
+                                   
             </div>
+
+            {{-- 1b. Akses Login --}}
+            <div class="sm:col-span-2 p-8">
+                    <div class="flex items-start gap-4 p-4 rounded-xl border border-gray-200 bg-gray-50/60 hover:border-blue-200 hover:bg-blue-50/30 transition-all">
+                        <div class="flex-1">
+                            <p class="text-sm font-bold text-gray-800 leading-none">Akses Login Sistem</p>
+                            <p class="text-xs text-gray-400 mt-1">Jika diaktifkan, staff ini dapat masuk ke sistem menggunakan email & kata sandi.</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer mt-0.5" title="Centang untuk mengizinkan login">
+                            <input type="checkbox" name="akses_login" id="akses_login_ubah" value="1"
+                                class="sr-only peer"
+                                @if(old('akses_login', optional($userAkun)->status_akun ?? 0)) checked @endif>
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        </label>
+                    </div>
+                </div>
 
             {{-- FOOTER / ACTIONS --}}
             <div class="bg-gray-50 px-8 py-5 flex items-center justify-end gap-3 border-t border-gray-200">

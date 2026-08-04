@@ -313,8 +313,8 @@ class PekerjaController extends Controller
 
                     'alamat' => 'required|string',
                     'desa' => 'required|string',
-                    'rt' => 'nullable|integer',
-                    'rw' => 'nullable|integer',
+                    'rt' => 'nullable|string|max:3',
+                    'rw' => 'nullable|string|max:3',
                     'kota' => 'required|string',
                     'kecamatan' => 'required|string',
                     'provinsi' => 'required|string',
@@ -372,8 +372,8 @@ class PekerjaController extends Controller
                     // Alamat
                     'alamat.required' => 'Alamat wajib diisi.',
                     'desa.required' => 'Desa wajib diisi.',
-                    'rt.integer' => 'RT harus berupa angka.',
-                    'rw.integer' => 'RW harus berupa angka.',
+                    'rt.string' => 'RT harus berupa angka.',
+                    'rw.string' => 'RW harus berupa angka.',
                     'kota.required' => 'Kota wajib diisi.',
                     'kecamatan.required' => 'Kecamatan wajib diisi.',
                     'provinsi.required' => 'Provinsi wajib diisi.',
@@ -509,8 +509,8 @@ class PekerjaController extends Controller
 
                     'alamat' => 'required|string',
                     'desa' => 'required|string',
-                    'rt' => 'nullable|integer',
-                    'rw' => 'nullable|integer',
+                    'rt' => 'nullable|string|max:3',
+                    'rw' => 'nullable|string|max:3',
                     'kota' => 'required|string',
                     'kecamatan' => 'required|string',
                     'provinsi' => 'required|string',
@@ -566,8 +566,8 @@ class PekerjaController extends Controller
                     // Alamat
                     'alamat.required' => 'Alamat wajib diisi.',
                     'desa.required' => 'Desa wajib diisi.',
-                    'rt.integer' => 'RT harus berupa angka.',
-                    'rw.integer' => 'RW harus berupa angka.',
+                    'rt.string' => 'RT harus berupa angka.',
+                    'rw.string' => 'RW harus berupa angka.',
                     'kota.required' => 'Kota wajib diisi.',
                     'kecamatan.required' => 'Kecamatan wajib diisi.',
                     'provinsi.required' => 'Provinsi wajib diisi.',

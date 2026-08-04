@@ -30,7 +30,7 @@
         staffStatuses: {{ json_encode(
             $pkwtPekerja->mapWithKeys(
                 fn($item) => [
-                    $item->id => $item->penilaian->first()?->status_staff ?? 0,
+                    $item->id => $item->penilaian->first()?->status_pic ?? 0,
                 ],
             ),
         ) }},

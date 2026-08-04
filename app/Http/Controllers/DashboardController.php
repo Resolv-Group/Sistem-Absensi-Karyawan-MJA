@@ -205,10 +205,14 @@ class DashboardController extends Controller
         $userRole = auth()->user()->role;
         $penilaianQuery = Penilaian_Pkwt::with(['pekerja', 'unit']);
         
-        if ($userRole === 'head_supervisor') {
-            $penilaianQuery->where('status_staff', 0);
-        } else {
+        if ($userRole === 'pic') {
+            $penilaianQuery->where('status_pic', 0);
+        } elseif ($userRole === 'hrd') {
             $penilaianQuery->where('status_hrd', 0);
+        } else {
+            $penilaianQuery->where(function ($q) {
+                $q->where('status_pic', 0)->orWhere('status_hrd', 0);
+            });
         }
         
         $penilaianPending = $penilaianQuery->orderBy('created_at', 'desc')->get();
@@ -262,11 +266,9 @@ class DashboardController extends Controller
 
             $User = User::where('id', auth()->id())->first();
 
-            // dd($User);
-
-            if ($User->role == 'head_supervisor') {
+            if ($User->role == 'pic') {
                 $penilaian->update([
-                    'status_staff' => auth()->id(),
+                    'status_pic' => auth()->id(),
                     'updated_by' => auth()->id(),
                 ]);
             } elseif ($User->role == 'hrd') {
@@ -274,6 +276,18 @@ class DashboardController extends Controller
                     'status_hrd' => auth()->id(),
                     'updated_by' => auth()->id(),
                 ]);
+            } else {
+                if ($penilaian->status_pic == 0) {
+                    $penilaian->update([
+                        'status_pic' => auth()->id(),
+                        'updated_by' => auth()->id(),
+                    ]);
+                } elseif ($penilaian->status_hrd == 0) {
+                    $penilaian->update([
+                        'status_hrd' => auth()->id(),
+                        'updated_by' => auth()->id(),
+                    ]);
+                }
             }
 
             // 2. Update status_hrd dan catat siapa yang mengupdate

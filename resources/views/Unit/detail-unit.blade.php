@@ -663,7 +663,6 @@
                                         <th class="px-4 py-2 text-center">Perolehan</th>
                                         <th class="px-4 py-2 text-right">Nilai Asset (Rp)</th>
                                         <th class="px-4 py-2 text-center">Lokasi</th>
-                                        <th class="px-4 py-2 text-center w-28">Status</th>
                                         <th class="px-4 py-2 text-center w-28">Aksi</th>
                                     </tr>
                                 </thead>
@@ -739,50 +738,33 @@
                                                 </span>
                                             </td>
 
-                                            {{-- Status --}}
-                                            <td class="px-4 py-4 border-y border-slate-100 text-center">
-                                                @if($a->status == 2)
-                                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-emerald-50 text-emerald-600 border border-emerald-100">
-                                                        ✓ Approved
-                                                    </span>
-                                                @else
-                                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-amber-50 text-amber-600 border border-amber-100">
-                                                        Pending
-                                                    </span>
-                                                @endif
-                                            </td>
-
                                             {{-- 8. Actions (Hover Reveal) --}}
                                             <td
                                                 class="px-4 py-4 rounded-r-2xl border-r border-y border-slate-100 text-center">
-                                                @if($a->status == 2)
-                                                    <span class="text-xs text-slate-400 italic">Locked</span>
-                                                @else
-                                                    <div
-                                                        class="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-all transform group-hover:scale-100 scale-90">
-                                                        <button @click="editEntries([{{ $a->id }}])"
-                                                            title="Edit Asset"
-                                                            class="p-2 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-600 hover:text-white transition shadow-sm">
-                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                                viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                                    stroke-width="2"
-                                                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                                            </svg>
-                                                        </button>
-                                                        <button
-                                                            onclick="confirmDeleteAsset({{ $a->id }}, {{ $unit->id }})"
-                                                            title="Hapus Asset"
-                                                            class="p-2 bg-rose-50 text-rose-600 rounded-xl hover:bg-rose-600 hover:text-white transition shadow-sm">
-                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                                viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                                    stroke-width="2"
-                                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                            </svg>
-                                                        </button>
-                                                    </div>
-                                                @endif
+                                                <div
+                                                    class="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-all transform group-hover:scale-100 scale-90">
+                                                    <button @click="editEntries([{{ $a->id }}])"
+                                                        title="Edit Asset"
+                                                        class="p-2 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-600 hover:text-white transition shadow-sm">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                            viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                        </svg>
+                                                    </button>
+                                                    <button
+                                                        onclick="confirmDeleteAsset({{ $a->id }}, {{ $unit->id }})"
+                                                        title="Hapus Asset"
+                                                        class="p-2 bg-rose-50 text-rose-600 rounded-xl hover:bg-rose-600 hover:text-white transition shadow-sm">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                            viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                        </svg>
+                                                    </button>
+                                                </div>
                                             </td>
                                         </tr>
                                     @empty
@@ -1259,14 +1241,14 @@
 
                         {{-- Approve Button (Beside export excel, only for HRD/Admin/Akuntan and Kas Kecil/Asset) --}}
                         @if(in_array(auth()->user()->role, ['admin', 'hrd', 'akuntan']))
-                        {{-- Active approve button: shown when no approved items selected --}}
+                        {{-- Active approve button: shown when no approved items selected and only for Kas Kecil --}}
                         <button type="button" @click="approveSelected()"
-                            x-show="!hasApprovedSelected()"
+                            x-show="activeType === 'kas' && !hasApprovedSelected()"
                             class="px-6 py-2 bg-emerald-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-emerald-700 transition shadow-lg">
-                            Approve (<span x-text="selectedRows.length"></span>)
+                            Approve(<span x-text="selectedRows.length"></span>)
                         </button>
                         {{-- Disabled approve button: shown when a selected item is already approved --}}
-                        <div x-show="hasApprovedSelected()"
+                        <div x-show="activeType === 'kas' && hasApprovedSelected()"
                             title="Terdapat data yang sudah disetujui dalam pilihan Anda"
                             class="relative group">
                             <button type="button" disabled

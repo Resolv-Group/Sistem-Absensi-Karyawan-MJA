@@ -162,6 +162,7 @@
                 </div>
             </div>
 
+            @if(in_array(strtolower(Auth::user()->role), ['pic', 'admin', 'hrd', 'akuntan', 'staff', 'head_supervisor', 'head supervisor']))
             {{-- 4. DAILY ATTENDANCE STATS --}}
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
                 <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-start justify-between">
@@ -549,8 +550,8 @@
                                                 </td>
                                                 <td class="px-6 py-4 whitespace-nowrap text-center">
                                                     <div class="flex items-center justify-center gap-1.5">
-                                                        <div title="Staff Verify"
-                                                            class="w-2 h-2 rounded-full {{ $nilai->status_staff ? 'bg-green-500' : 'bg-gray-200' }}">
+                                                        <div title="PIC Verify"
+                                                            class="w-2 h-2 rounded-full {{ $nilai->status_pic ? 'bg-green-500' : 'bg-gray-200' }}">
                                                         </div>
                                                         <div title="HRD Verify"
                                                             class="w-2 h-2 rounded-full {{ $nilai->status_hrd ? 'bg-green-500' : 'bg-gray-200' }}">
@@ -668,20 +669,20 @@
 
                                                 {{-- 2. Verification Status Row --}}
                                                 <div class="grid grid-cols-2 gap-4">
-                                                    {{-- Staff Verification --}}
+                                                    {{-- PIC Verification --}}
                                                     <div class="p-4 rounded-[1.5rem] border border-gray-100 transition-all"
-                                                        :class="selected.status_staff ? 'bg-emerald-50/50 border-emerald-100' :
+                                                        :class="selected.status_pic ? 'bg-emerald-50/50 border-emerald-100' :
                                                             'bg-gray-50/50'">
                                                         <div class="flex items-center gap-3">
-                                                            <div :class="selected.status_staff ? 'bg-emerald-500 text-white' :
+                                                            <div :class="selected.status_pic ? 'bg-emerald-500 text-white' :
                                                                 'bg-gray-200 text-gray-400'"
                                                                 class="w-8 h-8 rounded-xl flex items-center justify-center transition-colors">
-                                                                <svg x-show="selected.status_staff" class="w-5 h-5"
+                                                                <svg x-show="selected.status_pic" class="w-5 h-5"
                                                                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                     <path stroke-linecap="round" stroke-linejoin="round"
                                                                         stroke-width="3" d="M5 13l4 4L19 7" />
                                                                 </svg>
-                                                                <svg x-show="!selected.status_staff" class="w-4 h-4"
+                                                                <svg x-show="!selected.status_pic" class="w-4 h-4"
                                                                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                     <path stroke-linecap="round" stroke-linejoin="round"
                                                                         stroke-width="2.5" d="M12 8v4l3 3" />
@@ -690,11 +691,11 @@
                                                             <div>
                                                                 <p
                                                                     class="text-[9px] font-black uppercase tracking-widest text-gray-400 leading-none mb-1">
-                                                                    Staff Verify</p>
+                                                                    PIC Verify</p>
                                                                 <p class="text-[11px] font-bold"
-                                                                    :class="selected.status_staff ? 'text-emerald-700' :
+                                                                    :class="selected.status_pic ? 'text-emerald-700' :
                                                                         'text-gray-400'"
-                                                                    x-text="selected.status_staff ? 'Verified' : 'Pending'">
+                                                                    x-text="selected.status_pic ? 'Verified' : 'Pending'">
                                                                 </p>
                                                             </div>
                                                         </div>
@@ -832,7 +833,7 @@
                                 </a>
                                 @endif
 
-                                @if(in_array(Auth::user()->role, ['head_supervisor', 'hrd']))
+                                @if(in_array(Auth::user()->role, ['pic', 'hrd', 'admin']))
                                 <div class="col-span-2">
                                     <button @click="showApprovalModal = true"
                                         class="w-full relative flex flex-col items-center justify-center p-4 bg-gray-50 border border-gray-100 rounded-xl hover:bg-green-50 hover:border-green-200 hover:text-green-700 transition group">
@@ -1207,17 +1208,17 @@
 
                             <div class="grid grid-cols-2 gap-4">
                                 <div class="p-4 rounded-[1.5rem] border border-gray-100 transition-all"
-                                    :class="selected.status_staff ? 'bg-emerald-50/50 border-emerald-100' : 'bg-gray-50/50'">
+                                    :class="selected.status_pic ? 'bg-emerald-50/50 border-emerald-100' : 'bg-gray-50/50'">
                                     <div class="flex items-center gap-3">
-                                        <div :class="selected.status_staff ? 'bg-emerald-500 text-white' :
+                                        <div :class="selected.status_pic ? 'bg-emerald-500 text-white' :
                                             'bg-gray-200 text-gray-400'"
                                             class="w-8 h-8 rounded-xl flex items-center justify-center transition-colors">
-                                            <svg x-show="selected.status_staff" class="w-5 h-5" fill="none"
+                                            <svg x-show="selected.status_pic" class="w-5 h-5" fill="none"
                                                 stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
                                                     d="M5 13l4 4L19 7" />
                                             </svg>
-                                            <svg x-show="!selected.status_staff" class="w-4 h-4" fill="none"
+                                            <svg x-show="!selected.status_pic" class="w-4 h-4" fill="none"
                                                 stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
                                                     d="M12 8v4l3 3" />
@@ -1226,10 +1227,10 @@
                                         <div>
                                             <p
                                                 class="text-[9px] font-black uppercase tracking-widest text-gray-400 leading-none mb-1">
-                                                Staff Verify</p>
+                                                PIC Verify</p>
                                             <p class="text-[11px] font-bold"
-                                                :class="selected.status_staff ? 'text-emerald-700' : 'text-gray-400'"
-                                                x-text="selected.status_staff ? 'Verified' : 'Pending'"></p>
+                                                :class="selected.status_pic ? 'text-emerald-700' : 'text-gray-400'"
+                                                x-text="selected.status_pic ? 'Verified' : 'Pending'"></p>
                                         </div>
                                     </div>
                                 </div>
@@ -1342,6 +1343,7 @@
                     </div>
                 </div>
             </div>
+            @endif
 
         </div>
     @endsection

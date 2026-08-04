@@ -197,7 +197,7 @@
                                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
                     </div>
-                    <input id="searchInput" type="text" data-url="{{ route('view.unit') }}"
+                    <input id="searchInput" type="text" data-url="{{ route('view.payroll') }}"
                         class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg bg-white text-sm placeholder-gray-400
                         focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition shadow-sm"
                         placeholder="Cari unit...">

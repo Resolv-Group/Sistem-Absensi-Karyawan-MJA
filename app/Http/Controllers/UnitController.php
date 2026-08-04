@@ -798,7 +798,7 @@ class UnitController extends Controller
                     ->where('id_unit', $id)
                     ->first();
 
-                if ($asset && $asset->status != 2) {
+                if ($asset) {
                     $updateData = [
                         'nama_barang' => $entry['nama_barang'],
                         'jumlah' => $entry['jumlah'],
@@ -830,7 +830,6 @@ class UnitController extends Controller
 
             \App\Models\Asset::whereIn('id', $ids)
                 ->where('id_unit', $id_unit)
-                ->where('status', '!=', 2)
                 ->update(['status' => 0]); // Soft delete logic
 
             return response()->json(['message' => 'Asset berhasil dihapus']);

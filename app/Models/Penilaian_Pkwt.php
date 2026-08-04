@@ -19,7 +19,7 @@ class Penilaian_Pkwt extends Model
         'sikap',
         'total',
 
-        'status_staff',
+        'status_pic',
         'status_hrd',
         'status_aktif',
         'keterangan',

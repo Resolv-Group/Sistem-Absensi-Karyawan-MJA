@@ -64,7 +64,10 @@ class PayrollController extends Controller
 
         $query->when($search, function ($q) use ($search) {
             $q->where(function ($sub) use ($search) {
-                $sub->where('nama_unit', 'LIKE', "%{$search}%");
+                $sub->where('nama_unit', 'LIKE', "%{$search}%")
+                    ->orWhereHas('namaMitra', function ($m) use ($search) {
+                        $m->where('nama_mitra', 'LIKE', "%{$search}%");
+                    });
             });
         });
 
@@ -94,7 +97,7 @@ class PayrollController extends Controller
 
         // If AJAX request (from the search/filter script), return ONLY the table partial
         if ($request->ajax()) {
-            return view('Payroll.partials.unit-table', compact('unit'))->render();
+            return view('Payroll.partials.payroll-table', compact('unit'))->render();
         }
 
         // Otherwise return the full page
@@ -1822,8 +1825,8 @@ class PayrollController extends Controller
             
             // --- PENDAPATAN ---
             $gapok = (float) ($input['upah'] ?? 0);
-            $rateLembur = $pkwt->gaji_overtime ?? 0;
-            $rateHbn = $rateLembur * ($pkwt->rate_hbn ?? 1.5);
+            $rateLembur = $pkwt?->gaji_overtime ?? 0;
+            $rateHbn = $rateLembur * ($pkwt?->rate_hbn ?? 1.5);
             $lembur = ((float) ($input['overtime'] ?? 0) * $rateLembur) + ((float) ($input['hbn'] ?? 0) * $rateHbn);
             
             $koreksi = (float) ($input['potongan'] ?? 0);
@@ -1832,8 +1835,8 @@ class PayrollController extends Controller
             $total_pendapatan = $gapok + $lembur - $koreksi + $lainnya;
 
             // --- BPJS ---
-            $bpjstk = $pkwt->bpjs_naker ?? 0;
-            $bpjskes = $pkwt->bpjs_kesehatan ?? 0;
+            $bpjstk = $pkwt?->bpjs_naker ?? 0;
+            $bpjskes = $pkwt?->bpjs_kesehatan ?? 0;
             $total_gaji = $total_pendapatan - $bpjstk - $bpjskes;
 
             // --- INVOICE / PAJAK ---
@@ -1846,14 +1849,14 @@ class PayrollController extends Controller
             $invoice = $total_gaji + $management_fee + $ppn - $pph;
 
             \Carbon\Carbon::setLocale('id');
-            $joinDate = $pkwt->tgl_mulai_pkwt ? strtoupper(\Carbon\Carbon::parse($pkwt->tgl_mulai_pkwt)->translatedFormat('d M Y')) : '-';
-            $exitDate = $pkwt->tgl_akhir_pkwt ? strtoupper(\Carbon\Carbon::parse($pkwt->tgl_akhir_pkwt)->translatedFormat('d M Y')) : '-';
+            $joinDate = $pkwt?->tgl_mulai_pkwt ? strtoupper(\Carbon\Carbon::parse($pkwt->tgl_mulai_pkwt)->translatedFormat('d M Y')) : '-';
+            $exitDate = $pkwt?->tgl_akhir_pkwt ? strtoupper(\Carbon\Carbon::parse($pkwt->tgl_akhir_pkwt)->translatedFormat('d M Y')) : '-';
 
             $processedData[] = [
                 'no' => $no++,
                 'nik' => $staff->nik ?? $staff->id_pekerja ?? '-',
                 'nama' => $staff->nama,
-                'section' => $pkwt->divisi->nama ?? '-',
+                'section' => $pkwt?->divisi?->nama ?? '-',
                 'join' => $joinDate,
                 'exit' => $exitDate,
                 'status' => 'HARIAN', // Sesuaikan jika ada logika khusus
@@ -1905,8 +1908,8 @@ class PayrollController extends Controller
             $totals, 
             $periodeString, 
             $unitName,
-            $request->pj_nama,
-            $request->pj_jabatan
+            is_array($request->pj_nama) ? $request->pj_nama : [],
+            is_array($request->pj_jabatan) ? $request->pj_jabatan : []
         ), $filename);
     }
 

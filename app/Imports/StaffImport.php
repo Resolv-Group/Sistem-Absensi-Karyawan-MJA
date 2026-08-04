@@ -96,37 +96,59 @@ class StaffImport implements ToModel, WithHeadingRow
 // =========================================================================
         // 3. LOGIKA PEMBUATAN AKUN (USER)
         // =========================================================================
-        $roleMapping = [
-            'PIC'             => 'pic',
-            'Akuntan'         => 'akuntan',
-            'HRD'             => 'hrd',
-            'Head Supervisor' => 'head_supervisor'
-        ];
-
         $jabatan = $staff->jabatan;
 
-        // Syarat wajib: Jabatan valid, email TIDAK kosong, dan tanggal lahir TIDAK kosong
-        if ($jabatan && array_key_exists($jabatan, $roleMapping) && !empty($staff->email) && !empty($tglLahir)) {
+        // Logika fuzzy matching jabatan untuk role dan status_akun
+        if (!empty($jabatan) && !empty($staff->email) && !empty($tglLahir)) {
+            $rawJabatan = trim($jabatan ?? '');
+            $lower = strtolower($rawJabatan);
+            $role = !empty($lower) ? $lower : 'staff';
+            $statusAkun = 0;
+
+            if (str_contains($lower, 'hrd')) {
+                $role = 'hrd';
+                $statusAkun = 1;
+            } elseif (str_contains($lower, 'pic')) {
+                $role = 'pic';
+                $statusAkun = 1;
+            } elseif (str_contains($lower, 'akuntan') || str_contains($lower, 'akuntansi') || str_contains($lower, 'finance') || str_contains($lower, 'accounting')) {
+                $role = 'akuntan';
+                $statusAkun = 1;
+            } elseif (str_contains($lower, 'admin')) {
+                $role = 'admin';
+                $statusAkun = 1;
+            } elseif (str_contains($lower, 'head') || str_contains($lower, 'supervisor')) {
+                $role = 'head_supervisor';
+                $statusAkun = 0;
+            } else {
+                $role = !empty($lower) ? $lower : 'staff';
+                $statusAkun = 0;
+            }
             
-            // Menggunakan query() untuk menghindari error pembacaan parameter di editor
             $existingUser = User::query()->where('email', $staff->email)->first();
             
             if (!$existingUser) {
-                // Karena kita sudah memastikan $tglLahir ada, langsung parse saja
                 $plainPassword = Carbon::parse($tglLahir)->format('d-m-Y');
                 $password = Hash::make($plainPassword);
 
                 $user = User::create([
-                    'name'     => $staff->nama,
-                    'email'    => $staff->email,
-                    'password' => $password,
-                    'role'     => $roleMapping[$jabatan],
-                    'staff_id' => $staff->id,
+                    'name'        => $staff->nama,
+                    'email'       => $staff->email,
+                    'password'    => $password,
+                    'role'        => $role,
+                    'staff_id'    => $staff->id,
+                    'status_akun' => $statusAkun,
                 ]);
 
-                // Flash session: Kumpulkan informasi pembuatan akun ke dalam Array.
-                $info = 'Akun Staff (' . $user->name . ') dibuat! Username: ' . $user->email . ' | Password: ' . $plainPassword;
+                // Flash session info
+                $statusText = $statusAkun == 1 ? 'Aktif (Bisa Login)' : 'Tidak Aktif (Tidak Bisa Login)';
+                $info = 'Akun Staff (' . $user->name . ') dibuat! Email: ' . $user->email . ' | Status: ' . $statusText;
                 Session::push('akun_info_import', $info); 
+            } else {
+                $existingUser->update([
+                    'role'        => $role,
+                    'status_akun' => $statusAkun,
+                ]);
             }
         }
 

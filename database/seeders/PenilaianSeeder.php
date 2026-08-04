@@ -24,7 +24,7 @@ class PenilaianSeeder extends Seeder
                 'sikap' => 35,
                 'total' => 56,
 
-                'status_staff' => 0,
+                'status_pic' => 0,
                 'status_hrd' => 0,
                 'status_aktif' => 1,
 
@@ -43,7 +43,7 @@ class PenilaianSeeder extends Seeder
                 'sikap' => 35,
                 'total' => 56,
 
-                'status_staff' => 0,
+                'status_pic' => 0,
                 'status_hrd' => 0,
                 'status_aktif' => 1,
 
@@ -62,7 +62,7 @@ class PenilaianSeeder extends Seeder
                 'sikap' => 35,
                 'total' => 56,
 
-                'status_staff' => 0,
+                'status_pic' => 0,
                 'status_hrd' => 0,
                 'status_aktif' => 1,
 

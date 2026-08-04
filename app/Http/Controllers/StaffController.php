@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Imports\StaffImport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\DB;
+use App\Models\Jabatan;
 
 class StaffController extends Controller
 {
@@ -110,7 +111,26 @@ class StaffController extends Controller
         // Gabungkan
         $defaultIdStaff = "{$numberFormatted}-{$dateFormatted}";
 
-        return view('Staff.CRUD.tambah-staff', compact('defaultIdStaff'));
+        $jabatanList = Jabatan::orderBy('nama')->pluck('nama');
+
+        return view('Staff.CRUD.tambah-staff', compact('defaultIdStaff', 'jabatanList'));
+    }
+
+    /**
+     * AJAX: Simpan jabatan baru ke tabel jabatan.
+     */
+    function storeJabatan(Request $request)
+    {
+        $request->validate(['nama' => 'required|string|max:100']);
+
+        $nama = trim($request->nama);
+
+        $jabatan = Jabatan::firstOrCreate(['nama' => $nama]);
+
+        return response()->json([
+            'success' => true,
+            'nama'    => $jabatan->nama,
+        ]);
     }
 
     function viewDetailStaff($id)
@@ -145,8 +165,8 @@ class StaffController extends Controller
 
                     'alamat' => 'required|string',
                     'desa' => 'required|string',
-                    'rt' => 'nullable|integer',
-                    'rw' => 'nullable|integer',
+                    'rt' => 'nullable|string|max:3',
+                    'rw' => 'nullable|string|max:3',
                     'kota' => 'required|string',
                     'kecamatan' => 'required|string',
                     'provinsi' => 'required|string',
@@ -215,8 +235,8 @@ class StaffController extends Controller
                     // Alamat
                     'alamat.required' => 'Alamat wajib diisi.',
                     'desa.required' => 'Desa wajib diisi.',
-                    'rt.integer' => 'RT harus berupa angka.',
-                    'rw.integer' => 'RW harus berupa angka.',
+                    'rt.string' => 'RT harus berupa angka.',
+                    'rw.string' => 'RW harus berupa angka.',
                     'kota.required' => 'Kota wajib diisi.',
                     'kecamatan.required' => 'Kecamatan wajib diisi.',
                     'provinsi.required' => 'Provinsi wajib diisi.',
@@ -300,38 +320,61 @@ class StaffController extends Controller
                 'status_aktif' => 1,
             ]);
 
-            $roleMapping = [
-                'PIC' => 'pic',
-                'Akuntan' => 'akuntan',
-                'HRD' => 'hrd',
-                'Head Supervisor' => 'head_supervisor'
-            ];
+            $rawJabatan = trim($request->jabatan ?? '');
+            $lower = strtolower($rawJabatan);
+            $role = !empty($lower) ? $lower : 'staff';
+            $userStatusAkun = 0;
 
-            // dd($request->jabatan);
+            if (str_contains($lower, 'hrd')) {
+                $role = 'hrd';
+                $userStatusAkun = 1;
+            } elseif (str_contains($lower, 'pic')) {
+                $role = 'pic';
+                $userStatusAkun = 1;
+            } elseif (str_contains($lower, 'akuntan') || str_contains($lower, 'akuntansi') || str_contains($lower, 'finance') || str_contains($lower, 'accounting')) {
+                $role = 'akuntan';
+                $userStatusAkun = 1;
+            } elseif (str_contains($lower, 'admin')) {
+                $role = 'admin';
+                $userStatusAkun = 1;
+            } elseif (str_contains($lower, 'head') || str_contains($lower, 'supervisor')) {
+                $role = 'head_supervisor';
+                $userStatusAkun = 0;
+            } else {
+                $role = !empty($lower) ? $lower : 'staff';
+                $userStatusAkun = 0;
+            }
 
-            // Cek apakah jabatan masuk daftar role login
-            if (array_key_exists($request->jabatan, $roleMapping)) {
+            $existingUser = User::where('email', $staff->email)->first();
+            
+            // Manual override: if admin explicitly ticked akses_login, use that
+            if ($request->has('akses_login')) {
+                $userStatusAkun = 1;
+            } else {
+                $userStatusAkun = 0;
+            }
 
-                $existingUser = User::where('email', $staff->email)->first();
-                
-                if (!$existingUser) {
-                    $plainPassword = Carbon::parse($request->tgl_lahir)->format('d-m-Y');
+            if (!$existingUser) {
+                $plainPassword = Carbon::parse($request->tgl_lahir)->format('d-m-Y');
+                $password = Hash::make($plainPassword);
 
-                    $password = Hash::make($plainPassword);
+                $user = User::create([
+                    'name' => $staff->nama,
+                    'email' => $staff->email,
+                    'password' => $password,
+                    'role' => $role,
+                    'staff_id' => $staff->id,
+                    'status_akun' => $userStatusAkun,
+                ]);
 
-                    // dd($roleMapping[$request->jabatan]);
-
-                    $user = User::create([
-                        'name' => $staff->nama,
-                        'email' => $staff->email,
-                        'password' => $password,
-                        'role' => $roleMapping[$request->jabatan],
-                        'staff_id' => $staff->id,
-                    ]);
+                if ($userStatusAkun == 1) {
+                    session()->flash('akun_info', 'Akun dibuat! Username: ' . $user->email . ' | Password: ' . $plainPassword);
                 }
-
-                // (OPSIONAL) FLASH VIEW
-                session()->flash('akun_info', 'Akun dibuat! Username: ' . $user->email . ' | Password: ' . $plainPassword);
+            } else {
+                $existingUser->update([
+                    'role' => $role,
+                    'status_akun' => $userStatusAkun,
+                ]);
             }
             
             return redirect()
@@ -351,7 +394,9 @@ class StaffController extends Controller
     function ubahStaff(request $request, $id)
     {
         $staff = Staff::findOrFail($id);
-        return view('Staff.CRUD.ubah-staff', compact('staff'));
+        $userAkun = User::where('email', $staff->email)->orWhere('staff_id', $staff->id)->first();
+        $jabatanList = Jabatan::orderBy('nama')->pluck('nama');
+        return view('Staff.CRUD.ubah-staff', compact('staff', 'userAkun', 'jabatanList'));
     }
 
     function updateStaff(Request $request, $id)
@@ -379,8 +424,8 @@ class StaffController extends Controller
 
                     'alamat' => 'required|string',
                     'desa' => 'required|string',
-                    'rt' => 'nullable|integer',
-                    'rw' => 'nullable|integer',
+                    'rt' => 'nullable|string|max:3',
+                    'rw' => 'nullable|string|max:3',
                     'kota' => 'required|string',
                     'kecamatan' => 'required|string',
                     'provinsi' => 'required|string',
@@ -451,8 +496,8 @@ class StaffController extends Controller
                     // Alamat
                     'alamat.required' => 'Alamat wajib diisi.',
                     'desa.required' => 'Desa wajib diisi.',
-                    'rt.integer' => 'RT harus berupa angka.',
-                    'rw.integer' => 'RW harus berupa angka.',
+                    'rt.string' => 'RT harus berupa angka.',
+                    'rw.string' => 'RW harus berupa angka.',
                     'kota.required' => 'Kota wajib diisi.',
                     'kecamatan.required' => 'Kecamatan wajib diisi.',
                     'provinsi.required' => 'Provinsi wajib diisi.',
@@ -504,10 +549,44 @@ class StaffController extends Controller
                 return back()->with('error', 'User login staff tidak ditemukan.');
             }
 
-            // ✅ Update akun user
+            // ✅ Update akun user dengan fuzzy matching jabatan
+            $rawJabatan = trim($request->jabatan ?? '');
+            $lower = strtolower($rawJabatan);
+            $role = !empty($lower) ? $lower : 'staff';
+            $userStatusAkun = 0;
+
+            if (str_contains($lower, 'hrd')) {
+                $role = 'hrd';
+                $userStatusAkun = 1;
+            } elseif (str_contains($lower, 'pic')) {
+                $role = 'pic';
+                $userStatusAkun = 1;
+            } elseif (str_contains($lower, 'akuntan') || str_contains($lower, 'akuntansi') || str_contains($lower, 'finance') || str_contains($lower, 'accounting')) {
+                $role = 'akuntan';
+                $userStatusAkun = 1;
+            } elseif (str_contains($lower, 'admin')) {
+                $role = 'admin';
+                $userStatusAkun = 1;
+            } elseif (str_contains($lower, 'head') || str_contains($lower, 'supervisor')) {
+                $role = 'head_supervisor';
+                $userStatusAkun = 0;
+            } else {
+                $role = !empty($lower) ? $lower : 'staff';
+                $userStatusAkun = 0;
+            }
+
+            // Manual override: if admin explicitly ticked akses_login, use that
+            if ($request->has('akses_login')) {
+                $userStatusAkun = 1;
+            } else {
+                $userStatusAkun = 0;
+            }
+
             $user->update([
-                'name' => $request->nama,
-                'email' => $request->email,
+                'name'        => $request->nama,
+                'email'       => $request->email,
+                'role'        => $role,
+                'status_akun' => $userStatusAkun,
             ]);
 
             // ✅ Jika password diisi
