@@ -10,7 +10,7 @@ class PasswordResetLinkController extends Controller
 {
     public function create()
     {
-        return view('auth.forgot-password');
+        return view('Auth.forgot-password');
     }
 
     public function store(Request $request)
