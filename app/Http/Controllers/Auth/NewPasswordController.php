@@ -11,7 +11,7 @@ class NewPasswordController extends Controller
 {
     public function create($token)
     {
-        return view('auth.reset-password', ['token' => $token]);
+        return view('Auth.reset-password', ['token' => $token]);
     }
 
     public function store(Request $request)
