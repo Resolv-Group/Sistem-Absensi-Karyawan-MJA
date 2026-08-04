@@ -47,7 +47,7 @@ class SummaryUpahExport implements FromView, ShouldAutoSize, WithStyles, WithTit
     public function drawings()
     {
         $mja = new Drawing();
-        $mja->setPath(public_path('images\mja-logo-excel.png'));
+        $mja->setPath(public_path('images/mja-logo-excel.png'));
         $mja->setCoordinates('A1');
         $mja->setHeight(60); 
 

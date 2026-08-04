@@ -68,11 +68,17 @@
         <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
             <div class="flex justify-center">
                 <button type="button"
-                    @click="$store.payslip.open('{{ $u->id }}', '{{ $u->nama_unit }}', {{ $u->pkwt->map(fn($p) => ['id' => $p->id_pekerja, 'nama' => $p->pekerja->nama, 'total_tunjangan' => $p->pekerja->tunjangan->sum('total'),
-                        'total_potongan' => $p->pekerja->potongan->sum('total'), 
+                    class="btn-payslip-open inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-xl font-bold text-[11px] uppercase tracking-widest hover:bg-slate-50 hover:border-emerald-500 hover:text-emerald-600 transition-all duration-200 shadow-sm active:scale-95 group"
+                    data-unit-id="{{ $u->id }}"
+                    data-unit-name="{{ $u->nama_unit }}"
+                    data-sistem-pengajian="{{ $u->sistem_pengajian }}"
+                    data-workers="{{ $u->pkwt->map(fn($p) => [
+                        'id' => $p->id_pekerja,
+                        'nama' => $p->pekerja?->nama ?? '-',
+                        'total_tunjangan' => $p->pekerja?->tunjangan?->sum('total') ?? 0,
+                        'total_potongan' => $p->pekerja?->potongan?->sum('total') ?? 0,
                         'total_alokasi_jam' => ($p->hariKerja->where('hari', 'sat')->first()?->jam_kerja == 5) ? '7 Jam/Hari' : '8 Jam/Hari'
-                    ])->toJson() }}, {{ $u->sistem_pengajian }})"
-                    class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-xl font-bold text-[11px] uppercase tracking-widest hover:bg-slate-50 hover:border-emerald-500 hover:text-emerald-600 transition-all duration-200 shadow-sm active:scale-95 group">
+                    ])->toJson() }}">
 
                     <svg class="w-4 h-4 text-slate-400 group-hover:text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />

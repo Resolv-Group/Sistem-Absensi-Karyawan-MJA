@@ -1900,8 +1900,12 @@ class PayrollController extends Controller
         
         $unit = Unit::find($idUnit);
         $unitName = $unit ? $unit->nama_unit : 'UNIT TIDAK DIKETAHUI';
+
+        $safeUnitName = preg_replace('/[^A-Za-z0-9\-]/', '_', $unitName);
         
-        $filename = 'Summary_Upah_' . $unitName . '_' . now()->format('Ymd_His') . '.xlsx';
+        // $filename = 'Summary_Upah_' . $unitName . '_' . now()->format('Ymd_His') . '.xlsx';
+        $filename = 'Summary_Upah_' . $safeUnitName . '_' . now()->format('Ymd_His') . '.xlsx';
+        // dd($filename);
         // 6. Return ke Export Class
         return Excel::download(new \App\Exports\SummaryUpahExport(
             $processedData, 
