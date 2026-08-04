@@ -46,7 +46,7 @@ class PayrollController extends Controller
         // Contoh jika pakai kolom string biasa: $user->role === 'HRD'
         // Contoh jika pakai Spatie Permission: $user->hasRole('HRD')
         // Cek apakah role user ada di dalam array ['hrd', 'admin']
-        $isHrdOrAdmin = in_array($user->role, ['hrd', 'admin']); 
+        $isHrdOrAdmin = in_array($user->role, ['hrd', 'admin', 'akuntan']); 
 
         $query = Unit::query()
             // Dibaca: "Ketika user BUKAN HRD dan BUKAN Admin (!$isHrdOrAdmin), maka jalankan filter PIC"
