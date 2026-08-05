@@ -111,7 +111,7 @@
         @endif
 
         {{-- Penilaian Logic --}}
-        @if(Auth::user()->role === 'pic' && Auth::user()->units->count())
+        @if(Auth::user()->role === 'pic' && Auth::user()->staff && Auth::user()->staff->units->count())
             <li class="relative group">
                 <button
                     class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all duration-300
@@ -121,7 +121,7 @@
                     <svg class="w-4 h-4 {{ Request::is('penilaian*') ? 'text-red-500' : '' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
                     </svg>
-                    <span>Penilaian ({{ Auth::user()->units->count() }})</span>
+                    <span>Penilaian ({{ Auth::user()->staff->units->count() }})</span>
                     <svg class="w-3 h-3 opacity-40 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path d="M19 9l-7 7-7-7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
@@ -129,7 +129,7 @@
 
                 {{-- Dropdown Menu Tetap Sama --}}
                 <div class="absolute top-full left-0 mt-2 w-52 bg-white rounded-2xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 p-1.5 transform origin-top translate-y-2 group-hover:translate-y-0">
-                    @foreach (Auth::user()->units as $unit)
+                    @foreach (Auth::user()->staff->units as $unit)
                         <a href="{{ route('view.penilaian', $unit->id) }}"
                             class="group/item flex items-center gap-3 px-4 py-2.5 text-[11px] font-bold text-gray-600 hover:bg-red-50 hover:text-red-600 rounded-xl transition-all">
                             <div class="w-1.5 h-1.5 rounded-full bg-gray-300 group-hover/item:bg-red-500 group-hover/item:scale-125 transition-all duration-300"></div>

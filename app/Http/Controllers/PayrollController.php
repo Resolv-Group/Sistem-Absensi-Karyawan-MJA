@@ -52,7 +52,7 @@ class PayrollController extends Controller
             // Dibaca: "Ketika user BUKAN HRD dan BUKAN Admin (!$isHrdOrAdmin), maka jalankan filter PIC"
             ->when(!$isHrdOrAdmin, function ($query) use ($user) {
                 $query->whereHas('picUnit', function ($q) use ($user) {
-                    $q->where('id_pic', $user->id);
+                    $q->where('id_pic', $user->staff_id);
                 });
             })
             ->with(['picUnit.staff', 'namaMitra', 'pkwt.pekerja.tunjangan', 'pkwt.pekerja.potongan']) 
