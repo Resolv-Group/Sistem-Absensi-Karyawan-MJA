@@ -42,7 +42,7 @@ class PenilaianController extends Controller
         $user = auth()->user(); // staff login
 
         // CEK PIC PUNYA UNIT INI ATAU TIDAK
-        $isAllowed = Unit::where('id', $id)
+        $isAllowed = Unit::where('id', $id_unit)
             ->whereHas('picUnit', function ($q) use ($user) {
                 // Ganti $user->id menjadi $user->staff_id
                 $q->where('id_pic', $user->staff_id); 
