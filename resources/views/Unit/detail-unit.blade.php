@@ -1135,7 +1135,7 @@
 
                                     {{-- SIGNATURE FORM --}}
                                     <form action="{{ route('export.kas-kecil', $unit->id) }}" method="post"
-                                        enctype="multipart/form-data" id="exportFinalForm" target="_blank">
+                                        enctype="multipart/form-data" id="exportFinalForm" target="_blank" @submit="setTimeout(() => showModal = false, 800)">
                                         @csrf
                                         <template x-for="id in selectedRows" :key="id">
                                             <input type="hidden" name="kasKecilIds[]" :value="id">
@@ -1182,7 +1182,6 @@
                                 </div>
 
                                 <button type="submit" form="exportFinalForm"
-                                    @click="setTimeout(() => showModal = false, 800)"
                                     class="group relative flex items-center gap-4 px-14 py-6 bg-slate-900 text-white text-[12px] font-black uppercase tracking-[0.3em] rounded-[2rem] hover:bg-black hover:px-16 transition-all duration-300 shadow-2xl shadow-slate-300 active:scale-95">
                                     <span class="relative z-10">Generate Report</span>
                                     <svg class="w-5 h-5 relative z-10 group-hover:translate-x-2 transition-transform duration-300"

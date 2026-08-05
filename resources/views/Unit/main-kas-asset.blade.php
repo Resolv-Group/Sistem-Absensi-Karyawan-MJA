@@ -948,7 +948,7 @@
                                 <p class="text-xs text-slate-400 font-bold leading-relaxed max-w-[280px] mx-auto uppercase tracking-tighter mt-2">Lengkapi nama penanggung jawab untuk bagian pengesahan dokumen.</p>
                             </div>
 
-                            <form :action="`/unit/detail/${unitId}/kas-kecil/export`" method="post" enctype="multipart/form-data" id="exportFinalForm" target="_blank">
+                            <form :action="`/unit/detail/${unitId}/kas-kecil/export`" method="post" enctype="multipart/form-data" id="exportFinalForm" target="_blank" @submit="setTimeout(() => showModal = false, 800)">
                                 @csrf
                                 <template x-for="id in selectedRows" :key="id">
                                     <input type="hidden" name="kasKecilIds[]" :value="id">
@@ -981,7 +981,7 @@
                             <p class="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">Dokumen Siap</p>
                             <p class="text-xs font-bold text-slate-500">Laporan Kas Kecil Unit</p>
                         </div>
-                        <button type="submit" form="exportFinalForm" @click="setTimeout(() => showModal = false, 800)"
+                        <button type="submit" form="exportFinalForm"
                             class="group relative flex items-center gap-4 px-14 py-6 bg-slate-900 text-white text-[12px] font-black uppercase tracking-[0.3em] rounded-[2rem] hover:bg-black hover:px-16 transition-all duration-300 shadow-2xl shadow-slate-300 active:scale-95">
                             <span class="relative z-10">Generate Report</span>
                             <svg class="w-5 h-5 relative z-10 group-hover:translate-x-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
