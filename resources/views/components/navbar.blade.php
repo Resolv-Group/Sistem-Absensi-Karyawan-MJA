@@ -73,7 +73,7 @@
                     <span>Unit</span>
                 </a>
             </li>
-        @elseif(Auth::user()->role === 'pic' && Auth::user()->units->count())
+        @elseif(Auth::user()->role === 'pic' && Auth::user()->staff && Auth::user()->staff->units->count())
             <li class="relative group">
                 <button
                     class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all duration-300
@@ -83,7 +83,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                     </svg>
-                    <span>Unit ({{ Auth::user()->units->count() }})</span>
+                    <span>Unit ({{ Auth::user()->staff->units->count() }})</span>
                     <svg class="w-3 h-3 opacity-40 transition-transform group-hover:rotate-180" fill="none"
                         stroke="currentColor" viewBox="0 0 24 24">
                         <path d="M19 9l-7 7-7-7" stroke-width="3" />
@@ -93,7 +93,7 @@
                 {{-- Dropdown Menu --}}
                 <div
                     class="absolute top-full left-0 mt-2 w-52 bg-white rounded-2xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 p-1.5 transform origin-top translate-y-2 group-hover:translate-y-0">
-                    @foreach (Auth::user()->units as $unit)
+                    @foreach (Auth::user()->staff->units as $unit)
                         <a href="{{ route('view.detail.unit', $unit->id) }}"
                             class="group/item flex items-center gap-3 px-4 py-2.5 text-[11px] font-bold text-gray-600 hover:bg-red-50 hover:text-red-600 rounded-xl transition-all">
 

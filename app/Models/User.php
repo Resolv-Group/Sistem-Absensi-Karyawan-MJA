@@ -53,7 +53,7 @@ class User extends Authenticatable
 
     public function staff()
     {
-        return $this->belongsTo(Staff::class);
+        return $this->belongsTo(Staff::class, 'staff_id', 'id');
     }
 
     public function units()
