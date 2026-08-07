@@ -40,7 +40,7 @@ class PKWTController extends Controller
         // CEK PIC PUNYA UNIT INI ATAU TIDAK
         $isAllowed = Unit::where('id', $id_unit)
             ->whereHas('picUnit', function ($q) use ($user) {
-                $q->where('id_pic', $user->id);
+                $q->where('id_pic', $user->staff_id);
             })
             ->exists();
 
