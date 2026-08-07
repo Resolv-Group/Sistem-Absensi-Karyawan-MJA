@@ -410,9 +410,16 @@ class UnitController extends Controller
         $user = auth()->user(); // staff login
 
         // CEK PIC PUNYA UNIT INI ATAU TIDAK
+        // $isAllowed = Unit::where('id', $id)
+        //     ->whereHas('picUnit', function ($q) use ($user) {
+        //         $q->where('id_pic', $user->id);
+        //     })
+        //     ->exists();
+
         $isAllowed = Unit::where('id', $id)
             ->whereHas('picUnit', function ($q) use ($user) {
-                $q->where('id_pic', $user->id);
+                // Ganti $user->id menjadi $user->staff_id
+                $q->where('id_pic', $user->staff_id); 
             })
             ->exists();
 
