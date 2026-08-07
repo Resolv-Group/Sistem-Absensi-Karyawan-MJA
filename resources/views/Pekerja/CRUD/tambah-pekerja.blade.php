@@ -813,10 +813,10 @@
 
 @section('scripts')
 <script>
-    window.mitrasData = @json($mitras);
-</script>
+                window.mitrasData = @json($mitras);
+            </script>
             
-<script src="/js/tambah-pekerja.js"></script>
+    <script src="/js/tambah-pekerja.js"></script>
 
     @if (session('success'))
         <script>

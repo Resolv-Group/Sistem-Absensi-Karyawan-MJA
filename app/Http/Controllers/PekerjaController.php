@@ -158,66 +158,37 @@ class PekerjaController extends Controller
         return view('Pekerja.main-pekerja', compact('pekerja', 'totalPekerja', 'pekerjaBaru', 'tidakAktif', 'units'));
     }
 
-    // public function viewTambahPekerja()
-    // {
-    //     $user = auth()->user();
-    //     $staffId = $user->staff_id;
-
-    //     $query = MitraKerja::with(['units' => function($q) use ($user, $staffId) {
-    //         $q->where('status_aktif', 1);
-            
-    //         // JIKA USER ADALAH PIC, filter unit yang muncul hanya yang dia pegang
-    //         if ($user->role === 'pic') {
-    //             $q->whereHas('picUnit', function($queryPic) use ($staffId) {
-    //                 $queryPic->where('id_pic', $staffId);
-    //             });
-    //         }
-    //     }]);
-
-    //     // JIKA USER ADALAH PIC, filter Mitra agar hanya muncul yang punya unit miliknya
-    //     if ($user->role === 'pic') {
-    //         $query->whereHas('units', function($q) use ($staffId) {
-    //             $q->where('status_aktif', 1)
-    //             ->whereHas('picUnit', function($queryPic) use ($staffId) {
-    //                 $queryPic->where('id_pic', $staffId);
-    //             });
-    //         });
-    //     }
-
-    //     $mitras = $query->where('status_aktif', 1)->get();
-
-    //     // dd($mitras);
-
-    //     return view('Pekerja.CRUD.tambah-pekerja', compact('mitras'));
-    // }
-
     public function viewTambahPekerja()
-{
-    $staffId = auth()->user()->staff_id;
+    {
+        $user = auth()->user();
+        $isGlobalUser = in_array($user->role, ['admin', 'superadmin', 'hrd']);
+        $staffId = $user->staff?->id ?? $user->staff_id;
 
-    $query = MitraKerja::with(['units' => function ($q) use ($staffId) {
-        $q->where('status_aktif', 1);
+        $query = MitraKerja::query()
+            ->where('status_aktif', 1)
+            ->with(['units' => function ($q) use ($isGlobalUser, $staffId) {
+                $q->where('status_aktif', 1);
 
-        if (auth()->user()->role === 'pic') {
-            $q->whereHas('picUnit', function ($queryPic) use ($staffId) {
-                $queryPic->where('id_pic', $staffId);
+                if (!$isGlobalUser && $staffId) {
+                    $q->whereHas('picUnit', function ($queryPic) use ($staffId) {
+                        $queryPic->where('id_pic', $staffId);
+                    });
+                }
+            }]);
+
+        if (!$isGlobalUser && $staffId) {
+            $query->whereHas('units', function ($q) use ($staffId) {
+                $q->where('status_aktif', 1)
+                  ->whereHas('picUnit', function ($queryPic) use ($staffId) {
+                      $queryPic->where('id_pic', $staffId);
+                  });
             });
         }
-    }]);
 
-    if (auth()->user()->role === 'pic') {
-        $query->whereHas('units', function ($q) use ($staffId) {
-            $q->where('status_aktif', 1)
-              ->whereHas('picUnit', function ($queryPic) use ($staffId) {
-                  $queryPic->where('id_pic', $staffId);
-              });
-        });
+        $mitras = $query->get();
+
+        return view('Pekerja.CRUD.tambah-pekerja', compact('mitras'));
     }
-
-    $mitras = $query->where('status_aktif', 1)->get();
-
-    return view('Pekerja.CRUD.tambah-pekerja', compact('mitras'));
-}
 
     public function showDokumen($id, Request $request)
     {
