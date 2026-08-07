@@ -162,7 +162,7 @@ class PekerjaController extends Controller
     {
         $user = auth()->user();
         $isGlobalUser = in_array($user->role, ['admin', 'superadmin', 'hrd']);
-        $staffId = $user->staff?->id ?? $user->staff_id;
+        $staffId = $user->staff_id;
 
         $query = MitraKerja::query()
             ->where('status_aktif', 1)
