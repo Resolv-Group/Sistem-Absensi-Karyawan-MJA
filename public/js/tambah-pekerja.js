@@ -86,7 +86,7 @@ numericFieldHandler('.nik-input', 'NIK', 16);
 numericFieldHandler('.no_kk-input', 'No KK', 16);
 numericFieldHandler('.kpj-input', 'KPJ', 11);
 numericFieldHandler('.naker-input', 'Naker', 13);
-numericFieldHandler('.anak-input', 'Anak')
+numericFieldHandler('.anak-input', 'Anak');
 numericFieldHandler('.rt-input', 'RT');
 numericFieldHandler('.rw-input', 'RW');
 

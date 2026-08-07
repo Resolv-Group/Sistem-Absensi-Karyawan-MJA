@@ -1,5 +1,10 @@
 @extends('layout')
 
+<script>
+    window.mitrasData = @json($mitras ?? []);
+    console.log(window.mitrasData);
+</script>
+
 @section('content')
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
@@ -812,10 +817,6 @@
 @endsection
 
 @section('scripts')
-<script>
-                window.mitrasData = @json($mitras);
-            </script>
-            
     <script src="/js/tambah-pekerja.js"></script>
 
     @if (session('success'))

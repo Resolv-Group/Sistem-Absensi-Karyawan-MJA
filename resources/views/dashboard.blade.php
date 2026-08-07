@@ -862,11 +862,12 @@
 
                         {{-- Important Alerts --}}
                         @php
+                            $isPicUser = Auth::user()->role === 'pic';
                             $totalPerhatian =
                                 ($totalExpiredKontrak > 0 ? 1 : 0) +
                                 ($urgentKontrak ? 1 : 0) +
-                                ($totalExpiredMitra > 0 ? 1 : 0) +  
-                                ($totalMitraMendekati > 0 ? 1 : 0) +
+                                (!$isPicUser && $totalExpiredMitra > 0 ? 1 : 0) +  
+                                (!$isPicUser && $totalMitraMendekati > 0 ? 1 : 0) +
                                 ($absensiPendingCount > 0 ? 1 : 0);
                         @endphp
 
@@ -1002,7 +1003,7 @@
                                 @endif
 
                                 {{-- ALERT 1: EXPIRED (CRITICAL - MERAH) --}}
-                                @if ($totalExpiredMitra > 0)
+                                @if (Auth::user()->role !== 'pic' && $totalExpiredMitra > 0)
                                     <div class="flex items-start gap-3 p-3 bg-red-50 rounded-lg border border-red-100 mb-3">
                                         <div class="flex-shrink-0 mt-0.5 text-red-600">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1054,7 +1055,7 @@
                                 @endif
 
                                 {{-- ALERT 2: MENDEKATI HABIS (WARNING - ORANYE) --}}
-                                @if ($totalMitraMendekati > 0)
+                                @if (Auth::user()->role !== 'pic' && $totalMitraMendekati > 0)
                                     <div class="flex items-start gap-3 p-3 bg-orange-50 rounded-lg border border-orange-100">
                                         <div class="flex-shrink-0 mt-0.5 text-orange-600">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
