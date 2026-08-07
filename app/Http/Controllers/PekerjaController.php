@@ -161,7 +161,7 @@ class PekerjaController extends Controller
     public function viewTambahPekerja()
     {
         $user = auth()->user();
-        $staffId = $user->staff_id;
+        $staffId = $user->id;
 
         // dd($staffId);
         $query = MitraKerja::with(['units' => function($q) use ($user, $staffId) {

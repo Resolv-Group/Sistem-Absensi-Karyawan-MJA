@@ -664,7 +664,7 @@
             {{-- SECTION 5: Penempatan Unit --}}
             <div class="p-8 bg-blue-50/30" x-data="{
                 penempatan: {{ old('penempatan_unit') ? 'true' : 'false' }},
-                mitras: {{ $mitras?->toJson() ?? "''" }},
+                mitras: {{ $mitras->toJson() }}, 
                 selectedMitraId: '{{ old('id_mitra') }}',
                 selectedUnitId: '{{ old('id_unit') }}',
                 searchMitra: '',
