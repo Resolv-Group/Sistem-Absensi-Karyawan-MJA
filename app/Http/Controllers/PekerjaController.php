@@ -177,24 +177,17 @@ class PekerjaController extends Controller
                 }
             }]);
 
-        $query->whereHas('units', function ($q) use ($isGlobalUser, $staffId) {
-            $q->where('status_aktif', 1);
-
-            if (!$isGlobalUser && $staffId) {
-                $q->whereHas('picUnit', function ($queryPic) use ($staffId) {
-                    $queryPic->where('id_pic', $staffId);
-                });
-            }
-        });
+        // Only restrict MitraKerja to assigned units if user is NOT a global user (e.g. PIC)
+        if (!$isGlobalUser && $staffId) {
+            $query->whereHas('units', function ($q) use ($staffId) {
+                $q->where('status_aktif', 1)
+                  ->whereHas('picUnit', function ($queryPic) use ($staffId) {
+                      $queryPic->where('id_pic', $staffId);
+                  });
+            });
+        }
 
         $mitras = $query->get();
-
-    \Log::info('viewTambahPekerja debug', [
-        'role' => $role,
-        'isGlobalUser' => $isGlobalUser,
-        'staffId' => $staffId,
-        'mitras_count' => $mitras->count(),
-    ]);
 
         return view('Pekerja.CRUD.tambah-pekerja', compact('mitras'));
     }
