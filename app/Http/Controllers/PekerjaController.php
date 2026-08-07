@@ -159,36 +159,50 @@ class PekerjaController extends Controller
     }
 
     public function viewTambahPekerja()
-    {
-        $user = auth()->user();
-        $isGlobalUser = in_array($user->role, ['admin', 'superadmin', 'hrd']);
-        $staffId = $user->staff_id;
+{
+    $user = auth()->user();
+    $role = strtolower(trim($user->role ?? ''));
+    $isGlobalUser = in_array($role, ['admin', 'superadmin', 'hrd']);
+    $staffId = $user->staff_id;
 
-        $query = MitraKerja::query()
-            ->where('status_aktif', 1)
-            ->with(['units' => function ($q) use ($isGlobalUser, $staffId) {
-                $q->where('status_aktif', 1);
-
-                if (!$isGlobalUser && $staffId) {
-                    $q->whereHas('picUnit', function ($queryPic) use ($staffId) {
-                        $queryPic->where('id_pic', $staffId);
-                    });
-                }
-            }]);
-
-        if (!$isGlobalUser && $staffId) {
-            $query->whereHas('units', function ($q) use ($staffId) {
-                $q->where('status_aktif', 1)
-                  ->whereHas('picUnit', function ($queryPic) use ($staffId) {
-                      $queryPic->where('id_pic', $staffId);
-                  });
+    $query = MitraKerja::query()
+        ->where(function ($q) {
+            $q->where('status_aktif', 1)->orWhere('status_aktif', true);
+        })
+        ->with(['units' => function ($q) use ($isGlobalUser, $staffId) {
+            $q->where(function ($qq) {
+                $qq->where('status_aktif', 1)->orWhere('status_aktif', true);
             });
-        }
 
-        $mitras = $query->get();
+            if (!$isGlobalUser && $staffId) {
+                $q->whereHas('picUnit', function ($queryPic) use ($staffId) {
+                    $queryPic->where('id_pic', $staffId);
+                });
+            }
+        }]);
 
-        return view('Pekerja.CRUD.tambah-pekerja', compact('mitras'));
+    if (!$isGlobalUser && $staffId) {
+        $query->whereHas('units', function ($q) use ($staffId) {
+            $q->where(function ($qq) {
+                $qq->where('status_aktif', 1)->orWhere('status_aktif', true);
+            })
+            ->whereHas('picUnit', function ($queryPic) use ($staffId) {
+                $queryPic->where('id_pic', $staffId);
+            });
+        });
     }
+
+    $mitras = $query->get();
+
+    \Log::info('viewTambahPekerja debug', [
+        'role' => $role,
+        'isGlobalUser' => $isGlobalUser,
+        'staffId' => $staffId,
+        'mitras_count' => $mitras->count(),
+    ]);
+
+    return view('Pekerja.CRUD.tambah-pekerja', compact('mitras'));
+}
 
     public function showDokumen($id, Request $request)
     {
