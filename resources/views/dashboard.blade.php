@@ -930,7 +930,7 @@
                                                     </div>
                                                 @endif
                                             </div>
-                                            <a href="{{ route('view.ubah.unit-pekerja', ['unitId' => $urgentExpiredKontrak->id_unit, 'pekerjaId' => $urgentExpiredKontrak->id_pekerja]) }}" class="text-xs text-red-800 hover:underline block text-left">
+                                            <a href="{{ route('view.ubah.unit-pekerja', ['unitId' => $urgentExpiredKontrak->id_unit ?? 0, 'pekerjaId' => $urgentExpiredKontrak->id]) }}" class="text-xs text-red-800 hover:underline block text-left">
                                                 Kontrak <strong>{{ $urgentExpiredKontrak->pekerja->nama }}</strong>
                                                 ({{ $urgentExpiredKontrak->unit->nama_unit ?? 'N/A' }})
                                                 sudah lewat <strong
@@ -995,7 +995,7 @@
                                                     </div>
                                                 @endif
                                             </div>
-                                            <a href="{{ route('view.ubah.unit-pekerja', ['unitId' => $urgentKontrak->id_unit, 'pekerjaId' => $urgentKontrak->id]) }}" class="text-xs text-red-700 mt-1 text-left block hover:underline">
+                                            <a href="{{ route('view.ubah.unit-pekerja', ['unitId' => $urgentKontrak->id_unit ?? 0, 'pekerjaId' => $urgentKontrak->id]) }}" class="text-xs text-red-700 mt-1 text-left block hover:underline">
                                                 Kontrak <strong>{{ $urgentKontrak->pekerja->nama }}</strong> pada
                                                 <span
                                                     class="bg-red-100 text-red-800 px-1 rounded text-[10px] font-bold uppercase tracking-wide">
