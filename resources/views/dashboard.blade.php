@@ -908,7 +908,10 @@
                                                             <div class="space-y-1 max-h-48 overflow-y-auto custom-scrollbar">
                                                                 @foreach ($othersExpiredKontrak as $other)
                                                                     @php $diff = abs(\Carbon\Carbon::today()->diffInDays(\Carbon\Carbon::parse($other->tgl_akhir_pkwt), false)); @endphp
-                                                                    <a href="{{ route('view.ubah.unit-pekerja', ['unitId' => $other->id_unit, 'pekerjaId' => $other->id_pekerja]) }}"
+                                                                    <a href="{{ route('view.ubah.unit-pekerja', [
+                                                                        'unitId' => $other->id_unit ?? ($other->unit->id ?? 0), 
+                                                                        'pekerjaId' => $other->id
+                                                                    ])}}"
                                                                         class="flex items-center justify-between p-2 rounded-xl hover:bg-red-50 gap-2 transition">
                                                                         <div class="flex flex-col min-w-0 text-left">
                                                                             <span
