@@ -407,6 +407,7 @@ class DashboardController extends Controller
 
     // --- 2. PKWT AKAN BERAKHIR ---
     $kontrakMendekatiList = PKWT::with(['pekerja', 'unit'])
+        ->where('status_aktif', 1)
         ->whereBetween('tgl_akhir_pkwt', [$today, $thirtyDaysLater])
         ->when($isPic, function ($q) use ($accessibleUnitIds) {
             $q->whereIn('id_unit', $accessibleUnitIds);
