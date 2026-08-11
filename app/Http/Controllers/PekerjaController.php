@@ -19,6 +19,7 @@ use App\Imports\PekerjaImport;
 use App\Models\PKWT_Hari_Kerja;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class PekerjaController extends Controller
 {
@@ -879,5 +880,25 @@ class PekerjaController extends Controller
                 'message' => 'Gagal membatalkan pengajuan: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    public function exportPdf($id)
+    {
+        // Ambil data pekerja beserta relasi (opsional jika penempatan unit ada di tabel terpisah)
+        $pekerja = Pekerja::with([])->findOrFail($id);
+
+        // Load view khusus PDF dan kirim data pekerja
+        $pdf = Pdf::loadView('pekerja.pdf-export', compact('pekerja'));
+
+        // Atur ukuran kertas (A4) dan orientasi (portrait)
+        $pdf->setPaper('A4', 'portrait');
+
+        // Nama file yang akan didownload
+        $fileName = 'Detail_Pekerja_' . str_replace(' ', '_', $pekerja->nama) . '.pdf';
+
+        return $pdf->download($fileName);
+        
+        // Catatan: Jika ingin melihat preview di browser (tidak langsung download), 
+        // gunakan return $pdf->stream($fileName);
     }
 }
