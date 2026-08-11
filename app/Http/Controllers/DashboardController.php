@@ -387,7 +387,10 @@ class DashboardController extends Controller
     $thirtyDaysLater = now()->addDays(30)->endOfDay();
 
     // --- 1. PKWT EXPIRED ---
+    // Only show PKWT records that are still marked active (status_aktif = 1 on the PKWT itself)
+    // and whose linked pekerja is also still active
     $expiredKontrakList = PKWT::with(['pekerja', 'unit'])
+        ->where('status_aktif', 1)
         ->whereHas('pekerja', function ($q) {
             $q->where('status_aktif', 1);
         })
@@ -406,8 +409,12 @@ class DashboardController extends Controller
     $lewatHariKontrak = $urgentExpiredKontrak ? abs(Carbon::today()->diffInDays(Carbon::parse($urgentExpiredKontrak->tgl_akhir_pkwt), false)) : 0;
 
     // --- 2. PKWT AKAN BERAKHIR ---
+    // Only show PKWT records that are still active (not yet terminated)
     $kontrakMendekatiList = PKWT::with(['pekerja', 'unit'])
         ->where('status_aktif', 1)
+        ->whereHas('pekerja', function ($q) {
+            $q->where('status_aktif', 1);
+        })
         ->whereBetween('tgl_akhir_pkwt', [$today, $thirtyDaysLater])
         ->when($isPic, function ($q) use ($accessibleUnitIds) {
             $q->whereIn('id_unit', $accessibleUnitIds);
