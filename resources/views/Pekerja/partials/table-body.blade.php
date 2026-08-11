@@ -90,11 +90,17 @@
 
 
         <td class="px-6 py-4 whitespace-nowrap text-center">
-            @if ($p->status_aktif)
+            @if ($p->status_aktif == 1)
                 <span
                     class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
                     <span class="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5"></span>
                     Aktif
+                </span>
+            @elseif ($p->status_aktif == 2)
+                <span
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 border border-amber-200">
+                    <span class="w-1.5 h-1.5 bg-amber-500 rounded-full mr-1.5"></span>
+                    Pending
                 </span>
             @else
                 <span
@@ -107,6 +113,17 @@
 
         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
             <div class="flex justify-end gap-2">
+                @if ($p->status_aktif == 2 && in_array(strtolower(trim(auth()->user()->role ?? '')), ['admin', 'hrd', 'superadmin']))
+                    <button type="button" onclick="approvePekerjaDirect({{ $p->id }}, '{{ addslashes($p->nama) }}')"
+                        class="text-emerald-600 hover:text-emerald-900 border border-emerald-200 hover:bg-emerald-50 rounded-lg px-2 py-1 text-xs font-bold transition flex items-center gap-1"
+                        title="Setujui Pekerja">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        Setujui
+                    </button>
+                @endif
+
                 <!-- Edit -->
                 <a href="{{ route('view.ubah.pekerja', $p->id) }}"
                     class="text-blue-600 hover:text-blue-900 border border-blue-200 hover:bg-blue-50

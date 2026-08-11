@@ -177,6 +177,10 @@ class PKWTController extends Controller
                 ],
             );
 
+
+            $userRole = strtolower(trim(auth()->user()->role ?? ''));
+            $initialStatus = in_array($userRole, ['hrd', 'admin', 'superadmin']) ? 1 : 2;
+
             // ✅ LOOP PEKERJA
             foreach ($request->pekerja as $index => $data) {
                 // Upload file per pekerja
@@ -205,7 +209,7 @@ class PKWTController extends Controller
                     'tunjangan' => json_decode($data['tunjangan'], true),
                     'dokumen_pkwt' => $dokumen,
                     'dokumen_mime' => $dokumenMime,
-                    'status_aktif' => 1,
+                    'status_aktif' => $initialStatus, 
                 ]);
 
                 foreach ($data['days'] as $hari => $jam) {
@@ -220,7 +224,12 @@ class PKWTController extends Controller
 
             DB::commit();
 
-            return redirect()->route('view.detail.unit', $request->id_unit)->with('success', 'Pekerja berhasil ditambahkan ke unit.');
+            // ✅ 5. DYNAMIC REDIRECT MESSAGE
+            $msg = ($initialStatus == 2) 
+                ? 'Penempatan unit berhasil diajukan. Menunggu approval HRD.' 
+                : 'Pekerja berhasil ditambahkan ke unit.';
+
+            return redirect()->route('view.detail.unit', $request->id_unit)->with('success', $msg);
         } catch (QueryException $e) {
             DB::rollBack();
             \Log::error('TambahPekerjaUnit DB Error: ' . $e->getMessage());

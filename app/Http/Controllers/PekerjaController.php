@@ -16,6 +16,7 @@ use App\Models\Unit;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use App\Imports\PekerjaImport;
+use App\Models\PKWT_Hari_Kerja;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\DB;
 
@@ -70,9 +71,10 @@ class PekerjaController extends Controller
 
         // --- 2. CALCULATE STATS (Top Cards) ---
         // Start base queries for counters
-        $totalQuery = Pekerja::query();
-        $baruQuery  = Pekerja::whereMonth('created_at', Carbon::now()->month)->whereYear('created_at', Carbon::now()->year);
-        $aktifQuery = Pekerja::where('status_aktif', '!=', '1');
+        $totalQuery   = Pekerja::query();
+        $baruQuery    = Pekerja::whereMonth('created_at', Carbon::now()->month)->whereYear('created_at', Carbon::now()->year);
+        $pendingQuery = Pekerja::where('status_aktif', 2);
+        $aktifQuery   = Pekerja::where('status_aktif', 0);
 
         // Apply unit scope if user is a restricted PIC
         if (!$isGlobalUser) {
@@ -82,18 +84,32 @@ class PekerjaController extends Controller
             $baruQuery->whereHas('pkwtAktif', function ($q) use ($assignedUnitIds) {
                 $q->whereIn('id_unit', $assignedUnitIds);
             });
+            $pendingQuery->whereHas('pkwtAktif', function ($q) use ($assignedUnitIds) {
+                $q->whereIn('id_unit', $assignedUnitIds);
+            });
             $aktifQuery->whereHas('pkwtAktif', function ($q) use ($assignedUnitIds) {
                 $q->whereIn('id_unit', $assignedUnitIds);
             });
         }
 
-        $totalPekerja = $totalQuery->count();
-        $pekerjaBaru  = $baruQuery->count();
-        $tidakAktif   = $aktifQuery->count();
+        $totalPekerja        = $totalQuery->count();
+        $pekerjaBaru         = $baruQuery->count();
+        $pekerjaPendingCount = $pendingQuery->count();
+        $tidakAktif          = $aktifQuery->count();
+
+        $pendingPekerjaList = Pekerja::with(['pkwtAktif.unit'])
+            ->where('status_aktif', 2)
+            ->when(!$isGlobalUser, function ($q) use ($assignedUnitIds) {
+                $q->whereHas('pkwtAktif', function ($qq) use ($assignedUnitIds) {
+                    $qq->whereIn('id_unit', $assignedUnitIds);
+                });
+            })
+            ->orderBy('created_at', 'desc')
+            ->get();
 
 
         // --- 3. BUILD MAIN QUERY ---
-        $query = Pekerja::with(['pkwtAktif.unit']);
+        $query = Pekerja::with(['pkwtAktif.unit'])->where('status_aktif', '!=', 2);
 
         // Enforce unit scope only if NOT a global user
         if (!$isGlobalUser) {
@@ -150,12 +166,22 @@ class PekerjaController extends Controller
         }
         $units = $unitQuery->get(['id', 'nama_unit']);
 
+        // --- 6a. PIC-SPECIFIC: their own pending submissions ---
+        $myPendingList = collect();
+        if (!$isGlobalUser) {
+            $myPendingList = Pekerja::with(['pkwtAktif.unit', 'user'])
+                ->where('status_aktif', 2)
+                ->where('created_by', Auth::id()) // Ensure this matches your foreign key for the inputter
+                ->orderBy('created_at', 'desc')
+                ->get();
+        }
+
         // --- 6. RETURN RESPONSE ---
         if ($request->ajax()) {
             return view('Pekerja.partials.pekerja-table', compact('pekerja'))->render();
         }
 
-        return view('Pekerja.main-pekerja', compact('pekerja', 'totalPekerja', 'pekerjaBaru', 'tidakAktif', 'units'));
+        return view('Pekerja.main-pekerja', compact('pekerja', 'totalPekerja', 'pekerjaBaru', 'tidakAktif', 'pekerjaPendingCount', 'pendingPekerjaList', 'myPendingList', 'units'));
     }
 
     public function viewTambahPekerja()
@@ -308,7 +334,7 @@ class PekerjaController extends Controller
             $request->validate(
                 [
                     'nama' => 'required|string|max:255',
-                    'id_pekerja' => 'nullable|string',
+                    'id_pekerja' => 'required|string',
                     'nik' => 'required|digits:16|unique:pekerja,nik',
                     'no_kk' => 'required|digits:16',
                     'tempat_lahir' => 'required|string|max:100',
@@ -420,6 +446,9 @@ class PekerjaController extends Controller
             //     $dokumenBlob = file_get_contents($request->file('dokumen')->getRealPath());
             // }
 
+            $userRole = strtolower(trim(auth()->user()->role ?? ''));
+            $initialStatus = in_array($userRole, ['hrd', 'admin', 'superadmin']) ? 1 : 2;
+
             // ✅ Simpan ke database
             $pekerja = Pekerja::create([
                 'nama' => $request->nama,
@@ -459,7 +488,9 @@ class PekerjaController extends Controller
                 'foto' => $fotoBlob,
                 // 'dokumen' => $dokumenBlob,
 
-                'status_aktif' => 1,
+                'status_aktif' => $initialStatus,
+
+                'created_by' => Auth::id(),
             ]);
 
             if ($request->has('penempatan_unit') && $request->penempatan_unit == '1' && $request->filled('id_unit')) {
@@ -501,12 +532,11 @@ class PekerjaController extends Controller
             $request->validate(
                 [
                     'nama' => 'required|string|max:255',
-                    'id_pekerja' => 'nullable|string',
+                    'id_pekerja' => 'required|string',
 
-                    'nik' => ['required', 'digits:16', Rule::unique('pekerja', 'nik')->ignore($id)],
-
-                    'no_kk' => ['required', 'digits:16', Rule::unique('pekerja', 'no_kk')->ignore($id)],
-
+                    'nik' => 'required|digits:16',
+                    'no_kk' => 'required|digits:16',
+                    
                     'tempat_lahir' => 'required|string|max:100',
                     'tgl_lahir' => 'required|date',
                     'kelamin' => 'required|boolean',
@@ -536,7 +566,7 @@ class PekerjaController extends Controller
                     'telp_emergency' => 'required|string|max:16',
                     'hubungan_emergency' => 'required|string',
 
-                    'ibu_kandung' => 'string|max:255',
+                    'ibu_kandung' => 'nullable|string|max:255',
 
                     'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
                 ],
@@ -762,12 +792,92 @@ class PekerjaController extends Controller
             \Log::error('TambahHistoriPKWT DB Error: ' . $e->getMessage());
             return back()->withInput()->withErrors(['database' => $this->translateDbError($e)]);
         } catch (ValidationException $e) {
-            DB::rollBack();
-            throw $e;
+            return back()->withInput()->withErrors(['general' => 'Terjadi kesalahan sistem. Silakan coba lagi atau hubungi administrator.']);
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::error('TambahHistoriPKWT General Error: ' . $e->getMessage());
             return back()->withInput()->withErrors(['general' => 'Terjadi kesalahan sistem. Silakan coba lagi atau hubungi administrator.']);
+        }
+    }
+
+    public function approvePekerjaBulk(Request $request)
+    {
+        try {
+            $userRole = strtolower(trim(auth()->user()->role ?? ''));
+            if (!in_array($userRole, ['admin', 'hrd', 'superadmin'])) {
+                return response()->json(['success' => false, 'message' => 'Unauthorized.'], 403);
+            }
+
+            // Get the IDs (works for 1 ID or 100 IDs)
+            $ids = $request->input('ids', []);
+
+            if (empty($ids)) {
+                return response()->json(['success' => false, 'message' => 'Tidak ada data terpilih.'], 400);
+            }
+
+            // Mass update
+            Pekerja::whereIn('id', $ids)->update(['status_aktif' => 1]);
+            PKWT::whereIn('id_pekerja', $ids)->update(['status_aktif' => 1]);
+
+            // Dynamic message based on count
+            $count = count($ids);
+            $message = $count > 1 ? "$count pekerja berhasil disetujui." : "Pekerja berhasil disetujui.";
+
+            return response()->json([
+                'success' => true,
+                'message' => $message
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Error: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function cancelPekerja($id)
+    {
+        try {
+            // Start transaction
+            DB::beginTransaction();
+
+            $pekerja = \App\Models\Pekerja::findOrFail($id);
+            
+            // 1. Safety Check: Ensure it's still pending
+            if ($pekerja->status_aktif != 2) {
+                return response()->json(['success' => false, 'message' => 'Hanya pengajuan pending yang bisa dibatalkan.'], 403);
+            }
+
+            // 2. Delete associated PKWT and PKWT_Hari_Kerja
+            // We find the PKWTs first to clean up the dependent Hari Kerja records
+            $pkwtIds = PKWT::where('id_pekerja', $id)->pluck('id');
+
+            if ($pkwtIds->isNotEmpty()) {
+                // Delete Working Hours linked to these PKWTs
+                PKWT_Hari_Kerja::whereIn('pkwt_id', $pkwtIds)->delete();
+                
+                // Delete the PKWT records themselves
+                PKWT::whereIn('id', $pkwtIds)->delete();
+            }
+
+            // 3. Delete the Pekerja profile
+            $pekerja->delete();
+
+            // Commit all deletions
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Pengajuan pekerja dan penempatan unit berhasil dibatalkan.'
+            ]);
+
+        } catch (\Exception $e) {
+            // If anything goes wrong, undo all deletions
+            DB::rollBack();
+            
+            \Log::error('CancelPekerja Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false, 
+                'message' => 'Gagal membatalkan pengajuan: ' . $e->getMessage()
+            ], 500);
         }
     }
 }

@@ -74,7 +74,8 @@
                         {{-- ID Unit --}}
                         <div>
                             <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">ID
-                                Unit</label>
+                                Unit<span
+                                        class="text-red-500 font-semibold">*</span></label>
                             <input type="text" name="id_unit" placeholder="Contoh: 71923"
                                 class="w-full rounded-xl border-gray-200 bg-gray-100 focus:bg-white focus:border-blue-500 focus:ring-blue-100 transition py-3 px-4 text-sm font-medium placeholder-gray-400 cursor-not-allowed"
                                 value="{{ old('id', $unit->id) }}" maxlength="20" readonly>
@@ -84,7 +85,8 @@
 
                             {{-- Label & Add Button --}}
                             <div class="flex justify-between items-center mb-1">
-                                <label class="block text-sm font-bold text-gray-700">Mitra Kerja</label>
+                                <label class="block text-sm font-bold text-gray-700">Mitra Kerja<span
+                                        class="text-red-500 font-semibold">*</span></label>
 
                             </div>
 
@@ -161,7 +163,8 @@
                         {{-- Nama Unit --}}
                         <div>
                             <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Nama Unit
-                                <span class="text-red-500">*</span></label>
+                                <span
+                                        class="text-red-500 font-semibold">*</span></label>
                             <input type="text" name="nama_unit" placeholder="Contoh: Unit Produksi A"
                                 class="w-full rounded-xl border-gray-200 focus:bg-white focus:border-blue-500 focus:ring-blue-100 transition py-3 px-4 text-sm font-medium placeholder-gray-400"
                                 :class="isPic ? 'cursor-not-allowed bg-gray-100' : 'bg-gray-50'"
@@ -177,7 +180,8 @@
 
                             {{-- Label --}}
                             <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
-                                Penanggung Jawab (PIC)
+                                Penanggung Jawab (PIC)<span
+                                        class="text-red-500 font-semibold">*</span>
                             </label>
 
                             {{-- Hidden Inputs for Form Submission --}}
@@ -418,7 +422,8 @@
                             ]
                         }" class="relative">
                             <label class="block text-sm font-bold text-gray-700 mb-1">
-                                Sistem Pengajian
+                                Sistem Pengajian<span
+                                        class="text-red-500 font-semibold">*</span>
                             </label>
 
                             <!-- nilai tetap dikirim -->
@@ -572,7 +577,8 @@
                         <div class="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <div>
                                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Mulai
-                                    Perjanjian</label>
+                                    Perjanjian<span
+                                        class="text-red-500 font-semibold">*</span></label>
                                 <input type="date" name="mulai_perjanjian"
                                     class="w-full rounded-xl border-gray-200 focus:bg-white focus:border-blue-500 focus:ring-blue-100 transition py-3 px-4 text-sm font-medium text-gray-700"
                                     :class="isPic ? 'cursor-not-allowed bg-gray-100' : 'bg-gray-50'"
@@ -584,7 +590,8 @@
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Akhir
-                                    Perjanjian</label>
+                                    Perjanjian<span
+                                        class="text-red-500 font-semibold">*</span></label>
                                 <input type="date" name="akhir_perjanjian" min="{{ date('Y-m-d') }}"
                                     class="w-full rounded-xl border-gray-200 focus:bg-white focus:border-blue-500 focus:ring-blue-100 transition py-3 px-4 text-sm font-medium text-gray-700"
                                     :class="isPic ? 'cursor-not-allowed bg-gray-100' : 'bg-gray-50'"
@@ -600,7 +607,8 @@
                         <div class="md:col-span-2" x-data="{ fileName: '' }">
                             <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Perbarui
                                 Dokumen
-                                Kontrak (PDF/IMG)</label>
+                                Kontrak (PDF/IMG)<span
+                                        class="text-red-500 font-semibold">*</span></label>
 
                             <label
                                 :class="isPic ? 'cursor-not-allowed bg-gray-100' : 'cursor-pointer bg-gray-50 hover:bg-blue-50 hover:border-blue-400'"

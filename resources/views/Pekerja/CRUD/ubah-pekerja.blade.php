@@ -113,7 +113,8 @@
                     <div class="md:col-span-9 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
 
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-1">ID Pekerja</label>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">ID Pekerja<span
+                                    class="text-red-500 font-semibold">*</span></label>
 
                             <input type="text" name="id_pekerja" maxlength="16" autocomplete="off"
                                 class="id-input w-full rounded-lg shadow-sm border
@@ -129,7 +130,8 @@
 
                         {{-- NIK --}}
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-1">NIK</label>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">NIK<span
+                                    class="text-red-500 font-semibold">*</span></label>
                             <input type="text" name="nik" maxlength="16" autocomplete="off"
                                 value="{{ old('nik', $pekerja->nik) }}"
                                 class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition"
@@ -138,7 +140,8 @@
 
                         {{-- Nama Lengkap --}}
                         <div class="sm:col-span-2">
-                            <label class="block text-sm font-bold text-gray-700 mb-1">Nama Lengkap</label>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Nama Lengkap<span
+                                    class="text-red-500 font-semibold">*</span></label>
                             <input type="text" name="nama" maxlength="255" autocomplete="off"
                                 value="{{ old('nama', $pekerja->nama) }}"
                                 class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition"
@@ -175,7 +178,8 @@
                             </div>
 
                             <div>
-                                <label class="block text-sm font-bold text-gray-700 mb-1">Nomor Kartu Keluarga</label>
+                                <label class="block text-sm font-bold text-gray-700 mb-1">Nomor Kartu Keluarga<span
+                                    class="text-red-500 font-semibold">*</span></label>
                                 <input type="text" name="no_kk" maxlength="16" autocomplete="off"
                                     class="no_kk-input w-full rounded-lg shadow-sm border
                                 @error('no_kk') border-red-500 bg-red-50 @else border-gray-500 bg-gray-50 @enderror
@@ -189,7 +193,8 @@
 
                         {{-- Tempat Lahir --}}
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-1">Tempat Lahir</label>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Tempat Lahir<span
+                                    class="text-red-500 font-semibold">*</span></label>
                             <input type="text" name="tempat_lahir" maxlength="100" autocomplete="off"
                                 value="{{ old('tempat_lahir', $pekerja->tempat_lahir) }}"
                                 class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition"
@@ -198,7 +203,8 @@
 
                         {{-- Tanggal Lahir --}}
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-1">Tanggal Lahir</label>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Tanggal Lahir<span
+                                    class="text-red-500 font-semibold">*</span></label>
                             <input type="date" name="tgl_lahir" value="{{ old('tgl_lahir', $pekerja->tgl_lahir) }}"
                                 class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition">
                         </div>
@@ -213,7 +219,8 @@
                             ]
                         }" class="relative">
 
-                            <label class="block text-sm font-bold text-gray-700 mb-1">Jenis Kelamin</label>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Jenis Kelamin<span
+                                    class="text-red-500 font-semibold">*</span></label>
 
                             <input type="hidden" name="kelamin" x-model="selected">
 
@@ -249,7 +256,8 @@
                             list: ['TK', 'SD', 'SMP', 'SMA/SMK', 'D3', 'S1']
                         }" class="relative">
 
-                            <label class="block text-sm font-bold text-gray-700 mb-1">Pendidikan</label>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Pendidikan<span
+                                    class="text-red-500 font-semibold">*</span></label>
 
                             <input type="hidden" name="pendidikan" x-model="selected">
 
@@ -284,7 +292,8 @@
                             selected: '{{ old('status_kawin', $pekerja->status_kawin ?? '') }}',
                             list: ['TK', 'K']
                         }" class="relative">
-                            <label class="block text-sm font-bold text-gray-700 mb-1">Status Perkawinan</label>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Status Perkawinan<span
+                                    class="text-red-500 font-semibold">*</span></label>
 
                             <input type="hidden" name="status_kawin" x-model="selected">
 
@@ -324,7 +333,8 @@
                         </div>
 
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-1">Tanggal Bergabung</label>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Tanggal Bergabung<span
+                                    class="text-red-500 font-semibold">*</span></label>
                             <input type="date" name="tgl_bergabung"
                                 value="{{ old('tgl_bergabung', $pekerja->tgl_bergabung) }}"
                                 class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition">
@@ -357,7 +367,8 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
                     {{-- Jalan --}}
                     <div class="sm:col-span-2">
-                        <label class="block text-sm font-bold text-gray-700 mb-1">Jalan / Nama Gedung</label>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Jalan / Nama Gedung<span
+                                    class="text-red-500 font-semibold">*</span></label>
                         <textarea name="alamat" rows="2" maxlength="255" autocomplete="off"
                             class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 min-h-16 max-h-40 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition"
                             placeholder="Jl. ABC No. 10, Blok A">{{ old('alamat', $pekerja->alamat) }}</textarea>
@@ -366,7 +377,8 @@
 
                     {{-- Desa --}}
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">Desa</label>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Desa<span
+                                    class="text-red-500 font-semibold">*</span></label>
                         <input type="text" name="desa" maxlength="100" autocomplete="off"
                             value="{{ old('desa', $pekerja->desa) }}"
                             class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition">
@@ -390,7 +402,8 @@
 
                     {{-- Kota --}}
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">Kota / Kabupaten</label>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Kota / Kabupaten<span
+                                    class="text-red-500 font-semibold">*</span></label>
                         <input type="text" name="kota" maxlength="100" autocomplete="off"
                             value="{{ old('kota', $pekerja->kota) }}"
                             class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition">
@@ -399,13 +412,15 @@
                     {{-- Kecamatan & Provinsi --}}
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-1">Kecamatan</label>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Kecamatan<span
+                                    class="text-red-500 font-semibold">*</span></label>
                             <input type="text" name="kecamatan" maxlength="100" autocomplete="off"
                                 value="{{ old('kecamatan', $pekerja->kecamatan) }}"
                                 class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition">
                         </div>
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-1">Provinsi</label>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Provinsi<span
+                                    class="text-red-500 font-semibold">*</span></label>
                             <input type="text" name="provinsi" maxlength="100" autocomplete="off"
                                 value="{{ old('provinsi', $pekerja->provinsi) }}"
                                 class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition">
@@ -513,7 +528,8 @@
                     <div class="space-y-5">
                         {{-- Nama Kontak --}}
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-1">Nama Kontak</label>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Nama Kontak<span
+                                    class="text-red-500 font-semibold">*</span></label>
                             <input type="text" name="nama_emergency" maxlength="255" autocomplete="off"
                                 value="{{ old('nama_emergency', $pekerja->nama_emergency) }}"
                                 class="w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition">
@@ -521,7 +537,8 @@
 
                         {{-- No Kontak --}}
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-1">Nomor Telepon</label>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Nomor Telepon<span
+                                    class="text-red-500 font-semibold">*</span></label>
                             <input type="text" name="telp_emergency" maxlength="13" autocomplete="off"
                                 value="{{ old('telp_emergency', $pekerja->telp_emergency) }}"
                                 class="telp_emergency-input w-full rounded-lg shadow-sm border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition">
@@ -533,7 +550,8 @@
                             selected: '{{ old('hubungan_emergency', $pekerja->hubungan_emergency ?? '') }}',
                             list: ['Orang Tua', 'Saudara', 'Pasangan', 'Wali']
                         }" class="relative">
-                            <label class="block text-sm font-bold text-gray-700 mb-1">Hubungan</label>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Hubungan<span
+                                    class="text-red-500 font-semibold">*</span></label>
 
                             <input type="hidden" name="hubungan_emergency" x-model="selected">
 

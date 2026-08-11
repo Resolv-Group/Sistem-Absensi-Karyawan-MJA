@@ -117,9 +117,12 @@ Route::middleware(['auth', 'role:hrd,admin,head_supervisor,pic'])->group(functio
     Route::POST('/tambah-pekerja', [PekerjaController::class, 'tambahPekerja'])->name('tambah.pekerja.post');
     Route::get('/pekerja/ubah/{id}', [PekerjaController::class, 'ubahPekerja'])->name('view.ubah.pekerja');
     Route::put('/pekerja/ubah/{id}', [PekerjaController::class, 'updatePekerja'])->name('update.pekerja');
+    Route::post('/pekerja/approve-bulk', [PekerjaController::class, 'approvePekerjaBulk'])->name('pekerja.approve.bulk');
     // Route::get('/pekerja/dokumen/{id}', [PekerjaController::class, 'showDokumen'])->name('pekerja.dokumen.show');
     Route::get('/pkwt/dokumen/{id}', [PekerjaController::class, 'showPkwtDokumen'])->name('pkwt.dokumen.show'); // Route for specific PKWT records (Current and History)
     Route::put('/pekerja/toggle-status/{id}', [PekerjaController::class, 'toggleStatus']);
+    Route::post('/pekerja/approve/{id}', [PekerjaController::class, 'approvePekerja'])->name('pekerja.approve');
+    Route::post('/pekerja/cancel/{id}', [PekerjaController::class, 'cancelPekerja'])->name('pekerja.cancel');
 
     Route::post('/pekerja/histori-pkwt/tambah', [PekerjaController::class, 'TambahHistoriPKWT'])->name('pekerja.histori-pkwt.tambah');
 });
@@ -218,6 +221,7 @@ Route::middleware(['auth', 'role:hrd,pic,admin,head_supervisor,akuntan'])->group
     Route::get('/unit/{id}/kas-kecil/nota', [UnitController::class, 'showKasNota'])->name('kas-kecil.nota');
     Route::post('/unit/detail/{id}/kas-kecil/export', [UnitController::class, 'exportKasKecil'])->name('export.kas-kecil');
     Route::post('/unit/{id_unit}/kas-kecil/approve', [UnitController::class, 'approveKasKecil'])->name('kas-kecil.approve');
+    Route::post('/unit/{id_unit}/asset/approve', [UnitController::class, 'approveAsset'])->name('asset.approve');
 });
 
 Route::middleware(['auth', 'role:hrd,pic,admin,head_supervisor'])->group(function () {
@@ -227,6 +231,7 @@ Route::middleware(['auth', 'role:hrd,pic,admin,head_supervisor'])->group(functio
     Route::get('/unit/{id}/tambah-pekerja', [PKWTController::class, 'viewTambahUnitHarian'])->name('view.tambah.unit-pekerja');
     // =--=
     Route::POST('/tambah-unit-pekerja', [PKWTController::class, 'tambahPekerjaUnit'])->name('tambah.unit-pekerja.post');
+
     Route::get('/unit/{unitId}/pekerja/{pekerjaId}/ubah', [PKWTController::class, 'ubahUnitPekerja'])->name('view.ubah.unit-pekerja');
     Route::put('/unit/{unitId}/pekerja/{pekerjaId}/ubah', [PKWTController::class, 'updateUnitPekerja'])->name('update.unit-pekerja');
     Route::put('/unit/pekerja/bulk-update-status', [PKWTController::class, 'bulkUpdateStatus'])->name('bulk.update.pekerja');
