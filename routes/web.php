@@ -182,6 +182,8 @@ Route::middleware(['auth', 'role:pic,admin'])->group(function () {
 });
 
 Route::middleware(['auth', 'role:hrd,pic,admin,head_supervisor'])->group(function () {
+    // Export pdf detil pekerja
+    Route::get('/pekerja/{id}/export-pdf', [PekerjaController::class, 'exportPdf'])->name('pekerja.export_pdf');
     // Import Pekerja-Borongan
     Route::post('/pekerja/import', [PekerjaController::class, 'importExcel'])->name('pekerja.import');
     Route::post('/borongan/import', [BoronganController::class, 'importExcel'])->name('borongan.import');
