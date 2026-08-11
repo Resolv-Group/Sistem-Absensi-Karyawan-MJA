@@ -908,11 +908,11 @@
                                                             <div class="space-y-1 max-h-48 overflow-y-auto custom-scrollbar">
                                                                 @foreach ($othersExpiredKontrak as $other)
                                                                     @php $diff = abs(\Carbon\Carbon::today()->diffInDays(\Carbon\Carbon::parse($other->tgl_akhir_pkwt), false)); @endphp
-                                                                    <div
-                                                                        class="flex items-center justify-between p-2 rounded-xl hover:bg-red-50 gap-2">
+                                                                    <a href="{{ route('view.ubah.unit-pekerja', ['unitId' => $other->id_unit, 'pekerjaId' => $other->id_pekerja]) }}"
+                                                                        class="flex items-center justify-between p-2 rounded-xl hover:bg-red-50 gap-2 transition">
                                                                         <div class="flex flex-col min-w-0 text-left">
                                                                             <span
-                                                                                class="text-[11px] font-bold text-gray-700 truncate capitalize">{{ $other->pekerja->nama }}</span>
+                                                                                class="text-[11px] font-bold text-gray-700 truncate capitalize hover:underline">{{ $other->pekerja->nama }}</span>
                                                                             <span
                                                                                 class="text-[9px] font-medium text-gray-400 uppercase">{{ $other->unit->nama_unit ?? 'No Unit' }}</span>
                                                                         </div>
@@ -920,20 +920,20 @@
                                                                             class="shrink-0 text-[10px] font-black text-red-600 bg-red-100 px-2 py-0.5 rounded-lg">
                                                                             {{ $diff > 30 ? '> 30 hari' : $diff . ' hari' }}
                                                                         </span>
-                                                                    </div>
+                                                                    </a>
                                                                 @endforeach
                                                             </div>
                                                         </div>
                                                     </div>
                                                 @endif
                                             </div>
-                                            <p class="text-xs text-red-800">
+                                            <a href="{{ route('view.ubah.unit-pekerja', ['unitId' => $urgentExpiredKontrak->id_unit, 'pekerjaId' => $urgentExpiredKontrak->id_pekerja]) }}" class="text-xs text-red-800 hover:underline block text-left">
                                                 Kontrak <strong>{{ $urgentExpiredKontrak->pekerja->nama }}</strong>
                                                 ({{ $urgentExpiredKontrak->unit->nama_unit ?? 'N/A' }})
                                                 sudah lewat <strong
                                                     class="decoration-2">{{ $lewatHariKontrak > 30 ? 'lebih dari 30' : $lewatHariKontrak }}
                                                     hari</strong>.
-                                            </p>
+                                            </a>
                                         </div>
                                     </div>
                                 @endif
@@ -968,11 +968,11 @@
                                                             <div class="space-y-1 max-h-48 overflow-y-auto custom-scrollbar">
                                                                 @foreach ($othersKontrak as $other)
                                                                     @php $diff = \Carbon\Carbon::today()->diffInDays(\Carbon\Carbon::parse($other->tgl_akhir_pkwt), false); @endphp
-                                                                    <div
+                                                                    <a href="{{ route('view.ubah.unit-pekerja', ['unitId' => $other->id_unit, 'pekerjaId' => $other->id]) }}"
                                                                         class="flex items-center justify-between p-2 rounded-xl hover:bg-red-50 transition-colors gap-2">
                                                                         <div class="flex flex-col min-w-0 text-left">
                                                                             <span
-                                                                                class="text-[11px] font-bold text-gray-700 truncate capitalize">{{ $other->pekerja->nama }}</span>
+                                                                                class="text-[11px] font-bold text-gray-700 truncate capitalize hover:underline">{{ $other->pekerja->nama }}</span>
                                                                             <span
                                                                                 class="text-[9px] font-medium text-gray-500 uppercase tracking-tight truncate">
                                                                                 {{ $other->unit->nama_unit ?? 'No Unit' }}
@@ -982,14 +982,14 @@
                                                                             class="shrink-0 text-[10px] font-black text-red-600 bg-red-100/50 px-2 py-0.5 rounded-lg">
                                                                             {{ $diff > 30 ? '> 30 hari' : ($diff <= 0 ? 'Hari Ini' : $diff . ' hari') }}
                                                                         </span>
-                                                                    </div>
+                                                                    </a>
                                                                 @endforeach
                                                             </div>
                                                         </div>
                                                     </div>
                                                 @endif
                                             </div>
-                                            <p class="text-xs text-red-700 mt-1 text-left">
+                                            <a href="{{ route('view.ubah.unit-pekerja', ['unitId' => $urgentKontrak->id_unit, 'pekerjaId' => $urgentKontrak->id]) }}" class="text-xs text-red-700 mt-1 text-left block hover:underline">
                                                 Kontrak <strong>{{ $urgentKontrak->pekerja->nama }}</strong> pada
                                                 <span
                                                     class="bg-red-100 text-red-800 px-1 rounded text-[10px] font-bold uppercase tracking-wide">
@@ -997,7 +997,7 @@
                                                 </span>
                                                 berakhir dalam
                                                 <strong>{{ $sisaHari > 30 ? '> 30 hari' : ($sisaHari <= 0 ? 'Hari Ini' : $sisaHari . ' hari') }}</strong>.
-                                            </p>
+                                            </a>
                                         </div>
                                     </div>
                                 @endif
@@ -1025,31 +1025,31 @@
                                                             class="absolute right-0 mt-2 w-64 bg-white border border-red-100 shadow-xl rounded-2xl z-50 p-3"
                                                             x-cloak>
                                                             <p
-                                                                class="text-[9px] font-black text-red-400 uppercase tracking-widest mb-2 px-1">
+                                                                class="text-[9px] font-black text-red-400 uppercase tracking-widest mb-2 px-1 text-left">
                                                                 Daftar Expired</p>
                                                             <div class="space-y-1 max-h-48 overflow-y-auto custom-scrollbar">
                                                                 @foreach ($othersExpiredMitra as $other)
                                                                     @php $diff = abs(\Carbon\Carbon::today()->diffInDays(\Carbon\Carbon::parse($other->tgl_akhir_mou), false)); @endphp
-                                                                    <div
-                                                                        class="flex items-center justify-between p-2 rounded-xl hover:bg-red-50">
+                                                                    <a href="{{ route('view.ubah.mitra-kerja', $other->id) }}"
+                                                                        class="flex items-center justify-between p-2 rounded-xl hover:bg-red-50 transition">
                                                                         <span
-                                                                            class="text-[11px] font-bold text-gray-700 truncate w-32">{{ $other->nama_mitra }}</span>
+                                                                            class="text-[11px] font-bold text-gray-700 truncate w-32 text-left hover:underline">{{ $other->nama_mitra }}</span>
                                                                         <span
                                                                             class="text-[10px] font-black text-red-600 bg-red-100 px-2 py-0.5 rounded-lg">
                                                                             {{ $diff > 30 ? '> 30 hari' : $diff . ' hari' }}
                                                                         </span>
-                                                                    </div>
+                                                                    </a>
                                                                 @endforeach
                                                             </div>
                                                         </div>
                                                     </div>
                                                 @endif
                                             </div>
-                                            <p class="text-xs text-red-700">
+                                            <a href="{{ route('view.ubah.mitra-kerja', $urgentExpiredMitra->id) }}" class="text-xs text-red-700 hover:underline block text-left">
                                                 MOU <strong>{{ $urgentExpiredMitra->nama_mitra }}</strong> sudah lewat
                                                 <strong>{{ $lewatHariMitra > 30 ? 'lebih dari 30' : $lewatHariMitra }}
                                                     hari</strong>, namun status masih Aktif.
-                                            </p>
+                                            </a>
                                         </div>
                                     </div>
                                 @endif
@@ -1078,31 +1078,31 @@
                                                             class="absolute right-0 mt-2 w-64 bg-white border border-orange-100 shadow-xl rounded-2xl z-50 p-3"
                                                             x-cloak>
                                                             <p
-                                                                class="text-[9px] font-black text-orange-400 uppercase tracking-widest mb-2 px-1">
+                                                                class="text-[9px] font-black text-orange-400 uppercase tracking-widest mb-2 px-1 text-left">
                                                                 Daftar Mitra Mendekati</p>
                                                             <div class="space-y-1 max-h-48 overflow-y-auto custom-scrollbar">
                                                                 @foreach ($othersMitra as $other)
                                                                     @php $diff = \Carbon\Carbon::today()->diffInDays(\Carbon\Carbon::parse($other->tgl_akhir_mou), false); @endphp
-                                                                    <div
-                                                                        class="flex items-center justify-between p-2 rounded-xl hover:bg-orange-50">
+                                                                    <a href="{{ route('view.ubah.mitra-kerja', $other->id) }}"
+                                                                        class="flex items-center justify-between p-2 rounded-xl hover:bg-orange-50 transition">
                                                                         <span
-                                                                            class="text-[11px] font-bold text-gray-700 truncate w-32 text-left">{{ $other->nama_mitra }}</span>
+                                                                            class="text-[11px] font-bold text-gray-700 truncate w-32 text-left hover:underline">{{ $other->nama_mitra }}</span>
                                                                         <span
                                                                             class="text-[10px] font-black text-orange-600 bg-orange-100/50 px-2 py-0.5 rounded-lg">
                                                                             {{ $diff > 30 ? '> 30 hari' : ($diff <= 0 ? 'Hari Ini' : $diff . ' hari') }}
                                                                         </span>
-                                                                    </div>
+                                                                    </a>
                                                                 @endforeach
                                                             </div>
                                                         </div>
                                                     </div>
                                                 @endif
                                             </div>
-                                            <p class="text-xs text-orange-700">
+                                            <a href="{{ route('view.ubah.mitra-kerja', $urgentMitra->id) }}" class="text-xs text-orange-700 hover:underline block text-left">
                                                 Kontrak <strong>{{ $urgentMitra->nama_mitra }}</strong> berakhir dalam
                                                 <strong>{{ $sisaHariMitra > 30 ? 'lebih dari 30' : ($sisaHariMitra <= 0 ? 'Hari Ini' : $sisaHariMitra) }}
                                                     hari</strong>.
-                                            </p>
+                                            </a>
                                         </div>
                                     </div>
                                 @endif

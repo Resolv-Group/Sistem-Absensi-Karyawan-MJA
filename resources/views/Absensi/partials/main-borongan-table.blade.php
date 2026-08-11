@@ -10,17 +10,17 @@
             $itemCount = $effectiveDetil->count();
         @endphp
 
-        <tr class="hover:bg-orange-50/20 transition-colors group cursor-pointer border-b border-gray-50"
-            @click="selectedItems.includes({{ $u->id }})
-            ? selectedItems = selectedItems.filter(id => id !== {{ $u->id }})
-            : selectedItems.push({{ $u->id }})"
-            :class="selectedItems.includes({{ $u->id }}) ? 'bg-orange-50' : 'bg-white'">
+    <tr class="hover:bg-orange-50/20 transition-colors group cursor-pointer border-b border-gray-50"
+        @click="toggleWithGroup({{ $u->id }})"
+        :class="selectedItems.includes({{ (int)$u->id }}) ? 'bg-orange-50' : 'bg-white'">
 
-            {{-- CHECKBOX --}}
-            <td class="pl-6 py-4 w-10">
-                <input type="checkbox" value="{{ $u->id }}" x-model.number="selectedItems" @click.stop
-                    class="rounded border-gray-200 text-orange-600 focus:ring-orange-100">
-            </td>
+        {{-- CHECKBOX COLUMN --}}
+        <td class="pl-6 py-4 w-10">
+            <input type="checkbox" 
+                :checked="selectedItems.includes({{ (int)$u->id }})"
+                @click.stop="toggleWithGroup({{ $u->id }})"
+                class="rounded border-gray-200 text-orange-600 focus:ring-orange-100 cursor-pointer">
+        </td>
 
             {{-- PEKERJA --}}
             <td class="px-4 py-4 min-w-[200px]">
@@ -39,101 +39,90 @@
             </td>
 
             {{-- TIPE & RINGKASAN PRODUKSI --}}
-            <td class="px-4 py-4 min-w-[260px]">
+            <td class="px-4 py-4 min-w-[280px] relative" x-data="{ openItems: false }" 
+                {{-- This part ensures the row stays on top of other rows when hovered --}}
+                @mouseenter="openItems = true" @mouseleave="openItems = false"
+                :class="openItems ? 'z-[100]' : ''">
+
                 @if ($absensi && $effectiveDetil->isNotEmpty() && $statusKehadiran == 1)
                     <div class="flex items-start gap-3">
-
-                        {{-- Type Badge (vertical pill) --}}
-                        <div class="flex-shrink-0 flex flex-col items-center gap-1 pt-0.5">
-                            @if ($isGroup)
-                                <div class="w-6 h-6 rounded-lg bg-violet-100 flex items-center justify-center"
-                                    title="Absen Kelompok">
-                                    <svg class="w-3.5 h-3.5 text-violet-600" fill="none" viewBox="0 0 24 24"
-                                        stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    </svg>
-                                </div>
-                                <span
-                                    class="text-[8px] font-black text-violet-500 uppercase tracking-wider leading-none">Grup</span>
-                            @else
-                                <div class="w-6 h-6 rounded-lg bg-orange-100 flex items-center justify-center"
-                                    title="Absen Individual">
-                                    <svg class="w-3.5 h-3.5 text-orange-600" fill="none" viewBox="0 0 24 24"
-                                        stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                    </svg>
-                                </div>
-                                <span
-                                    class="text-[8px] font-black text-orange-500 uppercase tracking-wider leading-none">Indiv</span>
-                            @endif
+                        
+                        {{-- Type Badge --}}
+                        <div class="flex-shrink-0 flex flex-col items-center gap-1.5 pt-0.5">
+                            @php $isGroup = $absensi && $absensi->absensiBorongan->isNotEmpty(); @endphp
+                            <div class="w-7 h-7 rounded-xl flex items-center justify-center border shadow-sm {{ $isGroup ? 'bg-violet-50 border-violet-100' : 'bg-orange-50 border-orange-100' }}">
+                                @if($isGroup)
+                                    <svg class="w-4 h-4 text-violet-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                                @else
+                                    <svg class="w-4 h-4 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                                @endif
+                            </div>
+                            <span class="text-[8px] font-black uppercase tracking-widest leading-none {{ $isGroup ? 'text-violet-500' : 'text-orange-500' }}">
+                                {{ $isGroup ? 'Grup' : 'Indiv' }}
+                            </span>
                         </div>
 
                         {{-- Summary Content --}}
-                        <div class="flex-1 min-w-0 space-y-2">
+                        <div class="flex-1 min-w-0">
+                            {{-- Show only the FIRST item --}}
+                            @php $firstItem = $effectiveDetil->first(); @endphp
+                            <div class="flex items-center justify-between gap-2 mb-1">
+                                <span class="text-[12px] font-bold text-slate-800 truncate max-w-[140px]">
+                                    {{ $barangs->firstWhere('id', $firstItem->id_barang)->nama_item ?? '—' }}
+                                </span>
+                                <div class="flex items-center gap-1 shrink-0">
+                                    <span class="text-[12px] font-black text-slate-900">{{ number_format($firstItem->FD + $firstItem->act_rej + $firstItem->good_mc) }}</span>
+                                    <span class="text-[9px] font-bold text-slate-400">QTY</span>
+                                </div>
+                            </div>
 
-                            {{-- Item list (compact) --}}
-                            @foreach ($effectiveDetil->take(2) as $detilItem)
-                                @if ($detilItem->id_barang != 0)
-                                    <div class="flex items-center justify-between gap-2">
-                                        <span class="text-[12px] font-bold text-slate-700 truncate max-w-[130px]">
-                                            {{ $barangs->firstWhere('id', $detilItem->id_barang)->nama_item ?? '—' }}
-                                        </span>
-                                        <div class="flex items-center gap-1 flex-shrink-0">
-                                            <span class="text-[11px] font-black text-orange-600">
-                                                {{ number_format($detilItem->FD + $detilItem->act_rej + $detilItem->good_mc) }}
-                                            </span>
-                                            <span class="text-[9px] text-slate-400">qty</span>
+                            {{-- The Dropdown Trigger (Visible if > 1 item) --}}
+                            @if ($itemCount > 1)
+                                <div class="relative">
+                                    <button type="button" 
+                                        class="flex items-center gap-1.5 px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-[10px] font-black text-orange-600 uppercase tracking-tighter hover:bg-orange-100 transition-all">
+                                        +{{ $itemCount - 1 }} Item Lainnya
+                                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7" /></svg>
+                                    </button>
+
+                                    {{-- Dropdown Card: The absolute fix --}}
+                                    <div x-show="openItems" 
+                                        x-transition:enter="transition ease-out duration-200"
+                                        x-transition:enter-start="opacity-0 translate-y-2 scale-95"
+                                        x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                                        class="absolute left-0 top-full mt-2 w-[280px] z-[200] p-5 bg-white rounded-[1.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-slate-100 origin-top-left"
+                                        x-cloak>
+                                        
+                                        <div class="flex items-center justify-between mb-4 pb-2 border-b border-slate-50">
+                                            <span class="text-[11px] font-black text-slate-400 uppercase tracking-widest">Daftar Item Tambahan</span>
+                                            <span class="px-2 py-0.5 bg-orange-50 text-orange-600 text-[9px] font-bold rounded">{{ $itemCount }} Total</span>
+                                        </div>
+
+                                        <div class="space-y-3 max-h-[220px] overflow-y-auto custom-scrollbar pr-1">
+                                            @foreach ($effectiveDetil->slice(1) as $detilItem)
+                                                <div class="flex items-center justify-between gap-3 group/item pb-2 border-b border-slate-50 last:border-0 last:pb-0">
+                                                    <span class="text-[12px] font-bold text-slate-700 group-hover/item:text-orange-600 transition-colors truncate">
+                                                        {{ $barangs->firstWhere('id', $detilItem->id_barang)->nama_item ?? '—' }}
+                                                    </span>
+                                                    <div class="text-right shrink-0">
+                                                        <span class="text-[12px] font-black text-slate-900">{{ number_format($detilItem->FD + $detilItem->act_rej + $detilItem->good_mc) }}</span>
+                                                        <span class="text-[9px] font-bold text-slate-400">QTY</span>
+                                                    </div>
+                                                </div>
+                                            @endforeach
                                         </div>
                                     </div>
-                                @endif
-                            @endforeach
-
-                            {{-- More items indicator --}}
-                            @if ($itemCount > 2)
-                                <span class="text-[10px] font-bold text-slate-400">
-                                    +{{ $itemCount - 2 }} item lainnya
-                                </span>
+                                </div>
                             @endif
 
-                            {{-- Total footer --}}
-                            <div class="flex items-center justify-between pt-1 border-t border-slate-100 mt-1">
-                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total
-                                    Bayar</span>
-                                <span class="text-[12px] font-black text-emerald-600">
+                            {{-- Total Bayar --}}
+                            <div class="flex items-center justify-between pt-1.5 border-t border-slate-100 mt-2">
+                                <span class="text-[9px] font-black text-slate-400 uppercase">Total Bayar</span>
+                                <span class="text-[12px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-100">
                                     Rp {{ number_format($totalBayar, 0, ',', '.') }}
                                 </span>
                             </div>
                         </div>
-                    </div>
-                @elseif ($absensi && $statusKehadiran && $statusKehadiran != 1)
-                    {{-- Non-hadir status --}}
-                    <div class="flex items-center gap-2">
-                        <div
-                            class="w-1.5 h-1.5 rounded-full
-                        @if ($statusKehadiran == 2) bg-purple-400
-                        @elseif($statusKehadiran == 3) bg-amber-400
-                        @else bg-slate-300 @endif">
-                        </div>
-                        <span class="text-[12px] font-bold text-slate-500 italic">
-                            @switch($statusKehadiran)
-                                @case(2)
-                                    Cuti
-                                @break
-
-                                @case(3)
-                                    Sakit
-                                @break
-
-                                @case(4)
-                                    Izin
-                                @break
-
-                                @default
-                                    Tidak Hadir
-                            @endswitch
-                        </span>
                     </div>
                 @else
                     <span class="text-[11px] font-bold text-slate-300 italic">Belum diabsen</span>
@@ -285,18 +274,30 @@
             {{-- TUNJ / POT --}}
             <td class="px-4 py-4 text-center">
                 <div class="flex items-center justify-center gap-1.5">
-                    @if ($absensi?->tunjangan)
-                        <span
-                            class="px-1.5 py-0.5 bg-emerald-50 text-emerald-600 rounded text-[9px] font-black border border-emerald-100 uppercase tracking-wider"
-                            title="Ada Tunjangan">+T</span>
+                    @php
+                        $valTunjangan = $absensi?->tunjangan->total ?? 0;
+                        $valPotongan = $absensi?->potongan->total ?? 0;
+                    @endphp
+                    @if ($valTunjangan > 0)
+                        <div class="flex items-center gap-1.5 px-2 py-0.5 bg-emerald-50 border border-emerald-100 rounded-md w-full justify-between group-hover:bg-white transition-colors" title="Total Tunjangan">
+                            <span class="text-[9px] font-black text-emerald-500 uppercase tracking-tighter">Tunj</span>
+                            <span class="text-[11px] font-black text-emerald-700">
+                                +{{ number_format($valTunjangan, 0, ',', '.') }}
+                            </span>
+                        </div>
                     @endif
-                    @if ($absensi?->potongan)
-                        <span
-                            class="px-1.5 py-0.5 bg-rose-50 text-rose-600 rounded text-[9px] font-black border border-rose-100 uppercase tracking-wider"
-                            title="Ada Potongan">-P</span>
+
+                    @if ($valPotongan > 0)
+                        <div class="flex items-center gap-1.5 px-2 py-0.5 bg-rose-50 border border-rose-100 rounded-md w-full justify-between group-hover:bg-white transition-colors" title="Total Potongan">
+                            <span class="text-[9px] font-black text-rose-400 uppercase tracking-tighter">Pot</span>
+                            <span class="text-[11px] font-black text-rose-700">
+                                -{{ number_format($valPotongan, 0, ',', '.') }}
+                            </span>
+                        </div>
                     @endif
-                    @if (!$absensi?->tunjangan && !$absensi?->potongan)
-                        <span class="text-[11px] font-bold text-slate-200">—</span>
+
+                    @if ($valTunjangan == 0 && $valPotongan == 0)
+                        <span class="text-[11px] font-bold text-slate-200 tracking-widest">—</span>
                     @endif
                 </div>
             </td>

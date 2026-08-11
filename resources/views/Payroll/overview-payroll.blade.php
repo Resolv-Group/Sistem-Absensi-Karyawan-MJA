@@ -172,7 +172,7 @@
                                         <div>
                                             <label for="no_resi"
                                                 class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">
-                                                Nomor Resi / No. Ref
+                                                Nomor Resi / No. Ref<span class="text-red-500 font-semibold">*</span>
                                             </label>
                                             <input type="text" id="no_resi" name="no_resi" required
                                                 placeholder="Silahkan masukkan No Resi Disini.."
@@ -186,7 +186,7 @@
                                         <div>
                                             <label for="nama_resi"
                                                 class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">
-                                                Penanggungjawab
+                                                Penanggungjawab<span class="text-red-500 font-semibold">*</span>
                                             </label>
                                             <input type="text" id="nama_resi" name="nama_resi" required
                                                 placeholder="Silahkan masukkan nama disini.."
@@ -197,7 +197,7 @@
                                         <div>
                                             <label for="jabatan"
                                                 class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">
-                                                Jabatan
+                                                Jabatan<span class="text-red-500 font-semibold">*</span>
                                             </label>
                                             <input type="text" id="jabatan" name="jabatan"
                                                 placeholder="Silahkan masukkan jabatan disini.."
@@ -829,7 +829,7 @@
                                         {{-- Section Header with Blue Accent --}}
                                         <div class="flex items-center gap-3 px-1 mb-4">
                                             <div class="w-1 h-5 bg-blue-600 rounded-full"></div>
-                                            <h4 class="text-[11px] font-black text-slate-800 uppercase tracking-[0.2em]">Otorisasi Pejabat Penanggung Jawab</h4>
+                                            <h4 class="text-[11px] font-black text-slate-800 uppercase tracking-[0.2em]">Otorisasi Pejabat Penanggung Jawab<span class="text-red-500 font-semibold">*</span></h4>
                                         </div>
 
                                         {{-- Table Container --}}

@@ -163,7 +163,7 @@
                             {{-- SECTION 1: PERSONALIA --}}
                             <div class="space-y-6">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-1.5 h-6 bg-blue-500 rounded-full"></div>
+                                    <div class="w-1.5 h-6 bg-yellow-500 rounded-full"></div>
                                     <h4 class="text-[11px] font-black text-slate-800 uppercase tracking-[0.2em]">Informasi
                                         Personalia</h4>
                                 </div>
@@ -173,7 +173,7 @@
                                     <div x-data="workerCombobox(row)" x-init="init()" class="relative sm:col-span-2">
                                         <label
                                             class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Nama
-                                            Pekerja</label>
+                                            Pekerja<span class="text-red-500 font-semibold">*</span></label>
                                         <input type="hidden" :name="`pekerja[${index}][id_pekerja]`"
                                             x-model="selectedId">
                                         <div class="relative group">
@@ -260,7 +260,7 @@
                                     {{-- Divisi --}}
                                     <div x-data="idCombobox(row, 'divisiId', window.divisiData, d => d.nama)" x-init="init()" class="relative">
                                         <div class="flex justify-between items-center mb-1">
-                                            <label class="block text-sm font-bold text-gray-700">Divisi</label>
+                                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Divisi<span class="text-red-500 font-semibold">*</span></label>
                                             <button type="button" @click="showModal = true"
                                                 class="text-[11px] flex items-center gap-1 text-blue-600 hover:text-blue-800 font-bold transition">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor"
@@ -369,7 +369,7 @@
                                     {{-- 2. JABATAN PEKERJA --}}
                                     <div x-data="idCombobox(row, 'jabatanId', window.jabatanData, j => j.nama)" x-init="init()" class="relative">
                                         <div class="flex justify-between items-center mb-1">
-                                            <label class="block text-sm font-bold text-gray-700">Jabatan</label>
+                                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Jabatan<span class="text-red-500 font-semibold">*</span></label>
                                             <button type="button" @click="showModal = true"
                                                 class="text-[11px] flex items-center gap-1 text-indigo-600 hover:text-indigo-800 font-bold transition">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor"
@@ -547,7 +547,7 @@
                                     <div class="space-y-2" x-show="window.unitInfo.sistem_pengajian != 2">
                                         <label
                                             class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Gaji
-                                            Bulanan (Pokok)</label>
+                                            Bulanan (Pokok)<span class="text-red-500 font-semibold">*</span></label>
                                         <div class="relative group">
                                             <span
                                                 class="absolute left-5 top-1/2 -translate-y-1/2 text-xs font-black text-slate-300 group-focus-within:text-emerald-500 transition-colors">Rp</span>
@@ -563,7 +563,7 @@
                                     <div class="space-y-2" x-show="window.unitInfo.sistem_pengajian != 2">
                                         <label
                                             class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Gaji
-                                            Harian (Proporsional)</label>
+                                            Harian (Proporsional)<span class="text-red-500 font-semibold">*</span></label>
                                         <div class="relative group">
                                             <span
                                                 class="absolute left-5 top-1/2 -translate-y-1/2 text-xs font-black text-slate-300 group-focus-within:text-emerald-500 transition-colors">Rp</span>
@@ -579,7 +579,7 @@
                                     <div class="space-y-2" x-show="window.unitInfo.sistem_pengajian != 2">
                                         <label
                                             class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Upah
-                                            Overtime / Jam</label>
+                                            Overtime / Jam<span class="text-red-500 font-semibold">*</span></label>
                                         <div class="relative group">
                                             <span
                                                 class="absolute left-5 top-1/2 -translate-y-1/2 text-xs font-black text-slate-300 group-focus-within:text-emerald-500 transition-colors">Rp</span>
@@ -597,7 +597,7 @@
                                         <div class="flex items-center justify-between px-1">
                                             <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">
                                                 Rate HBN (OT × <span class="text-blue-600"
-                                                    x-text="row.rate_hbn || 0"></span>)
+                                                    x-text="row.rate_hbn || 0"></span>)<span class="text-red-500 font-semibold">*</span>
                                             </label>
 
                                             {{-- Hasil Kalkulasi (Compact beside title) --}}
@@ -632,7 +632,7 @@
                                     <div class="space-y-2">
                                         <label
                                             class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Iuran
-                                            BPJS Kesehatan
+                                            BPJS Kesehatan<span class="text-red-500 font-semibold">*</span>
                                             <span x-show="row.kpj"
                                                 class="ml-2 px-1.5 py-0.5 bg-emerald-50 text-emerald-600 text-[8px] rounded uppercase font-black">Editable</span>
                                         </label>
@@ -656,7 +656,7 @@
                                     <div class="space-y-2">
                                         <label
                                             class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Iuran
-                                            BPJS Ketenagakerjaan
+                                            BPJS Ketenagakerjaan<span class="text-red-500 font-semibold">*</span>
                                             <span x-show="row.naker"
                                                 class="ml-2 px-1.5 py-0.5 bg-emerald-50 text-emerald-600 text-[8px] rounded uppercase font-black">Editable</span>
                                         </label>
@@ -726,8 +726,8 @@
                             {{-- SECTION 5: ADMINISTRASI --}}
                             <div class="space-y-6">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-1.5 h-6 bg-slate-400 rounded-full"></div>
-                                    <h4 class="text-[11px] font-black text-slate-500 uppercase tracking-[0.2em]">
+                                    <div class="w-1.5 h-6 bg-purple-400 rounded-full"></div>
+                                    <h4 class="text-[11px] font-black text-slate-800 uppercase tracking-[0.2em]">
                                         Administrasi & Dokumen PKWT</h4>
                                 </div>
 
@@ -735,7 +735,7 @@
                                     <div class="space-y-2">
                                         <label
                                             class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Mulai
-                                            Berlaku PKWT</label>
+                                            Berlaku PKWT<span class="text-red-500 font-semibold">*</span></label>
                                         <input type="date" :name="`pekerja[${index}][tgl_mulai_pkwt]`"
                                             x-model="row.tgl_mulai_pkwt"
                                             class="w-full px-5 py-4 text-sm font-bold text-slate-600 bg-slate-50 border-none rounded-xl focus:ring-4 focus:ring-slate-100 focus:bg-white transition-all shadow-sm">
@@ -743,7 +743,7 @@
                                     <div class="space-y-2">
                                         <label
                                             class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Berakhir
-                                            Berlaku PKWT</label>
+                                            Berlaku PKWT<span class="text-red-500 font-semibold">*</span></label>
                                         <input type="date" :name="`pekerja[${index}][tgl_akhir_pkwt]`"
                                             x-model="row.tgl_akhir_pkwt"
                                             class="w-full px-5 py-4 text-sm font-bold text-slate-600 bg-slate-50 border-none rounded-xl focus:ring-4 focus:ring-slate-100 focus:bg-white transition-all shadow-sm">

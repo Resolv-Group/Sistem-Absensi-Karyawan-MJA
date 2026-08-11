@@ -398,6 +398,8 @@ class DashboardController extends Controller
         ->orderBy('tgl_akhir_pkwt', 'asc')
         ->get();
 
+    
+
     $urgentExpiredKontrak = $expiredKontrakList->first();
     $totalExpiredKontrak = $expiredKontrakList->count();
     $othersExpiredKontrak = $expiredKontrakList->skip(1);
