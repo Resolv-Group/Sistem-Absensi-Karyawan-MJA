@@ -518,6 +518,8 @@ class DashboardController extends Controller
             'izinSakitHariIni',
         ),
     );
+
+    //test
 }
 
     public function verifyPenilaianHrd($id)
