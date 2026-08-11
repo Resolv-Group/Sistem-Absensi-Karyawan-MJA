@@ -888,7 +888,7 @@ class PekerjaController extends Controller
         $pekerja = Pekerja::with([])->findOrFail($id);
 
         // Load view khusus PDF dan kirim data pekerja
-        $pdf = Pdf::loadView('pekerja.pdf-export', compact('pekerja'));
+        $pdf = Pdf::loadView('Pekerja.pdf-export', compact('pekerja'));
 
         // Atur ukuran kertas (A4) dan orientasi (portrait)
         $pdf->setPaper('A4', 'portrait');
