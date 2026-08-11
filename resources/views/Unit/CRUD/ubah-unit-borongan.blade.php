@@ -123,8 +123,7 @@
                                 {{-- 1. Nama Barang --}}
                                 <div class="sm:col-span-2">
                                     <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-2">Nama
-                                        Item
-                                        <span class="text-red-500">*</span></label>
+                                        Item<span class="text-red-500">*</span></label>
                                     <input type="text" :name="`borongan[${index}][nama_item]`" x-model="row.nama_item"
                                         placeholder="Contoh: Besi A"
                                         class="w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-blue-500 py-3 px-4 text-sm" />
@@ -134,7 +133,7 @@
                                 <div x-data="kategoriCombobox(row, index)" x-init="init()" class="relative">
 
                                     <div class="flex justify-between items-center mb-1">
-                                        <label class="block text-xs font-bold text-gray-700">Kategori</label>
+                                        <label class="block text-xs font-bold text-gray-700">Kategori<span class="text-red-500 font-semibold">*</span></label>
 
                                         <button type="button" @click="openModal()"
                                             class="text-xs flex items-center gap-1 text-blue-600 hover:text-blue-800 font-semibold transition">
@@ -329,7 +328,7 @@
                                 </div>
 
                                 <div>
-                                    <label class="block text-xs font-bold text-gray-700 mb-1">Max Rej Subkon(%)</label>
+                                    <label class="block text-xs font-bold text-gray-700 mb-1">Max Rej Subkon(%)<span class="text-red-500 font-semibold">*</span></label>
                                     <div class="relative">
                                         <input type="number"
                                             :name="`borongan[${index}][max_reject]`"
@@ -346,7 +345,7 @@
                                 {{-- 3. Gaji Unit --}}
                                 <div>
                                     <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-2">Harga
-                                        B.Unit</label>
+                                        B.Unit<span class="text-red-500 font-semibold">*</span></label>
                                     <div class="relative">
                                         <span
                                             class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-bold">Rp</span>
@@ -359,7 +358,7 @@
 
                                 {{-- 4. Gaji Pekerja --}}
                                 <div>
-                                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-2">Harga B.Pekerja (Pot.{{ $unitSelected->persentase_management_fee ?? 0 }}%)</label>
+                                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-2">Harga B.Pekerja (Pot.{{ $unitSelected->persentase_management_fee ?? 0 }}%)<span class="text-red-500 font-semibold">*</span></label>
                                     <div class="relative">
                                         <span
                                             class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-bold">Rp</span>
@@ -374,7 +373,7 @@
                                 <div x-data="satuanCombobox(row, index)" x-init="init()" class="relative">
 
                                         <div class="flex justify-between items-center mb-1">
-                                            <label class="block text-sm font-bold text-gray-700">Satuan</label>
+                                            <label class="block text-sm font-bold text-gray-700">Satuan<span class="text-red-500 font-semibold">*</span></label>
 
                                             <button type="button" @click="openModal()"
                                                 class="text-xs flex items-center gap-1 text-blue-600 hover:text-blue-800 font-semibold transition">

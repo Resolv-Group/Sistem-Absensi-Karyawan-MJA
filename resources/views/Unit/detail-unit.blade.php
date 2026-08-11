@@ -663,6 +663,7 @@
                                         <th class="px-4 py-2 text-center">Perolehan</th>
                                         <th class="px-4 py-2 text-right">Nilai Asset (Rp)</th>
                                         <th class="px-4 py-2 text-center">Lokasi</th>
+                                        <th class="px-4 py-2 text-center">Status</th>
                                         <th class="px-4 py-2 text-center w-28">Aksi</th>
                                     </tr>
                                 </thead>
@@ -738,33 +739,50 @@
                                                 </span>
                                             </td>
 
-                                            {{-- 8. Actions (Hover Reveal) --}}
+                                            {{-- 8. Status Badge --}}
+                                            <td class="px-4 py-4 border-y border-slate-100 text-center">
+                                                @if($a->status == 2)
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-emerald-50 text-emerald-600 border border-emerald-100">
+                                                        ✓ Approved
+                                                    </span>
+                                                @else
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-amber-50 text-amber-600 border border-amber-100">
+                                                        Pending
+                                                    </span>
+                                                @endif
+                                            </td>
+
+                                            {{-- 9. Actions (Hover Reveal) --}}
                                             <td
                                                 class="px-4 py-4 rounded-r-2xl border-r border-y border-slate-100 text-center">
-                                                <div
-                                                    class="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-all transform group-hover:scale-100 scale-90">
-                                                    <button @click="editEntries([{{ $a->id }}])"
-                                                        title="Edit Asset"
-                                                        class="p-2 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-600 hover:text-white transition shadow-sm">
-                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                            viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                stroke-width="2"
-                                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                                        </svg>
-                                                    </button>
-                                                    <button
-                                                        onclick="confirmDeleteAsset({{ $a->id }}, {{ $unit->id }})"
-                                                        title="Hapus Asset"
-                                                        class="p-2 bg-rose-50 text-rose-600 rounded-xl hover:bg-rose-600 hover:text-white transition shadow-sm">
-                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                            viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                stroke-width="2"
-                                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                        </svg>
-                                                    </button>
-                                                </div>
+                                                @if($a->status == 2)
+                                                    <span class="text-xs text-slate-400 italic">Locked</span>
+                                                @else
+                                                    <div
+                                                        class="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-all transform group-hover:scale-100 scale-90">
+                                                        <button @click="editEntries([{{ $a->id }}])"
+                                                            title="Edit Asset"
+                                                            class="p-2 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-600 hover:text-white transition shadow-sm">
+                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                                viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    stroke-width="2"
+                                                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                            </svg>
+                                                        </button>
+                                                        <button
+                                                            onclick="confirmDeleteAsset({{ $a->id }}, {{ $unit->id }})"
+                                                            title="Hapus Asset"
+                                                            class="p-2 bg-rose-50 text-rose-600 rounded-xl hover:bg-rose-600 hover:text-white transition shadow-sm">
+                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                                viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    stroke-width="2"
+                                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                            </svg>
+                                                        </button>
+                                                    </div>
+                                                @endif
                                             </td>
                                         </tr>
                                     @empty
@@ -864,9 +882,9 @@
                                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                                         <div>
                                                             <label
-                                                                class="block text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Tanggal</label>
+                                                                class="block text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Tanggal<span class="text-red-500 font-bold">*</span></label>
                                                             <input type="date" :name="'kas[' + index + '][tgl]'"
-                                                                x-model="entry.tgl"
+                                                                x-model="entry.tgl" required
                                                                 class="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-blue-500/10 focus:bg-white transition-all">
                                                         </div>
                                                         <div>
@@ -880,9 +898,9 @@
                                                     </div>
                                                     <div>
                                                         <label
-                                                            class="block text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Akun</label>
+                                                            class="block text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Akun<span class="text-red-500 font-bold">*</span></label>
                                                         <input type="text" :name="'kas[' + index + '][akun]'"
-                                                            x-model="entry.akun" placeholder="Ketik akun di sini..."
+                                                            x-model="entry.akun" placeholder="Ketik akun di sini..." required
                                                             class="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-blue-500/10 focus:bg-white transition-all">
                                                     </div>
                                                     <div>
@@ -942,7 +960,7 @@
                                                     <div>
                                                         <label
                                                             class="block text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Nama
-                                                            Asset / Barang</label>
+                                                            Asset / Barang<span class="text-red-500 font-bold">*</span></label>
                                                         <input type="text" :name="'asset[' + index + '][nama_barang]'"
                                                             x-model="entry.nama_barang"
                                                             placeholder="Contoh: Laptop MacBook Pro, Genset Honda..."
@@ -955,16 +973,16 @@
                                                         <div>
                                                             <label
                                                                 class="block text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Jumlah
-                                                                (Qty)</label>
+                                                                (Qty)<span class="text-red-500 font-bold">*</span></label>
                                                             <input type="number" :name="'asset[' + index + '][jumlah]'"
-                                                                x-model="entry.jumlah" min="1"
+                                                                x-model="entry.jumlah" min="1" required
                                                                 class="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-blue-500/10 focus:bg-white transition-all">
                                                         </div>
                                                         {{-- Tanggal Perolehan --}}
                                                         <div>
                                                             <label
                                                                 class="block text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Tgl
-                                                                Perolehan</label>
+                                                                Perolehan<span class="text-red-500 font-bold">*</span></label>
                                                             <input type="date"
                                                                 :name="'asset[' + index + '][tgl_perolehan]'"
                                                                 x-model="entry.tgl_perolehan" required
@@ -987,13 +1005,13 @@
                                                             class="p-6 bg-blue-50/30 rounded-3xl border border-blue-100 focus-within:bg-white transition-all">
                                                             <span
                                                                 class="text-[9px] font-black text-blue-600 block mb-2 uppercase tracking-widest">Harga
-                                                                Perolehan</span>
+                                                                Perolehan<span class="text-red-500 font-bold">*</span>
                                                             <div class="flex items-center">
                                                                 <span
                                                                     class="text-sm font-black text-blue-400 mr-2">Rp</span>
                                                                 <input type="text" x-model="entry.harga_display"
                                                                     @input="handleRupiahInput(index, 'harga')"
-                                                                    placeholder="0"
+                                                                    placeholder="0" required
                                                                     class="w-full bg-transparent border-none p-0 text-xl font-black text-blue-700 focus:ring-0">
                                                             </div>
                                                             <input type="hidden" :name="'asset[' + index + '][harga]'"
@@ -1238,16 +1256,16 @@
                             Export Excel (<span x-text="selectedRows.length"></span>)
                         </button>
 
-                        {{-- Approve Button (Beside export excel, only for HRD/Admin/Akuntan and Kas Kecil/Asset) --}}
+                        {{-- Approve Button (Beside export excel, only for HRD/Admin/Akuntan — works for both Kas Kecil & Asset) --}}
                         @if(in_array(auth()->user()->role, ['admin', 'hrd', 'akuntan']))
-                        {{-- Active approve button: shown when no approved items selected and only for Kas Kecil --}}
+                        {{-- Active approve button: no approved items in selection --}}
                         <button type="button" @click="approveSelected()"
-                            x-show="activeType === 'kas' && !hasApprovedSelected()"
+                            x-show="(activeType === 'kas' || activeType === 'asset') && !hasApprovedSelected()"
                             class="px-6 py-2 bg-emerald-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-emerald-700 transition shadow-lg">
                             Approve(<span x-text="selectedRows.length"></span>)
                         </button>
-                        {{-- Disabled approve button: shown when a selected item is already approved --}}
-                        <div x-show="activeType === 'kas' && hasApprovedSelected()"
+                        {{-- Disabled approve button: some selected items are already approved --}}
+                        <div x-show="(activeType === 'kas' || activeType === 'asset') && hasApprovedSelected()"
                             title="Terdapat data yang sudah disetujui dalam pilihan Anda"
                             class="relative group">
                             <button type="button" disabled

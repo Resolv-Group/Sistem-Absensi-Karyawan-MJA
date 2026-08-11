@@ -377,18 +377,29 @@ class AbsensiController extends Controller
             }
 
             // ✅ FIX: is_group now correctly uses $savedAbsensi (not undefined $absensi)
-            $isGroup = $savedAbsensi
-                ? $savedAbsensi->absensiBorongan->isNotEmpty()
-                : false;
+            // $isGroup = $savedAbsensi
+            //     ? $savedAbsensi->absensiBorongan->isNotEmpty()
+            //     : false;
 
+            // FIND THE SHARED GROUP IDENTIFIER
+            $groupId = null;
+            $isGroup = false;
+
+            if ($savedAbsensi && $savedAbsensi->absensiBorongan->isNotEmpty()) {
+                $isGroup = true;
+                // Every worker in the group shares the same id_detil_borongan.
+                // This is our unique "Group ID".
+                $groupId = $savedAbsensi->absensiBorongan->first()->id_detil_borongan;
+            }
             return [
-                $item->id => [
+                (int)$item->id => [
                     'nama' => $item->pekerja->nama,
                     'nik' => $item->pekerja->nik,
                     'initials' => strtoupper(substr($item->pekerja->nama, 0, 2)),
 
                     'has_absen' => $savedAbsensi !== null,
                     'is_group' => $isGroup,
+                    'group_id' => $groupId ? (int)$groupId : null, 
                     'is_individual' => $savedAbsensi !== null && ! $isGroup,
 
                     'existing_tunjangan' => $savedAbsensi?->tunjangan?->kategori ?? null,

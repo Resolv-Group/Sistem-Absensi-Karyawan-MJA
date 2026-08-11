@@ -127,8 +127,7 @@
                             </div>
                             <div class="flex justify-between items-center">
                                 <span class="text-sm text-gray-500 font-medium">Tanggal Resign</span>
-                                <span
-                                    class="text-sm font-bold text-gray-900">{{ formatTanggal($pekerja->tgl_resign) ?? '-' }}</span>
+                                <span class="text-sm font-bold text-gray-900">{{ $pekerja->tgl_resign ? formatTanggal($pekerja->tgl_resign) : '-' }}</span>
                             </div>
                         </div>
                     </div>

@@ -498,7 +498,7 @@
                                         class="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-600 text-white text-[12px] font-black flex items-center justify-center shadow-lg shadow-emerald-200">1</span>
                                     <label
                                         class="block text-[11px] font-black text-slate-700 uppercase tracking-widest">Tentukan
-                                        Periode Penggajian</label>
+                                        Periode Penggajian<span class="text-red-500 font-semibold">*</span></label>
                                 </div>
                                 @php
                                     use Carbon\Carbon;
@@ -541,7 +541,7 @@
                                             class="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-600 text-white text-[12px] font-black flex items-center justify-center shadow-lg shadow-emerald-200">2</span>
                                         <label
                                             class="block text-[11px] font-black text-slate-700 uppercase tracking-widest">Pilih
-                                            Pekerja yang Akan Dibayar</label>
+                                            Pekerja yang Akan Dibayar<span class="text-red-500 font-semibold">*</span></label>
                                     </div>
                                     <div class="flex gap-2">
                                         <button type="button"

@@ -349,10 +349,10 @@ class UnitController extends Controller
         $boronganKategori = Kategori::all();
         $jabatan = JabatanPKWT::all();
 
-        $kasKecil = Kas_Kecil::where('id_unit', $id)->whereIn('status', [1, 2])->orderBy('tanggal', 'asc')->get();
+        $kasKecil = Kas_Kecil::where('id_unit', $id)->whereIn('status', [1, 2])->orderBy('tanggal', 'desc')->get();
         $kasIds = $kasKecil->pluck('id')->toArray();
 
-        $assets = Asset::where('id_unit', $id)->whereIn('status', [1, 2])->orderBy('tahun_perolehan', 'asc')->get();
+        $assets = Asset::where('id_unit', $id)->whereIn('status', [1, 2])->orderBy('tahun_perolehan', 'desc')->get();
         $assetIds = $assets->pluck('id')->toArray();
 
         return view('Unit.detail-unit', compact('unit', 'historiUnit', 'pekerja', 'pkwtPekerja', 'borongan', 'divisions', 'boronganKategori', 'jabatan', 'kasKecil', 'kasIds', 'assets', 'assetIds'));
@@ -596,6 +596,9 @@ class UnitController extends Controller
                     $filePath = file_get_contents($file->getRealPath());
                 }
 
+                $userRole = strtolower(trim(auth()->user()->role ?? ''));
+                $initialStatus = in_array($userRole, ['hrd', 'admin', 'superadmin']) ? 2 : 1;
+
                 // Use the correct keys here too
                 Kas_Kecil::create([
                     'id_unit' => $id,
@@ -605,6 +608,7 @@ class UnitController extends Controller
                     'debit' => $entry['debit'],
                     'kredit' => $entry['kredit'],
                     'nota' => $filePath,
+                    'status' => $initialStatus,
                 ]);
 
                 $savedCount++;
@@ -763,6 +767,9 @@ class UnitController extends Controller
                 if (empty($entry['tgl_perolehan']) || empty($entry['nama_barang'])) {
                     continue;
                 }
+                $userRole = strtolower(trim(auth()->user()->role ?? ''));
+                $initialStatus = in_array($userRole, ['hrd', 'admin', 'superadmin']) ? 2 : 1;
+
                 // Map the form data to your database columns
                 Asset::create([
                     'id_unit' => $id,
@@ -772,7 +779,7 @@ class UnitController extends Controller
                     'tahun_perolehan' => $entry['tgl_perolehan'], // Form uses 'tgl_perolehan'
                     'harga_perolehan' => $entry['harga'] ?? 0,    // Form uses 'harga'
                     'lokasi' => $entry['lokasi'] ?? '-',
-                    'status' => 1, // Aktif
+                    'status' => $initialStatus,
                 ]);
 
                 $savedCount++;

@@ -126,8 +126,8 @@
 
                             {{-- Nama Mitra --}}
                             <div class="sm:col-span-2">
-                                <label class="block text-sm font-bold text-gray-700 mb-1">Nama Perusahaan / Mitra <span
-                                        class="text-red-500">*</span></label>
+                                <label class="block text-sm font-bold text-gray-700 mb-1">Nama Perusahaan / Mitra<span
+                                        class="text-red-500 font-semibold">*</span></label>
                                 <input type="text" name="nama_mitra" placeholder="PT. Contoh Sejahtera Abadi"
                                     class="w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white focus:border-blue-500 focus:ring-blue-200 transition py-2.5 px-4 text-sm font-medium"
                                     value="{{ old('nama_mitra', $mitraKerja->nama_mitra) }}">
@@ -135,7 +135,8 @@
 
                             {{-- Pimpinan --}}
                             <div class="sm:col-span-2">
-                                <label class="block text-sm font-bold text-gray-700 mb-1">Nama Pimpinan</label>
+                                <label class="block text-sm font-bold text-gray-700 mb-1">Nama Pimpinan<span
+                                        class="text-red-500 font-semibold">*</span></label>
                                 <div class="relative">
                                     <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -152,7 +153,8 @@
 
 
                             <div x-data="{ open: false, selected: '{{ old('status_pajak', $mitraKerja->status_pajak) }}' || '', list: ['PKP (Pengusaha Kena Pajak)', 'NON-PKP', ] }" class="relative">
-                                <label class="block text-sm font-bold text-gray-700 mb-1">Status Pajak</label>
+                                <label class="block text-sm font-bold text-gray-700 mb-1">Status Pajak<span
+                                        class="text-red-500 font-semibold">*</span></label>
 
                                 <input type="hidden" name="status_pajak" x-model="selected">
 
@@ -185,7 +187,8 @@
 
                                 {{-- Label & Add Button --}}
                                 <div class="flex justify-between items-center mb-1">
-                                    <label class="block text-sm font-bold text-gray-700">Bidang Usaha</label>
+                                    <label class="block text-sm font-bold text-gray-700">Bidang Usaha<span
+                                        class="text-red-500 font-semibold">*</span></label>
 
                                     {{-- Quick Add Trigger --}}
                                     <button type="button" @click="openModal()"
@@ -310,7 +313,8 @@
                                                 {{-- Modal Body --}}
                                                 <div class="p-6">
                                                     <label class="block text-sm font-bold text-gray-700 mb-2">Nama Bidang
-                                                        Usaha</label>
+                                                        Usaha<span
+                                        class="text-red-500 font-semibold">*</span></label>
 
                                                     <div class="relative">
                                                         <div
@@ -383,7 +387,8 @@
 
                             {{-- Telepon --}}
                             <div>
-                                <label class="block text-sm font-bold text-gray-700 mb-1">No. Telp Perusahaan</label>
+                                <label class="block text-sm font-bold text-gray-700 mb-1">No. Telp Perusahaan<span
+                                        class="text-red-500 font-semibold">*</span></label>
                                 <div class="relative">
                                     <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
 
@@ -402,7 +407,8 @@
 
                             {{-- Kota --}}
                             <div>
-                                <label class="block text-sm font-bold text-gray-700 mb-1">Kota</label>
+                                <label class="block text-sm font-bold text-gray-700 mb-1">Kota<span
+                                        class="text-red-500 font-semibold">*</span></label>
                                 <input type="text" name="kota" placeholder="PT. Contoh Sejahtera Abadi"
                                     class="w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white focus:border-blue-500 focus:ring-blue-200 transition py-2.5 px-4 text-sm font-medium"
                                     value="{{ old('kota', $mitraKerja->kota) }}">
@@ -411,7 +417,8 @@
 
                             {{-- Alamat (New from ERD) --}}
                             <div class="sm:col-span-2">
-                                <label class="block text-sm font-bold text-gray-700 mb-1">Alamat Lengkap</label>
+                                <label class="block text-sm font-bold text-gray-700 mb-1">Alamat Lengkap<span
+                                        class="text-red-500 font-semibold">*</span></label>
                                 <textarea name="alamat" rows="3" placeholder="Jl. Raya Utama No. 123, Kecamatan..."
                                     class="w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white focus:border-blue-500 focus:ring-blue-200 transition py-2.5 px-4 text-sm font-medium resize-none">{{ old('alamat', $mitraKerja->alamat) }}</textarea>
                             </div>
@@ -433,7 +440,8 @@
 
                             {{-- Mulai Kerjasama --}}
                             <div>
-                                <label class="block text-sm font-bold text-gray-700 mb-1">Mulai Kerjasama</label>
+                                <label class="block text-sm font-bold text-gray-700 mb-1">Mulai Kerjasama<span
+                                        class="text-red-500 font-semibold">*</span></label>
                                 <div class="relative">
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                         <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor"
@@ -470,7 +478,8 @@
 
                             {{-- Status MoU (Consistent Design) --}}
                             <div x-data="{ open: false, selected: '{{ old('status_mou', $mitraKerja->status_mou) }}' || 'Aktif Disnaker', list: ['Aktif Disnaker', 'Perpanjangan', 'Tidak Aktif'] }" class="relative">
-                                <label class="block text-sm font-bold text-gray-700 mb-1">Status MoU</label>
+                                <label class="block text-sm font-bold text-gray-700 mb-1">Status MoU<span
+                                        class="text-red-500 font-semibold">*</span></label>
                                 <input type="hidden" name="status_mou" x-model="selected">
 
                                 <button type="button" @click="open=!open"

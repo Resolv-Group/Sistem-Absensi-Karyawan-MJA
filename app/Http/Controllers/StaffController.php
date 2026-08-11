@@ -171,9 +171,9 @@ class StaffController extends Controller
                     'kecamatan' => 'required|string',
                     'provinsi' => 'required|string',
 
-                    'email' => 'nullable|email',
+                    'email' => 'required|email',
                     'telp' => 'nullable|string|max:16',
-                    'kpj' => 'required|string|max:13',
+                    'kpj' => 'nullable|string|max:13',
                     'naker' => 'nullable|string|max:13',
 
                     'nama_rek' => 'nullable|string',
@@ -409,9 +409,8 @@ class StaffController extends Controller
                     'nama' => 'required|string|max:255',
                     'id_staff' => 'nullable|string',
 
-                    'nik' => ['required', 'digits:16', Rule::unique('staff', 'nik')->ignore($id)],
-
-                    'no_kk' => ['required', 'digits:16', Rule::unique('staff', 'no_kk')->ignore($id)],
+                    'nik' => 'required|digits:16',
+                    'no_kk' => 'required|digits:16',
 
                     'tempat_lahir' => 'required|string|max:100',
                     'tgl_lahir' => 'required|date',
@@ -430,9 +429,9 @@ class StaffController extends Controller
                     'kecamatan' => 'required|string',
                     'provinsi' => 'required|string',
 
-                    'email' => 'nullable|email',
+                    'email' => 'required|email',
                     'telp' => 'nullable|string|max:16',
-                    'kpj' => 'required|string|max:13',
+                    'kpj' => 'nullable|string|max:13',
                     'naker' => 'nullable|string|max:13',
 
                     'nama_rek' => 'nullable|string',
@@ -448,7 +447,7 @@ class StaffController extends Controller
                     'telp_emergency' => 'required|string|max:16',
                     'hubungan_emergency' => 'required|string',
 
-                    'ibu_kandung' => 'string|max:255',
+                    'ibu_kandung' => 'required|string|max:255',
 
                     'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
 

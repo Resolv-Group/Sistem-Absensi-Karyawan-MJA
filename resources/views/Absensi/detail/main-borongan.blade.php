@@ -87,6 +87,7 @@
         showFilterDropdown: false,
         showAbsenModal: false,
         showAbsenStatusModal: false,
+        showAbsenKelompokModal: false,
         searchQuery: '',
         filterStatus: '',
         filterVerifikasi: '',
@@ -530,6 +531,32 @@
             // This will trigger the $watch which calls updateTable()
             // Our logic inside updateTable will see filters are empty and restore Page 2
         },
+
+toggleWithGroup(id) {
+    const clickedId = parseInt(id);
+    const worker = this.workerMap[clickedId];
+    if (!worker) return;
+
+    const gid = worker.group_id;
+    let idsToToggle = [clickedId];
+
+    // If this worker is part of a group, find all teammates currently in the map
+    if (gid !== null) {
+        idsToToggle = Object.keys(this.workerMap)
+            .filter(key => this.workerMap[key].group_id === gid)
+            .map(key => parseInt(key));
+    }
+
+    const isAlreadySelected = this.selectedItems.includes(clickedId);
+
+    if (isAlreadySelected) {
+        // UNCHECK: Filter out all group members from the selected array
+        this.selectedItems = this.selectedItems.filter(sid => !idsToToggle.includes(sid));
+    } else {
+        // CHECK: Add all group members (ensuring no duplicates)
+        this.selectedItems = [...new Set([...this.selectedItems, ...idsToToggle])];
+    }
+},
     
     }" x-init="calculateAllExistingPrices();
     $watch('searchQuery', () => updateTable());
@@ -861,28 +888,28 @@
                                     <div class="flex items-center gap-2">
 
                                         <!-- 1. Absen (Primary Orange) -->
-<button 
-    x-show="!selectedItems.some(id => workerMap[id]?.is_individual)"
-    @click="initGroupModal()"
-    class="group flex items-center gap-2 px-4 py-2.5 bg-orange-50 hover:bg-orange-600 border border-orange-100 text-orange-700 hover:text-white rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all active:scale-95 shadow-sm">
-    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857" />
-    </svg>
-    Kelompok Absen
-</button>
+                                        <button 
+                                            x-show="!selectedItems.some(id => workerMap[id]?.is_individual)"
+                                            @click="initGroupModal()"
+                                            class="group flex items-center gap-2 px-4 py-2.5 bg-orange-50 hover:bg-orange-600 border border-orange-100 text-orange-700 hover:text-white rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all active:scale-95 shadow-sm">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857" />
+                                            </svg>
+                                            Kelompok Absen
+                                        </button>
 
-<!-- Individual Absen: hide if ANY selected worker has group absen -->
-<button 
-    x-show="!selectedItems.some(id => workerMap[id]?.is_group)"
-    @click="showAbsenModal = true"
-    class="group flex items-center gap-2 px-4 py-2.5 bg-orange-50 hover:bg-orange-600 border border-orange-100 text-orange-700 hover:text-white rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all active:scale-95 shadow-sm">
-    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-    </svg>
-    Absen
-</button>
+                                        <!-- Individual Absen: hide if ANY selected worker has group absen -->
+                                        <button 
+                                            x-show="!selectedItems.some(id => workerMap[id]?.is_group)"
+                                            @click="showAbsenModal = true"
+                                            class="group flex items-center gap-2 px-4 py-2.5 bg-orange-50 hover:bg-orange-600 border border-orange-100 text-orange-700 hover:text-white rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all active:scale-95 shadow-sm">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            Absen
+                                        </button>
 
                                         <!-- 2. Tunjangan (Emerald) -->
                                         <button x-show="canShowTunjangan()"
@@ -2690,7 +2717,7 @@
                 </div>
 
                 {{-- TABLE --}}
-                <div class="overflow-x-auto max-h-[600px] custom-scrollbar">
+                <div class="overflow-x-auto max-h-[600px] custom-scrollbar pb-32 -mb-32">
                     <table class="w-full text-left border-separate border-spacing-0">
                         <thead class="sticky top-0 z-30 bg-gray-50 border-b border-gray-100 shadow-sm">
                             <tr>

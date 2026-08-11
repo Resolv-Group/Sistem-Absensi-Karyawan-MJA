@@ -32,9 +32,9 @@
         1. STATS OVERVIEW CARD
     ================================= --}}
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
 
-        {{-- CARD 1: TOTAL UNIT --}}
+        {{-- CARD 1: TOTAL PEKERJA --}}
         <div
             class="bg-white rounded-2xl p-5 border border-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-lg hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">
             <div class="flex justify-between items-start z-10 relative">
@@ -56,7 +56,7 @@
             </div>
         </div>
 
-        {{-- CARD 2: UNIT BARU --}}
+        {{-- CARD 2: PEKERJA BARU --}}
         <div
             class="bg-white rounded-2xl p-5 border border-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-lg hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">
             <div class="flex justify-between items-start z-10 relative">
@@ -80,10 +80,30 @@
             </div>
         </div>
 
-        {{-- CARD 5: TIDAK AKTIF --}}
-        {{-- On small screens, span full width to fill gap --}}
+        {{-- CARD 3: PEKERJA PENDING --}}
         <div
-            class="bg-white rounded-2xl p-5 border border-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-lg hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group sm:col-span-2 lg:col-span-1">
+            class="bg-white rounded-2xl p-5 border border-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-lg hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">
+            <div class="flex justify-between items-start z-10 relative">
+                <div>
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Pekerja Pending</p>
+                    <h3 class="text-3xl font-extrabold text-gray-900">{{ $pekerjaPendingCount ?? 0 }}</h3>
+                </div>
+                <div
+                    class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-50 to-amber-100 flex items-center justify-center text-amber-600 group-hover:scale-110 transition-transform">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+            </div>
+            <div
+                class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-amber-500 to-amber-300 opacity-0 group-hover:opacity-100 transition-opacity">
+            </div>
+        </div>
+
+        {{-- CARD 4: TIDAK AKTIF --}}
+        <div
+            class="bg-white rounded-2xl p-5 border border-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-lg hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">
             <div class="flex justify-between items-start z-10 relative">
                 <div>
                     <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Tidak Aktif</p>
@@ -180,6 +200,7 @@
                             list: [
                                 { val: '', label: 'Semua Status' },
                                 { val: '1', label: 'Aktif Bekerja' },
+                                { val: '2', label: 'Pending Approval' },
                                 { val: '0', label: 'Tidak Aktif / Resign' }
                             ]
                         }" x-init="$watch('selected', value => {
@@ -414,6 +435,33 @@
                 </div>
             </div>
 
+            {{-- PEKERJA PENDING BUTTON (RIGHT NEXT TO FILTER BUTTON) --}}
+            @if (in_array(strtolower(trim(Auth::user()->role ?? '')), ['admin', 'hrd', 'superadmin']))
+                <button type="button" id="pendingPekerjaBtn" onclick="openPendingModal()"
+                    class="flex items-center gap-2 px-3 py-2 bg-amber-50 border border-amber-200 rounded-lg text-sm font-bold text-amber-800 shadow-sm hover:bg-amber-100 focus:outline-none focus:ring-2 focus:ring-amber-500 transition">
+                    <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>Pekerja Pending</span>
+                    <span id="pendingCountBadge" class="inline-flex items-center justify-center px-2 py-0.5 text-xs font-black text-white bg-amber-600 rounded-full">
+                        {{ $pekerjaPendingCount ?? 0 }}
+                    </span>
+                </button>
+            @elseif (strtolower(trim(Auth::user()->role ?? '')) === 'pic')
+                <button type="button" onclick="openPendingModal()"
+                    class="flex items-center gap-2 px-3 py-2 bg-amber-50 border border-amber-200 rounded-lg text-sm font-bold text-amber-800 shadow-sm hover:bg-amber-100 focus:outline-none focus:ring-2 focus:ring-amber-500 transition">
+                    <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>Pengajuan Saya</span>
+                    <span class="inline-flex items-center justify-center px-2 py-0.5 text-xs font-black text-white bg-amber-600 rounded-full">
+                        {{ $myPendingList->count() ?? 0 }}
+                    </span>
+                </button>
+            @endif
+
             {{-- ADD BUTTON --}}
             @if (auth()->check() && auth()->user()->role === 'admin')
                 <form action="{{ route('pekerja.import') }}" method="POST" enctype="multipart/form-data"
@@ -454,8 +502,249 @@
     <div id="table-wrapper">
         @include('Pekerja.partials.pekerja-table')
     </div>
+@php
+    $isAdmin = in_array(strtolower(trim(Auth::user()->role ?? '')), ['admin', 'hrd', 'superadmin']);
+    $list = $isAdmin ? ($pendingPekerjaList ?? []) : ($myPendingList ?? []);
+    $count = count($list);
+@endphp
+
+<div id="pendingPekerjaModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-gray-900/40 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white/90 backdrop-blur-md rounded-2xl max-w-3xl w-full shadow-2xl overflow-hidden border border-gray-200/80 transform transition-all">
+        
+        <div class="px-6 py-4 bg-amber-500 text-white flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="p-2 bg-white/20 rounded-xl">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <div>
+                    {{-- DYNAMIC TITLE --}}
+                    <h3 class="font-bold text-base tracking-tight">
+                        {{ $isAdmin ? 'Daftar Approval Pekerja' : 'Pengajuan Saya (Pending Approval)' }}
+                    </h3>
+                    <p class="text-amber-100 text-xs font-medium">
+                        Total: <span class="font-bold text-white underline decoration-amber-300/60" id="total-count">{{ $count }}</span> Data
+                    </p>
+                </div>
+            </div>
+            <button type="button" onclick="closePendingModal()" class="text-white/80 hover:text-white p-1.5 rounded-xl hover:bg-white/10 transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Bulk Actions Bar (Subtle Amber Tint) -->
+        @if($isAdmin && $count > 0)
+        <div class="bg-amber-50/70 border-b border-amber-100/80 px-6 py-3 flex justify-between items-center">
+            <label class="flex items-center gap-2.5 cursor-pointer select-none">
+                <input type="checkbox" id="selectAllPekerja" class="w-4 h-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500 transition cursor-pointer">
+                <span class="text-xs font-bold text-gray-700 uppercase tracking-wider">Pilih Semua</span>
+            </label>
+            <button id="bulkApproveBtn" disabled onclick="bulkApprove()" class="px-4 py-1.5 bg-emerald-600 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white rounded-xl text-xs font-bold shadow-sm transition-all hover:bg-emerald-700 flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                Setujui Terpilih (<span id="selectedCount">0</span>)
+            </button>
+        </div>
+        @endif
+
+        <!-- Content -->
+        <div class="p-6 max-h-[55vh] overflow-y-auto custom-scrollbar">
+            @if($count > 0)
+                <div class="space-y-3">
+                    @foreach($list as $item)
+                        <div id="pending-row-{{ $item->id }}" class="group bg-white/70 hover:bg-white border border-gray-100 hover:border-amber-200/70 p-3.5 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all">
+                            <div class="flex items-center gap-3">
+                                @if($isAdmin)
+                                <input type="checkbox" name="pekerja_ids[]" value="{{ $item->id }}" class="pekerja-checkbox w-4 h-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500 transition cursor-pointer mt-0.5 sm:mt-0">
+                                @endif
+                                
+                                <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 font-bold flex items-center justify-center text-sm border border-amber-100 shrink-0">
+                                    {{ strtoupper(substr($item->nama, 0, 1)) }}
+                                </div>
+                                
+                                <div>
+                                    <h4 class="font-bold text-gray-900 text-sm group-hover:text-amber-700 transition-colors">{{ $item->nama ?? 'Belum Diset' }}</h4>
+                                    <p class="text-xs text-gray-500 font-mono">NIK: {{ $item->nik ?? 'Belum Diset' }} | KK: {{ $item->no_kk ?? 'Belum Diset' }}</p>
+                                    <p class="text-xs text-gray-500 font-mono">Telp: {{ $item->no_telp ?? 'Belum Diset' }}</p>
+                                    <p class="text-xs text-amber-700 font-medium mt-0.5">Diajukan Oleh : {{ $item->user->name ?? 'Belum Diset' }}</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-2 self-end sm:self-center">
+                                <a href="{{ route('view.detail.pekerja', $item->id) }}" target="_blank" class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-xs font-bold transition">
+                                    Detail
+                                </a>
+                                @if($isAdmin)
+                                <button type="button" onclick="approvePekerjaDirect({{ $item->id }}, '{{ addslashes($item->nama) }}')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shadow-sm transition flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                    Setujui
+                                </button>
+                                @else
+                                <button type="button" onclick="cancelPekerjaDirect({{ $item->id }}, '{{ addslashes($item->nama) }}')"
+                                    class="px-3 py-1.5 bg-red-50 hover:bg-red-600 text-red-600 hover:text-white rounded-lg text-xs font-bold shadow-sm transition flex items-center gap-1 border border-red-200 hover:border-red-600">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                    Batalkan
+                                </button>
+                                @endif
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <div class="text-center py-10 text-gray-500">
+                    <svg class="w-12 h-12 text-amber-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <p class="font-bold text-gray-700">Tidak ada pekerja pending</p>
+                    <p class="text-xs text-gray-400 mt-1">Semua pekerja yang diinput telah disetujui.</p>
+                </div>
+            @endif
+        </div>
+
+        <!-- Footer -->
+        <div class="px-6 py-3 bg-gray-50/80 border-t border-gray-100 flex justify-end">
+            <button type="button" onclick="closePendingModal()" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-bold rounded-xl transition">Tutup</button>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('scripts')
     <script src="/js/main-pekerja.js"></script>
+
+    <script>
+    function openPendingModal() {
+        document.getElementById('pendingPekerjaModal')?.classList.remove('hidden');
+    }
+    function closePendingModal() {
+        document.getElementById('pendingPekerjaModal')?.classList.add('hidden');
+    }
+
+    // --- REUSABLE SWEETALERT HANDLER ---
+    function handleAjaxAction(url, method, bodyData, confirmTitle, confirmText, successMessage) {
+    Swal.fire({
+        title: confirmTitle,
+        text: confirmText,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Ya, Lanjutkan!',
+        cancelButtonText: 'Batal',
+        showLoaderOnConfirm: true,
+        preConfirm: () => {
+            return fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json'
+                },
+                body: method === 'GET' ? null : JSON.stringify(bodyData)
+            })
+            .then(async response => {
+                const isJson = response.headers.get('content-type')?.includes('application/json');
+                const data = isJson ? await response.json() : null;
+
+                if (!response.ok) {
+                    // If not OK, show the error message from JSON or the status text
+                    throw new Error(data?.message || `Server Error: ${response.status}`);
+                }
+                return data;
+            })
+            .catch(error => {
+                Swal.showValidationMessage(`Gagal: ${error.message}`);
+            });
+        },
+        allowOutsideClick: () => !Swal.isLoading()
+    }).then((result) => {
+        if (result.isConfirmed && result.value) {
+            Swal.fire({
+                title: 'Berhasil!',
+                text: result.value.message || successMessage,
+                icon: 'success',
+                timer: 2000,
+                showConfirmButton: false
+            }).then(() => {
+                window.location.reload();
+            });
+        }
+    });
+}
+
+    // --- SINGLE ACTIONS ---
+
+    function approvePekerjaDirect(id, nama) {
+        handleAjaxAction(
+            '{{ route("pekerja.approve.bulk") }}',
+            'POST',
+            { ids: [id] },
+            'Setujui Pekerja?',
+            `Aktifkan data pekerja: ${nama}?`,
+            'Pekerja telah diaktifkan.'
+        );
+    }
+
+    function cancelPekerjaDirect(id, nama) {
+        // Generate the URL using the route name, replacing the placeholder with the actual ID
+        let url = '{{ route("pekerja.cancel", ":id") }}'.replace(':id', id);
+
+        handleAjaxAction(
+            url, 
+            'POST', 
+            {}, // No need for _method: DELETE since we changed the route to POST
+            'Batalkan Pengajuan?',
+            `Hapus pengajuan untuk: ${nama}? Tindakan ini permanen.`,
+            'Pengajuan telah dihapus.'
+        );
+    }
+
+    // --- BULK ACTIONS ---
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const selectAll = document.getElementById('selectAllPekerja');
+        const bulkBtn = document.getElementById('bulkApproveBtn');
+        const selectedCountSpan = document.getElementById('selectedCount');
+
+        if (selectAll) {
+            selectAll.addEventListener('change', function() {
+                const checkboxes = document.querySelectorAll('.pekerja-checkbox');
+                checkboxes.forEach(cb => cb.checked = this.checked);
+                updateBulkUI();
+            });
+        }
+
+        document.addEventListener('change', function(e) {
+            if (e.target.classList.contains('pekerja-checkbox')) {
+                updateBulkUI();
+            }
+        });
+
+        function updateBulkUI() {
+            const checkedCount = document.querySelectorAll('.pekerja-checkbox:checked').length;
+            if (bulkBtn) bulkBtn.disabled = checkedCount === 0;
+            if (selectedCountSpan) selectedCountSpan.textContent = checkedCount;
+        }
+    });
+
+    function bulkApprove() {
+        const ids = Array.from(document.querySelectorAll('.pekerja-checkbox:checked')).map(cb => cb.value);
+        if (ids.length === 0) return;
+
+        handleAjaxAction(
+            '{{ route("pekerja.approve.bulk") }}',
+            'POST',
+            { ids: ids },
+            'Approve Massal?',
+            `Setujui ${ids.length} pekerja terpilih sekaligus?`,
+            'Semua pekerja terpilih telah aktif.'
+        );
+    }
+</script>
 @endsection

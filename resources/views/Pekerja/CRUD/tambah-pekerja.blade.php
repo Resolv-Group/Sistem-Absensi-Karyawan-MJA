@@ -105,7 +105,8 @@
                     <div class="md:col-span-9 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
 
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-1">ID Pekerja</label>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">ID Pekerja<span
+                                    class="text-red-500 font-semibold">*</span></label>
 
                             <input type="text" name="id_pekerja" maxlength="16" autocomplete="off"
                                 class="id-input w-full rounded-lg shadow-sm border
@@ -121,7 +122,8 @@
 
                         {{-- NIK --}}
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-1">NIK</label>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">NIK<span
+                                    class="text-red-500 font-semibold">*</span></label>
 
                             <input type="text" name="nik" maxlength="16" autocomplete="off"
                                 class="nik-input w-full rounded-lg shadow-sm border
@@ -137,7 +139,8 @@
 
                         {{-- Nama Lengkap --}}
                         <div class="sm:col-span-2">
-                            <label class="block text-sm font-bold text-gray-700 mb-1">Nama Lengkap</label>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Nama Lengkap<span
+                                    class="text-red-500 font-semibold">*</span></label>
                             <input type="text" name="nama" maxlength="255" autocomplete="off"
                                 class="nama-input w-full rounded-lg shadow-sm border
                             @error('nama') border-red-500 bg-red-50 @else border-gray-500 bg-gray-50 @enderror
@@ -180,7 +183,8 @@
                             </div>
 
                             <div>
-                                <label class="block text-sm font-bold text-gray-700 mb-1">Nomor Kartu Keluarga</label>
+                                <label class="block text-sm font-bold text-gray-700 mb-1">Nomor Kartu Keluarga<span
+                                    class="text-red-500 font-semibold">*</span></label>
                                 <input type="text" name="no_kk" maxlength="16" autocomplete="off"
                                     class="no_kk-input w-full rounded-lg shadow-sm border
                                 @error('no_kk') border-red-500 bg-red-50 @else border-gray-500 bg-gray-50 @enderror
@@ -194,7 +198,8 @@
 
                         {{-- Tempat Lahir --}}
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-1">Tempat Lahir</label>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Tempat Lahir<span
+                                    class="text-red-500 font-semibold">*</span></label>
                             <input type="text" name="tempat_lahir" maxlength="100" autocomplete="off"
                                 class="w-full rounded-lg shadow-sm
                             @error('tempat_lahir') border-red-500 bg-red-50 @else border-gray-500 bg-gray-50 @enderror
@@ -207,7 +212,8 @@
 
                         {{-- Tanggal Lahir --}}
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-1">Tanggal Lahir</label>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Tanggal Lahir<span
+                                    class="text-red-500 font-semibold">*</span></label>
                             <input type="date" name="tgl_lahir"
                                 class="tanggal-input w-full rounded-lg shadow-sm cursor-pointer
                             @error('tgl_lahir') border-red-500 bg-red-50 @else border-gray-500 bg-gray-50 @enderror
@@ -220,7 +226,8 @@
 
                         {{-- Jenis Kelamin --}}
                         <div x-data="{ open: false, selected: '{{ old('kelamin') }}' || '', list: [{ val: '1', label: 'Laki-laki' }, { val: '0', label: 'Perempuan' }] }" class="relative">
-                            <label class="block text-sm font-bold text-gray-700 mb-1">Jenis Kelamin</label>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Jenis Kelamin<span
+                                    class="text-red-500 font-semibold">*</span></label>
 
                             <input type="hidden" name="kelamin" x-model="selected">
 
@@ -247,7 +254,8 @@
 
                         {{-- Pendidikan --}}
                         <div x-data="{ open: false, selected: '{{ old('pendidikan') }}' || '', list: ['TK', 'SD', 'SMP', 'SMA/SMK', 'D3', 'S1'] }" class="relative">
-                            <label class="block text-sm font-bold text-gray-700 mb-1">Pendidikan</label>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Pendidikan<span
+                                    class="text-red-500 font-semibold">*</span></label>
 
                             <input type="hidden" name="pendidikan" x-model="selected">
 
@@ -274,7 +282,8 @@
 
                         {{-- Status Perkawinan --}}
                         <div x-data="{ open: false, selected: '{{ old('status_kawin') }}' || '', list: ['TK', 'K'] }" class="relative">
-                            <label class="block text-sm font-bold text-gray-700 mb-1">Status Perkawinan</label>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Status Perkawinan<span
+                                    class="text-red-500 font-semibold">*</span></label>
 
                             <input type="hidden" name="status_kawin" x-model="selected">
 
@@ -307,7 +316,8 @@
                         </div>
 
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-1">Tanggal Bergabung</label>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Tanggal Bergabung<span
+                                    class="text-red-500 font-semibold">*</span></label>
                             <input type="date" name="tgl_bergabung"
                                 class="tanggal-input w-full rounded-lg shadow-sm cursor-pointer
                             @error('tgl_bergabung') border-red-500 bg-red-50 @else border-gray-500 bg-gray-50 @enderror
@@ -347,7 +357,8 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
                     {{-- Jalan --}}
                     <div class="sm:col-span-2">
-                        <label class="block text-sm font-bold text-gray-700 mb-1">Jalan / Nama Gedung</label>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Jalan / Nama Gedung<span
+                                    class="text-red-500 font-semibold">*</span></label>
                         <textarea name="alamat" rows="2" maxlength="255" autocomplete="off"
                             class="w-full rounded-lg shadow-sm
                             @error('alamat') border-red-500 bg-red-50 @else border-gray-500 bg-gray-50 @enderror
@@ -360,7 +371,8 @@
 
                     {{-- Desa --}}
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">Kelurahan / Desa</label>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Kelurahan / Desa<span
+                                    class="text-red-500 font-semibold">*</span></label>
                         <input type="text" name="desa" maxlength="100" autocomplete="off"
                             class="w-full rounded-lg shadow-sm
                         @error('desa') border-red-500 bg-red-50 @else border-gray-500 bg-gray-50 @enderror
@@ -390,7 +402,8 @@
 
                     {{-- Kota --}}
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">Kota / Kabupaten</label>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Kota / Kabupaten<span
+                                    class="text-red-500 font-semibold">*</span></label>
                         <input type="text" name="kota" maxlength="100" autocomplete="off"
                             class="w-full rounded-lg shadow-sm
                             @error('kota') border-red-500 bg-red-50 @else border-gray-500 bg-gray-50 @enderror
@@ -404,7 +417,8 @@
                     {{-- Kecamatan & Provinsi --}}
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-1">Kecamatan</label>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Kecamatan<span
+                                    class="text-red-500 font-semibold">*</span></label>
                             <input type="text" name="kecamatan" maxlength="100" autocomplete="off"
                                 class="w-full rounded-lg shadow-sm @error('kecamatan') border-red-500 bg-red-50 @else border-gray-500 bg-gray-50 @enderror
                                 border border-gray-500 bg-gray-50 text-gray-900 py-2.5 px-3 sm:text-sm font-medium placeholder-gray-400 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0 transition"
@@ -414,7 +428,8 @@
                             @enderror
                         </div>
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-1">Provinsi</label>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Provinsi<span
+                                    class="text-red-500 font-semibold">*</span></label>
                             <input type="text" name="provinsi" maxlength="100" autocomplete="off"
                                 class="w-full rounded-lg shadow-sm
                             @error('provinsi') border-red-500 bg-red-50 @else border-gray-500 bg-gray-50 @enderror
@@ -532,7 +547,8 @@
                     <div class="space-y-5">
                         {{-- Nama Kontak --}}
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-1">Nama Kontak</label>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Nama Kontak<span
+                                    class="text-red-500 font-semibold">*</span></label>
                             <input type="text" name="nama_emergency" maxlength="255" autocomplete="off"
                                 placeholder="Nama Kontak Emergency"
                                 class="w-full rounded-lg shadow-sm
@@ -546,7 +562,8 @@
 
                         {{-- No Kontak --}}
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-1">Nomor Telepon</label>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Nomor Telepon<span
+                                    class="text-red-500 font-semibold">*</span></label>
                             <input type="text" name="telp_emergency" maxlength="13" autocomplete="off"
                                 placeholder="Nomor Telepon Kontak Emergency"
                                 class="telp_emergency-input w-full rounded-lg shadow-sm
@@ -560,7 +577,8 @@
 
                         {{-- Hubungan --}}
                         <div x-data="{ open: false, selected: '{{ old('hubungan_emergency') }}' || '', list: ['Orang Tua', 'Saudara', 'Pasangan', 'Wali'] }" class="relative">
-                            <label class="block text-sm font-bold text-gray-700 mb-1">Hubungan</label>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Hubungan<span
+                                    class="text-red-500 font-semibold">*</span></label>
 
                             <input type="hidden" name="hubungan_emergency" x-model="selected">
 

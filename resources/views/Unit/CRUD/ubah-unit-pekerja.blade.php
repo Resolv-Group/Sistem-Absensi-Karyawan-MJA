@@ -138,14 +138,14 @@
         {{-- SECTION 1: PERSONALIA --}}
         <div class="space-y-6">
             <div class="flex items-center gap-3">
-                <div class="w-1.5 h-6 bg-blue-500 rounded-full"></div>
+                <div class="w-1.5 h-6 bg-yellow-500 rounded-full"></div>
                 <h4 class="text-[11px] font-black text-slate-800 uppercase tracking-[0.2em]">Informasi Personalia</h4>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
                 {{-- Nama Pekerja (Readonly in Update mode) --}}
                 <div x-data="workerCombobox(row)" x-init="init()" class="relative sm:col-span-2">
-                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Nama Pekerja</label>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Nama Pekerja<span class="text-red-500 font-semibold">*</span></label>
                     <input type="hidden" :name="`pekerja[${index}][id_pekerja]`" x-model="selectedId">
                     <div class="relative group">
                         <input type="text" x-model="search" readonly
@@ -158,7 +158,7 @@
 
                 {{-- Divisi --}}
                 <div x-data="idCombobox(row, 'divisiId', window.divisiData, d => d.nama)" x-init="init()" class="relative">
-                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Divisi</label>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Divisi<span class="text-red-500 font-semibold">*</span></label>
                     <input type="text" x-model="search" @focus="open = true" @click.outside="close()" placeholder="Pilih Divisi..."
                         class="w-full px-5 py-4 text-sm font-bold text-slate-700 bg-slate-50 border-none rounded-xl focus:ring-4 focus:ring-blue-100 focus:bg-white transition-all shadow-sm">
                     <ul x-show="open" class="absolute z-50 w-full mt-2 bg-white border border-gray-100 rounded-2xl shadow-xl max-h-48 overflow-y-auto py-2 custom-scrollbar">
@@ -171,7 +171,7 @@
 
                 {{-- Jabatan --}}
                 <div x-data="idCombobox(row, 'jabatanId', window.jabatanData, j => j.nama)" x-init="init()" class="relative">
-                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Jabatan</label>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Jabatan<span class="text-red-500 font-semibold">*</span></label>
                     <input type="text" x-model="search" @focus="open = true" @click.outside="close()" placeholder="Pilih Jabatan..."
                         class="w-full px-5 py-4 text-sm font-bold text-slate-700 bg-slate-50 border-none rounded-xl focus:ring-4 focus:ring-blue-100 focus:bg-white transition-all shadow-sm">
                     <ul x-show="open" class="absolute z-50 w-full mt-2 bg-white border border-gray-100 rounded-2xl shadow-xl max-h-48 overflow-y-auto py-2 custom-scrollbar">
@@ -250,7 +250,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
     {{-- Bulanan (hidden when sistem_pengajian == 2) --}}
     <div class="space-y-2" x-show="window.unitInfo.sistem_pengajian != 2">
-        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Gaji Bulanan (Pokok)</label>
+        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Gaji Bulanan (Pokok)<span class="text-red-500 font-semibold">*</span></label>
         <div class="relative group">
             <span class="absolute left-5 top-1/2 -translate-y-1/2 text-xs font-black text-slate-300 group-focus-within:text-emerald-500 transition-colors">Rp</span>
             <input type="text" :value="formatRupiah(row.gaji_bulanan)" 
@@ -262,7 +262,7 @@
 
     {{-- Harian - SEKARANG EDITABLE (hidden when sistem_pengajian == 2) --}}
     <div class="space-y-2" x-show="window.unitInfo.sistem_pengajian != 2">
-        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Gaji Harian (Proporsional)</label>
+        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Gaji Harian (Proporsional)<span class="text-red-500 font-semibold">*</span></label>
         <div class="relative group">
             <span class="absolute left-5 top-1/2 -translate-y-1/2 text-xs font-black text-slate-300 group-focus-within:text-emerald-500 transition-colors">Rp</span>
             <input type="text" :value="formatRupiah(row.gaji)" 
@@ -274,7 +274,7 @@
 
     {{-- Overtime - SEKARANG EDITABLE (hidden when sistem_pengajian == 2) --}}
     <div class="space-y-2" x-show="window.unitInfo.sistem_pengajian != 2">
-        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Upah Overtime / Jam</label>
+        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Upah Overtime / Jam<span class="text-red-500 font-semibold">*</span></label>
         <div class="relative group">
             <span class="absolute left-5 top-1/2 -translate-y-1/2 text-xs font-black text-slate-300 group-focus-within:text-emerald-500 transition-colors">Rp</span>
             <input type="text" :value="formatRupiah(row.overtime)" 
@@ -289,7 +289,7 @@
         {{-- Header: Judul & Hasil dalam satu baris (Compact) --}}
         <div class="flex items-center justify-between px-1">
             <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                Upah HBN (OT × <span class="text-blue-600" x-text="row.rate_hbn || 0"></span>)
+                Upah HBN (OT × <span class="text-blue-600" x-text="row.rate_hbn || 0"></span>)<span class="text-red-500 font-semibold">*</span>
             </label>
             
             {{-- Hasil Kalkulasi Nominal di samping label --}}
@@ -322,7 +322,7 @@
 
     {{-- BPJS Section (Tetap sama seperti kode asli Anda) --}}
     <div class="space-y-2">
-        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Iuran BPJS Kesehatan 
+        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Iuran BPJS Kesehatan <span class="text-red-500 font-semibold">*</span>
             <span x-show="row.kpj" class="ml-2 px-1.5 py-0.5 bg-emerald-50 text-emerald-600 text-[8px] rounded uppercase font-black tracking-widest">Editable</span>
         </label>
         <div class="relative">
@@ -337,7 +337,7 @@
         </div>
     </div>
     <div class="space-y-2">
-        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Iuran BPJS Naker
+        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Iuran BPJS Naker <span class="text-red-500 font-semibold">*</span>
             <span x-show="row.naker" class="ml-2 px-1.5 py-0.5 bg-emerald-50 text-emerald-600 text-[8px] rounded uppercase font-black tracking-widest">Editable</span>
         </label>
         <div class="relative">
@@ -382,18 +382,18 @@
         {{-- SECTION 5: ADMINISTRASI --}}
         <div class="space-y-6">
             <div class="flex items-center gap-3">
-                <div class="w-1.5 h-6 bg-slate-400 rounded-full"></div>
-                <h4 class="text-[11px] font-black text-slate-500 uppercase tracking-[0.2em]">Administrasi & Dokumen PKWT</h4>
+                <div class="w-1.5 h-6 bg-purple-400 rounded-full"></div>
+                <h4 class="text-[11px] font-black text-slate-800 uppercase tracking-[0.2em]">Administrasi & Dokumen PKWT</h4>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
                 <div class="space-y-2">
-                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Mulai Berlaku PKWT</label>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Mulai Berlaku PKWT<span class="text-red-500 font-semibold">*</span></label>
                     <input type="date" :name="`pekerja[${index}][tgl_mulai_pkwt]`" x-model="row.tglMulai"
                         class="w-full px-5 py-4 text-sm font-bold text-slate-600 bg-slate-50 border-none rounded-xl focus:ring-4 focus:ring-slate-100 focus:bg-white transition-all shadow-sm">
                 </div>
                 <div class="space-y-2">
-                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Berakhir Berlaku PKWT</label>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Berakhir Berlaku PKWT<span class="text-red-500 font-semibold">*</span></label>
                     <input type="date" :name="`pekerja[${index}][tgl_akhir_pkwt]`" x-model="row.tglAkhir"
                         class="w-full px-5 py-4 text-sm font-bold text-slate-600 bg-slate-50 border-none rounded-xl focus:ring-4 focus:ring-slate-100 focus:bg-white transition-all shadow-sm">
                 </div>

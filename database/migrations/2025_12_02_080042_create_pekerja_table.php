@@ -57,6 +57,8 @@ return new class extends Migration
 
             $table->string('ibu_kandung', 150)->nullable();
 
+            $table->integer('created_by')->nullable();
+
             $table->timestamps();
         });
 

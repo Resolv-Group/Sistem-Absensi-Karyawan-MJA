@@ -25,6 +25,8 @@ class Pekerja extends Model
         'kelamin','status_kawin','pendidikan','status_aktif', 'anak',
 
         'nama_emergency','telp_emergency','hubungan_emergency','ibu_kandung',
+
+        'created_by'
     ];
 
     protected $hidden = [
@@ -89,5 +91,10 @@ class Pekerja extends Model
     public function potongan()
     {
         return $this->hasMany(Potongan::class, 'id_pekerja', 'id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'created_by', 'id');
     }
 }
