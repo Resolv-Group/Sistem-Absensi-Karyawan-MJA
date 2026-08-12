@@ -567,8 +567,11 @@
                                         <div class="relative group">
                                             <span
                                                 class="absolute left-5 top-1/2 -translate-y-1/2 text-xs font-black text-slate-300 group-focus-within:text-emerald-500 transition-colors">Rp</span>
-                                            <input type="text" :value="formatRupiah(row.gaji)"
-                                                @input="calculateSalaryComponents(row)"
+                                            <input type="text"
+                                                :value="formatRupiah(row.gaji)"
+                                                @input="row.gaji = Number($event.target.value.replace(/\D/g, '')); $event.target.value = formatRupiah(row.gaji)"
+                                                @focus="$event.target.value = row.gaji > 0 ? formatRupiah(row.gaji) : ''"
+                                                @blur="$event.target.value = formatRupiah(row.gaji)"
                                                 class="w-full pl-12 pr-5 py-4 text-sm font-black text-slate-700 bg-slate-50 border-none rounded-xl focus:ring-4 focus:ring-emerald-100 focus:bg-white transition-all shadow-sm"
                                                 placeholder="0">
                                             <input type="hidden" :name="`pekerja[${index}][gaji_harian]`"
@@ -584,7 +587,9 @@
                                             <span
                                                 class="absolute left-5 top-1/2 -translate-y-1/2 text-xs font-black text-slate-300 group-focus-within:text-emerald-500 transition-colors">Rp</span>
                                             <input type="text" :value="formatRupiah(row.overtime)"
-                                                @input="row.overtime = Number($event.target.value.replace(/\D/g, ''))"
+                                                @input="row.overtime = Number($event.target.value.replace(/\D/g, '')); $event.target.value = formatRupiah(row.overtime); row.gaji_hbn = Math.round(row.overtime * (parseFloat(row.rate_hbn) || 0))"
+                                                @focus="$event.target.value = row.overtime > 0 ? formatRupiah(row.overtime) : ''"
+                                                @blur="$event.target.value = formatRupiah(row.overtime)"
                                                 class="w-full pl-12 pr-5 py-4 text-sm font-black text-slate-700 bg-slate-50 border-none rounded-xl focus:ring-4 focus:ring-emerald-100 focus:bg-white transition-all shadow-sm"
                                                 placeholder="0">
                                             <input type="hidden" :name="`pekerja[${index}][gaji_overtime]`"
@@ -1046,7 +1051,9 @@
                     const bulanan = parseFloat(row.gaji_bulanan) || 0;
                     const rateHbn = parseFloat(row.rate_hbn) || 0;
 
-                    // 1. Gaji Harian
+                    // 1. Gaji Harian — auto-derived from gaji_bulanan / 25
+                    //    Only update gaji if gaji_bulanan was the trigger
+                    //    (Manual edits to gaji_harian go directly to row.gaji via @input)
                     row.gaji = Math.round(bulanan / 25);
 
                     // 2. Upah Overtime per Jam (Base)
@@ -1055,6 +1062,16 @@
 
                     // 3. Gaji HBN (Hasil Otomatis)
                     // Rumus: Base Overtime x Angka Pengali (Rate)
+                    row.gaji_hbn = Math.round(row.overtime * rateHbn);
+                },
+
+                calculateOvertimeAndHbn(row) {
+                    // Recalculate overtime and HBN when rate_hbn changes,
+                    // without touching row.gaji (gaji harian)
+                    const bulanan = parseFloat(row.gaji_bulanan) || 0;
+                    const rateHbn = parseFloat(row.rate_hbn) || 0;
+                    const otBase = bulanan / 173;
+                    row.overtime = Math.round(otBase);
                     row.gaji_hbn = Math.round(row.overtime * rateHbn);
                 },
 
@@ -1156,7 +1173,8 @@
                     this.rows.splice(index, 1);
                 },
                 get totalAllocation() {
-                    return this.rows.reduce((sum, row) => sum + (parseInt(row.gaji) || 0), 0);
+                    // Sum of all gaji harian (gaji) across every pekerja row
+                    return this.rows.reduce((sum, row) => sum + (Number(row.gaji) || 0), 0);
                 },
 
                 calculateBpjs(row) {
