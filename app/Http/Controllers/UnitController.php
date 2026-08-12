@@ -22,6 +22,7 @@ use Illuminate\Validation\ValidationException;
 use App\Exports\KasKecilExport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\AssetExport;
+use App\Exports\PekerjaUnitExport;
 
 class UnitController extends Controller
 {
@@ -958,5 +959,15 @@ class UnitController extends Controller
             \Log::error('GetUnitData General Error: ' . $e->getMessage());
             return response()->json(['error' => 'Terjadi kesalahan sistem. Silakan coba lagi atau hubungi administrator.'], 500);
         }
+    }
+
+        public function exportExcelPekerja($id)
+    {
+        $unit = Unit::findOrFail($id);
+        
+        // Format nama file: Data_Pekerja_Aktif_NamaUnit.xlsx
+        $fileName = 'Data_Pekerja_Aktif_' . str_replace(' ', '_', $unit->nama_unit) . '.xlsx';
+        
+        return Excel::download(new PekerjaUnitExport($id), $fileName);
     }
 }
