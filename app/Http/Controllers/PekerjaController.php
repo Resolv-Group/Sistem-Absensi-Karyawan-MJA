@@ -218,15 +218,6 @@ class PekerjaController extends Controller
 
         $mitras = $query->get();
 
-        // dd($mitras);
-
-        \Log::info('viewTambahPekerja debug', [
-            'role' => $role,
-            'isGlobalUser' => $isGlobalUser,
-            'staffId' => $staffId,
-            'mitras_count' => $mitras->count(),
-        ]);
-
         return view('Pekerja.CRUD.tambah-pekerja', compact('mitras'));
     }
 
