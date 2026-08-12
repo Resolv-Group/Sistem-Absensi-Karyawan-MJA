@@ -380,7 +380,7 @@
 
                 <div id="new-pagination-provider">
                     @if ($borongan->hasPages())
-                        {{ $borongan->links('vendor.pagination.custom') }}
+                        {{ $borongan->links('vendor.Pagination.custom') }}
                     @endif
                 </div>
             </div>

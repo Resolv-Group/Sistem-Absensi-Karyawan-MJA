@@ -20,15 +20,17 @@
                         <span class="text-blue-600">Detail</span>
                 </nav>
                 <div class="flex items-center gap-4">
-                    <a href="{{ route('view.unit') }}"
-                        class="group p-2 rounded-full border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition shadow-sm">
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                            class="h-5 w-5 transform group-hover:-translate-x-0.5 transition" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                        </svg>
-                    </a>
+                    @if(auth()->check() && auth()->user()->role !== 'pic')
+                        <a href="{{ route('view.unit') }}"
+                            class="group p-2 rounded-full border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition shadow-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                class="h-5 w-5 transform group-hover:-translate-x-0.5 transition" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                            </svg>
+                        </a>
+                    @endif
                     <div>
                         <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Detail Unit</h1>
                         <p class="text-sm text-gray-500 mt-1">Informasi lengkap profil unit, PIC, dan kontrak.</p>
@@ -1161,28 +1163,45 @@
                                         <input type="hidden" name="format" :value="exportFormat">
 
                                         <div class="space-y-8">
+                                            <!-- Kepada -->
                                             <div class="group">
-                                                <label
-                                                    class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1 group-focus-within:text-blue-500 transition-colors">Diajukan
-                                                    Oleh (Staff)</label>
-                                                <input type="text" name="diajukan" x-model="approvals.diajukan"
-                                                    placeholder="Masukkan nama pengaju..." required
+                                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1 group-focus-within:text-blue-500 transition-colors">Kepada</label>
+                                                <input type="text" name="kepada" x-model="approvals.kepada" placeholder="Masukkan nama/organisasi tertuju..." required
                                                     class="w-full px-7 py-5 bg-white border border-slate-100 rounded-[1.5rem] text-sm font-bold shadow-sm focus:ring-[12px] focus:ring-blue-500/5 focus:border-blue-400 focus:bg-white transition-all outline-none">
                                             </div>
+                                            
+                                            <!-- Pembukuan -->
                                             <div class="group">
-                                                <label
-                                                    class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1 group-focus-within:text-blue-500 transition-colors">Diperiksa
-                                                    Oleh (Manager)</label>
-                                                <input type="text" name="diperiksa" x-model="approvals.diperiksa"
-                                                    placeholder="Masukkan nama atasan..." required
+                                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1 group-focus-within:text-blue-500 transition-colors">Pembukuan</label>
+                                                <input type="text" name="pembukuan" x-model="approvals.pembukuan" placeholder="Masukkan nama pembukuan..." required
                                                     class="w-full px-7 py-5 bg-white border border-slate-100 rounded-[1.5rem] text-sm font-bold shadow-sm focus:ring-[12px] focus:ring-blue-500/5 focus:border-blue-400 focus:bg-white transition-all outline-none">
                                             </div>
+                                            
+                                            <!-- Mengetahui -->
                                             <div class="group">
-                                                <label
-                                                    class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1 group-focus-within:text-blue-500 transition-colors">Disetujui
-                                                    Oleh (Accounting)</label>
-                                                <input type="text" name="disetujui" x-model="approvals.disetujui"
-                                                    placeholder="Masukkan nama penyetuju..." required
+                                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1 group-focus-within:text-blue-500 transition-colors">Mengetahui</label>
+                                                <input type="text" name="mengetahui" x-model="approvals.mengetahui" placeholder="Masukkan nama mengetahui..." required
+                                                    class="w-full px-7 py-5 bg-white border border-slate-100 rounded-[1.5rem] text-sm font-bold shadow-sm focus:ring-[12px] focus:ring-blue-500/5 focus:border-blue-400 focus:bg-white transition-all outline-none">
+                                            </div>
+                                            
+                                            <!-- Kasir -->
+                                            <div class="group">
+                                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1 group-focus-within:text-blue-500 transition-colors">Kasir</label>
+                                                <input type="text" name="kasir" x-model="approvals.kasir" placeholder="Masukkan nama kasir..." required
+                                                    class="w-full px-7 py-5 bg-white border border-slate-100 rounded-[1.5rem] text-sm font-bold shadow-sm focus:ring-[12px] focus:ring-blue-500/5 focus:border-blue-400 focus:bg-white transition-all outline-none">
+                                            </div>
+                                            
+                                            <!-- Penerima -->
+                                            <div class="group">
+                                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1 group-focus-within:text-blue-500 transition-colors">Penerima</label>
+                                                <input type="text" name="penerima" x-model="approvals.penerima" placeholder="Masukkan nama penerima..." required
+                                                    class="w-full px-7 py-5 bg-white border border-slate-100 rounded-[1.5rem] text-sm font-bold shadow-sm focus:ring-[12px] focus:ring-blue-500/5 focus:border-blue-400 focus:bg-white transition-all outline-none">
+                                            </div>
+                                            
+                                            <!-- Catatan -->
+                                            <div class="group">
+                                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1 group-focus-within:text-blue-500 transition-colors">Catatan</label>
+                                                <input type="text" name="catatan" x-model="approvals.catatan" placeholder="Masukkan catatan (Opsional)..." 
                                                     class="w-full px-7 py-5 bg-white border border-slate-100 rounded-[1.5rem] text-sm font-bold shadow-sm focus:ring-[12px] focus:ring-blue-500/5 focus:border-blue-400 focus:bg-white transition-all outline-none">
                                             </div>
                                         </div>
