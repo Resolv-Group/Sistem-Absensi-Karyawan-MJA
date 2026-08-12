@@ -185,7 +185,7 @@ class PekerjaController extends Controller
         return view('Pekerja.main-pekerja', compact('pekerja', 'totalPekerja', 'pekerjaBaru', 'tidakAktif', 'pekerjaPendingCount', 'pendingPekerjaList', 'myPendingList', 'units'));
     }
 
-    public function viewTambahPekerja()
+    public function PekerjaAddView()
     {
         $user = auth()->user();
         $role = strtolower(trim($user->role ?? ''));

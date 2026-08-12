@@ -112,7 +112,7 @@ Route::middleware(['auth', 'role:hrd,admin,head_supervisor'])->group(function ()
 Route::middleware(['auth', 'role:hrd,admin,head_supervisor,pic'])->group(function () {
     // Pekerja
     Route::get('/daftar-pekerja', [PekerjaController::class, 'viewPekerjaMain'])->name('view.pekerja');
-    Route::get('/pekerja/tambah', [PekerjaController::class, 'viewTambahPekerja'])->name('view.tambah.pekerja');
+    Route::get('/pekerja/tambah', [PekerjaController::class, 'PekerjaAddView'])->name('view.tambah.pekerja');
     Route::get('/pekerja/detail/{id}', [PekerjaController::class, 'viewDetailPekerja'])->name('view.detail.pekerja');
     Route::POST('/tambah-pekerja', [PekerjaController::class, 'tambahPekerja'])->name('tambah.pekerja.post');
     Route::get('/pekerja/ubah/{id}', [PekerjaController::class, 'ubahPekerja'])->name('view.ubah.pekerja');
