@@ -27,7 +27,7 @@ class BoronganUnitExport implements FromCollection, WithHeadings, WithMapping, S
     */
     public function collection()
     {
-        return Borongan::with('dataKategori')
+        return Borongan::with('kategoriRel')
             ->where('id_unit', $this->unit_id)
             ->where('status_aktif', 1) // Hanya ambil yang berstatus aktif
             ->get();
