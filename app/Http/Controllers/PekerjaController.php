@@ -323,7 +323,6 @@ class PekerjaController extends Controller
 
     function tambahPekerja(request $request)
     {
-        // dd($request->all());
         try {
             $request->validate(
                 [
@@ -426,8 +425,6 @@ class PekerjaController extends Controller
                     'foto.max' => 'Ukuran foto maksimal 2MB.',
                 ],
             );
-
-            // dd($request->all());
 
             // ✅ Upload foto
             $fotoBlob = null;
@@ -722,7 +719,6 @@ class PekerjaController extends Controller
 
     public function TambahHistoriPKWT(Request $request)
     {
-        // dd($request->all());
         // 1. Validasi Input Dasar
         $request->validate([
             'id_pekerja'     => 'required|string', // Sesuaikan jika id_pekerja Anda char/string/integer
