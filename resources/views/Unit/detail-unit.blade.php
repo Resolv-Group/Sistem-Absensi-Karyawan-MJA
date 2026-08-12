@@ -20,15 +20,17 @@
                         <span class="text-blue-600">Detail</span>
                 </nav>
                 <div class="flex items-center gap-4">
-                    <a href="{{ route('view.unit') }}"
-                        class="group p-2 rounded-full border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition shadow-sm">
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                            class="h-5 w-5 transform group-hover:-translate-x-0.5 transition" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                        </svg>
-                    </a>
+                    @if(auth()->check() && auth()->user()->role !== 'pic')
+                        <a href="{{ route('view.unit') }}"
+                            class="group p-2 rounded-full border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition shadow-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                class="h-5 w-5 transform group-hover:-translate-x-0.5 transition" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                            </svg>
+                        </a>
+                    @endif
                     <div>
                         <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Detail Unit</h1>
                         <p class="text-sm text-gray-500 mt-1">Informasi lengkap profil unit, PIC, dan kontrak.</p>
