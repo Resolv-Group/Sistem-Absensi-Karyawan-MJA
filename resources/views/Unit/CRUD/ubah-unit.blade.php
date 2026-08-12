@@ -368,14 +368,14 @@
                                     <div class="flex-1 grid grid-cols-2 gap-4">
                                         {{-- Edit Nama --}}
                                         <input type="text" x-model="t.nama"
-                                            class="bg-transparent border-none p-0 text-sm font-black text-gray-900 focus:ring-0">
+                                            class="w-full rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm font-black text-gray-900 focus:ring-2 focus:ring-emerald-100 focus:border-emerald-400 outline-none transition">
 
                                         {{-- Edit Nilai --}}
-                                        <div class="flex items-center gap-1">
-                                            <span class="text-xs font-bold text-emerald-500">Rp</span>
+                                        <div class="flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-1.5">
+                                            <span class="text-xs font-bold text-emerald-500 flex-shrink-0">Rp</span>
                                             <input type="text" :value="formatDisplay(t.value)"
                                                 @input="handleListInput($event, index)"
-                                                class="bg-transparent border-none p-0 text-sm font-black text-emerald-600 focus:ring-0 w-full">
+                                                class="bg-transparent border-none p-0 text-sm font-black text-emerald-600 focus:ring-0 w-full outline-none">
                                         </div>
                                     </div>
                                 </div>
