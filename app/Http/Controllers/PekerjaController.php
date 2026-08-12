@@ -195,14 +195,16 @@ class PekerjaController extends Controller
         $query = MitraKerja::query()
             ->where('status_aktif', 1)
             ->with(['units' => function ($q) use ($isGlobalUser, $staffId) {
-                $q->where('status_aktif', 1);
+                $q->where('status_aktif', 1)
+                  ->select('id', 'id_mitra_kerja', 'nama_unit');
 
                 if (!$isGlobalUser && $staffId) {
                     $q->whereHas('picUnit', function ($queryPic) use ($staffId) {
                         $queryPic->where('id_pic', $staffId);
                     });
                 }
-            }]);
+            }])
+            ->select('id', 'nama_mitra');
 
         // Only restrict MitraKerja to assigned units if user is NOT a global user (e.g. PIC)
         if (!$isGlobalUser && $staffId) {
