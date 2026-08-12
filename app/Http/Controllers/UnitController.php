@@ -972,7 +972,7 @@ class UnitController extends Controller
         return Excel::download(new PekerjaUnitExport($id), $fileName);
     }
 
-        public function exportExcelBorongan($id)s
+        public function exportExcelBorongan($id)
     {
         $unit = Unit::findOrFail($id);
         
