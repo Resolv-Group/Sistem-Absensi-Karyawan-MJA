@@ -195,7 +195,7 @@
                 <div class="relative">
                     <div
                         class="h-10 w-10 rounded-2xl border-2 border-white ring-1 ring-gray-100 shadow-sm overflow-hidden group-hover/btn:ring-red-200 transition-all duration-300">
-                        <img src="{{ Auth::user()->foto ? asset('storage/' . Auth::user()->foto) : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&background=FEE2E2&color=EF4444&bold=true' }}"
+                        <img src="{{ Auth::user()->staff?->image_base64 ?? 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&background=FEE2E2&color=EF4444&bold=true' }}"
                             class="w-full h-full object-cover">
                     </div>
                     <div

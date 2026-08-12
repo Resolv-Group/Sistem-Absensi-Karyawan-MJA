@@ -35,7 +35,7 @@
                                     class="h-32 w-32 rounded-full border-4 border-white shadow-md bg-white overflow-hidden mx-auto relative">
                                     {{-- Image Preview Target --}}
                                     <img id="avatar-preview"
-                                        src="{{ Auth::user()->foto ? asset('storage/' . Auth::user()->foto) : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&background=0D8ABC&color=fff&size=256' }}"
+                                        src="{{ Auth::user()->staff?->image_base64 ?? 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&background=0D8ABC&color=fff&size=256' }}"
                                         class="w-full h-full object-cover transition-opacity hover:opacity-90">
                                 </div>
 
