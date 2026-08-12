@@ -182,6 +182,8 @@ Route::middleware(['auth', 'role:pic,admin'])->group(function () {
 });
 
 Route::middleware(['auth', 'role:hrd,pic,admin,head_supervisor'])->group(function () {
+    // Export Borongan Pekerja
+    Route::get('/unit/{id}/export-borongan', [UnitController::class, 'exportExcelBorongan'])->name('unit.export_borongan');
     // Export Unit Pekerja
     Route::get('/unit/{id}/export-pekerja', [UnitController::class, 'exportExcelPekerja'])->name('unit.export_pekerja');
     // Export pdf detil pekerja
