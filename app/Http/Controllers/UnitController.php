@@ -723,13 +723,16 @@ class UnitController extends Controller
 
     public function exportKasKecil(Request $request, $id)
     {
-        // 1. Validasi Input
+        // 1. Validasi Input (Disesuaikan dengan form HTML yang baru)
         $request->validate([
             'kasKecilIds' => 'required|array|min:1',
             'format'      => 'required|in:excel,pdf',
-            'diajukan'    => 'required|string',
-            'diperiksa'   => 'required|string',
-            'disetujui'   => 'required|string',
+            'kepada'      => 'required|string',
+            'pembukuan'   => 'required|string',
+            'mengetahui'  => 'required|string',
+            'kasir'       => 'required|string',
+            'penerima'    => 'required|string',
+            'catatan'     => 'nullable|string', // Boleh kosong (opsional)
         ]);
 
         // 2. Ambil data dari database yang ID-nya dikirim dari checkbox/tabel
@@ -739,18 +742,26 @@ class UnitController extends Controller
 
         // 3. Eksekusi Export Excel
         if ($request->format === 'excel') {
-            $namaFile = 'Laporan_Kas_Kecil_' . date('d_M_Y_Hi') . '.xlsx';
+            $namaFile = 'Bukti_Kas_Keluar_' . date('d_M_Y_Hi') . '.xlsx';
 
             return Excel::download(
-                new KasKecilExport(
+                new \App\Exports\KasKecilExport(
                     $dataKasKecil,
-                    $request->diajukan,
-                    $request->diperiksa,
-                    $request->disetujui
+                    $request->kepada,
+                    $request->pembukuan,
+                    $request->mengetahui,
+                    $request->kasir,
+                    $request->penerima,
+                    $request->catatan
                 ), 
                 $namaFile
             );
         }
+        
+        // Tambahan: Jika nantinya Anda ingin membuat kondisi untuk PDF
+        // elseif ($request->format === 'pdf') {
+        //     ... logika export PDF ...
+        // }
     }
 
     public function storeBulkAsset(Request $request, $id)

@@ -8,9 +8,13 @@
 @endphp
 
 <table>
+    <!-- BAGIAN HEADER -->
     <thead>
         <tr>
-            <th colspan="7" style="text-align: center; font-size: 14px; font-weight: bold;">LAPORAN KAS KECIL</th>
+            <td colspan="2" style="font-weight: bold; font-size: 12px; vertical-align: middle;">Dibayarkan kepada: {{ $kepada }}</td>
+            <td colspan="3" style="text-align: center; font-size: 14px; font-weight: bold; vertical-align: middle; text-decoration: underline;">BUKTI KAS KELUAR</td>
+            <!-- Menggunakan waktu saat ini berdasarkan timezone lokasi (WIB/Jakarta) -->
+            <td colspan="2" style="text-align: right; font-weight: bold; font-size: 12px; vertical-align: middle;">Tanggal: {{ \Carbon\Carbon::now()->timezone('Asia/Jakarta')->format('d-m-Y') }}</td>
         </tr>
         <tr></tr>
         
@@ -24,6 +28,8 @@
             <th style="font-weight: bold; text-align: center; border: 1px solid black; background-color: #1B365D; color: #ffffff;">Saldo</th>
         </tr>
     </thead>
+    
+    <!-- BAGIAN DATA TABEL -->
     <tbody>
         @foreach($data as $index => $row)
             @php
@@ -50,46 +56,62 @@
         </tr>
     </tbody>
     
+    <!-- BAGIAN FOOTER & REKAP -->
     <tfoot>
         <tr></tr>
         
         <tr>
-            <td colspan="3"></td> <td style="border: 1px solid black; font-weight: bold; background-color: #e6e6e6;">Saldo Awal</td>
-            <td style="border: 1px solid black; font-weight: bold; text-align: right;">{{ $saldoAwal }}</td>
-            <td colspan="2"></td>
+            <td colspan="3"></td> 
+            <td style="border: 1px solid black; font-weight: bold; background-color: #e6e6e6;">Saldo Awal</td>
+            <td colspan="2" style="border: 1px solid black; font-weight: bold; text-align: right;">{{ $saldoAwal }}</td>
+            <td></td>
         </tr>
         <tr>
             <td colspan="3"></td>
             <td style="border: 1px solid black; font-weight: bold; background-color: #e6e6e6;">Total Pengeluaran</td>
-            <td style="border: 1px solid black; font-weight: bold; text-align: right; color: red;">{{ $totalPengeluaran }}</td>
-            <td colspan="2"></td>
+            <td colspan="2" style="border: 1px solid black; font-weight: bold; text-align: right; color: red;">{{ $totalPengeluaran }}</td>
+            <td></td>
         </tr>
         <tr>
             <td colspan="3"></td>
             <td style="border: 1px solid black; font-weight: bold; background-color: #e6e6e6;">Sisa Saldo</td>
-            <td style="border: 1px solid black; font-weight: bold; text-align: right;">{{ $sisaSaldo }}</td>
-            <td colspan="2"></td>
+            <td colspan="2" style="border: 1px solid black; font-weight: bold; text-align: right;">{{ $sisaSaldo }}</td>
+            <td></td>
         </tr>
         <tr>
             <td colspan="3"></td>
             <td style="border: 1px solid black; font-weight: bold; background-color: #e6e6e6;">Pengajuan Pengisian Kembali</td>
-            <td style="border: 1px solid black; font-weight: bold; text-align: right; color: green;">{{ $pengajuanKembali }}</td>
-            <td colspan="2"></td>
+            <td colspan="2" style="border: 1px solid black; font-weight: bold; text-align: right; color: green;">{{ $pengajuanKembali }}</td>
+            <td></td>
         </tr>
 
-        <tr></tr><tr></tr>
+        <tr></tr>
+        <tr></tr>
+
+        <!-- BAGIAN TANDA TANGAN (Dibagi menjadi 4 Kolom secara rata) -->
         <tr>
-            <td colspan="2" style="text-align: center;">Diajukan Oleh,</td>
-            <td></td>
-            <td colspan="2" style="text-align: center;">Diperiksa Oleh,</td>
-            <td colspan="2" style="text-align: center;">Disetujui Oleh,</td>
+            <td colspan="2" style="text-align: center; font-weight: bold;">Pembukuan</td>
+            <td colspan="2" style="text-align: center; font-weight: bold;">Mengetahui</td>
+            <td colspan="2" style="text-align: center; font-weight: bold;">Kasir</td>
+            <td style="text-align: center; font-weight: bold;">Penerima</td>
         </tr>
-        <tr></tr><tr></tr><tr></tr>
+        <tr></tr>
+        <tr></tr>
+        <tr></tr>
         <tr>
-            <td colspan="2" style="text-align: center; font-weight: bold; text-decoration: underline;">{{ $diajukan }}</td>
-            <td></td>
-            <td colspan="2" style="text-align: center; font-weight: bold; text-decoration: underline;">{{ $diperiksa }}</td>
-            <td colspan="2" style="text-align: center; font-weight: bold; text-decoration: underline;">{{ $disetujui }}</td>
+            <td colspan="2" style="text-align: center; font-weight: bold; text-decoration: underline;">{{ $pembukuan }}</td>
+            <td colspan="2" style="text-align: center; font-weight: bold; text-decoration: underline;">{{ $mengetahui }}</td>
+            <td colspan="2" style="text-align: center; font-weight: bold; text-decoration: underline;">{{ $kasir }}</td>
+            <td style="text-align: center; font-weight: bold; text-decoration: underline;">{{ $penerima }}</td>
+        </tr>
+
+        <!-- BAGIAN CATATAN BAWAH -->
+        <tr></tr>
+        <tr>
+            <td colspan="7" style="border: 1px solid black; vertical-align: top; height: 60px;">
+                <strong>Catatan:</strong><br>
+                {{ $catatan ?? '-' }}
+            </td>
         </tr>
     </tfoot>
 </table>

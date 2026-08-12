@@ -1163,46 +1163,45 @@
                                         <input type="hidden" name="format" :value="exportFormat">
 
                                         <div class="space-y-8">
+                                            <!-- Kepada -->
                                             <div class="group">
-                                                <label
-                                                    class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1 group-focus-within:text-blue-500 transition-colors">Kepada</label>
-                                                <input type="text" name="diajukan" x-model="approvals.diajukan"
-                                                    placeholder="Masukkan nama/organisasi tertuju..." required
+                                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1 group-focus-within:text-blue-500 transition-colors">Kepada</label>
+                                                <input type="text" name="kepada" x-model="approvals.kepada" placeholder="Masukkan nama/organisasi tertuju..." required
                                                     class="w-full px-7 py-5 bg-white border border-slate-100 rounded-[1.5rem] text-sm font-bold shadow-sm focus:ring-[12px] focus:ring-blue-500/5 focus:border-blue-400 focus:bg-white transition-all outline-none">
                                             </div>
+                                            
+                                            <!-- Pembukuan -->
                                             <div class="group">
-                                                <label
-                                                    class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1 group-focus-within:text-blue-500 transition-colors">Pembukuan</label>
-                                                <input type="text" name="diajukan" x-model="approvals.diajukan"
-                                                    placeholder="Masukkan nama pembukuan..." required
+                                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1 group-focus-within:text-blue-500 transition-colors">Pembukuan</label>
+                                                <input type="text" name="pembukuan" x-model="approvals.pembukuan" placeholder="Masukkan nama pembukuan..." required
                                                     class="w-full px-7 py-5 bg-white border border-slate-100 rounded-[1.5rem] text-sm font-bold shadow-sm focus:ring-[12px] focus:ring-blue-500/5 focus:border-blue-400 focus:bg-white transition-all outline-none">
                                             </div>
+                                            
+                                            <!-- Mengetahui -->
                                             <div class="group">
-                                                <label
-                                                    class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1 group-focus-within:text-blue-500 transition-colors">Mengetahui</label>
-                                                <input type="text" name="diperiksa" x-model="approvals.diperiksa"
-                                                    placeholder="Masukkan nama mengetahui..." required
+                                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1 group-focus-within:text-blue-500 transition-colors">Mengetahui</label>
+                                                <input type="text" name="mengetahui" x-model="approvals.mengetahui" placeholder="Masukkan nama mengetahui..." required
                                                     class="w-full px-7 py-5 bg-white border border-slate-100 rounded-[1.5rem] text-sm font-bold shadow-sm focus:ring-[12px] focus:ring-blue-500/5 focus:border-blue-400 focus:bg-white transition-all outline-none">
                                             </div>
+                                            
+                                            <!-- Kasir -->
                                             <div class="group">
-                                                <label
-                                                    class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1 group-focus-within:text-blue-500 transition-colors">Kasir</label>
-                                                <input type="text" name="disetujui" x-model="approvals.disetujui"
-                                                    placeholder="Masukkan nama kasir..." required
+                                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1 group-focus-within:text-blue-500 transition-colors">Kasir</label>
+                                                <input type="text" name="kasir" x-model="approvals.kasir" placeholder="Masukkan nama kasir..." required
                                                     class="w-full px-7 py-5 bg-white border border-slate-100 rounded-[1.5rem] text-sm font-bold shadow-sm focus:ring-[12px] focus:ring-blue-500/5 focus:border-blue-400 focus:bg-white transition-all outline-none">
                                             </div>
+                                            
+                                            <!-- Penerima -->
                                             <div class="group">
-                                                <label
-                                                    class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1 group-focus-within:text-blue-500 transition-colors">Penerima</label>
-                                                <input type="text" name="disetujui" x-model="approvals.disetujui"
-                                                    placeholder="Masukkan nama penerima..." required
+                                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1 group-focus-within:text-blue-500 transition-colors">Penerima</label>
+                                                <input type="text" name="penerima" x-model="approvals.penerima" placeholder="Masukkan nama penerima..." required
                                                     class="w-full px-7 py-5 bg-white border border-slate-100 rounded-[1.5rem] text-sm font-bold shadow-sm focus:ring-[12px] focus:ring-blue-500/5 focus:border-blue-400 focus:bg-white transition-all outline-none">
                                             </div>
+                                            
+                                            <!-- Catatan -->
                                             <div class="group">
-                                                <label
-                                                    class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1 group-focus-within:text-blue-500 transition-colors">Catatan</label>
-                                                <input type="text" name="disetujui" x-model="approvals.disetujui"
-                                                    placeholder="Masukkan catatan..." 
+                                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1 group-focus-within:text-blue-500 transition-colors">Catatan</label>
+                                                <input type="text" name="catatan" x-model="approvals.catatan" placeholder="Masukkan catatan (Opsional)..." 
                                                     class="w-full px-7 py-5 bg-white border border-slate-100 rounded-[1.5rem] text-sm font-bold shadow-sm focus:ring-[12px] focus:ring-blue-500/5 focus:border-blue-400 focus:bg-white transition-all outline-none">
                                             </div>
                                         </div>

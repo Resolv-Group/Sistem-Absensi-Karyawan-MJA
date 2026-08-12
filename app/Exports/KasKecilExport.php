@@ -9,30 +9,34 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 class KasKecilExport implements FromView, ShouldAutoSize
 {
     protected $dataKasKecil;
+    protected $kepada;
+    protected $pembukuan;
+    protected $mengetahui;
+    protected $kasir;
+    protected $penerima;
+    protected $catatan;
 
-    protected $diajukan;
-
-    protected $diperiksa;
-
-    protected $disetujui;
-
-    // Menangkap data dari Controller
-    public function __construct($dataKasKecil, $diajukan, $diperiksa, $disetujui)
+    public function __construct($dataKasKecil, $kepada, $pembukuan, $mengetahui, $kasir, $penerima, $catatan)
     {
         $this->dataKasKecil = $dataKasKecil;
-        $this->diajukan = $diajukan;
-        $this->diperiksa = $diperiksa;
-        $this->disetujui = $disetujui;
+        $this->kepada = $kepada;
+        $this->pembukuan = $pembukuan;
+        $this->mengetahui = $mengetahui;
+        $this->kasir = $kasir;
+        $this->penerima = $penerima;
+        $this->catatan = $catatan;
     }
 
     public function view(): View
     {
-        // Melempar data ke blade untuk di-render menjadi Excel
         return view('Exports.kas_kecil', [
-            'data' => $this->dataKasKecil,
-            'diajukan' => $this->diajukan,
-            'diperiksa' => $this->diperiksa,
-            'disetujui' => $this->disetujui,
+            'data'      => $this->dataKasKecil,
+            'kepada'    => $this->kepada,
+            'pembukuan' => $this->pembukuan,
+            'mengetahui'=> $this->mengetahui,
+            'kasir'     => $this->kasir,
+            'penerima'  => $this->penerima,
+            'catatan'   => $this->catatan,
         ]);
     }
 }
