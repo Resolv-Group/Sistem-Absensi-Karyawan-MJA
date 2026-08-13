@@ -728,10 +728,10 @@ class UnitController extends Controller
             'kasKecilIds' => 'required|array|min:1',
             'format'      => 'required|in:excel,pdf',
             'kepada'      => 'required|string',
-            'pembukuan'   => 'required|string',
-            'mengetahui'  => 'required|string',
-            'kasir'       => 'required|string',
-            'penerima'    => 'required|string',
+            'pembukuan'   => 'nullable|string',
+            'mengetahui'  => 'nullable|string',
+            'kasir'       => 'nullable|string',
+            'penerima'    => 'nullable|string',
             'catatan'     => 'nullable|string', // Boleh kosong (opsional)
         ]);
 
