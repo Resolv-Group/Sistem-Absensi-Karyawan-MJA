@@ -60,28 +60,28 @@
     <tfoot>
         <tr></tr>
         
-        <tr>
+<tr>
             <td colspan="3"></td> 
             <td style="border: 1px solid black; font-weight: bold; background-color: #e6e6e6;">Saldo Awal</td>
-            <td colspan="2" style="border: 1px solid black; font-weight: bold; text-align: right;">{{ $saldoAwal }}</td>
+            <td colspan="2" style="border: 1px solid black; font-weight: bold; text-align: right;">{{ number_format($saldoAwal, 0, ',', '.') }}</td>
             <td></td>
         </tr>
         <tr>
             <td colspan="3"></td>
             <td style="border: 1px solid black; font-weight: bold; background-color: #e6e6e6;">Total Pengeluaran</td>
-            <td colspan="2" style="border: 1px solid black; font-weight: bold; text-align: right; color: red;">{{ $totalPengeluaran }}</td>
+            <td colspan="2" style="border: 1px solid black; font-weight: bold; text-align: right; color: red;">{{ number_format($totalPengeluaran, 0, ',', '.') }}</td>
             <td></td>
         </tr>
         <tr>
             <td colspan="3"></td>
             <td style="border: 1px solid black; font-weight: bold; background-color: #e6e6e6;">Sisa Saldo</td>
-            <td colspan="2" style="border: 1px solid black; font-weight: bold; text-align: right;">{{ $sisaSaldo }}</td>
+            <td colspan="2" style="border: 1px solid black; font-weight: bold; text-align: right;">{{ number_format($sisaSaldo, 0, ',', '.') }}</td>
             <td></td>
         </tr>
         <tr>
             <td colspan="3"></td>
             <td style="border: 1px solid black; font-weight: bold; background-color: #e6e6e6;">Pengajuan Pengisian Kembali</td>
-            <td colspan="2" style="border: 1px solid black; font-weight: bold; text-align: right; color: green;">{{ $pengajuanKembali }}</td>
+            <td colspan="2" style="border: 1px solid black; font-weight: bold; text-align: right; color: green;">{{ number_format($pengajuanKembali, 0, ',', '.') }}</td>
             <td></td>
         </tr>
 
