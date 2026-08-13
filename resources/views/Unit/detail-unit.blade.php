@@ -1173,28 +1173,28 @@
                                             <!-- Pembukuan -->
                                             <div class="group">
                                                 <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1 group-focus-within:text-blue-500 transition-colors">Pembukuan</label>
-                                                <input type="text" name="pembukuan" x-model="approvals.pembukuan" placeholder="Masukkan nama pembukuan..." required
+                                                <input type="text" name="pembukuan" x-model="approvals.pembukuan" placeholder="Masukkan nama pembukuan..." 
                                                     class="w-full px-7 py-5 bg-white border border-slate-100 rounded-[1.5rem] text-sm font-bold shadow-sm focus:ring-[12px] focus:ring-blue-500/5 focus:border-blue-400 focus:bg-white transition-all outline-none">
                                             </div>
                                             
                                             <!-- Mengetahui -->
                                             <div class="group">
                                                 <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1 group-focus-within:text-blue-500 transition-colors">Mengetahui</label>
-                                                <input type="text" name="mengetahui" x-model="approvals.mengetahui" placeholder="Masukkan nama mengetahui..." required
+                                                <input type="text" name="mengetahui" x-model="approvals.mengetahui" placeholder="Masukkan nama mengetahui..." 
                                                     class="w-full px-7 py-5 bg-white border border-slate-100 rounded-[1.5rem] text-sm font-bold shadow-sm focus:ring-[12px] focus:ring-blue-500/5 focus:border-blue-400 focus:bg-white transition-all outline-none">
                                             </div>
                                             
                                             <!-- Kasir -->
                                             <div class="group">
                                                 <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1 group-focus-within:text-blue-500 transition-colors">Kasir</label>
-                                                <input type="text" name="kasir" x-model="approvals.kasir" placeholder="Masukkan nama kasir..." required
+                                                <input type="text" name="kasir" x-model="approvals.kasir" placeholder="Masukkan nama kasir..." 
                                                     class="w-full px-7 py-5 bg-white border border-slate-100 rounded-[1.5rem] text-sm font-bold shadow-sm focus:ring-[12px] focus:ring-blue-500/5 focus:border-blue-400 focus:bg-white transition-all outline-none">
                                             </div>
                                             
                                             <!-- Penerima -->
                                             <div class="group">
                                                 <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1 group-focus-within:text-blue-500 transition-colors">Penerima</label>
-                                                <input type="text" name="penerima" x-model="approvals.penerima" placeholder="Masukkan nama penerima..." required
+                                                <input type="text" name="penerima" x-model="approvals.penerima" placeholder="Masukkan nama penerima..." 
                                                     class="w-full px-7 py-5 bg-white border border-slate-100 rounded-[1.5rem] text-sm font-bold shadow-sm focus:ring-[12px] focus:ring-blue-500/5 focus:border-blue-400 focus:bg-white transition-all outline-none">
                                             </div>
                                             
