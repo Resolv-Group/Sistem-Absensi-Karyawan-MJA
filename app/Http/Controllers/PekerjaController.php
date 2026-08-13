@@ -185,7 +185,7 @@ class PekerjaController extends Controller
         return view('Pekerja.main-pekerja', compact('pekerja', 'totalPekerja', 'pekerjaBaru', 'tidakAktif', 'pekerjaPendingCount', 'pendingPekerjaList', 'myPendingList', 'units'));
     }
 
-    public function viewTambahPekerja()
+    public function PekerjaAddView()
     {
         $user = auth()->user();
         $role = strtolower(trim($user->role ?? ''));
@@ -217,15 +217,6 @@ class PekerjaController extends Controller
         }
 
         $mitras = $query->get();
-
-        // dd($mitras);
-
-        \Log::info('viewTambahPekerja debug', [
-            'role' => $role,
-            'isGlobalUser' => $isGlobalUser,
-            'staffId' => $staffId,
-            'mitras_count' => $mitras->count(),
-        ]);
 
         return view('Pekerja.CRUD.tambah-pekerja', compact('mitras'));
     }
@@ -332,7 +323,6 @@ class PekerjaController extends Controller
 
     function tambahPekerja(request $request)
     {
-        // dd($request->all());
         try {
             $request->validate(
                 [
@@ -435,8 +425,6 @@ class PekerjaController extends Controller
                     'foto.max' => 'Ukuran foto maksimal 2MB.',
                 ],
             );
-
-            // dd($request->all());
 
             // ✅ Upload foto
             $fotoBlob = null;
@@ -731,7 +719,6 @@ class PekerjaController extends Controller
 
     public function TambahHistoriPKWT(Request $request)
     {
-        // dd($request->all());
         // 1. Validasi Input Dasar
         $request->validate([
             'id_pekerja'     => 'required|string', // Sesuaikan jika id_pekerja Anda char/string/integer

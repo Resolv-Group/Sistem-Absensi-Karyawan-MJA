@@ -26,6 +26,14 @@
 
         allIds: {{ json_encode($pkwtPekerja->pluck('id')) }},
 
+        // Map of pkwt_id -> pekerja.status_aktif for the current page
+        pekerjaStatusMap: {{ json_encode($pkwtPekerja->mapWithKeys(fn($pkwt) => [$pkwt->id => $pkwt->pekerja->status_aktif ?? null])) }},
+
+        // Returns true if ANY selected PKWT belongs to a pending (status_aktif == 2) pekerja
+        get hasAnyPending() {
+            return this.selectedItems.some(id => this.pekerjaStatusMap[id] == 2);
+        },
+
         toggleAll() {
             this.selectedItems = this.selectedItems.length === this.allIds.length ? [] : [...this.allIds];
         },
@@ -480,15 +488,21 @@
                                             Ubah Divisi
                                         </button>
 
-                                        {{-- Status Update Form --}}
+                                        {{-- Status Update Form - hidden when any selected pekerja is still pending (status_aktif == 2) --}}
                                         <form action="{{ route('bulk.update.pekerja') }}" method="POST"
                                             class="flex gap-2">
                                             @csrf @method('put')
                                             <input type="hidden" name="ids" :value="JSON.stringify(selectedItems)">
                                             <button type="button" @click="showStatusModal = true"
+                                                x-show="!hasAnyPending"
                                                 class="px-4 py-2 bg-gray-50 text-gray-600 border border-gray-200 rounded-xl text-xs font-bold hover:bg-gray-800 hover:text-white transition-all">
                                                 Update Status
                                             </button>
+                                            <div x-show="hasAnyPending"
+                                                title="Tidak bisa update status: salah satu pekerja yang dipilih masih berstatus Pending."
+                                                class="px-4 py-2 bg-gray-100 text-gray-400 border border-gray-200 rounded-xl text-xs font-bold cursor-not-allowed select-none">
+                                                Update Status
+                                            </div>
                                             <button name="action" value="delete" onclick="return confirm('Hapus data?')"
                                                 class="p-2 bg-red-50 text-red-600 border border-red-100 rounded-xl hover:bg-red-600 hover:text-white transition-all">
                                                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24"

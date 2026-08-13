@@ -104,6 +104,9 @@
             @if ($pkwt->status_aktif == 1)
                 <span
                     class="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-[10px] font-black uppercase tracking-widest">Aktif</span>
+            @elseif($pkwt->status_aktif == 2)
+                <span
+                    class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-[10px] font-black uppercase tracking-widest">Pending</span>
             @else
                 <span
                     class="px-3 py-1 bg-gray-100 text-gray-400 rounded-full text-[10px] font-black uppercase tracking-widest">Nonaktif</span>
