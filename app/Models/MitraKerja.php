@@ -132,7 +132,7 @@ class MitraKerja extends Model
 
         return collect(explode(',', $this->alamat))
             ->map(fn ($line) => trim($line))
-            ->implode('<br>');
+            ->implode(', ');
     }
     public function units()
     {

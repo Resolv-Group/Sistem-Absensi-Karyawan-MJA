@@ -454,13 +454,13 @@
                 x-transition:leave-end="opacity-0" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm"></div>
 
             <!-- Layout Container -->
-            <div class="fixed inset-0 z-10 overflow-hidden flex items-center justify-center p-4">
+            <div class="fixed inset-0 z-10 overflow-hidden flex items-center justify-center p-3 sm:p-4">
 
-                <!-- MODAL BOX: Pastikan rounded-2xl dan overflow-hidden ada di sini -->
+                <!-- MODAL BOX -->
                 <div @click.away="$store.payslip.close()" x-transition:enter="ease-out duration-300"
                     x-transition:enter-start="opacity-0 translate-y-4 sm:scale-[0.98]"
                     x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
-                    class="relative w-full max-w-5xl bg-white rounded-2xl shadow-2xl border border-slate-200 flex flex-col max-h-[90vh] overflow-hidden">
+                    class="relative w-full max-w-5xl bg-white rounded-3xl sm:rounded-2xl shadow-2xl border border-slate-200 flex flex-col max-h-[92vh] sm:max-h-[90vh] overflow-hidden">
 
                     <form action="{{ route('overview.payroll') }}" @submit="handleSubmit($event)" method="POST"
                         class="flex flex-col overflow-hidden">
@@ -469,19 +469,19 @@
                         <input type="hidden" name="id_unit" x-model="$store.payslip.unitId">
                         <!-- 1. FIXED HEADER -->
                         <div
-                            class="px-8 py-6 border-b border-slate-100 flex justify-between items-center shrink-0 bg-white">
+                            class="px-5 py-4 sm:px-8 sm:py-6 border-b border-slate-100 flex justify-between items-center shrink-0 bg-white">
                             <div>
-                                <h3 class="text-xl font-black text-slate-800 tracking-tight">Proses Penggajian Unit</h3>
-                                <div class="flex items-center gap-2 mt-1">
+                                <h3 class="text-lg sm:text-xl font-black text-slate-800 tracking-tight">Proses Penggajian Unit</h3>
+                                <div class="flex items-center gap-2 mt-0.5 sm:mt-1">
                                     <span
-                                        class="text-[11px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded uppercase tracking-wider border border-emerald-100">Unit
+                                        class="text-[9px] sm:text-[11px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded uppercase tracking-wider border border-emerald-100">Unit
                                         Aktif</span>
-                                    <p class="text-xs font-bold text-slate-500" x-text="$store.payslip.unitName"></p>
+                                    <p class="text-xs font-bold text-slate-500 truncate max-w-[180px] sm:max-w-none" x-text="$store.payslip.unitName"></p>
                                 </div>
                             </div>
                             <button type="button" @click="$store.payslip.close()"
                                 class="p-2 text-slate-300 hover:text-slate-600 transition-colors">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M6 18L18 6M6 6l12 12" />
                                 </svg>
@@ -489,15 +489,15 @@
                         </div>
 
                         <!-- 2. SCROLLABLE BODY -->
-                        <div class="p-8 space-y-10 overflow-y-auto custom-scrollbar flex-1 bg-white">
+                        <div class="p-4 sm:p-8 space-y-6 sm:space-y-10 overflow-y-auto custom-scrollbar flex-1 bg-white">
 
                             <!-- STEP 1: PERIODE -->
-                            <div class="space-y-4">
-                                <div class="flex items-center gap-3">
+                            <div class="space-y-3 sm:space-y-4">
+                                <div class="flex items-center gap-2.5 sm:gap-3">
                                     <span
-                                        class="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-600 text-white text-[12px] font-black flex items-center justify-center shadow-lg shadow-emerald-200">1</span>
+                                        class="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-emerald-600 text-white text-[11px] sm:text-[12px] font-black flex items-center justify-center shadow-lg shadow-emerald-200">1</span>
                                     <label
-                                        class="block text-[11px] font-black text-slate-700 uppercase tracking-widest">Tentukan
+                                        class="block text-[10px] sm:text-[11px] font-black text-slate-700 uppercase tracking-widest">Tentukan
                                         Periode Penggajian<span class="text-red-500 font-semibold">*</span></label>
                                 </div>
                                 @php
@@ -506,58 +506,58 @@
                                     $today = Carbon::today();
                                     $startOfMonth = Carbon::today()->startOfMonth();
                                 @endphp
-                                <div class="bg-emerald-50/20 p-6 rounded-xl border border-emerald-100/50 ml-9">
-                                    <div class="grid grid-cols-2 gap-6">
+                                <div class="bg-emerald-50/20 p-4 sm:p-6 rounded-2xl sm:rounded-xl border border-emerald-100/50 sm:ml-9">
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                                         <div class="space-y-1.5">
-                                            <span class="text-[11px] font-bold text-slate-400 uppercase ml-1">
+                                            <span class="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase ml-1">
                                                 Tanggal Mulai
                                             </span>
                                             <input type="date" name="tanggal_mulai"
                                                 x-model="$store.payslip.tanggal_mulai"
                                                 @change="$store.payslip.fetchAdjustments()"
                                                 required
-                                                class="w-full bg-white border border-slate-200 rounded-lg text-sm font-bold text-slate-700 py-2.5 px-3 focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm">
+                                                class="w-full bg-white border border-slate-200 rounded-xl sm:rounded-lg text-xs sm:text-sm font-bold text-slate-700 py-2.5 px-3 focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm">
                                         </div>
 
                                         <div class="space-y-1.5">
-                                            <span class="text-[11px] font-bold text-slate-400 uppercase ml-1">
+                                            <span class="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase ml-1">
                                                 Tanggal Selesai
                                             </span>
                                             <input type="date" name="tanggal_akhir"
                                                 x-model="$store.payslip.tanggal_akhir"
                                                 @change="$store.payslip.fetchAdjustments()"
                                                 required
-                                                class="w-full bg-white border border-slate-200 rounded-lg text-sm font-bold text-slate-700 py-2.5 px-3 focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm">
+                                                class="w-full bg-white border border-slate-200 rounded-xl sm:rounded-lg text-xs sm:text-sm font-bold text-slate-700 py-2.5 px-3 focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm">
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- STEP 2: PEKERJA DIBAYAR (DEFAULT TERPILIH SEMUA) -->
-                            <div class="space-y-4">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-3">
+                            <div class="space-y-3 sm:space-y-4">
+                                <div class="flex items-center justify-between gap-2">
+                                    <div class="flex items-center gap-2.5 sm:gap-3">
                                         <span
-                                            class="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-600 text-white text-[12px] font-black flex items-center justify-center shadow-lg shadow-emerald-200">2</span>
+                                            class="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-emerald-600 text-white text-[11px] sm:text-[12px] font-black flex items-center justify-center shadow-lg shadow-emerald-200">2</span>
                                         <label
-                                            class="block text-[11px] font-black text-slate-700 uppercase tracking-widest">Pilih
-                                            Pekerja yang Akan Dibayar<span class="text-red-500 font-semibold">*</span></label>
+                                            class="block text-[10px] sm:text-[11px] font-black text-slate-700 uppercase tracking-widest">Pilih
+                                            Pekerja yang Dibayar<span class="text-red-500 font-semibold">*</span></label>
                                     </div>
-                                    <div class="flex gap-2">
+                                    <div class="flex gap-2 shrink-0">
                                         <button type="button"
                                             @click="$store.payslip.selectedWorkers = $store.payslip.workers.map(w => w.id)"
-                                            class="text-[11px] font-black text-emerald-600 hover:underline uppercase tracking-tighter">Pilih
+                                            class="text-[10px] sm:text-[11px] font-black text-emerald-600 hover:underline uppercase tracking-tighter">Pilih
                                             Semua</button>
                                         <span class="text-slate-300 text-[11px]">|</span>
                                         <button type="button" @click="$store.payslip.selectedWorkers = []"
-                                            class="text-[11px] font-black text-slate-400 hover:underline uppercase tracking-tighter">Hapus
+                                            class="text-[10px] sm:text-[11px] font-black text-slate-400 hover:underline uppercase tracking-tighter">Hapus
                                             Semua</button>
                                     </div>
                                 </div>
-                                <div class="ml-9">
+                                <div class="sm:ml-9">
                                     <template x-if="$store.payslip.workers.length > 0">
                                         <div
-                                            class="grid grid-cols-2 gap-3 max-h-56 overflow-y-auto p-4 border border-slate-200 rounded-xl bg-slate-50/50 custom-scrollbar">
+                                            class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 max-h-56 overflow-y-auto p-3 sm:p-4 border border-slate-200 rounded-2xl sm:rounded-xl bg-slate-50/50 custom-scrollbar">
 
                                             <template x-for="worker in $store.payslip.workers" :key="worker.id">
                                                 <label
@@ -575,14 +575,12 @@
                                                             <span class="text-[10px] font-medium text-slate-400 tracking-tight"
                                                                 x-text="'ID: ' + worker.id"></span>
                                                             <span x-show="$store.payslip.sistemPengajian == 1"
-                                                                class="flex-shrink-0 text-[12px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded tracking-tight"
+                                                                class="flex-shrink-0 text-[11px] sm:text-[12px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded tracking-tight"
                                                                 x-text="worker.total_alokasi_jam || '-'"></span>
                                                         </div>
                                                     </div>
                                                 </label>
                                             </template>
-
-
                                         </div>
                                     </template>
                                 </div>
@@ -594,33 +592,33 @@
                             </div>
 
                             <!-- STEP 3: POTONGAN TANGGAL SPESIFIK -->
-                            <div class="space-y-4">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-3">
+                            <div class="space-y-3 sm:space-y-4">
+                                <div class="flex items-center justify-between gap-2">
+                                    <div class="flex items-center gap-2.5 sm:gap-3">
                                         <span
-                                            class="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-600 text-white text-[12px] font-black flex items-center justify-center shadow-lg shadow-emerald-200">3</span>
+                                            class="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-emerald-600 text-white text-[11px] sm:text-[12px] font-black flex items-center justify-center shadow-lg shadow-emerald-200">3</span>
                                         <label
-                                            class="block text-[11px] font-black text-slate-700 uppercase tracking-widest">Potongan
-                                            Tanggal Spesifik (Opsional)</label>
+                                            class="block text-[10px] sm:text-[11px] font-black text-slate-700 uppercase tracking-widest">Potongan
+                                            Tgl Spesifik (Opsional)</label>
                                     </div>
                                     <button type="button" @click="$store.payslip.addExclusion()"
-                                        class="text-[12px] font-black text-emerald-600 hover:text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-100 uppercase">+
+                                        class="text-[10px] sm:text-[12px] font-black text-emerald-600 hover:text-emerald-800 bg-emerald-50 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg border border-emerald-100 uppercase shrink-0">+
                                         Tambah Baris</button>
                                 </div>
 
-                                <div class="ml-9 space-y-3">
+                                <div class="sm:ml-9 space-y-3">
                                     <template x-for="(item, index) in $store.payslip.exclusions" :key="index">
-                                        <div class="flex gap-3 items-start relative animate-in slide-in-from-top-1">
+                                        <div class="flex flex-col sm:flex-row gap-2 sm:gap-3 items-stretch sm:items-start p-3 sm:p-0 bg-slate-50/50 sm:bg-transparent rounded-2xl sm:rounded-none border sm:border-0 border-slate-100 relative animate-in slide-in-from-top-1">
 
                                             <div class="flex-1 relative">
-                                                <!-- HIDDEN INPUT: Pakai :value dan ambil langsung dari store index -->
+                                                <!-- HIDDEN INPUT -->
                                                 <input type="hidden" :name="'specific_workers[' + index + '][id]'"
                                                     :value="$store.payslip.exclusions[index].worker_id"
                                                     :required="$store.payslip.exclusions[index].date != ''">
 
                                                 <!-- TRIGGER DROPDOWN -->
                                                 <div @click.stop="$store.payslip.exclusions[index].open = !$store.payslip.exclusions[index].open"
-                                                    class="w-full bg-white border border-slate-200 rounded-xl text-[11px] font-bold text-slate-700 py-3 px-4 flex justify-between items-center cursor-pointer hover:border-emerald-500 transition-all shadow-sm">
+                                                    class="w-full bg-white border border-slate-200 rounded-xl text-[11px] font-bold text-slate-700 py-2.5 sm:py-3 px-3 sm:px-4 flex justify-between items-center cursor-pointer hover:border-emerald-500 transition-all shadow-sm">
 
                                                     <span
                                                         :class="!$store.payslip.exclusions[index].worker_id ? 'text-slate-400' :
@@ -641,7 +639,6 @@
                                                     class="absolute w-full mt-2 border border-slate-200 bg-white rounded-xl shadow-2xl overflow-y-auto max-h-48 z-[150] p-1 custom-scrollbar">
                                                     <template x-for="worker in $store.payslip.workers"
                                                         :key="worker.id">
-                                                        <!-- FIX: Update langsung ke index Store -->
                                                         <li @click.stop="$store.payslip.exclusions[index].worker_id = worker.id; $store.payslip.exclusions[index].open = false"
                                                             class="px-4 py-2.5 text-[11px] font-bold text-slate-600 hover:bg-emerald-600 hover:text-white rounded-lg cursor-pointer transition flex items-center justify-between">
                                                             <span x-text="worker.nama"></span>
@@ -652,49 +649,51 @@
                                                 </ul>
                                             </div>
 
-                                            <div class="flex-1">
-                                                <!-- DATE INPUT: Bind langsung ke index Store -->
-                                                <input type="date" :name="'specific_workers[' + index + '][date]'"
-                                                    x-model="$store.payslip.exclusions[index].date"
-                                                    :required="$store.payslip.exclusions[index].worker_id != ''"
-                                                    class="w-full bg-white border border-slate-200 rounded-xl text-[11px] font-bold text-slate-700 py-2.5 px-3 focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm">
-                                            </div>
+                                            <div class="flex items-center gap-2 flex-1">
+                                                <!-- DATE INPUT -->
+                                                <div class="flex-1">
+                                                    <input type="date" :name="'specific_workers[' + index + '][date]'"
+                                                        x-model="$store.payslip.exclusions[index].date"
+                                                        :required="$store.payslip.exclusions[index].worker_id != ''"
+                                                        class="w-full bg-white border border-slate-200 rounded-xl text-[11px] font-bold text-slate-700 py-2 sm:py-2.5 px-3 focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all shadow-sm">
+                                                </div>
 
-                                            <button type="button" @click="$store.payslip.removeExclusion(index)"
-                                                class="mt-3 p-1 transition-colors"
-                                                :class="$store.payslip.exclusions.length > 1 ?
-                                                    'text-red-400 hover:text-red-500' : 'text-slate-300'">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path
-                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                                        stroke-width="2" stroke-linecap="round"
-                                                        stroke-linejoin="round" />
-                                                </svg>
-                                            </button>
+                                                <button type="button" @click="$store.payslip.removeExclusion(index)"
+                                                    class="p-2 sm:mt-2.5 transition-colors shrink-0"
+                                                    :class="$store.payslip.exclusions.length > 1 ?
+                                                        'text-red-400 hover:text-red-500' : 'text-slate-300'">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path
+                                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                                            stroke-width="2" stroke-linecap="round"
+                                                            stroke-linejoin="round" />
+                                                    </svg>
+                                                </button>
+                                            </div>
                                         </div>
                                     </template>
                                 </div>
                             </div>
 
-                            <!-- STEP 4: RINGKASAN PENYESUAIAN (SCROLLABLE VERSION) -->
-                            <div class="space-y-4">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-3">
-                                        <span class="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-600 text-white text-[12px] font-black flex items-center justify-center shadow-lg shadow-emerald-200">4</span>
-                                        <label class="block text-[11px] font-black text-slate-700 uppercase tracking-widest">Ringkasan Penyesuaian (Otomatis DB)</label>
+                            <!-- STEP 4: RINGKASAN PENYESUAIAN -->
+                            <div class="space-y-3 sm:space-y-4">
+                                <div class="flex items-center justify-between gap-2">
+                                    <div class="flex items-center gap-2.5 sm:gap-3">
+                                        <span class="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-emerald-600 text-white text-[11px] sm:text-[12px] font-black flex items-center justify-center shadow-lg shadow-emerald-200">4</span>
+                                        <label class="block text-[10px] sm:text-[11px] font-black text-slate-700 uppercase tracking-widest">Ringkasan Penyesuaian (Otomatis DB)</label>
                                     </div>
                                     <!-- Badge jumlah pekerja yang muncul di rincian -->
-                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tight bg-slate-50 px-2 py-1 rounded-md border border-slate-100">
-                                        <span x-text="$store.payslip.selectedWorkers.length"></span> Pekerja Terlampir
+                                    <span class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-tight bg-slate-50 px-2 py-1 rounded-md border border-slate-100 shrink-0">
+                                        <span x-text="$store.payslip.selectedWorkers.length"></span> Pekerja
                                     </span>
                                 </div>
 
-                                <div class="ml-9">
-                                    <div class="rounded-[2rem] border border-slate-200 bg-white overflow-hidden shadow-sm">
+                                <div class="sm:ml-9">
+                                    <div class="rounded-2xl sm:rounded-[2rem] border border-slate-200 bg-white overflow-hidden shadow-sm">
                                         <div class="relative">
                                             <div x-show="$store.payslip.isLoadingAdjustments"
-                                                class="absolute inset-0 bg-white/60 backdrop-blur-[2px] z-50 flex items-center justify-center rounded-[2rem]">
+                                                class="absolute inset-0 bg-white/60 backdrop-blur-[2px] z-50 flex items-center justify-center rounded-2xl sm:rounded-[2rem]">
                                                 <div class="flex items-center gap-2 px-4 py-2 bg-white shadow-xl rounded-full border border-slate-100">
                                                     <svg class="animate-spin h-4 w-4 text-emerald-500" viewBox="0 0 24 24">
                                                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
@@ -703,12 +702,11 @@
                                                     <span class="text-[10px] font-black text-slate-600 uppercase tracking-widest">Menghitung Ulang...</span>
                                                 </div>
                                             </div>
-                                            <!-- Container dengan Scroll Otomatis (Muncul setelah ~5 pekerja) -->
 
                                             <div class="max-h-[380px] overflow-y-auto custom-scrollbar">
-                                                <table class="w-full text-left border-separate border-spacing-0">
-                                                    <!-- Sticky Header: Agar judul kolom tidak ikut ter-scroll -->
-                                                    <thead class="sticky top-0 z-30 bg-slate-50/95 backdrop-blur-md border-b border-slate-200 rounded-tl-[2rem] rounded-tr-[2rem]">
+                                                {{-- Desktop Table View --}}
+                                                <table class="hidden sm:table w-full text-left border-separate border-spacing-0">
+                                                    <thead class="sticky top-0 z-30 bg-slate-50/95 backdrop-blur-md border-b border-slate-200">
                                                         <tr>
                                                             <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Informasi Pekerja</th>
                                                             <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Total Potongan</th>
@@ -717,7 +715,6 @@
                                                     </thead>
                                                     <tbody class="divide-y divide-slate-100">
                                                         <template x-for="worker in $store.payslip.workers" :key="worker.id">
-                                                            <!-- Baris hanya muncul jika pekerja dipilih di Step 2 -->
                                                             <tr x-show="$store.payslip.selectedWorkers.includes(worker.id)"
                                                                 class="hover:bg-slate-50/50 transition-colors group">
 
@@ -740,7 +737,7 @@
                                                                         </span>
                                                                         <span class="text-[8px] font-bold text-slate-300 uppercase">Deductions</span>
                                                                     </div>
-                                                                    <input type="hidden" :name="'adjustments[' + worker.id + '][pembayaran_lain]'" :value="$store.payslip.adjustments[worker.id].pembayaran_lain">
+                                                                    <input type="hidden" :name="'adjustments[' + worker.id + '][pembayaran_lain]'" :value="$store.payslip.adjustments[worker.id]?.pembayaran_lain">
                                                                 </td>
 
                                                                 <!-- TUNJANGAN -->
@@ -751,13 +748,12 @@
                                                                         </span>
                                                                         <span class="text-[8px] font-bold text-slate-300 uppercase">Allowances</span>
                                                                     </div>
-                                                                    <input type="hidden" :name="'adjustments[' + worker.id + '][tunjangan_bayaran]'" :value="$store.payslip.adjustments[worker.id].tunjangan_bayaran">
+                                                                    <input type="hidden" :name="'adjustments[' + worker.id + '][tunjangan_bayaran]'" :value="$store.payslip.adjustments[worker.id]?.tunjangan_bayaran">
                                                                 </td>
 
                                                             </tr>
                                                         </template>
 
-                                                        <!-- Empty State Inside Table -->
                                                         <tr x-show="$store.payslip.selectedWorkers.length === 0">
                                                             <td colspan="3" class="px-6 py-12 text-center">
                                                                 <p class="text-xs font-bold text-slate-400 italic">Pilih pekerja pada langkah ke-2 untuk melihat rincian.</p>
@@ -765,11 +761,49 @@
                                                         </tr>
                                                     </tbody>
                                                 </table>
+
+                                                {{-- Mobile Card Stack View --}}
+                                                <div class="sm:hidden divide-y divide-slate-100">
+                                                    <template x-for="worker in $store.payslip.workers" :key="'mob-worker-' + worker.id">
+                                                        <div x-show="$store.payslip.selectedWorkers.includes(worker.id)" class="p-3.5 space-y-2.5">
+                                                            {{-- Worker Identity --}}
+                                                            <div class="flex items-center gap-3">
+                                                                <div class="w-8 h-8 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-[11px] font-black text-slate-500 shrink-0"
+                                                                    x-text="worker.nama.charAt(0)"></div>
+                                                                <div class="min-w-0 flex-1">
+                                                                    <p class="text-xs font-black text-slate-800 truncate" x-text="worker.nama"></p>
+                                                                    <p class="text-[10px] font-mono text-slate-400" x-text="'ID: ' + worker.id"></p>
+                                                                </div>
+                                                            </div>
+
+                                                            {{-- Adjustments Grid --}}
+                                                            <div class="grid grid-cols-2 gap-2 pt-1 border-t border-slate-50">
+                                                                <div class="p-2 bg-rose-50/50 rounded-xl border border-rose-100 flex flex-col items-center">
+                                                                    <span class="text-[9px] font-bold text-rose-400 uppercase tracking-wider">Potongan</span>
+                                                                    <span class="text-xs font-black text-rose-600 mt-0.5"
+                                                                        x-text="'Rp ' + $store.payslip.formatRupiah($store.payslip.adjustments[worker.id]?.pembayaran_lain || 0)">
+                                                                    </span>
+                                                                </div>
+
+                                                                <div class="p-2 bg-emerald-50/50 rounded-xl border border-emerald-100 flex flex-col items-center">
+                                                                    <span class="text-[9px] font-bold text-emerald-500 uppercase tracking-wider">Tunjangan</span>
+                                                                    <span class="text-xs font-black text-emerald-600 mt-0.5"
+                                                                        x-text="'Rp ' + $store.payslip.formatRupiah($store.payslip.adjustments[worker.id]?.tunjangan_bayaran || 0)">
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </template>
+
+                                                    <div x-show="$store.payslip.selectedWorkers.length === 0" class="p-6 text-center">
+                                                        <p class="text-xs font-bold text-slate-400 italic">Pilih pekerja pada langkah ke-2 untuk melihat rincian.</p>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
 
                                         <!-- Table Footer Indicator -->
-                                        <div class="bg-slate-50 border-t border-slate-100 px-6 py-2.5 flex justify-end items-center">
+                                        <div class="bg-slate-50 border-t border-slate-100 px-4 sm:px-6 py-2.5 flex justify-end items-center">
                                             <div class="flex items-center gap-1.5">
                                                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                                                 <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Data Terverifikasi Database</span>
@@ -783,12 +817,12 @@
 
                         <!-- 3. FIXED FOOTER (Rounded Bottom Corners) -->
                         <div
-                            class="px-8 py-6 bg-slate-50 border-t border-slate-100 flex justify-between items-center shrink-0 bg-white">
+                            class="px-5 py-4 sm:px-8 sm:py-6 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-0 shrink-0 bg-white">
                             <button type="button" @click="$store.payslip.close()"
-                                class="text-xs font-black text-slate-400 hover:text-slate-600 uppercase tracking-widest transition-colors">Batalkan</button>
+                                class="order-2 sm:order-1 text-xs font-black text-slate-400 hover:text-slate-600 uppercase tracking-widest transition-colors text-center py-2 sm:py-0">Batalkan</button>
 
                             <button type="button" id="btnPayrollSubmit"
-                                class="group flex items-center gap-4 bg-emerald-600 hover:bg-emerald-500 text-white px-10 py-4 rounded-xl font-black text-[11px] uppercase tracking-[0.2em] shadow-lg shadow-emerald-500/30 transition-all active:scale-95">
+                                class="order-1 sm:order-2 group flex items-center justify-center gap-3 sm:gap-4 bg-emerald-600 hover:bg-emerald-500 text-white px-6 sm:px-10 py-3.5 sm:py-4 rounded-2xl sm:rounded-xl font-black text-[11px] uppercase tracking-[0.2em] shadow-lg shadow-emerald-500/30 transition-all active:scale-95">
                                 <span>Proses Payroll</span>
                                 <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform"
                                     fill="none" stroke="currentColor" viewBox="0 0 24 24">

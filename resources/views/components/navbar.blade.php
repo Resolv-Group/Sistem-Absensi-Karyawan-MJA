@@ -313,7 +313,7 @@
                     <svg class="w-4 h-4 transition-transform duration-300" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2"/></svg>
                 </button>
                 <div x-show="open" x-collapse class="pl-11 flex flex-col gap-1 mt-1">
-                    @foreach (Auth::user()->units as $unit)
+                    @foreach (Auth::user()->staff->units as $unit)
                         <a href="{{ route('view.detail.unit', $unit->id) }}" class="py-2 text-xs font-bold text-gray-500 hover:text-red-600 transition-colors">
                             {{ $unit->nama_unit }}
                         </a>
@@ -336,7 +336,7 @@
                     <svg class="w-4 h-4 transition-transform duration-300" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2"/></svg>
                 </button>
                 <div x-show="open" x-collapse class="pl-11 flex flex-col gap-1 mt-1">
-                    @foreach (Auth::user()->units as $unit)
+                    @foreach (Auth::user()->staff->units as $unit)
                         <a href="{{ route('view.penilaian', $unit->id) }}" class="py-2 text-xs font-bold text-gray-500 hover:text-red-600 transition-colors">
                             {{ $unit->nama_unit }}
                         </a>

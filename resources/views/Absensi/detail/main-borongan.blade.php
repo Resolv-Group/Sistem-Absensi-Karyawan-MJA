@@ -564,7 +564,7 @@ toggleWithGroup(id) {
     $watch('filterVerifikasi', () => updateTable());">
 
         {{-- HEADER SECTION --}}
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
             <div
                 class="bg-white rounded-[2.5rem] p-8 md:p-10 shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-gray-100 relative overflow-hidden">
 
@@ -611,17 +611,15 @@ toggleWithGroup(id) {
                         {{-- Left Side: Identity & Branding --}}
                         <div class="space-y-4">
                             <div class="flex items-center gap-5">
-                                <div class="h-16 w-2 bg-orange-600 rounded-full shadow-[0_0_20px_rgba(37,99,235,0.4)]">
+                                <div class="h-14 w-2 bg-orange-600 rounded-full shadow-[0_0_20px_rgba(37,99,235,0.4)] shrink-0">
                                 </div>
-                                <div>
-                                    <div class="flex items-center gap-3 mb-1">
-                                        <h1 class="text-5xl font-black text-gray-900 tracking-tight leading-none">
-                                            Pengelolaan
-                                            Absensi<span class="text-orange-600">.</span>
-                                        </h1>
-                                    </div>
+                                <div class="min-w-0">
+                                    <h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tight leading-none break-words">
+                                        Pengelolaan
+                                        Absensi<span class="text-orange-600">.</span>
+                                    </h1>
 
-                                    <div class="flex items-center gap-3 mt-4">
+                                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 mt-3">
                                         <div
                                             class="px-3 py-1 bg-gray-900 text-white text-[12px] font-black uppercase tracking-widest rounded-lg shadow-sm">
                                             {{ $unit->namaMitra->nama_mitra ?? 'Mitra Perusahaan' }}
@@ -644,7 +642,7 @@ toggleWithGroup(id) {
                         </div>
 
                         {{-- Right Side: Grid Stats Cards --}}
-                        <div class="grid grid-cols-2 gap-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             {{-- Total Card --}}
                             <div
                                 class="bg-gray-50/50 border border-gray-100 rounded-3xl p-5 min-w-[140px] hover:bg-white hover:shadow-xl hover:shadow-orange-900/5 transition-all duration-300 group">
@@ -683,9 +681,9 @@ toggleWithGroup(id) {
             <div class="bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-200">
                 {{-- TOOLBAR --}}
                 <div
-                    class="px-6 py-6 rounded-3xl border-b border-gray-100 flex flex-col md:flex-row justify-between gap-4 bg-white">
-                    <div class="flex items-center gap-4 flex-1">
-                        <div class="relative w-full max-w-md group">
+                    class="p-4 sm:p-6 rounded-3xl border-b border-gray-100 flex flex-col sm:flex-row justify-between gap-3 sm:gap-4 bg-white">
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 flex-1">
+                        <div class="relative w-full sm:max-w-md group">
                             <svg class="w-5 h-5 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2 group-focus-within:text-orange-500 transition"
                                 fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -696,9 +694,9 @@ toggleWithGroup(id) {
                                 class="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-orange-100 focus:bg-white transition text-sm">
                         </div>
 
-                        <div class="relative">
+                        <div class="relative w-full sm:w-auto">
                             <button @click="showFilterDropdown = !showFilterDropdown"
-                                class="flex items-center gap-2 px-5 py-3 bg-gray-50 rounded-2xl text-sm font-bold text-gray-600 hover:bg-gray-100 transition">
+                                class="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-3 bg-gray-50 rounded-2xl text-sm font-bold text-gray-600 hover:bg-gray-100 transition">
                                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
@@ -785,17 +783,17 @@ toggleWithGroup(id) {
                                 </div>
                                 <div class="space-y-5 mt-7">
 
-                                    {{-- STATUS FILTER --}}
+                                    {{-- STATUS VERIFIKASI FILTER --}}
                                     <div x-data="{
                                         open: false,
                                         list: [{ val: '', label: 'Semua Status' },
-                                            { val: '1', label: 'Disetujui' },
-                                            { val: '0', label: 'Menunggu Persetujuan' }
+                                            { val: '1', label: 'Sudah Diverifikasi' },
+                                            { val: '0', label: 'Belum Diverifikasi' }
                                         ]
-                                    }" class="relative mb-2">
+                                    }" class="relative">
                                         <label
                                             class="block text-[12px] uppercase tracking-wider font-bold text-gray-400 mb-1.5">Status
-                                            Verifikasi Absen</label>
+                                            Verifikasi</label>
                                         <div @click="open = !open"
                                             class="relative block w-full pl-9 pr-3 py-2.5 text-sm bg-gray-50 border border-transparent rounded-xl text-gray-700 cursor-pointer hover:bg-gray-100 transition flex justify-between items-center">
                                             <div
@@ -848,102 +846,109 @@ toggleWithGroup(id) {
                                 </div>
                             </div>
 
-                            {{-- Floating Action Bar --}}
+                            {{-- Floating Action Bar (Responsive Mobile & Desktop) --}}
                             <div x-show="selectedItems.length > 0" x-transition:enter="transition ease-out duration-300"
                                 x-transition:enter-start="opacity-0 translate-y-10"
                                 x-transition:enter-end="opacity-100 translate-y-0"
                                 x-transition:leave="transition ease-in duration-200"
                                 x-transition:leave-start="opacity-100 translate-y-0"
                                 x-transition:leave-end="opacity-0 translate-y-10"
-                                class="fixed bottom-8 left-1/2 -translate-x-1/2 z-[60] w-[105%] max-w-4xl" x-cloak>
+                                class="fixed bottom-4 sm:bottom-8 left-1/2 -translate-x-1/2 z-[60] w-[95%] sm:w-[105%] max-w-4xl" x-cloak>
 
                                 <div
-                                    class="bg-white/70 backdrop-blur-xl border border-white/80 shadow-[0_20px_50px_rgba(0,0,0,0.1)] rounded-[2rem] px-6 py-4 flex items-center justify-between">
+                                    class="bg-white/95 sm:bg-white/70 backdrop-blur-xl border border-white/80 shadow-[0_20px_50px_rgba(0,0,0,0.1)] rounded-3xl sm:rounded-[2rem] p-4 sm:px-6 sm:py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
 
-                                    <!-- Left Side: Selection Count & Reset -->
-                                    <div class="flex items-center gap-4">
-                                        <div class="relative">
-                                            <div
-                                                class="bg-orange-600 text-white text-[11px] font-black h-8 w-8 rounded-xl shadow-lg shadow-orange-200 flex items-center justify-center">
-                                                <span x-text="selectedItems.length"></span>
+                                    <!-- Top / Left Side: Selection Count & Reset -->
+                                    <div class="flex items-center justify-between sm:justify-start gap-3 sm:gap-4 border-b sm:border-b-0 pb-2 sm:pb-0 border-gray-100">
+                                        <div class="flex items-center gap-3">
+                                            <div class="relative">
+                                                <div
+                                                    class="bg-orange-600 text-white text-[11px] font-black h-8 w-8 rounded-xl shadow-lg shadow-orange-200 flex items-center justify-center">
+                                                    <span x-text="selectedItems.length"></span>
+                                                </div>
+                                                <div class="absolute -top-1 -right-1 flex h-3 w-3">
+                                                    <span
+                                                        class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                                                    <span
+                                                        class="relative inline-flex rounded-full h-3 w-3 bg-orange-500"></span>
+                                                </div>
                                             </div>
-                                            <div class="absolute -top-1 -right-1 flex h-3 w-3">
-                                                <span
-                                                    class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
-                                                <span
-                                                    class="relative inline-flex rounded-full h-3 w-3 bg-orange-500"></span>
+                                            <div class="flex flex-col">
+                                                <span class="text-xs sm:text-sm font-black text-slate-800 leading-none">Pekerja Dipilih</span>
+                                                <span class="text-[10px] text-slate-400 sm:hidden">Pilih aksi massal</span>
                                             </div>
                                         </div>
-                                        <div class="flex flex-col">
-                                            <span class="text-sm font-black text-slate-800 leading-none">Pekerja
-                                                Dipilih</span>
-                                            <button type="button" @click="selectedItems = []"
-                                                class="text-[10px] font-bold text-slate-400 hover:text-rose-500 uppercase tracking-widest mt-1 transition-colors text-left outline-none">
-                                                Batalkan Semua
-                                            </button>
-                                        </div>
+                                        <button type="button" @click="selectedItems = []"
+                                            class="text-[10px] font-bold text-slate-400 hover:text-rose-500 uppercase tracking-widest transition-colors text-right sm:text-left outline-none">
+                                            Batalkan Semua
+                                        </button>
                                     </div>
 
-                                    <!-- Right Side: Semantic Actions Group -->
-                                    <div class="flex items-center gap-2">
+                                    <!-- Bottom / Right Side: Actions Group -->
+                                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
 
-                                        <!-- 1. Absen (Primary Orange) -->
-                                        <button 
-                                            x-show="!selectedItems.some(id => workerMap[id]?.is_individual)"
-                                            @click="initGroupModal()"
-                                            class="group flex items-center gap-2 px-4 py-2.5 bg-orange-50 hover:bg-orange-600 border border-orange-100 text-orange-700 hover:text-white rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all active:scale-95 shadow-sm">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857" />
-                                            </svg>
-                                            Kelompok Absen
-                                        </button>
+                                        <div class="grid grid-cols-1 sm:flex items-center gap-2">
+                                            <!-- 1. Kelompok Absen -->
+                                            <button 
+                                                x-show="!selectedItems.some(id => workerMap[id]?.is_individual)"
+                                                @click="initGroupModal()"
+                                                class="group flex items-center justify-center gap-2 px-4 py-2.5 bg-orange-50 hover:bg-orange-600 border border-orange-100 text-orange-700 hover:text-white rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all active:scale-95 shadow-sm">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857" />
+                                                </svg>
+                                                Kelompok Absen
+                                            </button>
 
-                                        <!-- Individual Absen: hide if ANY selected worker has group absen -->
-                                        <button 
-                                            x-show="!selectedItems.some(id => workerMap[id]?.is_group)"
-                                            @click="showAbsenModal = true"
-                                            class="group flex items-center gap-2 px-4 py-2.5 bg-orange-50 hover:bg-orange-600 border border-orange-100 text-orange-700 hover:text-white rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all active:scale-95 shadow-sm">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                            </svg>
-                                            Absen
-                                        </button>
+                                            <!-- Individual Absen -->
+                                            <button 
+                                                x-show="!selectedItems.some(id => workerMap[id]?.is_group)"
+                                                @click="showAbsenModal = true"
+                                                class="group flex items-center justify-center gap-2 px-4 py-2.5 bg-orange-50 hover:bg-orange-600 border border-orange-100 text-orange-700 hover:text-white rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all active:scale-95 shadow-sm">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                Absen Individu
+                                            </button>
+                                        </div>
 
-                                        <!-- 2. Tunjangan (Emerald) -->
-                                        <button x-show="canShowTunjangan()"
-                                            x-transition:enter="transition ease-out duration-200"
-                                            x-transition:enter-start="opacity-0 scale-95"
-                                            x-transition:enter-end="opacity-100 scale-100" @click="initTunjanganModal()"
-                                            class="group flex items-center gap-2 px-4 py-2.5 bg-emerald-50 hover:bg-emerald-600 border border-emerald-100 text-emerald-600 hover:text-white rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all active:scale-95 shadow-sm">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                                    d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                            </svg>
-                                            Tunjangan
-                                        </button>
+                                        <!-- Tunjangan & Potongan -->
+                                        <div class="grid grid-cols-2 sm:flex items-center gap-2">
+                                            <!-- 2. Tunjangan (Emerald) -->
+                                            <button x-show="canShowTunjangan()"
+                                                x-transition:enter="transition ease-out duration-200"
+                                                x-transition:enter-start="opacity-0 scale-95"
+                                                x-transition:enter-end="opacity-100 scale-100" @click="initTunjanganModal()"
+                                                class="group flex items-center justify-center gap-2 px-3 sm:px-4 py-2.5 bg-emerald-50 hover:bg-emerald-600 border border-emerald-100 text-emerald-600 hover:text-white rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all active:scale-95 shadow-sm">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                                        d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                                </svg>
+                                                Tunjangan
+                                            </button>
 
-                                        <!-- 3. Potongan (Rose) -->
-                                        <button x-show="canShowPotongan()"
-                                            x-transition:enter="transition ease-out duration-200"
-                                            x-transition:enter-start="opacity-0 scale-95"
-                                            x-transition:enter-end="opacity-100 scale-100" @click="initPotonganModal()"
-                                            class="group flex items-center gap-2 px-4 py-2.5 bg-rose-50 hover:bg-rose-600 border border-rose-100 text-rose-600 hover:text-white rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all active:scale-95 shadow-sm">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                                    d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                            </svg>
-                                            Potongan
-                                        </button>
+                                            <!-- 3. Potongan (Rose) -->
+                                            <button x-show="canShowPotongan()"
+                                                x-transition:enter="transition ease-out duration-200"
+                                                x-transition:enter-start="opacity-0 scale-95"
+                                                x-transition:enter-end="opacity-100 scale-100" @click="initPotonganModal()"
+                                                class="group flex items-center justify-center gap-2 px-3 sm:px-4 py-2.5 bg-rose-50 hover:bg-rose-600 border border-rose-100 text-rose-600 hover:text-white rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all active:scale-95 shadow-sm">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                                        d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                                </svg>
+                                                Potongan
+                                            </button>
+                                        </div>
 
-                                        <div class="h-8 w-px bg-slate-200 mx-2"></div>
+                                        <div class="hidden sm:block h-8 w-px bg-slate-200 mx-1"></div>
 
                                         <!-- 4. Status Absen (Indigo) -->
                                         <button @click="initStatusModal()"
-                                            class="group flex items-center gap-2 px-4 py-2.5 bg-indigo-50 hover:bg-indigo-600 border border-indigo-100 text-indigo-700 hover:text-white rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all active:scale-95 shadow-sm">
+                                            class="group flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-50 hover:bg-indigo-600 border border-indigo-100 text-indigo-700 hover:text-white rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all active:scale-95 shadow-sm">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                 viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
@@ -954,10 +959,9 @@ toggleWithGroup(id) {
                                     </div>
                                 </div>
                             </div>
-
                             <!-- MODAL: INPUT HASIL PRODUKSI (STEPPER) -->
                             <div x-show="showAbsenModal"
-                                class="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6" x-cloak>
+                                class="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6" x-cloak>
                                 <div x-show="showAbsenModal" x-transition.opacity @click="showAbsenModal = false"
                                     class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm"></div>
 
@@ -965,19 +969,19 @@ toggleWithGroup(id) {
                                     action="{{ route('absensi.borongan.bulk.update', ['id_unit' => $unit->id, 'date' => $date]) }}"
                                     method="POST" enctype="multipart/form-data" x-ref="absenForm"
                                     x-data="absenFormHandler()"
-                                    class="relative bg-white rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.1)] w-full max-w-6xl overflow-hidden flex flex-col max-h-[90vh] border border-gray-100">
+                                    class="relative bg-white rounded-3xl sm:rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.1)] w-full max-w-6xl overflow-hidden flex flex-col max-h-[92vh] sm:max-h-[90vh] border border-gray-100">
                                     @csrf
                                     @method('PUT')
                                     <input type="hidden" name="date" value="{{ $date }}">
 
-                                    {{-- 1. CONTEXT HEADER (SOFT & PROFESSIONAL) --}}
+                                    {{-- 1. CONTEXT HEADER --}}
                                     <div
-                                        class="px-10 py-5 bg-slate-50/80 border-b border-gray-100 flex items-center justify-between">
-                                        <div class="flex items-center gap-4">
+                                        class="px-5 py-4 sm:px-10 sm:py-5 bg-slate-50/80 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                                        <div class="flex items-center gap-3 sm:gap-4">
                                             {{-- Soft Accent Icon --}}
                                             <div
-                                                class="w-10 h-10 bg-white rounded-xl shadow-sm border border-gray-100 flex items-center justify-center">
-                                                <svg class="w-5 h-5 text-orange-500" fill="none" viewBox="0 0 24 24"
+                                                class="w-9 h-9 sm:w-10 sm:h-10 bg-white rounded-xl shadow-sm border border-gray-100 flex items-center justify-center shrink-0">
+                                                <svg class="w-4 h-4 sm:w-5 sm:h-5 text-orange-500" fill="none" viewBox="0 0 24 24"
                                                     stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                         d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
@@ -985,77 +989,77 @@ toggleWithGroup(id) {
                                             </div>
                                             <div>
                                                 <div class="flex items-center gap-2">
-                                                    <h1 class="text-base font-black text-slate-800 tracking-tight">Presensi
+                                                    <h1 class="text-sm sm:text-base font-black text-slate-800 tracking-tight">Presensi
                                                         Borongan</h1>
                                                     <span
-                                                        class="px-2 py-0.5 bg-orange-100 text-orange-700 text-[12px] font-black uppercase tracking-widest rounded-md">Sistem
+                                                        class="px-2 py-0.5 bg-orange-100 text-orange-700 text-[10px] sm:text-[12px] font-black uppercase tracking-widest rounded-md">Sistem
                                                         Aktif
                                                     </span>
                                                 </div>
                                                 <p
-                                                    class="text-[12px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">
+                                                    class="text-[10px] sm:text-[12px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">
                                                     Input Data Produksi Harian</p>
                                             </div>
                                         </div>
 
-                                        <div class="flex items-center gap-4">
+                                        <div class="flex items-center gap-2 sm:gap-4 justify-between sm:justify-end">
                                             {{-- Unit Info Pill --}}
                                             <div
-                                                class="flex items-center gap-3 px-4 py-2 bg-white rounded-2xl border border-gray-100 shadow-sm">
-                                                <div class="text-right">
+                                                class="flex items-center gap-2 sm:gap-3 px-3 py-1.5 sm:px-4 sm:py-2 bg-white rounded-xl sm:rounded-2xl border border-gray-100 shadow-sm flex-1 sm:flex-initial">
+                                                <div class="text-left sm:text-right">
                                                     <p
-                                                        class="text-[12px] font-black text-slate-400 uppercase tracking-widest leading-none">
+                                                        class="text-[9px] sm:text-[12px] font-black text-slate-400 uppercase tracking-widest leading-none">
                                                         Unit Kerja</p>
-                                                    <p class="text-xs font-bold text-slate-700 mt-1">
+                                                    <p class="text-[11px] sm:text-xs font-bold text-slate-700 mt-0.5 sm:mt-1 truncate">
                                                         {{ $unit->nama_unit }}</p>
                                                 </div>
                                             </div>
                                             {{-- Date Info Pill --}}
                                             <div
-                                                class="flex items-center gap-3 px-4 py-2 bg-white rounded-2xl border border-gray-100 shadow-sm">
-                                                <div class="text-right">
+                                                class="flex items-center gap-2 sm:gap-3 px-3 py-1.5 sm:px-4 sm:py-2 bg-white rounded-xl sm:rounded-2xl border border-gray-100 shadow-sm flex-1 sm:flex-initial">
+                                                <div class="text-left sm:text-right">
                                                     <p
-                                                        class="text-[12px] font-black text-slate-400 uppercase tracking-widest leading-none">
+                                                        class="text-[9px] sm:text-[12px] font-black text-slate-400 uppercase tracking-widest leading-none">
                                                         Periode</p>
-                                                    <p class="text-xs font-bold text-slate-700 mt-1">
-                                                        {{ \Carbon\Carbon::parse($date)->translatedFormat('d F Y') }}</p>
+                                                    <p class="text-[11px] sm:text-xs font-bold text-slate-700 mt-0.5 sm:mt-1 truncate">
+                                                        {{ \Carbon\Carbon::parse($date)->translatedFormat('d M Y') }}</p>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
 
-                                    {{-- 2. STEPPER NAVIGATION (MINIMALIST) --}}
-                                    <div class="px-10 py-6 bg-white border-b border-gray-100">
+                                    {{-- 2. STEPPER NAVIGATION --}}
+                                    <div class="px-5 py-4 sm:px-10 sm:py-6 bg-white border-b border-gray-100">
                                         <div class="flex items-center justify-between">
-                                            <div class="flex items-center gap-6">
+                                            <div class="flex items-center gap-3 sm:gap-6 min-w-0">
                                                 {{-- Avatar with soft glow --}}
-                                                <div class="relative">
+                                                <div class="relative shrink-0">
                                                     <div
-                                                        class="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 text-lg font-black transition-all">
+                                                        class="w-10 h-10 sm:w-14 sm:h-14 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 text-sm sm:text-lg font-black transition-all">
                                                         <span x-text="workerMap[currentWorkerId]?.initials"></span>
                                                     </div>
                                                     <div
-                                                        class="absolute -bottom-1 -right-1 w-6 h-6 bg-white border border-gray-100 rounded-full flex items-center justify-center shadow-sm">
-                                                        <div class="w-3 h-3 bg-emerald-500 rounded-full"></div>
+                                                        class="absolute -bottom-0.5 -right-0.5 sm:-bottom-1 sm:-right-1 w-4 h-4 sm:w-6 sm:h-6 bg-white border border-gray-100 rounded-full flex items-center justify-center shadow-sm">
+                                                        <div class="w-2 h-2 sm:w-3 sm:h-3 bg-emerald-500 rounded-full"></div>
                                                     </div>
                                                 </div>
 
-                                                <div>
-                                                    <div class="flex items-center gap-3">
-                                                        <h3 class="text-xl font-black text-slate-800 tracking-tight"
+                                                <div class="min-w-0">
+                                                    <div class="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-3">
+                                                        <h3 class="text-sm sm:text-xl font-black text-slate-800 tracking-tight truncate"
                                                             x-text="workerMap[currentWorkerId]?.nama"></h3>
-                                                        <span class="text-xs font-mono text-slate-400"
+                                                        <span class="text-[11px] sm:text-xs font-mono text-slate-400"
                                                             x-text="workerMap[currentWorkerId]?.nik"></span>
                                                     </div>
-                                                    <div class="flex items-center gap-3 mt-1.5">
+                                                    <div class="flex items-center gap-2 sm:gap-3 mt-1 sm:mt-1.5">
                                                         <div
-                                                            class="flex items-center gap-2 px-2.5 py-1 bg-slate-100 rounded-lg">
+                                                            class="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-2.5 py-0.5 sm:py-1 bg-slate-100 rounded-md sm:rounded-lg">
                                                             <span
-                                                                class="text-[12px] font-black text-slate-500 uppercase tracking-widest">Antrean</span>
-                                                            <span class="text-[12px] font-black text-orange-600"
+                                                                class="text-[9px] sm:text-[12px] font-black text-slate-500 uppercase tracking-widest">Antrean</span>
+                                                            <span class="text-[9px] sm:text-[12px] font-black text-orange-600"
                                                                 x-text="(currentIndex + 1) + ' / ' + selectedItems.length"></span>
                                                         </div>
-                                                        <div class="h-1 w-32 bg-slate-100 rounded-full overflow-hidden">
+                                                        <div class="h-1 w-20 sm:w-32 bg-slate-100 rounded-full overflow-hidden">
                                                             <div class="h-full bg-orange-400 transition-all duration-500"
                                                                 :style="'width: ' + (((currentIndex + 1) / selectedItems
                                                                     .length) * 100) + '%'">
@@ -1066,11 +1070,11 @@ toggleWithGroup(id) {
                                             </div>
 
                                             {{-- Clean Navigation Actions --}}
-                                            <div class="flex items-center gap-2">
+                                            <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
                                                 <button type="button" @click="currentIndex > 0 ? currentIndex-- : ''"
                                                     :disabled="currentIndex === 0"
-                                                    class="p-3 rounded-xl border border-gray-100 text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-all disabled:opacity-20">
-                                                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                                                    class="p-2 sm:p-3 rounded-xl border border-gray-100 text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-all disabled:opacity-20">
+                                                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24"
                                                         stroke="currentColor">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
                                                             stroke-width="2.5" d="M15 19l-7-7 7-7" />
@@ -1080,19 +1084,19 @@ toggleWithGroup(id) {
                                                 <button type="button"
                                                     @click="currentIndex < selectedItems.length - 1 ? currentIndex++ : ''"
                                                     :disabled="currentIndex === selectedItems.length - 1"
-                                                    class="p-3 rounded-xl border border-gray-100 text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-all disabled:opacity-20">
-                                                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                                                    class="p-2 sm:p-3 rounded-xl border border-gray-100 text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-all disabled:opacity-20">
+                                                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24"
                                                         stroke="currentColor">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
                                                             stroke-width="2.5" d="M9 5l7 7-7 7" />
                                                     </svg>
                                                 </button>
 
-                                                <div class="w-px h-6 bg-gray-100 mx-2"></div>
+                                                <div class="w-px h-5 sm:h-6 bg-gray-100 mx-1 sm:mx-2"></div>
 
                                                 <button @click="showAbsenModal = false" type="button"
-                                                    class="p-3 text-slate-300 hover:text-red-500 transition-colors">
-                                                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+                                                    class="p-2 sm:p-3 text-slate-300 hover:text-red-500 transition-colors">
+                                                    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24"
                                                         stroke="currentColor">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
                                                             stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -1103,15 +1107,15 @@ toggleWithGroup(id) {
                                     </div>
 
                                     {{-- 2. CONTENT: MULTIPLE ITEMS PER WORKER --}}
-                                    <div class="flex-1 overflow-y-auto custom-scrollbar bg-gray-50/30 p-10">
-                                        <div class="max-w-5xl mx-auto space-y-6">
+                                    <div class="flex-1 overflow-y-auto custom-scrollbar bg-gray-50/30 p-3.5 sm:p-10">
+                                        <div class="max-w-5xl mx-auto space-y-4 sm:space-y-6">
 
                                             {{-- Loop through workers, but only show current index --}}
                                             <template x-for="(workerId, wIdx) in selectedItems" :key="workerId">
                                                 <div x-show="currentIndex === wIdx" class="space-y-4">
 
                                                     {{-- Add Item Button --}}
-                                                    <div class="flex justify-between items-center mb-4">
+                                                    <div class="flex justify-between items-center mb-2 sm:mb-4">
                                                         <h4
                                                             class="text-xs font-black text-gray-400 uppercase tracking-widest">
                                                             Daftar Hasil Borongan</h4>
@@ -1120,14 +1124,14 @@ toggleWithGroup(id) {
                                                             :class="rowItems[workerId]?.length >= {{ count($barangs) }} ?
                                                                 'opacity-50 cursor-not-allowed bg-gray-100 text-gray-400' :
                                                                 'bg-orange-50 text-orange-600 hover:bg-orange-600 hover:text-white'"
-                                                            class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all">
+                                                            class="flex items-center gap-1.5 sm:gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs font-bold transition-all">
                                                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24"
                                                                 stroke="currentColor">
                                                                 <path stroke-linecap="round" stroke-linejoin="round"
                                                                     stroke-width="2.5" d="M12 4v16m8-8H4" />
                                                             </svg>
                                                             <span
-                                                                x-text="rowItems[workerId]?.length >= {{ count($barangs) }} ? 'Batas Barang Tercapai' : 'Tambah Baris Barang'"></span>
+                                                                x-text="rowItems[workerId]?.length >= {{ count($barangs) }} ? 'Batas Tercapai' : 'Tambah Baris'"></span>
                                                         </button>
                                                     </div>
 
@@ -1136,10 +1140,10 @@ toggleWithGroup(id) {
                                                         x-for="(row, rIdx) in (rowItems && rowItems[workerId] ? rowItems[workerId] : [])"
                                                         :key="rIdx">
                                                         <div
-                                                            class="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm space-y-6 relative group">
+                                                            class="bg-white p-4 sm:p-6 rounded-2xl sm:rounded-[2rem] border border-gray-100 shadow-sm space-y-4 sm:space-y-6 relative group">
                                                             <button type="button"
                                                                 @click="rowItems[workerId].splice(rIdx, 1)"
-                                                                class="absolute top-4 right-4 p-2 text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all">
+                                                                class="absolute top-3 right-3 sm:top-4 sm:right-4 p-2 text-gray-300 hover:text-red-500 transition-all">
                                                                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24"
                                                                     stroke="currentColor">
                                                                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -1148,7 +1152,7 @@ toggleWithGroup(id) {
                                                                 </svg>
                                                             </button>
 
-                                                            <div class="grid grid-cols-12 gap-6">
+                                                            <div class="grid grid-cols-12 gap-4 sm:gap-6">
                                                                 {{-- Col 1: Item & Quantities --}}
                                                                 <div class="col-span-12 lg:col-span-7 space-y-4">
                                                                     <div class="flex flex-col gap-1.5"
@@ -1175,7 +1179,6 @@ toggleWithGroup(id) {
                                                                                     'bg-white border-orange-400 ring-4 ring-orange-50' :
                                                                                     ''">
 
-                                                                                {{-- THE FIX: Direct lookup in the trigger label --}}
                                                                                 <span
                                                                                     :class="row.id_barang ? 'text-slate-700' :
                                                                                         'text-slate-400'"
@@ -1213,7 +1216,6 @@ toggleWithGroup(id) {
                                                                                         class="w-full bg-white border-none rounded-lg px-3 py-2 text-xs font-medium focus:ring-1 focus:ring-orange-200 outline-none">
                                                                                 </div>
 
-                                                                                {{-- Cari bagian Dropdown List di dalam Modal --}}
                                                                                 <ul
                                                                                     class="max-h-48 overflow-y-auto custom-scrollbar">
                                                                                     <template
@@ -1226,9 +1228,9 @@ toggleWithGroup(id) {
                                                                                             <button type="button"
                                                                                                 @click="
                                                                                                     row.id_barang = item.id;
-                                                                                                    row.bayaranPerusahaan = item.harga_unit; {{-- Direct mapping --}}
-                                                                                                    row.bayaranItem = item.harga_pekerja;   {{-- Direct mapping --}}
-                                                                                                    row.max_rej_subkon = item.max_rej_subkon; {{-- Direct mapping --}}
+                                                                                                    row.bayaranPerusahaan = item.harga_unit;
+                                                                                                    row.bayaranItem = item.harga_pekerja;
+                                                                                                    row.max_rej_subkon = item.max_rej_subkon;
 
                                                                                                     row.FD = 0;
                                                                                                     row.act_rej = 0;
@@ -1265,7 +1267,6 @@ toggleWithGroup(id) {
                                                                                         </li>
                                                                                     </template>
 
-                                                                                    {{-- Tampilkan pesan jika semua barang sudah dipilih atau tidak ditemukan --}}
                                                                                     <div x-show="options.filter(b => b.nama_item.toLowerCase().includes(search.toLowerCase()) && !rowItems[workerId].some(r => r.id_barang == b.id && r !== row)).length === 0"
                                                                                         class="px-4 py-8 text-center">
                                                                                         <p
@@ -1278,27 +1279,27 @@ toggleWithGroup(id) {
                                                                         </div>
                                                                     </div>
 
-                                                                    {{-- Grid Input: 4 Kolom untuk field produksi --}}
-                                                                    <div class="space-y-4">
+                                                                    {{-- Grid Input: Kolom untuk field produksi --}}
+                                                                    <div class="space-y-3 sm:space-y-4">
                                                                         <!-- Baris Pertama: 3 Kolom -->
-                                                                        <div class="grid grid-cols-3 gap-3">
+                                                                        <div class="grid grid-cols-3 gap-2 sm:gap-3">
                                                                             <!-- FD -->
-                                                                            <div class="flex flex-col gap-1.5">
+                                                                            <div class="flex flex-col gap-1 sm:gap-1.5">
                                                                                 <label
-                                                                                    class="text-[12px] font-black text-slate-400 uppercase tracking-widest">FD</label>
+                                                                                    class="text-[11px] sm:text-[12px] font-black text-slate-400 uppercase tracking-widest">FD</label>
                                                                                 <input type="number" min="0"
                                                                                     :name="'data[' + workerId + '][' + rIdx +
                                                                                         '][FD]'"
                                                                                     :disabled="!row.id_barang"
                                                                                     x-model.number="row.FD"
                                                                                     @input="updatePrices(workerId, rIdx)"
-                                                                                    class="bg-slate-50 border-transparent rounded-xl px-3 py-2 text-xs font-bold focus:bg-white focus:ring-2 focus:ring-slate-200 outline-none transition-all">
+                                                                                    class="bg-slate-50 border-transparent rounded-xl px-2.5 sm:px-3 py-2 text-xs font-bold focus:bg-white focus:ring-2 focus:ring-slate-200 outline-none transition-all">
                                                                             </div>
 
                                                                             <!-- Good MC -->
-                                                                            <div class="flex flex-col gap-1.5">
+                                                                            <div class="flex flex-col gap-1 sm:gap-1.5">
                                                                                 <label
-                                                                                    class="text-[12px] font-black text-emerald-500 uppercase tracking-widest">Good
+                                                                                    class="text-[11px] sm:text-[12px] font-black text-emerald-500 uppercase tracking-widest">Good
                                                                                     MC</label>
                                                                                 <input type="number" min="0"
                                                                                     :name="'data[' + workerId + '][' + rIdx +
@@ -1306,37 +1307,36 @@ toggleWithGroup(id) {
                                                                                     :disabled="!row.id_barang"
                                                                                     x-model.number="row.good_mc"
                                                                                     @input="updatePrices(workerId, rIdx)"
-                                                                                    class="bg-slate-50 border-transparent rounded-xl px-3 py-2 text-xs font-bold focus:bg-white focus:ring-2 focus:ring-emerald-200 outline-none transition-all">
+                                                                                    class="bg-slate-50 border-transparent rounded-xl px-2.5 sm:px-3 py-2 text-xs font-bold focus:bg-white focus:ring-2 focus:ring-emerald-200 outline-none transition-all">
                                                                             </div>
 
 
                                                                             <!-- Act/Rej -->
-                                                                            <div class="flex flex-col gap-1.5">
+                                                                            <div class="flex flex-col gap-1 sm:gap-1.5">
                                                                                 <label
-                                                                                    class="text-[12px] font-black text-slate-400 uppercase tracking-widest">Act/Rej</label>
+                                                                                    class="text-[11px] sm:text-[12px] font-black text-slate-400 uppercase tracking-widest">Act/Rej</label>
                                                                                 <input type="number" min="0"
                                                                                     :name="'data[' + workerId + '][' + rIdx +
                                                                                         '][act_rej]'"
                                                                                     :disabled="!row.id_barang"
                                                                                     x-model.number="row.act_rej"
                                                                                     @input="updatePrices(workerId, rIdx)"
-                                                                                    class="bg-slate-50 border-transparent rounded-xl px-3 py-2 text-xs font-bold focus:bg-white focus:ring-2 focus:ring-slate-200 outline-none transition-all">
+                                                                                    class="bg-slate-50 border-transparent rounded-xl px-2.5 sm:px-3 py-2 text-xs font-bold focus:bg-white focus:ring-2 focus:ring-slate-200 outline-none transition-all">
                                                                             </div>
                                                                         </div>
 
-                                                                        <!-- Baris Kedua: 2 Kolom (Dibuat Setara/Simetris) -->
-                                                                        <div class="grid grid-cols-2 gap-3">
+                                                                        <!-- Baris Kedua: 2 Kolom -->
+                                                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                                                                             <!-- Max Rej. Subkon -->
-                                                                            <div class="flex flex-col gap-1.5">
+                                                                            <div class="flex flex-col gap-1 sm:gap-1.5">
                                                                                 <label
-                                                                                    class="text-[12px] font-black text-gray-500 uppercase tracking-widest">
+                                                                                    class="text-[11px] sm:text-[12px] font-black text-gray-500 uppercase tracking-widest">
                                                                                     Max Rej. Subkon ( <span
                                                                                         x-text="row.max_rej_subkon"></span>%
                                                                                     )
                                                                                 </label>
 
                                                                                 <div class="relative flex items-center">
-                                                                                    {{-- Input ini akan otomatis menampilkan hasil Math.round dari updatePrices --}}
                                                                                     <input type="number"
                                                                                         @input="updatePrices(workerId, rIdx)"
                                                                                         readonly
@@ -1353,26 +1353,24 @@ toggleWithGroup(id) {
 
 
                                                                             <!-- Rej. MC Dibebankan -->
-                                                                            <div class="flex flex-col gap-1.5">
+                                                                            <div class="flex flex-col gap-1 sm:gap-1.5">
                                                                                 <label
-                                                                                    class="text-[12px] font-black text-red-500 uppercase tracking-widest">
+                                                                                    class="text-[11px] sm:text-[12px] font-black text-red-500 uppercase tracking-widest">
                                                                                     Rej. MC Dibebankan
                                                                                 </label>
                                                                                 <input type="number"
                                                                                     @input="updatePrices(workerId, rIdx)"
-                                                                                    readonly {{-- Pastikan name sesuai dengan field di database, misal: rej_mc_dibebankan --}}
+                                                                                    readonly
                                                                                     :name="'data[' + workerId + '][' + rIdx +
                                                                                         '][rej_mc_dibebankan]'"
-                                                                                    {{-- Hubungkan ke variabel hasil kalkulasi --}}
                                                                                     x-model.number="row.rej_mc_dibebankan"
                                                                                     class="bg-red-50 border-transparent rounded-xl px-3 py-2 text-xs font-black text-red-700 outline-none transition-all"
                                                                                     placeholder="0">
 
-                                                                                {{-- Info tambahan untuk user --}}
                                                                                 <span
-                                                                                    class="text-[10px] text-slate-400 mt-1 italic"
+                                                                                    class="text-[10px] text-slate-400 mt-0.5 italic"
                                                                                     x-show="row.rej_mc_dibebankan > 0">
-                                                                                    *Melebihi batas toleransi <span
+                                                                                    *Melebihi batas <span
                                                                                         x-text="row.act_rej_max"></span>
                                                                                     Pcs
                                                                                 </span>
@@ -1380,19 +1378,19 @@ toggleWithGroup(id) {
                                                                         </div>
                                                                     </div>
 
-                                                                    {{-- 2. TOTAL QUANTITY DISPLAY (Matches the UI Vibe) --}}
+                                                                    {{-- 2. TOTAL QUANTITY DISPLAY --}}
                                                                     <div
-                                                                        class="mt-4 p-4 rounded-2xl border-2 border-dashed border-slate-100 bg-slate-50/30">
+                                                                        class="mt-3 sm:mt-4 p-3 sm:p-4 rounded-2xl border-2 border-dashed border-slate-100 bg-slate-50/30">
                                                                         <div
-                                                                            class="grid grid-cols-2 gap-4 divide-x divide-slate-200">
+                                                                            class="grid grid-cols-2 gap-2 sm:gap-4 divide-x divide-slate-200">
 
                                                                             {{-- Sisi Kiri: Total Produksi --}}
                                                                             <div
-                                                                                class="flex items-center justify-between pr-4">
-                                                                                <div class="flex items-center gap-3">
+                                                                                class="flex flex-col sm:flex-row sm:items-center sm:justify-between pr-2 sm:pr-4">
+                                                                                <div class="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-0">
                                                                                     <div
-                                                                                        class="p-2 bg-orange-100 rounded-lg">
-                                                                                        <svg class="w-4 h-4 text-orange-600"
+                                                                                        class="p-1.5 sm:p-2 bg-orange-100 rounded-lg shrink-0">
+                                                                                        <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-orange-600"
                                                                                             fill="none"
                                                                                             viewBox="0 0 24 24"
                                                                                             stroke="currentColor">
@@ -1404,30 +1402,30 @@ toggleWithGroup(id) {
                                                                                     </div>
                                                                                     <div>
                                                                                         <p
-                                                                                            class="text-[10px] font-black text-orange-400 uppercase tracking-widest leading-none">
+                                                                                            class="text-[9px] sm:text-[10px] font-black text-orange-400 uppercase tracking-widest leading-none">
                                                                                             Total Produksi</p>
                                                                                         <p
-                                                                                            class="text-[11px] font-bold text-slate-400 mt-1">
+                                                                                            class="text-[10px] sm:text-[11px] font-bold text-slate-400 mt-0.5 hidden sm:block">
                                                                                             QTY Akumulasi</p>
                                                                                     </div>
                                                                                 </div>
                                                                                 <div class="flex items-baseline gap-1">
                                                                                     <span
-                                                                                        class="text-2xl font-black text-slate-700 tracking-tighter"
+                                                                                        class="text-lg sm:text-2xl font-black text-slate-700 tracking-tighter"
                                                                                         x-text="(parseInt(row.FD) || 0) + (parseInt(row.act_rej) || 0) + (parseInt(row.good_mc) || 0)">
                                                                                     </span>
                                                                                     <span
-                                                                                        class="text-[10px] font-black text-slate-400 uppercase">Pcs</span>
+                                                                                        class="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase">Pcs</span>
                                                                                 </div>
                                                                             </div>
 
                                                                             {{-- Sisi Kanan: Total yang Dibayar --}}
                                                                             <div
-                                                                                class="flex items-center justify-between pl-4">
-                                                                                <div class="flex items-center gap-3">
+                                                                                class="flex flex-col sm:flex-row sm:items-center sm:justify-between pl-2 sm:pl-4">
+                                                                                <div class="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-0">
                                                                                     <div
-                                                                                        class="p-2 bg-emerald-100 rounded-lg">
-                                                                                        <svg class="w-4 h-4 text-emerald-600"
+                                                                                        class="p-1.5 sm:p-2 bg-emerald-100 rounded-lg shrink-0">
+                                                                                        <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600"
                                                                                             fill="none"
                                                                                             viewBox="0 0 24 24"
                                                                                             stroke="currentColor">
@@ -1439,20 +1437,20 @@ toggleWithGroup(id) {
                                                                                     </div>
                                                                                     <div>
                                                                                         <p
-                                                                                            class="text-[10px] font-black text-emerald-500 uppercase tracking-widest leading-none">
+                                                                                            class="text-[9px] sm:text-[10px] font-black text-emerald-500 uppercase tracking-widest leading-none">
                                                                                             Yang Dibayar</p>
                                                                                         <p
-                                                                                            class="text-[11px] font-bold text-slate-400 mt-1">
-                                                                                            Barang Disetujui</p>
+                                                                                            class="text-[10px] sm:text-[11px] font-bold text-slate-400 mt-0.5 hidden sm:block">
+                                                                                            Disetujui</p>
                                                                                     </div>
                                                                                 </div>
                                                                                 <div class="flex items-baseline gap-1">
                                                                                     <span
-                                                                                        class="text-2xl font-black text-emerald-600 tracking-tighter"
+                                                                                        class="text-lg sm:text-2xl font-black text-emerald-600 tracking-tighter"
                                                                                         x-text="(row.good_mc + row.FD - row.rej_mc_dibebankan)  || 0">
                                                                                     </span>
                                                                                     <span
-                                                                                        class="text-[10px] font-black text-emerald-500 uppercase">Pcs</span>
+                                                                                        class="text-[9px] sm:text-[10px] font-black text-emerald-500 uppercase">Pcs</span>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
@@ -1473,25 +1471,21 @@ toggleWithGroup(id) {
                                                                                 .rej_mc_dibebankan) || 0))">
                                                                     </div>
 
-
-
-                                                                    {{-- Baris Bawah: 3 Kolom (Reject MC & Hasil Akhir) --}}
-                                                                    <div class="grid grid-cols-2 gap-3 mt-4">
+                                                                    {{-- Baris Bawah: Tagihan & Bayaran --}}
+                                                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 mt-3 sm:mt-4">
                                                                         {{-- FIELD: TAGIHAN PERUSAHAAN --}}
-                                                                        <div class="flex flex-col gap-1.5">
+                                                                        <div class="flex flex-col gap-1 sm:gap-1.5">
                                                                             <label
-                                                                                class="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Tagihan
+                                                                                class="text-[10px] sm:text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Tagihan
                                                                                 Perusahaan</label>
                                                                             <div class="relative flex items-center">
                                                                                 <span
                                                                                     class="absolute left-3 text-[10px] font-black text-slate-400">Rp.</span>
 
-                                                                                {{-- Display Only Input (With Dots) --}}
                                                                                 <input type="text" readonly
                                                                                     :value="formatRibuan(row.bayaranPerusahaan)"
-                                                                                    class="w-full bg-slate-100 border-transparent rounded-xl pl-10 pr-3 py-2 text-xs font-black text-slate-700 outline-none">
+                                                                                    class="w-full bg-slate-100 border-transparent rounded-xl pl-9 sm:pl-10 pr-3 py-2 text-xs font-black text-slate-700 outline-none">
 
-                                                                                {{-- Actual Data Input (Sent to Database) --}}
                                                                                 <input type="hidden"
                                                                                     :name="'data[' + workerId + '][' + rIdx +
                                                                                         '][bayaranPerusahaan]'"
@@ -1500,20 +1494,18 @@ toggleWithGroup(id) {
                                                                         </div>
 
                                                                         {{-- FIELD: BAYARAN PEKERJA --}}
-                                                                        <div class="flex flex-col gap-1.5">
+                                                                        <div class="flex flex-col gap-1 sm:gap-1.5">
                                                                             <label
-                                                                                class="text-[11px] font-black text-orange-600 uppercase tracking-widest ml-1">Bayaran
+                                                                                class="text-[10px] sm:text-[11px] font-black text-orange-600 uppercase tracking-widest ml-1">Bayaran
                                                                                 Pekerja</label>
                                                                             <div class="relative flex items-center">
                                                                                 <span
                                                                                     class="absolute left-3 text-[10px] font-black text-orange-300">Rp.</span>
 
-                                                                                {{-- Display Only Input (With Dots) --}}
                                                                                 <input type="text" readonly
                                                                                     :value="formatRibuan(row.bayaranItem)"
-                                                                                    class="w-full bg-orange-50 border border-orange-100 rounded-xl pl-10 pr-3 py-2 text-xs font-black text-orange-700 outline-none">
+                                                                                    class="w-full bg-orange-50 border border-orange-100 rounded-xl pl-9 sm:pl-10 pr-3 py-2 text-xs font-black text-orange-700 outline-none">
 
-                                                                                {{-- Actual Data Input (Sent to Database) --}}
                                                                                 <input type="hidden"
                                                                                     :name="'data[' + workerId + '][' + rIdx +
                                                                                         '][bayaranItem]'"
@@ -1524,31 +1516,28 @@ toggleWithGroup(id) {
                                                                 </div>
 
                                                                 {{-- Col 2: Image & Note --}}
-                                                                <div class="col-span-12 lg:col-span-5 space-y-4">
-                                                                    {{-- Bukti Surat Jalan (File Name Approach) --}}
-                                                                    <div class="flex flex-col gap-1.5">
+                                                                <div class="col-span-12 lg:col-span-5 space-y-3 sm:space-y-4">
+                                                                    {{-- Bukti Surat Jalan --}}
+                                                                    <div class="flex flex-col gap-1 sm:gap-1.5">
                                                                         <label
-                                                                            class="text-[12px] font-black text-slate-400 uppercase tracking-widest ml-1">Bukti
+                                                                            class="text-[11px] sm:text-[12px] font-black text-slate-400 uppercase tracking-widest ml-1">Bukti
                                                                             Surat Jalan</label>
 
                                                                         <div class="relative group/file">
-                                                                            {{-- Hidden Actual Input --}}
                                                                             <input type="file"
                                                                                 :name="'data[' + workerId + '][' + rIdx +
                                                                                     '][buktiSuratJalan]'"
                                                                                 @change="const file = $event.target.files[0]; if(file) { row.fileName = file.name; }"
                                                                                 class="absolute inset-0 w-full h-full opacity-0 z-10 cursor-pointer">
 
-                                                                            {{-- Visual UI --}}
-                                                                            <div class="flex items-center gap-3 px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl transition-all group-hover/file:bg-white group-hover/file:border-orange-200 shadow-sm"
+                                                                            <div class="flex items-center gap-2.5 sm:gap-3 px-3.5 py-2.5 sm:px-4 sm:py-3 bg-slate-50 border border-slate-100 rounded-xl transition-all group-hover/file:bg-white group-hover/file:border-orange-200 shadow-sm"
                                                                                 :class="row.fileName ?
                                                                                     'border-orange-100 bg-orange-50/30' :
                                                                                     ''">
 
-                                                                                {{-- Icon --}}
                                                                                 <div class="flex-shrink-0">
                                                                                     <template x-if="!row.fileName">
-                                                                                        <svg class="w-5 h-5 text-slate-400"
+                                                                                        <svg class="w-4 h-4 sm:w-5 sm:h-5 text-slate-400"
                                                                                             fill="none"
                                                                                             viewBox="0 0 24 24"
                                                                                             stroke="currentColor">
@@ -1559,7 +1548,7 @@ toggleWithGroup(id) {
                                                                                         </svg>
                                                                                     </template>
                                                                                     <template x-if="row.fileName">
-                                                                                        <svg class="w-5 h-5 text-orange-500"
+                                                                                        <svg class="w-4 h-4 sm:w-5 sm:h-5 text-orange-500"
                                                                                             fill="none"
                                                                                             viewBox="0 0 24 24"
                                                                                             stroke="currentColor">
@@ -1571,32 +1560,30 @@ toggleWithGroup(id) {
                                                                                     </template>
                                                                                 </div>
 
-                                                                                {{-- Text Content --}}
                                                                                 <div class="min-w-0 flex-1">
                                                                                     <p class="text-xs font-semibold truncate"
                                                                                         :class="row.fileName ?
                                                                                             'text-slate-700' :
                                                                                             'text-slate-400'"
-                                                                                        x-text="row.fileName || 'Pilih atau drop file surat jalan...'">
+                                                                                        x-text="row.fileName || 'Pilih/drop surat jalan...'">
                                                                                     </p>
                                                                                 </div>
 
-                                                                                {{-- Badge for "Selected" --}}
                                                                                 <template x-if="row.fileName">
                                                                                     <span
-                                                                                        class="text-[12px] font-black text-orange-600 bg-white px-2 py-1 rounded-md border border-orange-100 shadow-sm uppercase tracking-tighter">Terpilih</span>
+                                                                                        class="text-[10px] font-black text-orange-600 bg-white px-2 py-0.5 rounded-md border border-orange-100 shadow-sm uppercase tracking-tighter shrink-0">Pilih</span>
                                                                                 </template>
                                                                             </div>
                                                                         </div>
                                                                     </div>
 
-                                                                    {{-- Catatan (Consistent with vibe) --}}
-                                                                    <div class="flex flex-col gap-1.5">
+                                                                    {{-- Catatan --}}
+                                                                    <div class="flex flex-col gap-1 sm:gap-1.5">
                                                                         <label
-                                                                            class="text-[12px] font-black text-slate-400 uppercase tracking-widest ml-1">Catatan</label>
-                                                                        <textarea :name="'data[' + workerId + '][' + rIdx + '][catatan]'" rows="1" x-model="row.catatan"
-                                                                            placeholder="Tambahkan keterangan tambahan..."
-                                                                            class="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-2.5 text-xs font-semibold text-slate-700 focus:bg-white focus:ring-2 focus:ring-orange-100 focus:border-orange-400 outline-none transition-all resize-none shadow-sm placeholder:text-slate-300"></textarea>
+                                                                            class="text-[11px] sm:text-[12px] font-black text-slate-400 uppercase tracking-widest ml-1">Catatan</label>
+                                                                        <textarea :name="'data[' + workerId + '][' + rIdx + '][catatan]'" rows="2" x-model="row.catatan"
+                                                                            placeholder="Keterangan tambahan..."
+                                                                            class="w-full bg-slate-50 border border-slate-100 rounded-xl px-3.5 py-2 sm:px-4 sm:py-2.5 text-xs font-semibold text-slate-700 focus:bg-white focus:ring-2 focus:ring-orange-100 focus:border-orange-400 outline-none transition-all resize-none shadow-sm placeholder:text-slate-300"></textarea>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -1605,16 +1592,16 @@ toggleWithGroup(id) {
 
                                                     {{-- Empty State for Rows --}}
                                                     <div x-show="!rowItems[workerId] || rowItems[workerId].length === 0"
-                                                        class="py-20 border-2 border-dashed border-gray-100 rounded-[2.5rem] flex flex-col items-center justify-center text-gray-300">
-                                                        <svg class="w-12 h-12 mb-2" fill="none" viewBox="0 0 24 24"
+                                                        class="py-12 sm:py-20 border-2 border-dashed border-gray-100 rounded-2xl sm:rounded-[2.5rem] flex flex-col items-center justify-center text-gray-300">
+                                                        <svg class="w-10 h-10 sm:w-12 sm:h-12 mb-2" fill="none" viewBox="0 0 24 24"
                                                             stroke="currentColor">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                             <path stroke-linecap="round" stroke-linejoin="round"
                                                                 stroke-width="1.5"
                                                                 d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                                                         </svg>
-                                                        <p class="text-sm font-bold">Belum ada item ditambahkan</p>
+                                                        <p class="text-xs sm:text-sm font-bold">Belum ada item ditambahkan</p>
                                                         <button type="button" @click="addBoronganRow(workerId)"
-                                                            class="mt-4 text-xs font-black text-orange-600 uppercase tracking-widest hover:underline">Tambah
+                                                            class="mt-3 text-xs font-black text-orange-600 uppercase tracking-widest hover:underline">Tambah
                                                             Sekarang</button>
                                                     </div>
                                                 </div>
@@ -1624,19 +1611,19 @@ toggleWithGroup(id) {
 
                                     {{-- 3. FOOTER: ACTIONS --}}
                                     <div
-                                        class="sticky bottom-0 px-10 py-6 bg-white border-t border-gray-100 flex items-center justify-between">
-                                        <div class="flex items-center gap-2">
+                                        class="sticky bottom-0 px-4 py-3.5 sm:px-10 sm:py-6 bg-white border-t border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                                        <div class="flex items-center justify-center sm:justify-start gap-1.5 sm:gap-2">
                                             <template x-for="(dot, dIdx) in selectedItems.length" :key="dIdx">
                                                 <div class="h-1.5 rounded-full transition-all duration-300"
-                                                    :class="currentIndex === dIdx ? 'w-8 bg-orange-600' : 'w-1.5 bg-gray-200'">
+                                                    :class="currentIndex === dIdx ? 'w-6 sm:w-8 bg-orange-600' : 'w-1.5 bg-gray-200'">
                                                 </div>
                                             </template>
                                         </div>
-                                        <div class="flex items-center gap-4">
+                                        <div class="flex items-center justify-end gap-2 sm:gap-4">
                                             <button type="button" @click="showAbsenModal = false"
-                                                class="px-6 py-3 text-xs font-black text-gray-400 uppercase tracking-widest hover:text-gray-600 transition">Batal</button>
+                                                class="px-4 py-2 sm:px-6 sm:py-3 text-xs font-black text-gray-400 uppercase tracking-widest hover:text-gray-600 transition">Batal</button>
                                             <button type="button" @click="confirmSubmit()"
-                                                class="px-10 py-4 bg-orange-600 text-white text-xs font-black uppercase tracking-[0.2em] rounded-2xl hover:bg-orange-700 shadow-xl shadow-orange-100 transition-all active:scale-95">
+                                                class="px-6 py-2.5 sm:px-10 sm:py-4 bg-orange-600 text-white text-xs font-black uppercase tracking-[0.2em] rounded-2xl hover:bg-orange-700 shadow-xl shadow-orange-100 transition-all active:scale-95">
                                                 Simpan Semua Data
                                             </button>
                                         </div>
@@ -1644,9 +1631,9 @@ toggleWithGroup(id) {
                                 </form>
                             </div>
 
-                            <!-- MODAL: KELOMPOK ABSEN (ONE FORM FOR ALL - SAME UI) -->
+                            <!-- MODAL: KELOMPOK ABSEN (ONE FORM FOR ALL) -->
                             <div x-show="showAbsenKelompokModal"
-                                class="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6" x-cloak>
+                                class="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6" x-cloak>
                                 <div x-show="showAbsenKelompokModal" x-transition.opacity
                                     @click="showAbsenKelompokModal = false"
                                     class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm"></div>
@@ -1654,34 +1641,34 @@ toggleWithGroup(id) {
                                 <form
                                     action="{{ route('absensi.kelompok.borongan.bulk.update', ['id_unit' => $unit->id, 'date' => $date]) }}"
                                     method="POST" enctype="multipart/form-data" x-ref="groupForm"
-                                    class="relative bg-white rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.1)] w-full max-w-6xl overflow-hidden flex flex-col max-h-[90vh] border border-gray-100">
+                                    class="relative bg-white rounded-3xl sm:rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.1)] w-full max-w-6xl overflow-hidden flex flex-col max-h-[92vh] sm:max-h-[90vh] border border-gray-100">
                                     @csrf
                                     @method('PUT')
                                     <input type="hidden" name="date" value="{{ $date }}">
 
                                     {{-- HEADER --}}
                                     <div
-                                        class="px-10 py-5 bg-slate-50/80 border-b border-gray-100 flex items-center justify-between">
-                                        <div class="flex items-center gap-4">
+                                        class="px-5 py-4 sm:px-10 sm:py-5 bg-slate-50/80 border-b border-gray-100 flex items-center justify-between">
+                                        <div class="flex items-center gap-3 sm:gap-4">
                                             <div
-                                                class="w-10 h-10 bg-white rounded-xl shadow-sm border border-gray-100 flex items-center justify-center">
-                                                <svg class="w-5 h-5 text-orange-500" fill="none" viewBox="0 0 24 24"
+                                                class="w-9 h-9 sm:w-10 sm:h-10 bg-white rounded-xl shadow-sm border border-gray-100 flex items-center justify-center shrink-0">
+                                                <svg class="w-4 h-4 sm:w-5 sm:h-5 text-orange-500" fill="none" viewBox="0 0 24 24"
                                                     stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                         d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                                                 </svg>
                                             </div>
                                             <div>
-                                                <h1 class="text-base font-black text-slate-800 tracking-tight">Presensi
+                                                <h1 class="text-sm sm:text-base font-black text-slate-800 tracking-tight">Presensi
                                                     Kelompok Borongan</h1>
                                                 <p
-                                                    class="text-[12px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">
-                                                    Input satu data untuk banyak pekerja sekaligus</p>
+                                                    class="text-[10px] sm:text-[12px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">
+                                                    Input satu data untuk banyak pekerja</p>
                                             </div>
                                         </div>
                                         <button @click="showAbsenKelompokModal = false" type="button"
-                                            class="p-3 text-slate-300 hover:text-red-500 transition-colors">
-                                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+                                            class="p-2 sm:p-3 text-slate-300 hover:text-red-500 transition-colors">
+                                            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24"
                                                 stroke="currentColor">
                                                 <path stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                             </svg>
@@ -1689,18 +1676,18 @@ toggleWithGroup(id) {
                                     </div>
 
                                     {{-- WORKERS LIST HEADER --}}
-                                    <div class="px-10 py-6 bg-white border-b border-gray-100">
-                                        <div class="flex items-start gap-6">
-                                            <div class="w-14 h-14 rounded-2xl bg-orange-600 text-white flex items-center justify-center text-xl font-black shadow-lg shadow-orange-200"
+                                    <div class="px-5 py-4 sm:px-10 sm:py-6 bg-white border-b border-gray-100">
+                                        <div class="flex items-start gap-3 sm:gap-6">
+                                            <div class="w-10 h-10 sm:w-14 sm:h-14 rounded-2xl bg-orange-600 text-white flex items-center justify-center text-sm sm:text-xl font-black shadow-lg shadow-orange-200 shrink-0"
                                                 x-text="selectedItems.length"></div>
                                             <div class="flex-1 min-w-0">
                                                 <h3
-                                                    class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">
+                                                    class="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1 sm:mb-2">
                                                     Anggota Kelompok Terpilih:</h3>
-                                                <div class="flex flex-wrap gap-2">
+                                                <div class="flex flex-wrap gap-1.5 sm:gap-2 max-h-24 sm:max-h-32 overflow-y-auto custom-scrollbar">
                                                     <template x-for="id in selectedItems" :key="id">
                                                         <span
-                                                            class="px-3 py-1.5 bg-slate-50 border border-slate-100 rounded-xl text-xs font-black text-slate-700 truncate max-w-[200px]"
+                                                            class="px-2.5 py-1 sm:px-3 sm:py-1.5 bg-slate-50 border border-slate-100 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-black text-slate-700 truncate max-w-[160px] sm:max-w-[200px]"
                                                             x-text="workerMap[id]?.nama"></span>
                                                     </template>
                                                 </div>
@@ -1709,43 +1696,42 @@ toggleWithGroup(id) {
                                     </div>
 
                                     {{-- FORM BODY --}}
-                                    {{-- FORM BODY --}}
-                                    <div class="flex-1 overflow-y-auto custom-scrollbar bg-gray-50/30 p-10">
+                                    <div class="flex-1 overflow-y-auto custom-scrollbar bg-gray-50/30 p-3.5 sm:p-10">
 
                                         {{-- Hidden: submit all selected worker IDs --}}
                                         <template x-for="id in selectedItems" :key="'gid-' + id">
                                             <input type="hidden" name="selected_ids[]" :value="id">
                                         </template>
 
-                                        <div class="max-w-5xl mx-auto space-y-6">
+                                        <div class="max-w-5xl mx-auto space-y-4 sm:space-y-6">
 
                                             {{-- Add Item Button --}}
-                                            <div class="flex justify-between items-center mb-4">
+                                            <div class="flex justify-between items-center mb-2 sm:mb-4">
                                                 <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest">
-                                                    Daftar Hasil Borongan (Berlaku untuk semua pekerja terpilih)
+                                                    Daftar Hasil Borongan
                                                 </h4>
                                                 <button type="button" @click="groupRows.push(getEmptyRow())"
                                                     :disabled="groupRows.length >= {{ count($barangs) }}"
                                                     :class="groupRows.length >= {{ count($barangs) }} ?
                                                         'opacity-50 cursor-not-allowed bg-gray-100 text-gray-400' :
                                                         'bg-orange-50 text-orange-600 hover:bg-orange-600 hover:text-white'"
-                                                    class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all">
+                                                    class="flex items-center gap-1.5 sm:gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs font-bold transition-all">
                                                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24"
                                                         stroke="currentColor">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
                                                             stroke-width="2.5" d="M12 4v16m8-8H4" />
                                                     </svg>
                                                     <span
-                                                        x-text="groupRows.length >= {{ count($barangs) }} ? 'Batas Barang Tercapai' : 'Tambah Baris Barang'"></span>
+                                                        x-text="groupRows.length >= {{ count($barangs) }} ? 'Batas Tercapai' : 'Tambah Baris'"></span>
                                                 </button>
                                             </div>
 
                                             {{-- The Rows (loop over groupRows directly) --}}
                                             <template x-for="(row, rIdx) in groupRows" :key="rIdx">
                                                 <div
-                                                    class="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm space-y-6 relative group">
+                                                    class="bg-white p-4 sm:p-6 rounded-2xl sm:rounded-[2rem] border border-gray-100 shadow-sm space-y-4 sm:space-y-6 relative group">
                                                     <button type="button" @click="groupRows.splice(rIdx, 1)"
-                                                        class="absolute top-4 right-4 p-2 text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all">
+                                                        class="absolute top-3 right-3 sm:top-4 sm:right-4 p-2 text-gray-300 hover:text-red-500 transition-all">
                                                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24"
                                                             stroke="currentColor">
                                                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -1754,7 +1740,7 @@ toggleWithGroup(id) {
                                                         </svg>
                                                     </button>
 
-                                                    <div class="grid grid-cols-12 gap-6">
+                                                    <div class="grid grid-cols-12 gap-4 sm:gap-6">
                                                         {{-- Col 1: Item & Quantities --}}
                                                         <div class="col-span-12 lg:col-span-7 space-y-4">
                                                             <div class="flex flex-col gap-1.5" x-data="{ open: false, search: '', options: {{ json_encode($barangs) }} }">
@@ -1798,20 +1784,20 @@ toggleWithGroup(id) {
                                                                             class="max-h-48 overflow-y-auto custom-scrollbar">
                                                                             <template
                                                                                 x-for="item in options.filter(b =>
-                                            b.nama_item.toLowerCase().includes(search.toLowerCase()) &&
-                                            !groupRows.some(r => r !== row && r.id_barang == b.id)
-                                        )"
+                                             b.nama_item.toLowerCase().includes(search.toLowerCase()) &&
+                                             !groupRows.some(r => r !== row && r.id_barang == b.id)
+                                         )"
                                                                                 :key="item.id">
                                                                                 <li>
                                                                                     <button type="button"
                                                                                         @click="
-                                                        row.id_barang = item.id;
-                                                        row.max_rej_subkon = item.max_rej_subkon;
-                                                        row.FD = 0; row.act_rej = 0; row.good_mc = 0;
-                                                        row.rej_mc_dibebankan = 0; row.totalQTY = 0;
-                                                        open = false; search = '';
-                                                        updateGroupPrices(rIdx);
-                                                    "
+                                                         row.id_barang = item.id;
+                                                         row.max_rej_subkon = item.max_rej_subkon;
+                                                         row.FD = 0; row.act_rej = 0; row.good_mc = 0;
+                                                         row.rej_mc_dibebankan = 0; row.totalQTY = 0;
+                                                         open = false; search = '';
+                                                         updateGroupPrices(rIdx);
+                                                     "
                                                                                         class="w-full text-left px-4 py-3 text-xs font-semibold transition-colors flex items-center justify-between"
                                                                                         :class="row.id_barang == item.id ?
                                                                                             'bg-orange-50 text-orange-700' :
@@ -1832,8 +1818,8 @@ toggleWithGroup(id) {
                                                                                 </li>
                                                                             </template>
                                                                             <div x-show="options.filter(b =>
-                                            b.nama_item.toLowerCase().includes(search.toLowerCase()) &&
-                                            !groupRows.some(r => r !== row && r.id_barang == b.id)).length === 0"
+                                             b.nama_item.toLowerCase().includes(search.toLowerCase()) &&
+                                             !groupRows.some(r => r !== row && r.id_barang == b.id)).length === 0"
                                                                                 class="px-4 py-8 text-center">
                                                                                 <p
                                                                                     class="text-[12px] font-bold text-slate-300 uppercase tracking-widest">
@@ -1845,45 +1831,45 @@ toggleWithGroup(id) {
                                                             </div>
 
                                                             {{-- Quantity Inputs --}}
-                                                            <div class="space-y-4">
-                                                                <div class="grid grid-cols-3 gap-3">
-                                                                    <div class="flex flex-col gap-1.5">
+                                                            <div class="space-y-3 sm:space-y-4">
+                                                                <div class="grid grid-cols-3 gap-2 sm:gap-3">
+                                                                    <div class="flex flex-col gap-1 sm:gap-1.5">
                                                                         <label
-                                                                            class="text-[12px] font-black text-slate-400 uppercase tracking-widest">FD</label>
+                                                                            class="text-[11px] sm:text-[12px] font-black text-slate-400 uppercase tracking-widest">FD</label>
                                                                         <input type="number" min="0"
                                                                             :name="'group_data[' + rIdx + '][FD]'"
                                                                             :disabled="!row.id_barang"
                                                                             x-model.number="row.FD"
                                                                             @input="updateGroupPrices(rIdx)"
-                                                                            class="bg-slate-50 border-transparent rounded-xl px-3 py-2 text-xs font-bold focus:bg-white focus:ring-2 focus:ring-slate-200 outline-none transition-all">
+                                                                            class="bg-slate-50 border-transparent rounded-xl px-2.5 sm:px-3 py-2 text-xs font-bold focus:bg-white focus:ring-2 focus:ring-slate-200 outline-none transition-all">
                                                                     </div>
-                                                                    <div class="flex flex-col gap-1.5">
+                                                                    <div class="flex flex-col gap-1 sm:gap-1.5">
                                                                         <label
-                                                                            class="text-[12px] font-black text-emerald-500 uppercase tracking-widest">Good
+                                                                            class="text-[11px] sm:text-[12px] font-black text-emerald-500 uppercase tracking-widest">Good
                                                                             MC</label>
                                                                         <input type="number" min="0"
                                                                             :name="'group_data[' + rIdx + '][good_mc]'"
                                                                             :disabled="!row.id_barang"
                                                                             x-model.number="row.good_mc"
                                                                             @input="updateGroupPrices(rIdx)"
-                                                                            class="bg-slate-50 border-transparent rounded-xl px-3 py-2 text-xs font-bold focus:bg-white focus:ring-2 focus:ring-emerald-200 outline-none transition-all">
+                                                                            class="bg-slate-50 border-transparent rounded-xl px-2.5 sm:px-3 py-2 text-xs font-bold focus:bg-white focus:ring-2 focus:ring-emerald-200 outline-none transition-all">
                                                                     </div>
-                                                                    <div class="flex flex-col gap-1.5">
+                                                                    <div class="flex flex-col gap-1 sm:gap-1.5">
                                                                         <label
-                                                                            class="text-[12px] font-black text-slate-400 uppercase tracking-widest">Act/Rej</label>
+                                                                            class="text-[11px] sm:text-[12px] font-black text-slate-400 uppercase tracking-widest">Act/Rej</label>
                                                                         <input type="number" min="0"
                                                                             :name="'group_data[' + rIdx + '][act_rej]'"
                                                                             :disabled="!row.id_barang"
                                                                             x-model.number="row.act_rej"
                                                                             @input="updateGroupPrices(rIdx)"
-                                                                            class="bg-slate-50 border-transparent rounded-xl px-3 py-2 text-xs font-bold focus:bg-white focus:ring-2 focus:ring-slate-200 outline-none transition-all">
+                                                                            class="bg-slate-50 border-transparent rounded-xl px-2.5 sm:px-3 py-2 text-xs font-bold focus:bg-white focus:ring-2 focus:ring-slate-200 outline-none transition-all">
                                                                     </div>
                                                                 </div>
 
-                                                                <div class="grid grid-cols-2 gap-3">
-                                                                    <div class="flex flex-col gap-1.5">
+                                                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+                                                                    <div class="flex flex-col gap-1 sm:gap-1.5">
                                                                         <label
-                                                                            class="text-[12px] font-black text-gray-500 uppercase tracking-widest">
+                                                                            class="text-[11px] sm:text-[12px] font-black text-gray-500 uppercase tracking-widest">
                                                                             Max Rej. Subkon ( <span
                                                                                 x-text="row.max_rej_subkon"></span>% )
                                                                         </label>
@@ -1896,9 +1882,9 @@ toggleWithGroup(id) {
                                                                                 class="absolute right-3 text-[10px] font-black text-slate-400 uppercase">Pcs</span>
                                                                         </div>
                                                                     </div>
-                                                                    <div class="flex flex-col gap-1.5">
+                                                                    <div class="flex flex-col gap-1 sm:gap-1.5">
                                                                         <label
-                                                                            class="text-[12px] font-black text-red-500 uppercase tracking-widest">Rej.
+                                                                            class="text-[11px] sm:text-[12px] font-black text-red-500 uppercase tracking-widest">Rej.
                                                                             MC Dibebankan</label>
                                                                         <input type="number" readonly
                                                                             :name="'group_data[' + rIdx +
@@ -1911,31 +1897,31 @@ toggleWithGroup(id) {
 
                                                             {{-- Totals Display --}}
                                                             <div
-                                                                class="mt-4 p-4 rounded-2xl border-2 border-dashed border-slate-100 bg-slate-50/30">
+                                                                class="mt-3 sm:mt-4 p-3 sm:p-4 rounded-2xl border-2 border-dashed border-slate-100 bg-slate-50/30">
                                                                 <div
-                                                                    class="grid grid-cols-2 gap-4 divide-x divide-slate-200">
-                                                                    <div class="flex items-center justify-between pr-4">
+                                                                    class="grid grid-cols-2 gap-2 sm:gap-4 divide-x divide-slate-200">
+                                                                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pr-2 sm:pr-4">
                                                                         <p
-                                                                            class="text-[10px] font-black text-orange-400 uppercase tracking-widest">
+                                                                            class="text-[9px] sm:text-[10px] font-black text-orange-400 uppercase tracking-widest">
                                                                             Total Produksi</p>
                                                                         <div class="flex items-baseline gap-1">
                                                                             <span
-                                                                                class="text-2xl font-black text-slate-700"
+                                                                                class="text-lg sm:text-2xl font-black text-slate-700"
                                                                                 x-text="(parseInt(row.FD)||0) + (parseInt(row.act_rej)||0) + (parseInt(row.good_mc)||0)"></span>
                                                                             <span
-                                                                                class="text-[10px] font-black text-slate-400 uppercase">Pcs</span>
+                                                                                class="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase">Pcs</span>
                                                                         </div>
                                                                     </div>
-                                                                    <div class="flex items-center justify-between pl-4">
+                                                                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pl-2 sm:pl-4">
                                                                         <p
-                                                                            class="text-[10px] font-black text-emerald-500 uppercase tracking-widest">
+                                                                            class="text-[9px] sm:text-[10px] font-black text-emerald-500 uppercase tracking-widest">
                                                                             Yang Dibayar</p>
                                                                         <div class="flex items-baseline gap-1">
                                                                             <span
-                                                                                class="text-2xl font-black text-emerald-600"
+                                                                                class="text-lg sm:text-2xl font-black text-emerald-600"
                                                                                 x-text="(row.good_mc + row.FD - row.rej_mc_dibebankan) || 0"></span>
                                                                             <span
-                                                                                class="text-[10px] font-black text-emerald-500 uppercase">Pcs</span>
+                                                                                class="text-[9px] sm:text-[10px] font-black text-emerald-500 uppercase">Pcs</span>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -1950,33 +1936,33 @@ toggleWithGroup(id) {
                                                             </div>
 
                                                             {{-- Payment Fields --}}
-                                                            <div class="grid grid-cols-2 gap-3 mt-4">
-                                                                <div class="flex flex-col gap-1.5">
+                                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 mt-3 sm:mt-4">
+                                                                <div class="flex flex-col gap-1 sm:gap-1.5">
                                                                     <label
-                                                                        class="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Tagihan
+                                                                        class="text-[10px] sm:text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Tagihan
                                                                         Perusahaan</label>
                                                                     <div class="relative flex items-center">
                                                                         <span
                                                                             class="absolute left-3 text-[10px] font-black text-slate-400">Rp.</span>
                                                                         <input type="text" readonly
                                                                             :value="formatRibuan(row.bayaranPerusahaan)"
-                                                                            class="w-full bg-slate-100 border-transparent rounded-xl pl-10 pr-3 py-2 text-xs font-black text-slate-700 outline-none">
+                                                                            class="w-full bg-slate-100 border-transparent rounded-xl pl-9 sm:pl-10 pr-3 py-2 text-xs font-black text-slate-700 outline-none">
                                                                         <input type="hidden"
                                                                             :name="'group_data[' + rIdx +
                                                                                 '][bayaranPerusahaan]'"
                                                                             x-model="row.bayaranPerusahaan">
                                                                     </div>
                                                                 </div>
-                                                                <div class="flex flex-col gap-1.5">
+                                                                <div class="flex flex-col gap-1 sm:gap-1.5">
                                                                     <label
-                                                                        class="text-[11px] font-black text-orange-600 uppercase tracking-widest ml-1">Bayaran
+                                                                        class="text-[10px] sm:text-[11px] font-black text-orange-600 uppercase tracking-widest ml-1">Bayaran
                                                                         Pekerja</label>
                                                                     <div class="relative flex items-center">
                                                                         <span
                                                                             class="absolute left-3 text-[10px] font-black text-orange-300">Rp.</span>
                                                                         <input type="text" readonly
                                                                             :value="formatRibuan(row.bayaranItem)"
-                                                                            class="w-full bg-orange-50 border border-orange-100 rounded-xl pl-10 pr-3 py-2 text-xs font-black text-orange-700 outline-none">
+                                                                            class="w-full bg-orange-50 border border-orange-100 rounded-xl pl-9 sm:pl-10 pr-3 py-2 text-xs font-black text-orange-700 outline-none">
                                                                         <input type="hidden"
                                                                             :name="'group_data[' + rIdx + '][bayaranItem]'"
                                                                             x-model="row.bayaranItem">
@@ -1986,33 +1972,33 @@ toggleWithGroup(id) {
                                                         </div>
 
                                                         {{-- Col 2: File & Note --}}
-                                                        <div class="col-span-12 lg:col-span-5 space-y-4">
-                                                            <div class="flex flex-col gap-1.5">
+                                                        <div class="col-span-12 lg:col-span-5 space-y-3 sm:space-y-4">
+                                                            <div class="flex flex-col gap-1 sm:gap-1.5">
                                                                 <label
-                                                                    class="text-[12px] font-black text-slate-400 uppercase tracking-widest ml-1">Bukti
+                                                                    class="text-[11px] sm:text-[12px] font-black text-slate-400 uppercase tracking-widest ml-1">Bukti
                                                                     Surat Jalan</label>
                                                                 <div class="relative group/file">
                                                                     <input type="file"
                                                                         :name="'group_data[' + rIdx + '][buktiSuratJalan]'"
                                                                         @change="const file = $event.target.files[0]; if(file) { row.fileName = file.name; }"
                                                                         class="absolute inset-0 w-full h-full opacity-0 z-10 cursor-pointer">
-                                                                    <div class="flex items-center gap-3 px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl transition-all group-hover/file:bg-white group-hover/file:border-orange-200 shadow-sm"
+                                                                    <div class="flex items-center gap-2.5 sm:gap-3 px-3.5 py-2.5 sm:px-4 sm:py-3 bg-slate-50 border border-slate-100 rounded-xl transition-all group-hover/file:bg-white group-hover/file:border-orange-200 shadow-sm"
                                                                         :class="row.fileName ?
                                                                             'border-orange-100 bg-orange-50/30' : ''">
                                                                         <p class="text-xs font-semibold truncate"
                                                                             :class="row.fileName ? 'text-slate-700' :
                                                                                 'text-slate-400'"
-                                                                            x-text="row.fileName || 'Pilih atau drop file surat jalan...'">
+                                                                            x-text="row.fileName || 'Pilih/drop surat jalan...'">
                                                                         </p>
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                            <div class="flex flex-col gap-1.5">
+                                                            <div class="flex flex-col gap-1 sm:gap-1.5">
                                                                 <label
-                                                                    class="text-[12px] font-black text-slate-400 uppercase tracking-widest ml-1">Catatan</label>
-                                                                <textarea :name="'group_data[' + rIdx + '][catatan]'" rows="3" x-model="row.catatan"
-                                                                    placeholder="Tambahkan keterangan tambahan..."
-                                                                    class="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-2.5 text-xs font-semibold text-slate-700 focus:bg-white focus:ring-2 focus:ring-orange-100 focus:border-orange-400 outline-none transition-all resize-none shadow-sm placeholder:text-slate-300"></textarea>
+                                                                    class="text-[11px] sm:text-[12px] font-black text-slate-400 uppercase tracking-widest ml-1">Catatan</label>
+                                                                <textarea :name="'group_data[' + rIdx + '][catatan]'" rows="2" x-model="row.catatan"
+                                                                    placeholder="Keterangan tambahan..."
+                                                                    class="w-full bg-slate-50 border border-slate-100 rounded-xl px-3.5 py-2 sm:px-4 sm:py-2.5 text-xs font-semibold text-slate-700 focus:bg-white focus:ring-2 focus:ring-orange-100 focus:border-orange-400 outline-none transition-all resize-none shadow-sm placeholder:text-slate-300"></textarea>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -2021,10 +2007,10 @@ toggleWithGroup(id) {
 
                                             {{-- Empty State --}}
                                             <div x-show="groupRows.length === 0"
-                                                class="py-20 border-2 border-dashed border-gray-100 rounded-[2.5rem] flex flex-col items-center justify-center text-gray-300">
-                                                <p class="text-sm font-bold">Belum ada item ditambahkan</p>
+                                                class="py-12 sm:py-20 border-2 border-dashed border-gray-100 rounded-2xl sm:rounded-[2.5rem] flex flex-col items-center justify-center text-gray-300">
+                                                <p class="text-xs sm:text-sm font-bold">Belum ada item ditambahkan</p>
                                                 <button type="button" @click="groupRows.push(getEmptyRow())"
-                                                    class="mt-4 text-xs font-black text-orange-600 uppercase tracking-widest hover:underline">Tambah
+                                                    class="mt-3 text-xs font-black text-orange-600 uppercase tracking-widest hover:underline">Tambah
                                                     Sekarang</button>
                                             </div>
                                         </div>
@@ -2032,50 +2018,46 @@ toggleWithGroup(id) {
 
                                     {{-- FOOTER --}}
                                     <div
-                                        class="px-10 py-6 bg-white border-t border-gray-100 flex items-center justify-end gap-4 shadow-[0_-10px_40px_rgba(0,0,0,0.02)]">
+                                        class="px-4 py-3.5 sm:px-10 sm:py-6 bg-white border-t border-gray-100 flex items-center justify-end gap-2 sm:gap-4 shadow-[0_-10px_40px_rgba(0,0,0,0.02)]">
                                         <button type="button" @click="showAbsenKelompokModal = false"
-                                            class="px-6 py-3 text-xs font-black text-gray-400 uppercase tracking-widest hover:text-gray-600 transition">Batal</button>
+                                            class="px-4 py-2 sm:px-6 sm:py-3 text-xs font-black text-gray-400 uppercase tracking-widest hover:text-gray-600 transition">Batal</button>
                                         <button type="button" @click="confirmSubmitGroup()"
-                                            class="px-12 py-4 bg-orange-600 text-white text-[11px] font-black uppercase tracking-[0.2em] rounded-2xl hover:bg-orange-700 shadow-xl shadow-orange-100 transition-all active:scale-95">Simpan
+                                            class="px-6 py-2.5 sm:px-12 sm:py-4 bg-orange-600 text-white text-[11px] font-black uppercase tracking-[0.2em] rounded-2xl hover:bg-orange-700 shadow-xl shadow-orange-100 transition-all active:scale-95">Simpan
                                             Data Kelompok</button>
                                     </div>
                                 </form>
                             </div>
-
-
                             <!-- MODAL: UPDATE STATUS ABSENSI -->
                             <div x-show="showAbsenStatusModal"
-                                class="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6" x-cloak>
-                                {{-- Glass Backdrop --}}
+                                class="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6" x-cloak>
                                 <div x-show="showAbsenStatusModal" x-transition.opacity
                                     @click="showAbsenStatusModal = false"
-                                    class="fixed inset-0 bg-gray-900/60 backdrop-blur-md"></div>
+                                    class="fixed inset-0 bg-slate-900/40 backdrop-blur-md"></div>
 
-                                {{-- Modal Content --}}
                                 <div x-show="showAbsenStatusModal" x-transition:enter="ease-out duration-300"
                                     x-transition:enter-start="opacity-0 scale-95 translate-y-8"
                                     x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-                                    class="relative bg-white rounded-[2.5rem] shadow-[0_30px_100px_rgba(0,0,0,0.25)] w-full max-w-5xl overflow-hidden flex flex-col max-h-[85vh] border border-white/20">
+                                    class="relative bg-white rounded-3xl sm:rounded-[2.5rem] shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col max-h-[92vh] sm:max-h-[90vh] border border-gray-100">
 
                                     {{-- Header Section --}}
                                     <div
-                                        class="px-10 py-8 border-b border-gray-100 bg-gradient-to-b from-gray-50 to-white relative">
+                                        class="px-5 py-4 sm:px-10 sm:py-8 border-b border-gray-100 bg-gradient-to-b from-gray-50 to-white relative">
                                         <div class="flex items-center justify-between">
                                             <div>
-                                                <div class="flex items-center gap-3 mb-1">
+                                                <div class="flex items-center gap-2 sm:gap-3 mb-1">
                                                     <span
-                                                        class="px-3 py-1 bg-orange-600 text-white text-[12px] font-black uppercase tracking-widest rounded-lg">Keterangan
+                                                        class="px-2 sm:px-3 py-0.5 sm:py-1 bg-orange-600 text-white text-[10px] sm:text-[12px] font-black uppercase tracking-widest rounded-lg">Keterangan
                                                         Khusus</span>
-                                                    <h3 class="text-2xl font-black text-gray-900 tracking-tight">Status &
+                                                    <h3 class="text-lg sm:text-2xl font-black text-gray-900 tracking-tight">Status &
                                                         Alasan<span class="text-orange-600">.</span></h3>
                                                 </div>
-                                                <p class="text-sm text-gray-500 font-medium">Memperbarui alasan
+                                                <p class="text-xs sm:text-sm text-gray-500 font-medium">Memperbarui alasan
                                                     ketidakhadiran untuk <span x-text="selectedItems.length"
                                                         class="text-orange-600 font-black"></span> pekerja.</p>
                                             </div>
                                             <button @click="showAbsenStatusModal = false"
-                                                class="group p-3 bg-gray-100 hover:bg-red-50 rounded-2xl transition-all">
-                                                <svg class="w-6 h-6 text-gray-400 group-hover:text-red-500 transition-colors"
+                                                class="group p-2 sm:p-3 bg-gray-100 hover:bg-red-50 rounded-xl sm:rounded-2xl transition-all">
+                                                <svg class="w-5 h-5 sm:w-6 sm:h-6 text-gray-400 group-hover:text-red-500 transition-colors"
                                                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
                                                         stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
@@ -2088,41 +2070,36 @@ toggleWithGroup(id) {
                                     <form
                                         action="{{ route('absensi.borongan.bulk.update', ['id_unit' => $unit->id, 'date' => $date]) }}"
                                         method="POST" x-ref="absenForm" x-data="absenFormHandler()"
-                                        class="flex-1 overflow-y-auto custom-scrollbar bg-white p-10 pt-6">
+                                        class="flex-1 overflow-y-auto custom-scrollbar bg-white p-4 sm:p-10 pt-4 sm:pt-6 flex flex-col">
                                         @csrf
                                         @method('PUT')
                                         <input type="hidden" name="date" value="{{ $date }}">
 
-                                        <table class="w-full border-separate border-spacing-y-4">
+                                        {{-- Desktop Table View --}}
+                                        <table class="hidden md:table w-full border-separate border-spacing-y-4">
                                             <thead>
                                                 <tr
                                                     class="text-[12px] font-black text-gray-400 uppercase tracking-[0.2em]">
                                                     <th class="text-left pb-2 pl-6">Informasi Pekerja</th>
                                                     <th class="text-left pb-2 w-64">Tipe Absensi</th>
-                                                    {{-- <th class="text-left pb-2 pr-6">Catatan / Keterangan</th> --}}
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <template x-for="id in selectedItems" :key="id">
                                                     <tr class="group">
-                                                        {{-- Side Label: Pekerja --}}
                                                         <td
                                                             class="py-4 pl-6 bg-gray-50/50 rounded-l-2xl border-y border-l border-gray-100">
-                                                            {{-- Left: Identity Section --}}
                                                             <div
                                                                 class="flex items-center gap-4 min-w-0 flex-1 lg:flex-none lg:w-64">
-                                                                {{-- Avatar Circle (Keep as is) --}}
                                                                 <div
                                                                     class="flex-shrink-0 w-12 h-12 rounded-2xl bg-white shadow-sm border border-gray-100 flex items-center justify-center text-orange-600 text-xs font-black group-hover:bg-orange-600 group-hover:text-white transition-all duration-500">
                                                                     <span x-text="workerMap[id]?.initials"></span>
                                                                 </div>
 
-                                                                {{-- Name & NIK Container --}}
-                                                                <div class="min-w-0"> {{-- This allows the children to truncate --}}
+                                                                <div class="min-w-0">
                                                                     <p class="text-sm font-black text-gray-900 leading-tight truncate"
                                                                         x-text="workerMap[id]?.nama"
                                                                         :title="workerMap[id]?.nama">
-                                                                        {{-- Added :title so full name shows on hover --}}
                                                                     </p>
                                                                     <p class="text-[12px] font-bold text-gray-400 mt-0.5 tracking-widest truncate"
                                                                         x-text="workerMap[id]?.nik">
@@ -2131,9 +2108,8 @@ toggleWithGroup(id) {
                                                             </div>
                                                         </td>
 
-                                                        {{-- Alpine Dropdown (Balanced Height) --}}
                                                         <td
-                                                            class="py-4 pl-0 pr-10 bg-gray-50/50 border-y border-gray-100 ">
+                                                            class="py-4 pl-0 pr-10 bg-gray-50/50 rounded-r-2xl border-y border-r border-gray-100">
                                                             <div x-data="{
                                                                 open: false,
                                                                 list: [
@@ -2187,13 +2163,75 @@ toggleWithGroup(id) {
                                             </tbody>
                                         </table>
 
+                                        {{-- Mobile Card Stack View --}}
+                                        <div class="md:hidden space-y-3">
+                                            <template x-for="id in selectedItems" :key="'mob-status-' + id">
+                                                <div class="p-4 bg-gray-50/70 border border-gray-100 rounded-2xl space-y-3">
+                                                    {{-- Header Pekerja --}}
+                                                    <div class="flex items-center gap-3">
+                                                        <div
+                                                            class="flex-shrink-0 w-10 h-10 rounded-xl bg-white shadow-sm border border-gray-100 flex items-center justify-center text-orange-600 text-xs font-black">
+                                                            <span x-text="workerMap[id]?.initials"></span>
+                                                        </div>
+                                                        <div class="min-w-0 flex-1">
+                                                            <p class="text-xs font-black text-gray-900 leading-tight truncate"
+                                                                x-text="workerMap[id]?.nama">
+                                                            </p>
+                                                            <p class="text-[10px] font-bold text-gray-400 font-mono"
+                                                                x-text="workerMap[id]?.nik">
+                                                            </p>
+                                                        </div>
+                                                    </div>
+
+                                                    {{-- Status Selector --}}
+                                                    <div x-data="{
+                                                        open: false,
+                                                        list: [
+                                                            { val: '2', label: 'Cuti' }
+                                                        ]
+                                                    }" class="relative">
+                                                        <label class="block text-[9px] font-black text-gray-400 uppercase tracking-wider mb-1">Status Absensi</label>
+                                                        <input type="hidden" :name="'data[' + id + '][status]'" x-model="rowStatus[id]">
+                                                        <div @click="open = !open" @click.outside="open = false"
+                                                            class="flex items-center justify-between px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl cursor-pointer hover:border-orange-400 transition-all shadow-sm">
+                                                            <span class="text-xs font-bold"
+                                                                :class="rowStatus[id] == 1 ? 'text-blue-600' : 'text-gray-700'"
+                                                                x-text="rowStatus[id] == 1 ? 'Hadir (Ubah ke...)' : (list.find(x => x.val == rowStatus[id])?.label || 'Pilih Status')">
+                                                            </span>
+                                                            <svg class="w-4 h-4 text-orange-500 transition-transform duration-300"
+                                                                :class="open ? 'rotate-180' : ''" fill="none"
+                                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7" />
+                                                            </svg>
+                                                        </div>
+
+                                                        <div x-show="open" x-transition.origin.top
+                                                            class="absolute w-full mt-1 bg-white border border-gray-100 rounded-xl shadow-xl z-[110] overflow-hidden">
+                                                            <template x-for="item in list" :key="item.val">
+                                                                <div @click="rowStatus[id] = item.val; open = false"
+                                                                    class="px-3.5 py-2.5 text-xs font-bold cursor-pointer transition-colors"
+                                                                    :class="rowStatus[id] == item.val ? 'bg-orange-50 text-orange-600' : 'text-gray-600 hover:bg-gray-50'">
+                                                                    <span x-text="item.label"></span>
+                                                                </div>
+                                                            </template>
+                                                        </div>
+                                                        <div x-show="rowStatus[id] == 1" class="mt-1">
+                                                            <span class="text-[9px] font-bold text-amber-600 uppercase tracking-tighter">
+                                                                ⚠️ Saat ini Hadir
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </template>
+                                        </div>
+
                                         {{-- Sticky Footer --}}
                                         <div
-                                            class="sticky bottom-0 mt-10 py-6 bg-white/90 backdrop-blur-md border-t border-gray-100 flex items-center justify-end gap-4">
+                                            class="sticky bottom-0 mt-6 sm:mt-10 py-4 sm:py-6 bg-white/95 backdrop-blur-md border-t border-gray-100 flex items-center justify-between sm:justify-end gap-3 sm:gap-4">
                                             <button type="button" @click="showAbsenStatusModal = false"
-                                                class="px-6 py-3 text-xs font-black text-gray-400 uppercase tracking-widest hover:text-gray-600 transition">Batal</button>
+                                                class="px-4 py-2 sm:px-6 sm:py-3 text-xs font-black text-gray-400 uppercase tracking-widest hover:text-gray-600 transition">Batal</button>
                                             <button type="button" @click="confirmSubmit()"
-                                                class="px-10 py-4 bg-orange-600 text-white text-xs font-black uppercase tracking-[0.2em] rounded-2xl hover:bg-orange-700 shadow-2xl shadow-orange-200 transition-all active:scale-95">
+                                                class="px-6 py-3 sm:px-10 sm:py-4 bg-orange-600 text-white text-xs font-black uppercase tracking-[0.2em] rounded-2xl hover:bg-orange-700 shadow-2xl shadow-orange-200 transition-all active:scale-95">
                                                 Simpan Keterangan
                                             </button>
                                         </div>
@@ -2203,58 +2241,58 @@ toggleWithGroup(id) {
 
                             <!-- MODAL: Tunjangan -->
                             <div x-show="showTunjanganModal"
-                                class="fixed inset-0 z-[100] flex items-center justify-center p-4" x-cloak>
+                                class="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4" x-cloak>
                                 {{-- Glass Backdrop --}}
                                 <div x-show="showTunjanganModal" x-transition.opacity @click="showTunjanganModal = false"
                                     class="fixed inset-0 bg-slate-900/40 backdrop-blur-md"></div>
 
-                                {{-- Modal Content: Tightened max-width and rounded corner --}}
+                                {{-- Modal Content --}}
                                 <div x-show="showTunjanganModal" x-transition:enter="ease-out duration-300"
                                     x-transition:enter-start="opacity-0 scale-95 translate-y-8"
                                     x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-                                    class="relative bg-white/95 backdrop-blur-2xl rounded-[2.5rem] shadow-[0_25px_80px_-20px_rgba(0,0,0,0.15)] w-full max-w-5xl overflow-hidden flex flex-col border border-white">
+                                    class="relative bg-white/95 backdrop-blur-2xl rounded-3xl sm:rounded-[2.5rem] shadow-[0_25px_80px_-20px_rgba(0,0,0,0.15)] w-full max-w-5xl overflow-hidden flex flex-col max-h-[90vh] sm:max-h-[85vh] border border-white">
 
-                                    {{-- Header Section: Compact py and expanded progress --}}
-                                    <div class="px-8 py-6 bg-white/50 border-b border-gray-100">
-                                        <div class="flex items-center justify-between mb-5">
+                                    {{-- Header Section --}}
+                                    <div class="px-5 py-4 sm:px-8 sm:py-6 bg-white/50 border-b border-gray-100">
+                                        <div class="flex items-center justify-between mb-3 sm:mb-5">
                                             <div>
                                                 <span
                                                     class="inline-block px-2 py-0.5 bg-blue-600 text-white text-[8px] font-black uppercase tracking-widest rounded mb-1">Payroll
                                                     Adjustment</span>
-                                                <h3 class="text-2xl font-black text-gray-900 tracking-tight">Input Detail
+                                                <h3 class="text-lg sm:text-2xl font-black text-gray-900 tracking-tight">Input Detail
                                                     Tunjangan<span class="text-blue-600">.</span></h3>
                                             </div>
 
                                             {{-- Unified Navigation & Close --}}
-                                            <div class="flex items-center gap-2">
+                                            <div class="flex items-center gap-1.5 sm:gap-2">
                                                 <div
                                                     class="flex items-center bg-gray-50 p-1 rounded-xl border border-gray-100">
                                                     <button type="button" @click="prevWorker()"
                                                         :disabled="currentIndex === 0"
-                                                        class="p-2.5 rounded-lg transition-all"
+                                                        class="p-1.5 sm:p-2.5 rounded-lg transition-all"
                                                         :class="currentIndex === 0 ? 'text-gray-200 cursor-not-allowed' :
                                                             'text-blue-600 hover:bg-white hover:shadow-sm active:scale-90'">
-                                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                                                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24"
                                                             stroke="currentColor" stroke-width="3">
                                                             <path d="M15 19l-7-7 7-7" />
                                                         </svg>
                                                     </button>
-                                                    <div class="w-px h-5 bg-gray-200 mx-1"></div>
+                                                    <div class="w-px h-4 sm:h-5 bg-gray-200 mx-1"></div>
                                                     <button type="button" @click="nextWorker()"
                                                         :disabled="currentIndex === selectedItems.length - 1"
-                                                        class="p-2.5 rounded-lg transition-all"
+                                                        class="p-1.5 sm:p-2.5 rounded-lg transition-all"
                                                         :class="currentIndex === selectedItems.length - 1 ?
                                                             'text-gray-200 cursor-not-allowed' :
                                                             'text-blue-600 hover:bg-white hover:shadow-sm active:scale-90'">
-                                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                                                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24"
                                                             stroke="currentColor" stroke-width="3">
                                                             <path d="M9 5l7 7-7 7" />
                                                         </svg>
                                                     </button>
                                                 </div>
                                                 <button @click="showTunjanganModal = false"
-                                                    class="p-3 bg-gray-50 hover:bg-rose-50 text-gray-400 hover:text-rose-500 rounded-xl transition-all">
-                                                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                                                    class="p-2 sm:p-3 bg-gray-50 hover:bg-rose-50 text-gray-400 hover:text-rose-500 rounded-xl transition-all">
+                                                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24"
                                                         stroke="currentColor" stroke-width="2.5">
                                                         <path d="M6 18L18 6M6 6l12 12" />
                                                     </svg>
@@ -2279,7 +2317,7 @@ toggleWithGroup(id) {
                                         </div>
                                     </div>
 
-                                    {{-- Main Area: reduced gap from 12 to 8, py from 10 to 6 --}}
+                                    {{-- Main Area --}}
                                     <form
                                         action="{{ route('absensi.bulk.store-tunjangan', ['id_unit' => $unit, 'date' => $date]) }}"
                                         method="POST" enctype="multipart/form-data" x-ref="tunjPotForm"
@@ -2301,52 +2339,52 @@ toggleWithGroup(id) {
                                             </div>
                                         </template>
 
-                                        <div class="flex-1 overflow-y-auto px-10 py-6 custom-scrollbar">
+                                        <div class="flex-1 overflow-y-auto p-4 sm:px-10 sm:py-6 custom-scrollbar">
                                             <template x-for="(id, index) in selectedItems" :key="'visible-' + id">
                                                 <div x-show="index === currentIndex"
                                                     x-transition:enter="transition ease-out duration-300"
                                                     x-transition:enter-start="opacity-0 translate-y-4"
                                                     x-transition:enter-end="opacity-100 translate-y-0">
 
-                                                    <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
-                                                        {{-- Info Panel (Left) --}}
-                                                        <div class="md:col-span-4 space-y-5">
+                                                    <div class="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-8 items-start">
+                                                        {{-- Info Panel (Left / Top on Mobile) --}}
+                                                        <div class="md:col-span-4 space-y-3 sm:space-y-5">
                                                             <div
-                                                                class="p-6 bg-gray-50/50 border border-gray-100 rounded-[2rem]">
+                                                                class="p-4 sm:p-6 bg-gray-50/50 border border-gray-100 rounded-2xl sm:rounded-[2rem]">
                                                                 <p
-                                                                    class="text-[9px] font-black text-blue-600 uppercase tracking-widest mb-3">
+                                                                    class="text-[9px] font-black text-blue-600 uppercase tracking-widest mb-1.5 sm:mb-3">
                                                                     Informasi Pekerja</p>
-                                                                <h4 class="text-xl font-black text-gray-900 leading-tight mb-1"
+                                                                <h4 class="text-base sm:text-xl font-black text-gray-900 leading-tight mb-0.5"
                                                                     x-text="workerMap[id]?.nama"></h4>
                                                                 <p class="text-xs font-bold text-gray-400 font-mono"
                                                                     x-text="workerMap[id]?.nik"></p>
                                                             </div>
 
                                                             <div
-                                                                class="p-6 bg-blue-600 rounded-[2rem] text-white shadow-lg shadow-blue-200">
+                                                                class="p-4 sm:p-6 bg-blue-600 rounded-2xl sm:rounded-[2rem] text-white shadow-lg shadow-blue-200">
                                                                 <p
                                                                     class="text-[9px] font-black opacity-60 uppercase tracking-widest mb-1">
                                                                     Total Tunjangan</p>
-                                                                <p class="text-3xl font-black tracking-tighter"
+                                                                <p class="text-2xl sm:text-3xl font-black tracking-tighter"
                                                                     x-text="'Rp ' + formatRibuan(calculateWorkerTotal(id))">
                                                                 </p>
                                                             </div>
 
-                                                            <div class="space-y-2">
+                                                            <div class="space-y-1.5">
                                                                 <label
                                                                     class="block text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Catatan
                                                                     Khusus (Opsional)</label>
                                                                 <textarea x-model="rowKeteranganTunjangan[id]" placeholder="Keterangan..."
-                                                                    class="w-full h-24 px-5 py-4 bg-white border border-gray-100 rounded-2xl text-xs font-bold text-gray-600 focus:border-blue-400 outline-none shadow-sm resize-none"></textarea>
+                                                                    class="w-full h-20 sm:h-24 px-4 py-3 bg-white border border-gray-100 rounded-2xl text-xs font-bold text-gray-600 focus:border-blue-400 outline-none shadow-sm resize-none"></textarea>
                                                             </div>
                                                         </div>
 
-                                                        {{-- Input Panel (Right) --}}
+                                                        {{-- Input Panel (Right / Bottom on Mobile) --}}
                                                         <div class="md:col-span-8">
                                                             <div
-                                                                class="bg-white border border-gray-100 rounded-[2rem] overflow-hidden shadow-sm">
+                                                                class="bg-white border border-gray-100 rounded-2xl sm:rounded-[2rem] overflow-hidden shadow-sm">
                                                                 <div
-                                                                    class="grid grid-cols-12 gap-4 px-6 py-4 bg-gray-50/50 text-[9px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                                                                    class="hidden sm:grid grid-cols-12 gap-4 px-6 py-4 bg-gray-50/50 text-[9px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
                                                                     <div class="col-span-4">Nama Tunjangan</div>
                                                                     <div class="col-span-3">Nominal</div>
                                                                     <div class="col-span-2 text-center">Jumlah</div>
@@ -2357,41 +2395,41 @@ toggleWithGroup(id) {
                                                                     <template x-for="(item, key) in rowTunjangan[id]"
                                                                         :key="key">
                                                                         <div
-                                                                            class="grid grid-cols-12 gap-4 px-6 py-4 items-center hover:bg-blue-50/30 transition-colors">
-                                                                            <div class="col-span-4">
+                                                                            class="flex flex-col sm:grid sm:grid-cols-12 gap-2 sm:gap-4 p-4 sm:px-6 sm:py-4 sm:items-center hover:bg-blue-50/30 transition-colors">
+                                                                            {{-- Title & Nominal (Mobile Header) --}}
+                                                                            <div class="sm:col-span-4 flex items-center justify-between sm:block">
                                                                                 <p class="text-[11px] font-black text-gray-900 uppercase tracking-tight"
                                                                                     x-text="key.replace(/_/g, ' ')"></p>
+                                                                                <span class="sm:hidden text-xs font-bold text-gray-400" x-text="'Rp ' + formatRibuan(rowTunjangan[id][key].nominal)"></span>
                                                                             </div>
-                                                                            <div class="col-span-3">
+
+                                                                            {{-- Nominal Desktop --}}
+                                                                            <div class="hidden sm:block sm:col-span-3">
                                                                                 <div
                                                                                     class="flex items-center gap-1.5 text-[11px] font-bold text-gray-400">
                                                                                     <span>Rp</span>
                                                                                     <span
                                                                                         x-text="formatRibuan(rowTunjangan[id][key].nominal)"></span>
-                                                                                    <svg class="w-3 h-3 opacity-30"
-                                                                                        fill="none"
-                                                                                        viewBox="0 0 24 24"
-                                                                                        stroke="currentColor">
-                                                                                        <path
-                                                                                            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                                                                                            stroke-width="3" />
-                                                                                    </svg>
                                                                                 </div>
                                                                             </div>
-                                                                            <div class="col-span-2">
-                                                                                <input type="number"
-                                                                                    x-model="rowTunjangan[id][key].qty"
-                                                                                    min="0" step="1"
-                                                                                    {{-- Mencegah pengetikan simbol -, +, dan e --}}
-                                                                                    @keydown="if(['-', '+', 'e', 'E'].includes($event.key)) $event.preventDefault()"
-                                                                                    {{-- Memastikan jika di-paste atau diinput manual tetap jadi angka positif --}}
-                                                                                    @input="if($event.target.value < 0) rowTunjangan[id][key].qty = 0"
-                                                                                    class="w-full py-1.5 bg-gray-50 border border-gray-100 rounded-lg text-xs font-black text-center focus:bg-white focus:border-blue-400 outline-none transition-all">
-                                                                            </div>
-                                                                            <div class="col-span-3 text-right">
-                                                                                <p class="text-[13px] font-black text-blue-600"
-                                                                                    x-text="'Rp.' + formatRibuan(calculateCategoryTotal(id, key))">
-                                                                                </p>
+
+                                                                            {{-- Qty & Subtotal Controls --}}
+                                                                            <div class="flex items-center justify-between sm:contents pt-2 sm:pt-0 border-t border-gray-100 sm:border-0">
+                                                                                <div class="sm:col-span-2 flex items-center gap-2">
+                                                                                    <span class="sm:hidden text-[10px] font-bold text-gray-400 uppercase">Jumlah:</span>
+                                                                                    <input type="number"
+                                                                                        x-model="rowTunjangan[id][key].qty"
+                                                                                        min="0" step="1"
+                                                                                        @keydown="if(['-', '+', 'e', 'E'].includes($event.key)) $event.preventDefault()"
+                                                                                        @input="if($event.target.value < 0) rowTunjangan[id][key].qty = 0"
+                                                                                        class="w-20 sm:w-full py-1.5 bg-gray-50 border border-gray-100 rounded-lg text-xs font-black text-center focus:bg-white focus:border-blue-400 outline-none transition-all">
+                                                                                </div>
+                                                                                <div class="sm:col-span-3 text-right">
+                                                                                    <span class="sm:hidden text-[10px] font-bold text-gray-400 uppercase mr-1">Total:</span>
+                                                                                    <span class="text-xs sm:text-[13px] font-black text-blue-600"
+                                                                                        x-text="'Rp ' + formatRibuan(calculateCategoryTotal(id, key))">
+                                                                                    </span>
+                                                                                </div>
                                                                             </div>
                                                                         </div>
                                                                     </template>
@@ -2403,13 +2441,13 @@ toggleWithGroup(id) {
                                             </template>
                                         </div>
 
-                                        {{-- Footer: Compacted py-5 --}}
+                                        {{-- Footer --}}
                                         <div
-                                            class="px-10 py-5 bg-white border-t border-gray-50 flex items-center justify-between">
+                                            class="px-4 py-4 sm:px-10 sm:py-5 bg-white border-t border-gray-50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
                                             <div class="flex items-center gap-3">
                                                 <div
-                                                    class="h-10 w-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 border border-emerald-100">
-                                                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                                                    class="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 border border-emerald-100 shrink-0">
+                                                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24"
                                                         stroke="currentColor" stroke-width="2.5">
                                                         <path
                                                             d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -2419,18 +2457,18 @@ toggleWithGroup(id) {
                                                     <p
                                                         class="text-[8px] font-black text-gray-400 uppercase tracking-[0.2em]">
                                                         Grand Total Alokasi</p>
-                                                    <p class="text-xl font-black text-emerald-600 tracking-tighter"
+                                                    <p class="text-lg sm:text-xl font-black text-emerald-600 tracking-tighter"
                                                         x-text="'Rp ' + formatRibuan(calculateGrandTotal())"></p>
                                                 </div>
                                             </div>
 
-                                            <div class="flex items-center gap-3">
+                                            <div class="flex items-center justify-end gap-2 sm:gap-3">
                                                 <button type="button" @click="showTunjanganModal = false"
-                                                    class="text-[10px] font-black text-gray-400 uppercase tracking-widest px-4">Batal</button>
+                                                    class="text-[10px] font-black text-gray-400 uppercase tracking-widest px-3 sm:px-4 py-2">Batal</button>
 
                                                 <button type="button" @click="confirmSubmitTunjPot()"
                                                     x-show="currentIndex === selectedItems.length - 1"
-                                                    class="px-8 py-3.5 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all active:scale-95 flex items-center gap-2">
+                                                    class="px-5 py-3 sm:px-8 sm:py-3.5 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all active:scale-95 flex items-center gap-2">
                                                     <span>Finalisasi & Simpan</span>
                                                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24"
                                                         stroke="currentColor" stroke-width="3">
@@ -2440,8 +2478,8 @@ toggleWithGroup(id) {
 
                                                 <button type="button" @click="nextWorker()"
                                                     x-show="currentIndex < selectedItems.length - 1"
-                                                    class="px-8 py-3.5 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl hover:bg-blue-600 transition-all active:scale-95 flex items-center gap-2">
-                                                    Pekerja Berikutnya
+                                                    class="px-5 py-3 sm:px-8 sm:py-3.5 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl hover:bg-blue-600 transition-all active:scale-95 flex items-center gap-2">
+                                                    Berikutnya
                                                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24"
                                                         stroke="currentColor" stroke-width="3">
                                                         <path d="M9 5l7 7-7 7" />
@@ -2455,7 +2493,7 @@ toggleWithGroup(id) {
 
                             <!-- MODAL: Potongan -->
                             <div x-show="showPotonganModal"
-                                class="fixed inset-0 z-[100] flex items-center justify-center p-4" x-cloak>
+                                class="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4" x-cloak>
                                 {{-- Glass Backdrop --}}
                                 <div x-show="showPotonganModal" x-transition.opacity @click="showPotonganModal = false"
                                     class="fixed inset-0 bg-slate-900/40 backdrop-blur-md"></div>
@@ -2464,48 +2502,48 @@ toggleWithGroup(id) {
                                 <div x-show="showPotonganModal" x-transition:enter="ease-out duration-300"
                                     x-transition:enter-start="opacity-0 scale-95 translate-y-8"
                                     x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-                                    class="relative bg-white/95 backdrop-blur-2xl rounded-[2.5rem] shadow-[0_40px_120px_-20px_rgba(0,0,0,0.15)] w-full max-w-5xl overflow-hidden flex flex-col border border-white">
+                                    class="relative bg-white/95 backdrop-blur-2xl rounded-3xl sm:rounded-[2.5rem] shadow-[0_40px_120px_-20px_rgba(0,0,0,0.15)] w-full max-w-5xl overflow-hidden flex flex-col max-h-[90vh] sm:max-h-[85vh] border border-white">
 
                                     {{-- Header Section --}}
-                                    <div class="px-12 py-6 bg-white/50 border-b border-gray-100">
-                                        <div class="flex items-start justify-between mb-5">
+                                    <div class="px-5 py-4 sm:px-12 sm:py-6 bg-white/50 border-b border-gray-100">
+                                        <div class="flex items-start justify-between mb-3 sm:mb-5">
                                             <div>
                                                 <span
                                                     class="inline-block px-2 py-0.5 bg-rose-600 text-white text-[8px] font-black uppercase tracking-widest rounded mb-1">Payroll
                                                     Adjustment</span>
-                                                <h3 class="text-2xl font-black text-gray-900 tracking-tight">Input Detail
+                                                <h3 class="text-lg sm:text-2xl font-black text-gray-900 tracking-tight">Input Detail
                                                     Potongan<span class="text-rose-600">.</span></h3>
                                             </div>
 
-                                            <div class="flex items-center gap-2">
+                                            <div class="flex items-center gap-1.5 sm:gap-2">
                                                 <div
                                                     class="flex items-center bg-gray-50 p-1 rounded-xl border border-gray-100">
                                                     <button type="button" @click="prevWorker()"
                                                         :disabled="currentIndex === 0"
-                                                        class="p-2.5 rounded-lg transition-all"
+                                                        class="p-1.5 sm:p-2.5 rounded-lg transition-all"
                                                         :class="currentIndex === 0 ? 'text-gray-200 cursor-not-allowed' :
                                                             'text-rose-600 hover:bg-white hover:shadow-sm active:scale-90'">
-                                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                                                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24"
                                                             stroke="currentColor" stroke-width="3">
                                                             <path d="M15 19l-7-7 7-7" />
                                                         </svg>
                                                     </button>
-                                                    <div class="w-px h-5 bg-gray-200 mx-1"></div>
+                                                    <div class="w-px h-4 sm:h-5 bg-gray-200 mx-1"></div>
                                                     <button type="button" @click="nextWorker()"
                                                         :disabled="currentIndex === selectedItems.length - 1"
-                                                        class="p-2.5 rounded-lg transition-all"
+                                                        class="p-1.5 sm:p-2.5 rounded-lg transition-all"
                                                         :class="currentIndex === selectedItems.length - 1 ?
                                                             'text-gray-200 cursor-not-allowed' :
                                                             'text-rose-600 hover:bg-white hover:shadow-sm active:scale-90'">
-                                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                                                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24"
                                                             stroke="currentColor" stroke-width="3">
                                                             <path d="M9 5l7 7-7 7" />
                                                         </svg>
                                                     </button>
                                                 </div>
                                                 <button @click="showPotonganModal = false"
-                                                    class="p-3 bg-gray-50 hover:bg-rose-50 text-gray-400 hover:text-rose-500 rounded-xl transition-all active:scale-90">
-                                                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                                                    class="p-2 sm:p-3 bg-gray-50 hover:bg-rose-50 text-gray-400 hover:text-rose-500 rounded-xl transition-all active:scale-90">
+                                                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24"
                                                         stroke="currentColor" stroke-width="2.5">
                                                         <path d="M6 18L18 6M6 6l12 12" />
                                                     </svg>
@@ -2543,7 +2581,6 @@ toggleWithGroup(id) {
                                                 <input type="hidden" :name="`data[${id}][kategori]`"
                                                     :value="JSON.stringify((rowPotongan[id] || []).reduce((acc, item) => {
                                                         if (item.nama) {
-                                                            // Ubah nama menjadi key snake_case untuk DB
                                                             let key = item.nama.toLowerCase().replace(/ /g,
                                                                 '_');
                                                             acc[key] = item.nominal;
@@ -2558,50 +2595,50 @@ toggleWithGroup(id) {
                                             </div>
                                         </template>
 
-                                        <div class="flex-1 overflow-y-auto px-10 py-6 custom-scrollbar">
+                                        <div class="flex-1 overflow-y-auto p-4 sm:px-10 sm:py-6 custom-scrollbar">
                                             <template x-for="(id, index) in selectedItems" :key="'visible-pot-' + id">
                                                 <div x-show="index === currentIndex"
                                                     x-transition:enter="transition ease-out duration-300">
 
-                                                    <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
-                                                        {{-- Info Panel (Kiri) --}}
-                                                        <div class="md:col-span-4 space-y-5">
+                                                    <div class="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-8 items-start">
+                                                        {{-- Info Panel (Kiri / Atas) --}}
+                                                        <div class="md:col-span-4 space-y-3 sm:space-y-5">
                                                             <div
-                                                                class="p-6 bg-gray-50/50 border border-gray-100 rounded-[2rem]">
+                                                                class="p-4 sm:p-6 bg-gray-50/50 border border-gray-100 rounded-2xl sm:rounded-[2rem]">
                                                                 <p
-                                                                    class="text-[9px] font-black text-rose-600 uppercase tracking-widest mb-3">
+                                                                    class="text-[9px] font-black text-rose-600 uppercase tracking-widest mb-1.5 sm:mb-3">
                                                                     Profil Pekerja</p>
-                                                                <h4 class="text-xl font-black text-gray-900 leading-tight mb-1"
+                                                                <h4 class="text-base sm:text-xl font-black text-gray-900 leading-tight mb-0.5"
                                                                     x-text="workerMap[id]?.nama"></h4>
                                                                 <p class="text-xs font-bold text-gray-400 font-mono"
                                                                     x-text="workerMap[id]?.nik"></p>
                                                             </div>
 
                                                             <div
-                                                                class="p-6 bg-rose-600 rounded-[2rem] text-white shadow-lg shadow-rose-200">
+                                                                class="p-4 sm:p-6 bg-rose-600 rounded-2xl sm:rounded-[2rem] text-white shadow-lg shadow-rose-200">
                                                                 <p
                                                                     class="text-[9px] font-black opacity-60 uppercase tracking-widest mb-1">
                                                                     Total Potongan</p>
-                                                                <p class="text-3xl font-black tracking-tighter"
+                                                                <p class="text-2xl sm:text-3xl font-black tracking-tighter"
                                                                     x-text="'Rp ' + formatRibuan(calculatePotonganWorkerTotal(id))">
                                                                 </p>
                                                             </div>
 
-                                                            <div class="space-y-2">
+                                                            <div class="space-y-1.5">
                                                                 <label
                                                                     class="block text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Keterangan
                                                                     Internal</label>
                                                                 <textarea x-model="rowKeteranganPotongan[id]" placeholder="Contoh: Terlambat, Kerusakan barang, dsb..."
-                                                                    class="w-full h-24 px-5 py-4 bg-white border border-gray-100 rounded-2xl text-xs font-bold text-gray-600 focus:border-rose-400 outline-none shadow-sm resize-none"></textarea>
+                                                                    class="w-full h-20 sm:h-24 px-4 py-3 bg-white border border-gray-100 rounded-2xl text-xs font-bold text-gray-600 focus:border-rose-400 outline-none shadow-sm resize-none"></textarea>
                                                             </div>
                                                         </div>
 
-                                                        {{-- Input Panel (Kanan) --}}
+                                                        {{-- Input Panel (Kanan / Bawah) --}}
                                                         <div class="md:col-span-8">
                                                             <div
-                                                                class="bg-white border border-gray-100 rounded-[2rem] overflow-hidden shadow-sm">
+                                                                class="bg-white border border-gray-100 rounded-2xl sm:rounded-[2rem] overflow-hidden shadow-sm">
                                                                 <div
-                                                                    class="grid grid-cols-12 gap-4 px-6 py-4 bg-gray-50/50 text-[9px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                                                                    class="hidden sm:grid grid-cols-12 gap-4 px-6 py-4 bg-gray-50/50 text-[9px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
                                                                     <div class="col-span-6">Nama Potongan</div>
                                                                     <div class="col-span-4">Nominal</div>
                                                                     <div class="col-span-2 text-center">Aksi</div>
@@ -2612,48 +2649,52 @@ toggleWithGroup(id) {
                                                                     <template x-for="(item, pIdx) in rowPotongan[id]"
                                                                         :key="pIdx">
                                                                         <div
-                                                                            class="grid grid-cols-12 gap-4 px-6 py-4 items-center hover:bg-rose-50/30 transition-colors">
+                                                                            class="flex flex-col sm:grid sm:grid-cols-12 gap-2 sm:gap-4 p-4 sm:px-6 sm:py-4 sm:items-center hover:bg-rose-50/30 transition-colors">
                                                                             {{-- Nama Potongan --}}
-                                                                            <div class="col-span-6">
+                                                                            <div class="sm:col-span-6">
+                                                                                <label class="block text-[9px] font-bold text-gray-400 uppercase mb-1 sm:hidden">Nama Potongan</label>
                                                                                 <input type="text"
                                                                                     x-model="rowPotongan[id][pIdx].nama"
                                                                                     placeholder="Masukkan nama potongan..."
                                                                                     class="w-full px-3 py-2 bg-white border border-gray-100 rounded-xl text-[11px] font-bold text-gray-700 focus:border-rose-400 focus:ring-0 outline-none">
                                                                             </div>
 
-                                                                            {{-- Nominal --}}
-                                                                            <div class="col-span-4">
-                                                                                <div class="relative group/input">
-                                                                                    <span
-                                                                                        class="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] font-black text-gray-300">Rp</span>
-                                                                                    <input type="text"
-                                                                                        :value="formatRibuan(rowPotongan[id][
-                                                                                            pIdx
-                                                                                        ].nominal)"
-                                                                                        @input="rowPotongan[id][pIdx].nominal = $event.target.value.replace(/\D/g, '')"
-                                                                                        class="w-full pl-8 pr-3 py-2 bg-white border border-gray-100 rounded-xl text-xs font-black text-gray-700 focus:border-rose-400 outline-none">
+                                                                            {{-- Nominal & Delete Row --}}
+                                                                            <div class="flex items-center gap-2 sm:contents">
+                                                                                <div class="flex-1 sm:col-span-4">
+                                                                                    <label class="block text-[9px] font-bold text-gray-400 uppercase mb-1 sm:hidden">Nominal</label>
+                                                                                    <div class="relative group/input">
+                                                                                        <span
+                                                                                            class="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] font-black text-gray-300">Rp</span>
+                                                                                        <input type="text"
+                                                                                            :value="formatRibuan(rowPotongan[id][
+                                                                                                pIdx
+                                                                                            ].nominal)"
+                                                                                            @input="rowPotongan[id][pIdx].nominal = $event.target.value.replace(/\D/g, '')"
+                                                                                            class="w-full pl-8 pr-3 py-2 bg-white border border-gray-100 rounded-xl text-xs font-black text-gray-700 focus:border-rose-400 outline-none">
+                                                                                    </div>
                                                                                 </div>
-                                                                            </div>
 
-                                                                            {{-- Hapus Baris --}}
-                                                                            <div class="col-span-2 text-center">
-                                                                                <button type="button"
-                                                                                    @click="removePotonganRow(id, pIdx)"
-                                                                                    class="p-2 text-gray-300 hover:text-rose-500 transition-colors">
-                                                                                    <svg class="w-4 h-4" fill="none"
-                                                                                        viewBox="0 0 24 24"
-                                                                                        stroke="currentColor"
-                                                                                        stroke-width="2.5">
-                                                                                        <path d="M6 18L18 6M6 6l12 12" />
-                                                                                    </svg>
-                                                                                </button>
+                                                                                {{-- Hapus Baris --}}
+                                                                                <div class="sm:col-span-2 text-center pt-4 sm:pt-0">
+                                                                                    <button type="button"
+                                                                                        @click="removePotonganRow(id, pIdx)"
+                                                                                        class="p-2 text-gray-300 hover:text-rose-500 transition-colors">
+                                                                                        <svg class="w-4 h-4" fill="none"
+                                                                                            viewBox="0 0 24 24"
+                                                                                            stroke="currentColor"
+                                                                                            stroke-width="2.5">
+                                                                                            <path d="M6 18L18 6M6 6l12 12" />
+                                                                                        </svg>
+                                                                                    </button>
+                                                                                </div>
                                                                             </div>
                                                                         </div>
                                                                     </template>
                                                                 </div>
 
                                                                 {{-- Tombol Tambah Baris --}}
-                                                                <div class="p-4 bg-gray-50/50 border-t border-gray-50">
+                                                                <div class="p-3 sm:p-4 bg-gray-50/50 border-t border-gray-50">
                                                                     <button type="button" @click="addPotonganRow(id)"
                                                                         class="w-full py-2 border-2 border-dashed border-gray-200 rounded-xl text-[10px] font-black text-gray-400 uppercase tracking-widest hover:bg-white hover:border-rose-300 hover:text-rose-500 transition-all flex items-center justify-center gap-2">
                                                                         <svg class="w-3 h-3" fill="none"
@@ -2673,11 +2714,11 @@ toggleWithGroup(id) {
 
                                         {{-- Footer --}}
                                         <div
-                                            class="px-10 py-5 bg-white border-t border-gray-50 flex items-center justify-between">
+                                            class="px-4 py-4 sm:px-10 sm:py-5 bg-white border-t border-gray-50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
                                             <div class="flex items-center gap-3">
                                                 <div
-                                                    class="h-10 w-10 rounded-xl bg-rose-50 flex items-center justify-center text-rose-600 border border-rose-100">
-                                                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                                                    class="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-rose-50 flex items-center justify-center text-rose-600 border border-rose-100 shrink-0">
+                                                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24"
                                                         stroke="currentColor" stroke-width="2.5">
                                                         <path d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                     </svg>
@@ -2686,26 +2727,26 @@ toggleWithGroup(id) {
                                                     <p
                                                         class="text-[8px] font-black text-gray-400 uppercase tracking-[0.2em]">
                                                         Grand Total Potongan (Global)</p>
-                                                    <p class="text-xl font-black text-rose-600 tracking-tighter"
+                                                    <p class="text-lg sm:text-xl font-black text-rose-600 tracking-tighter"
                                                         x-text="'Rp ' + formatRibuan(calculatePotonganGrandTotal())"></p>
                                                 </div>
                                             </div>
 
-                                            <div class="flex items-center gap-3">
+                                            <div class="flex items-center justify-end gap-2 sm:gap-3">
                                                 <button type="button" @click="showPotonganModal = false"
-                                                    class="text-[10px] font-black text-gray-400 uppercase tracking-widest px-4">Batal</button>
+                                                    class="text-[10px] font-black text-gray-400 uppercase tracking-widest px-3 sm:px-4 py-2">Batal</button>
 
                                                 <button type="button"
                                                     x-show="currentIndex === selectedItems.length - 1"
                                                     @click="confirmSubmitTunjPot()"
-                                                    class="px-8 py-3.5 bg-rose-600 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl hover:bg-rose-700 shadow-lg shadow-rose-200 transition-all active:scale-95 flex items-center gap-2">
+                                                    class="px-5 py-3 sm:px-8 sm:py-3.5 bg-rose-600 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl hover:bg-rose-700 shadow-lg shadow-rose-200 transition-all active:scale-95 flex items-center gap-2">
                                                     Simpan Semua
                                                 </button>
 
                                                 <button type="button" @click="nextWorker()"
                                                     x-show="currentIndex < selectedItems.length - 1"
-                                                    class="px-8 py-3.5 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl hover:bg-blue-600 transition-all active:scale-95 flex items-center gap-2">
-                                                    Lanjut Pekerja Berikutnya
+                                                    class="px-5 py-3 sm:px-8 sm:py-3.5 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl hover:bg-blue-600 transition-all active:scale-95 flex items-center gap-2">
+                                                    Berikutnya
                                                 </button>
                                             </div>
                                         </div>

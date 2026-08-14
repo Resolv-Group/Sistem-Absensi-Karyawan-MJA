@@ -21,7 +21,7 @@
     <div class="grid grid-cols-1 gap-3">
         @forelse($historiPenilaian as $n)
             <div
-                class="flex items-center justify-between p-4 bg-white border border-gray-100 rounded-2xl hover:shadow-lg hover:shadow-gray-200/40 transition-all group">
+                class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-white border border-gray-100 rounded-2xl hover:shadow-lg hover:shadow-gray-200/40 transition-all group">
                 <div class="flex items-center gap-4">
                     {{-- Score & Grade Badge --}}
                     <div class="relative flex-shrink-0">
@@ -55,7 +55,7 @@
                 </div>
 
                 <button @click="openDetail({{ $n->toJson() }})"
-                    class="px-5 py-2.5 bg-gray-50 text-gray-600 text-xs font-black uppercase tracking-widest rounded-xl hover:bg-gray-900 hover:text-white transition-all active:scale-95">
+                    class="w-full sm:w-auto flex justify-center px-5 py-2.5 bg-gray-50 text-gray-600 text-xs font-black uppercase tracking-widest rounded-xl hover:bg-gray-900 hover:text-white transition-all active:scale-95">
                     View
                 </button>
             </div>

@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('content')
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="max-w-7xl mx-auto px-1 sm:px-2 lg:px-4 py-8">
 
         {{-- HEADER SECTION --}}
         <div class="mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
@@ -32,7 +32,7 @@
             </div>
 
             {{-- Right Side: Action Buttons --}}
-            <div class="flex items-center gap-3">
+            <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-3">
                 <button
                     onclick="confirmToggleStatus({{ $mitraKerja->id }}, {{ $mitraKerja->status_aktif }})"
                     class="px-4 py-2 text-sm font-medium
@@ -42,7 +42,7 @@
                     {{ $mitraKerja->status_aktif ? 'Nonaktifkan' : 'Aktifkan' }}
                 </button>
                 <a href="{{ route('view.ubah.mitra-kerja', $mitraKerja->id) }}"
-                    class="px-4 py-2 text-sm font-medium text-white bg-black border border-black rounded-lg hover:bg-gray-800 transition shadow-sm flex items-center gap-2">
+                    class="w-full sm:w-auto justify-center flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-black border border-black rounded-lg hover:bg-gray-800 transition shadow-sm">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -115,18 +115,15 @@
 
                         {{-- Quick Info List --}}
                         <div class="mt-8 text-left space-y-4 border-t border-gray-100 pt-6">
-                            <div class="flex justify-between items-start">
+                            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-0">
                                 <span class="text-sm text-gray-500 font-medium">Bidang Usaha</span>
-                                <span class="text-sm font-bold text-gray-900 text-right">{{ $mitraKerja->bidangUsaha->nama }}</span>
+                                <span class="text-sm font-bold text-gray-900 break-words sm:text-right">{{ $mitraKerja->bidangUsaha->nama }}</span>
                             </div>
-                            <div class="flex justify-between items-start">
+                            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-0">
                                 <span class="text-sm text-gray-500 font-medium">Pimpinan</span>
-                                <div class="text-right">
-                                    <span class="block text-sm font-bold text-gray-900">{{ $mitraKerja->pimpinan }}</span>
-                                    <span class="text-xs text-gray-400">Penanggung Jawab</span>
-                                </div>
+                                <span class="text-sm font-bold text-gray-900 break-words sm:text-right">{{ $mitraKerja->pimpinan }}</span>
                             </div>
-                            <div class="flex justify-between items-center">
+                            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-0">
                                 <span class="text-sm text-gray-500 font-medium">Kerjasama Sejak</span>
                                 <span class="text-sm font-bold text-gray-900">{{ formatTanggal($mitraKerja->tgl_mulai_kerjasama) }}</span>
                             </div>

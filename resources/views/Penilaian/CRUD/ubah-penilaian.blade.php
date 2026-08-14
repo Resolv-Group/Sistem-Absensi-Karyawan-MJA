@@ -1,24 +1,84 @@
 @extends('layout')
 
 @section('content')
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="max-w-6xl mx-auto px-2 sm:px-6 lg:px-8 py-8">
 
         {{-- HEADER --}}
-        <div class="flex items-center gap-4">
-            <a href={{ url()->previous() }}
-                class="p-2 rounded-xl border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 transition shadow-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        <div class="mb-6 sm:mb-8
+                    flex items-start sm:items-center
+                    gap-3 sm:gap-4">
+
+            {{-- Back Button --}}
+            <a href="{{ url()->previous() }}"
+                class="shrink-0
+                    p-2 sm:p-2
+                    rounded-xl
+                    border border-gray-200
+                    bg-white
+                    text-gray-500
+                    hover:bg-gray-50
+                    transition
+                    shadow-sm">
+
+                <svg xmlns="http://www.w3.org/2000/svg"
+                    class="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor">
+
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+
                 </svg>
+
             </a>
-            <div>
-                <nav class="flex text-sm font-medium text-gray-500 mb-1">
-                    <span class="hover:text-gray-700">Unit</span>
-                    <span class="mx-2 text-gray-300">/</span>
-                    <span class="text-blue-600">Penilaian Pekerja</span>
+
+
+            {{-- Page Information --}}
+            <div class="min-w-0">
+
+                {{-- Breadcrumb --}}
+                <nav
+                    class="flex items-center
+                        text-[10px] sm:text-sm
+                        font-medium
+                        text-gray-500
+                        mb-1
+                        whitespace-nowrap
+                        overflow-hidden">
+
+                    <span class="hover:text-gray-700 shrink-0">
+                        Unit
+                    </span>
+
+                    <span class="mx-1.5 sm:mx-2 text-gray-300 shrink-0">
+                        /
+                    </span>
+
+                    <span class="text-blue-600 truncate">
+                        Penilaian Pekerja
+                    </span>
+
                 </nav>
-                <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Buat Penilaian Pekerja</h1>
+
+
+                {{-- Title --}}
+                <h1
+                    class="text-xl sm:text-2xl
+                        font-bold
+                        text-gray-900
+                        tracking-tight
+                        leading-tight">
+
+                    Ubah Penilaian Pekerja
+
+                </h1>
+
             </div>
+
         </div>
 
         @if ($errors->any())
@@ -119,25 +179,61 @@
 
                                     {{-- HEADER: Identity & Live Score --}}
                                     <div
-                                        class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 mb-10 pb-6 border-b border-gray-50">
+                                        class="flex flex-col
+                                            sm:flex-row
+                                            justify-between
+                                            items-stretch sm:items-center
+                                            gap-5 sm:gap-6
+                                            mb-8 sm:mb-10
+                                            pb-6
+                                            border-b border-gray-50">
 
                                         {{-- Left: Worker Info --}}
-                                        <div class="flex items-center gap-5">
+                                        <div class="flex items-center gap-4 sm:gap-5 min-w-0">
                                             {{-- Number Badge --}}
                                             <div
-                                                class="flex-shrink-0 h-12 w-12 bg-blue-50 text-blue-600 text-sm font-black rounded-2xl flex items-center justify-center border border-blue-100 shadow-sm">
+                                                class="flex-shrink-0
+                                                    h-11 w-11 sm:h-12 sm:w-12
+                                                    bg-blue-50
+                                                    text-blue-600
+                                                    text-sm
+                                                    font-black
+                                                    rounded-2xl
+                                                    flex items-center justify-center
+                                                    border border-blue-100
+                                                    shadow-sm">
                                                 <span x-text="index + 1"></span>
                                             </div>
-                                            <div>
-                                                <h3 class="text-xl font-black text-gray-900 tracking-tight"
+
+                                            <div class="min-w-0">
+                                                <h3 class="text-lg sm:text-xl
+                                                        font-black
+                                                        text-gray-900
+                                                        tracking-tight
+                                                        truncate"
                                                     x-text="row.nama"></h3>
-                                                <div class="flex items-center gap-2 mt-0.5">
+                                                <div class="flex flex-wrap
+                                                        items-center
+                                                        gap-x-2
+                                                        gap-y-1
+                                                        mt-1">
                                                     <span
-                                                        class="text-[10px] font-bold text-gray-400 uppercase tracking-widest"
+                                                        class="text-[10px]
+                                                            font-bold
+                                                            text-gray-400
+                                                            uppercase
+                                                            tracking-widest"
                                                         x-text="row.nik"></span>
-                                                    <span class="h-1 w-1 rounded-full bg-gray-300"></span>
+                                                    <span class="h-1 w-1
+                                                            rounded-full
+                                                            bg-gray-300
+                                                            hidden sm:block"></span>
                                                     <span
-                                                        class="text-[10px] font-black text-blue-500 uppercase tracking-widest">Penilaian
+                                                        class="text-[10px]
+                                                            font-black
+                                                            text-blue-500
+                                                            uppercase
+                                                            tracking-widest">Penilaian
                                                         PKWT</span>
                                                 </div>
                                             </div>

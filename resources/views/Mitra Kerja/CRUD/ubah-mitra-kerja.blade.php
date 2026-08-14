@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('content')
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="max-w-6xl mx-auto px-2 sm:px-6 lg:px-8 py-8">
 
         {{-- HEADER SECTION --}}
         <div class="mb-8">
@@ -53,18 +53,21 @@
             @method('PUT')
 
             {{-- HEADER --}}
-            <div class="px-8 py-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
-                <div class="flex items-center gap-4">
-                    <div class="p-3 bg-blue-100 text-blue-600 rounded-xl">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                        </svg>
+            <div class="px-6 py-6 border-b border-gray-100 bg-gray-50/50">
+                <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="p-3 bg-blue-100 text-blue-600 rounded-xl shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                            </svg>
+                        </div>
+                        <h2 class="text-xl font-bold text-gray-900 block sm:hidden">Ubah Mitra Kerja</h2>
                     </div>
                     <div>
-                        <h2 class="text-xl font-bold text-gray-900">Ubah Mitra Kerja</h2>
-                        <p class="text-sm text-gray-500">Ubah data identitas perusahaan dan status kontrak.</p>
+                        <h2 class="text-xl font-bold text-gray-900 hidden sm:block">Ubah Mitra Kerja</h2>
+                        <p class="text-sm text-gray-500 mt-1 sm:mt-0">Ubah data identitas perusahaan dan status kontrak.</p>
                     </div>
                 </div>
             </div>
@@ -533,13 +536,13 @@
             </div>
 
             {{-- FOOTER --}}
-            <div class="bg-gray-50 px-8 py-5 flex items-center justify-end gap-3 border-t border-gray-200">
+            <div class="bg-gray-50 px-8 py-5 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-3 border-t border-gray-200">
                 <a href="{{ route('view.mitra-kerja') }}"
-                    class="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-2 focus:ring-gray-200 transition shadow-sm">
+                    class="w-full sm:w-auto text-center px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 transition shadow-sm">
                     Batalkan
                 </a>
                 <button type="button" id="save-btn"
-                    class="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition shadow-sm">
+                    class="w-full sm:w-auto justify-center flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition shadow-sm">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
@@ -573,6 +576,19 @@
 
             const file = input.files[0];
             if (!file) return;
+
+            // Sanitize filename (remove '=' and illegal characters)
+            const cleanName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+            if (cleanName !== file.name) {
+                try {
+                    const cleanFile = new File([file], cleanName, { type: file.type, lastModified: file.lastModified });
+                    const dt = new DataTransfer();
+                    dt.items.add(cleanFile);
+                    input.files = dt.files;
+                } catch (e) {
+                    console.warn('File sanitization error:', e);
+                }
+            }
 
             // Validasi ukuran max 2MB
             if (file.size > 2 * 1024 * 1024) {

@@ -251,13 +251,13 @@
                         </div>
 
                         {{-- Footer / Submit --}}
-                        <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex items-center justify-end gap-3">
+                        <div class="bg-gray-50 px-8 py-5 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-3 border-t border-gray-200">
                             <button type="reset"
-                                class="text-sm font-medium text-gray-600 hover:text-gray-900 px-4 py-2 transition-colors">
+                                class="w-full sm:w-auto text-center px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 transition shadow-sm">
                                 Reset
                             </button>
                             <button type="submit"
-                                class="inline-flex items-center justify-center px-6 py-2.5 border border-transparent text-sm font-bold rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 shadow-sm transition-all hover:shadow-md">
+                                class="w-full sm:w-auto justify-center flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition shadow-sm">
                                 Simpan Perubahan
                             </button>
                         </div>
@@ -293,6 +293,19 @@
         // Preview Image when File Selected
         function previewImage(input) {
             if (input.files && input.files[0]) {
+                const file = input.files[0];
+                const cleanName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+                if (cleanName !== file.name) {
+                    try {
+                        const cleanFile = new File([file], cleanName, { type: file.type, lastModified: file.lastModified });
+                        const dt = new DataTransfer();
+                        dt.items.add(cleanFile);
+                        input.files = dt.files;
+                    } catch (e) {
+                        console.warn('File sanitization error:', e);
+                    }
+                }
+
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     document.getElementById('avatar-preview').src = e.target.result;

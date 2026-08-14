@@ -106,10 +106,10 @@
     {{-- ================================
     3. TOOLBAR & FILTERS
 ================================= --}}
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 relative">
+    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6 relative">
 
         {{-- Left: View Switcher (Visual only) --}}
-        <div class="bg-gray-100 p-1 rounded-lg inline-flex self-start sm:self-center">
+        <div class="bg-gray-100 p-1 rounded-lg inline-flex self-start">
             <div
                 class="inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 rounded-full shadow-sm text-sm font-medium text-gray-600">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" viewBox="0 0 20 20"
@@ -123,10 +123,10 @@
         </div>
 
         {{-- Right: Actions --}}
-        <div class="flex flex-1 justify-end items-center gap-3">
+        <div class="flex flex-col lg:flex-row flex-1 justify-end items-stretch lg:items-center gap-3 w-full">
 
             {{-- SEARCH BAR --}}
-            <div class="relative w-full max-w-xs">
+            <div class="relative w-full lg:max-w-xs">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -142,7 +142,7 @@
             {{-- FILTER TOGGLE BUTTON --}}
             <div class="relative">
                 <button id="filterToggleBtn"
-                    class="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                    class="w-full justify-center lg:w-auto flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -159,7 +159,7 @@
 
                 {{-- FILTER DROPDOWN POPUP --}}
                 <div id="filterDropdown"
-                    class="hidden absolute right-0 mt-3 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 ring-1 ring-black ring-opacity-5 p-5 origin-top-right transform transition-all">
+                    class="hidden absolute left-0 lg:right-0 lg:left-auto mt-3 w-full lg:w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 ring-1 ring-black ring-opacity-5 p-5 origin-top lg:origin-top-right transform transition-all">
 
                     {{-- Header --}}
                     <div class="flex justify-between items-center mb-5">
@@ -323,7 +323,7 @@
 
             {{-- ADD BUTTON --}}
             <a href="{{ route('view.tambah.staff') }}"
-                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">
+                class="w-full justify-center lg:w-auto cursor-pointer inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">
                 <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />

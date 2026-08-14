@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('content')
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="max-w-7xl mx-auto px-1 sm:px-2 lg:px-4 py-8">
 
         {{-- HEADER SECTION --}}
         <div class="mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
@@ -32,10 +32,10 @@
             </div>
 
             {{-- Right Side: Action Buttons --}}
-            <div class="flex items-center gap-3">
+            <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-3">
                 <button
                     onclick="confirmToggleStatus({{ $pekerja->id }}, {{ $pekerja->status_aktif }})"
-                    class="px-4 py-2 text-sm font-medium
+                    class="w-full sm:w-auto justify-center flex items-center gap-2 px-4 py-2 text-sm font-medium
                         {{ $pekerja->status_aktif ? 'text-red-600 bg-red-50 border-red-100 hover:bg-red-100'
                                                 : 'text-emerald-600 bg-emerald-50 border-emerald-100 hover:bg-emerald-100' }}
                         border rounded-lg transition shadow-sm">
@@ -44,14 +44,14 @@
 
 
                 <a href="{{ route('pekerja.export_pdf', $pekerja->id) }}" target="_blank"
-                    class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition shadow-sm">
+                    class="w-full sm:w-auto justify-center flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition shadow-sm">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                         </svg>
                         Cetak Data
                     </a>
                 <a href="{{ route('view.ubah.pekerja', $pekerja->id) }}"
-                    class="px-4 py-2 text-sm font-medium text-white bg-black border border-black rounded-lg hover:bg-gray-800 transition shadow-sm flex items-center gap-2">
+                    class="w-full sm:w-auto justify-center flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-black border border-black rounded-lg hover:bg-gray-800 transition shadow-sm">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -114,23 +114,21 @@
 
                         {{-- Info List --}}
                         <div class="mt-8 text-left space-y-4 border-t border-gray-100 pt-6">
-                            <div class="flex justify-between items-center">
+                            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-0">
                                 <span class="text-sm text-gray-500 font-medium">ID Pekerja</span>
-                                <span class="text-sm font-bold text-gray-900">{{ $pekerja->id_pekerja }}</span>
+                                <span class="text-sm font-bold text-gray-900 break-words sm:text-right">{{ $pekerja->id_pekerja }}</span>
                             </div>
-                            <div class="flex justify-between items-center">
+                            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-0">
                                 <span class="text-sm text-gray-500 font-medium">Unit Kerja</span>
-                                <span
-                                    class="text-sm font-bold text-gray-900">{{ $currentPkwt->unit->nama_unit ?? '-'}}</span>
+                                <span class="text-sm font-bold text-gray-900 break-words sm:text-right">{{ $currentPkwt->unit->nama_unit ?? '-'}}</span>
                             </div>
-                            <div class="flex justify-between items-center">
+                            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-0">
                                 <span class="text-sm text-gray-500 font-medium">Tanggal Bergabung</span>
-                                <span
-                                    class="text-sm font-bold text-gray-900">{{ formatTanggal($pekerja->tgl_bergabung) ?? '-' }}</span>
+                                <span class="text-sm font-bold text-gray-900 break-words sm:text-right">{{ formatTanggal($pekerja->tgl_bergabung) ?? '-' }}</span>
                             </div>
-                            <div class="flex justify-between items-center">
+                            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-0">
                                 <span class="text-sm text-gray-500 font-medium">Tanggal Resign</span>
-                                <span class="text-sm font-bold text-gray-900">{{ $pekerja->tgl_resign ? formatTanggal($pekerja->tgl_resign) : '-' }}</span>
+                                <span class="text-sm font-bold text-gray-900 break-words sm:text-right">{{ $pekerja->tgl_resign ? formatTanggal($pekerja->tgl_resign) : '-' }}</span>
                             </div>
                         </div>
                     </div>
@@ -165,10 +163,10 @@
             <div class="lg:col-span-2">
                 <div x-data="{ tab: 'personal' }"
                     class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden min-h-full">
-                    <div class="border-b border-gray-200 bg-gray-50/50 px-6">
+                    <div class="border-b border-gray-200 bg-gray-50/50 px-6 overflow-x-auto">
 
                         {{-- Tabs --}}
-                        <nav class="-mb-px flex space-x-8">
+                        <nav class="-mb-px flex space-x-8 min-w-max">
                             <button @click="tab='personal'"
                                 :class="tab == 'personal' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'"
                                 class="whitespace-nowrap py-4 px-1 font-medium text-sm">

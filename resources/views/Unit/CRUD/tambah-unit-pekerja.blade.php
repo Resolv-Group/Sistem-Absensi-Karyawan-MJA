@@ -20,24 +20,84 @@
             box-shadow: none !important;
         }
     </style>
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="max-w-6xl mx-auto px-2 sm:px-6 lg:px-8 py-8">
 
         {{-- HEADER --}}
-        <div class="mb-8 flex items-center gap-4">
-                <a href="{{ url('/unit/detail/' . $unitSelected->id) }}"
-                    class="p-2 rounded-xl border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 transition shadow-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                    </svg>
-                </a>
-            <div>
-                <nav class="flex text-sm font-medium text-gray-500 mb-1">
-                    <span class="hover:text-gray-700">Unit</span>
-                    <span class="mx-2 text-gray-300">/</span>
-                    <span class="text-blue-600">Tambah Pekerja Unit</span>
+        <div class="mb-6 sm:mb-8
+                    flex items-start sm:items-center
+                    gap-3 sm:gap-4">
+
+            {{-- Back Button --}}
+            <a href="{{ url('/unit/detail/' . $unitSelected->id) }}"
+                class="shrink-0
+                    p-2 sm:p-2
+                    rounded-xl
+                    border border-gray-200
+                    bg-white
+                    text-gray-500
+                    hover:bg-gray-50
+                    transition
+                    shadow-sm">
+
+                <svg xmlns="http://www.w3.org/2000/svg"
+                    class="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor">
+
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+
+                </svg>
+
+            </a>
+
+
+            {{-- Page Information --}}
+            <div class="min-w-0">
+
+                {{-- Breadcrumb --}}
+                <nav
+                    class="flex items-center
+                        text-[10px] sm:text-sm
+                        font-medium
+                        text-gray-500
+                        mb-1
+                        whitespace-nowrap
+                        overflow-hidden">
+
+                    <span class="hover:text-gray-700 shrink-0">
+                        Unit
+                    </span>
+
+                    <span class="mx-1.5 sm:mx-2 text-gray-300 shrink-0">
+                        /
+                    </span>
+
+                    <span class="text-blue-600 truncate">
+                        Tambah Pekerja Unit
+                    </span>
+
                 </nav>
-                <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Tambah Pekerja Unit</h1>
+
+
+                {{-- Title --}}
+                <h1
+                    class="text-xl sm:text-2xl
+                        font-bold
+                        text-gray-900
+                        tracking-tight
+                        leading-tight">
+
+                    Tambah Pekerja Unit
+
+                </h1>
+
             </div>
+
         </div>
 
         @if ($errors->any())
@@ -121,26 +181,74 @@
 
             {{-- CARD 2: ALOKASI PEKERJA (Redesigned) --}}
             <div class="bg-white rounded-2xl shadow-sm border border-gray-200">
-                <div class="p-6 border-b border-gray-100 flex justify-between items-center">
-                    <h3 class="font-bold text-gray-900">Daftar Pekerja & Kontrak</h3>
-                    <button type="button" @click="addRow()"
-                        class="text-xs font-bold text-blue-600 bg-white hover:bg-blue-50 px-3 py-1.5 rounded-lg transition flex items-center gap-1 border border-gray-200 shadow-sm">
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                <div class="p-4 sm:p-6
+                    border-b border-gray-100
+                    flex flex-col sm:flex-row
+                    sm:items-center
+                    sm:justify-between
+                    gap-3 sm:gap-0">
+
+                    {{-- TITLE --}}
+                    <h3
+                        class="font-bold
+                            text-gray-900
+                            text-sm sm:text-base
+                            leading-tight">
+
+                        Daftar Pekerja & Kontrak
+
+                    </h3>
+
+
+                    {{-- ADD ROW --}}
+                    <button
+                        type="button"
+                        @click="addRow()"
+                        class="w-full sm:w-auto
+                            inline-flex
+                            items-center
+                            justify-center
+                            gap-1.5
+                            px-3 py-2
+                            text-xs
+                            font-bold
+                            text-blue-600
+                            bg-white
+                            hover:bg-blue-50
+                            rounded-lg
+                            transition
+                            border border-gray-200
+                            shadow-sm">
+
+                        <svg
+                            class="w-4 h-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor">
+
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M12 4v16m8-8H4" />
+
                         </svg>
+
                         Tambah Baris
+
                     </button>
+
                 </div>
 
                 <div class="p-6 space-y-6">
                     <template x-for="(row, index) in rows" :key="row.id">
                         <div
-                            class="bg-white rounded-xl border border-gray-200 p-8 md:p-10 relative group transition-all duration-300 hover:border-blue-300 hover:shadow-[0_20px_50px_rgba(0,0,0,0.04)] space-y-12 mb-10">
+                            class="bg-white rounded-xl border border-gray-200 p-5 sm:p-8 md:p-10 relative group transition-all duration-300 hover:border-blue-300 hover:shadow-[0_20px_50px_rgba(0,0,0,0.04)] space-y-10 sm:space-y-12 mb-10">
 
                             {{-- 1. HEADER BARIS --}}
-                            <div class="flex items-center justify-between border-b border-gray-50 pb-6">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-50 pb-6">
                                 <div class="flex items-center gap-4">
-                                    <div class="h-10 w-10 bg-blue-600 text-white text-sm font-black rounded-2xl flex items-center justify-center shadow-lg shadow-blue-200"
+                                    <div class="h-10 w-10 bg-blue-600 text-white text-sm font-black rounded-2xl flex items-center justify-center shadow-lg shadow-blue-200 shrink-0"
                                         x-text="index + 1"></div>
                                     <div>
                                         <h3 class="text-sm font-black text-slate-800 uppercase tracking-widest">Konfigurasi
@@ -150,7 +258,7 @@
                                     </div>
                                 </div>
                                 <button type="button" @click="removeRow(index)"
-                                    class="flex items-center gap-2 px-4 py-2 text-[10px] font-black text-red-500 uppercase tracking-widest hover:bg-red-50 rounded-xl transition-all active:scale-95">
+                                    class="self-start sm:self-auto flex items-center gap-2 px-4 py-2 text-[10px] font-black text-red-500 uppercase tracking-widest hover:bg-red-50 rounded-xl transition-all active:scale-95">
                                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
                                         stroke-width="2.5">
                                         <path
@@ -501,34 +609,36 @@
                                                     x-text="(Object.values(row.days).reduce((a, b) => (parseFloat(a) || 0) + (parseFloat(b) || 0), 0)).toFixed(1) + ' Jam'"></span>
                                             </div>
                                         </div>
-                                        <div
-                                            class="flex bg-slate-50 p-1.5 rounded-[1.5rem] border border-slate-100 overflow-hidden shadow-inner">
-                                            <template
-                                                x-for="(dayName, dayKey) in {mon:'Senin', tue:'Selasa', wed:'Rabu', thu:'Kamis', fri:'Jumat', sat:'Sabtu', sun:'Minggu'}"
-                                                :key="dayKey">
-                                                <div class="flex-1 relative group/day">
-                                                    <div
-                                                        class="absolute top-3 left-0 right-0 text-center pointer-events-none z-20">
-                                                        <span
-                                                            class="text-[9px] font-black uppercase tracking-tighter transition-colors"
-                                                            :class="row.days[dayKey] !== '' && parseFloat(row.days[
-                                                                dayKey]) > 0 ? (dayKey === 'sun' ?
-                                                                'text-red-500' : 'text-blue-600') : 'text-slate-300'"
-                                                            x-text="dayName"></span>
+                                        <div class="overflow-x-auto -mx-1 px-1">
+                                            <div
+                                                class="flex bg-slate-50 p-1.5 rounded-[1.5rem] border border-slate-100 shadow-inner min-w-[480px]">
+                                                <template
+                                                    x-for="(dayName, dayKey) in {mon:'Senin', tue:'Selasa', wed:'Rabu', thu:'Kamis', fri:'Jumat', sat:'Sabtu', sun:'Minggu'}"
+                                                    :key="dayKey">
+                                                    <div class="flex-1 relative group/day">
+                                                        <div
+                                                            class="absolute top-3 left-0 right-0 text-center pointer-events-none z-20">
+                                                            <span
+                                                                class="text-[9px] font-black uppercase tracking-tighter transition-colors"
+                                                                :class="row.days[dayKey] !== '' && parseFloat(row.days[
+                                                                    dayKey]) > 0 ? (dayKey === 'sun' ?
+                                                                    'text-red-500' : 'text-blue-600') : 'text-slate-300'"
+                                                                x-text="dayName"></span>
+                                                        </div>
+                                                        <input type="number" step="0.1" placeholder="0"
+                                                            :name="`pekerja[${index}][days][${dayKey}]`"
+                                                            :value="row.days[dayKey]"
+                                                            @input="validateDayInput($event, row, dayKey)"
+                                                            @blur="cleanupDayInput(row, dayKey)"
+                                                            class="w-full pt-8 pb-4 text-center text-sm font-black bg-transparent border-none outline-none ring-0 focus:ring-0 z-10 relative transition-all"
+                                                            :class="row.days[dayKey] !== '' ? 'text-slate-800' :
+                                                                'text-slate-300'" />
+                                                        <div x-show="dayKey !== 'sun'"
+                                                            class="absolute right-0 top-4 bottom-4 w-px bg-slate-200/60 group-focus-within/day:opacity-0 transition-opacity">
+                                                        </div>
                                                     </div>
-                                                    <input type="number" step="0.1" placeholder="0"
-                                                        :name="`pekerja[${index}][days][${dayKey}]`"
-                                                        :value="row.days[dayKey]"
-                                                        @input="validateDayInput($event, row, dayKey)"
-                                                        @blur="cleanupDayInput(row, dayKey)"
-                                                        class="w-full pt-8 pb-4 text-center text-sm font-black bg-transparent border-none outline-none ring-0 focus:ring-0 z-10 relative transition-all"
-                                                        :class="row.days[dayKey] !== '' ? 'text-slate-800' :
-                                                            'text-slate-300'" />
-                                                    <div x-show="dayKey !== 'sun'"
-                                                        class="absolute right-0 top-4 bottom-4 w-px bg-slate-200/60 group-focus-within/day:opacity-0 transition-opacity">
-                                                    </div>
-                                                </div>
-                                            </template>
+                                                </template>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -599,13 +709,13 @@
                                     {{-- HBN (hidden when sistem_pengajian == 2) --}}
                                     <div class="space-y-2" x-show="window.unitInfo.sistem_pengajian != 2">
                                         {{-- Header: Judul & Hasil dalam satu baris --}}
-                                        <div class="flex items-center justify-between px-1">
+                                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 px-1 mb-2">
                                             <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">
                                                 Rate HBN (OT × <span class="text-blue-600"
                                                     x-text="row.rate_hbn || 0"></span>)<span class="text-red-500 font-semibold">*</span>
                                             </label>
 
-                                            {{-- Hasil Kalkulasi (Compact beside title) --}}
+                                            {{-- Hasil Kalkulasi --}}
                                             <div class="flex items-center gap-1.5">
                                                 <span
                                                     class="text-[11px] font-bold text-slate-300 uppercase tracking-tighter">Hasil:</span>
@@ -757,10 +867,10 @@
                                     {{-- File Upload --}}
                                     <div class="sm:col-span-2 mt-2" x-data="{ fileName: '' }">
                                         <label
-                                            class="flex items-center gap-5 p-6 bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl cursor-pointer hover:bg-white hover:border-blue-400 transition-all group shadow-sm">
+                                            class="flex items-center gap-4 p-4 sm:p-6 bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl cursor-pointer hover:bg-white hover:border-blue-400 transition-all group shadow-sm">
                                             <div
-                                                class="h-14 w-14 bg-white rounded-2xl shadow-sm border border-slate-100 flex items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors">
-                                                <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24"
+                                                class="shrink-0 h-10 w-10 sm:h-14 sm:w-14 bg-white rounded-2xl shadow-sm border border-slate-100 flex items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors">
+                                                <svg class="w-5 h-5 sm:w-7 sm:h-7" fill="none" viewBox="0 0 24 24"
                                                     stroke="currentColor" stroke-width="2">
                                                     <path
                                                         d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
@@ -769,14 +879,15 @@
                                             <div class="flex-1 min-w-0">
                                                 <p class="text-sm font-black text-slate-700 group-hover:text-blue-600 transition-colors truncate"
                                                     x-text="fileName || 'Upload Dokumen PKWT Resmi'"></p>
-                                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1"
-                                                    x-show="!fileName">Format yang didukung: PDF, PNG, JPG (Maks. 2MB)</p>
+                                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 leading-relaxed"
+                                                    x-show="!fileName">Format: PDF, PNG, JPG (Maks. 2MB)</p>
                                                 <p class="text-[10px] font-bold text-emerald-500 uppercase tracking-widest mt-1"
                                                     x-show="fileName">File siap diunggah</p>
                                             </div>
                                             <input type="file" class="hidden"
                                                 :name="`pekerja[${index}][dokumen_pkwt]`"
-                                                @change="fileName = $event.target.files[0]?.name || ''">
+                                                accept=".pdf,.jpg,.jpeg,.png"
+                                                @change="fileName = sanitizeFileInput($event.target)">
                                         </label>
                                     </div>
                                 </div>
@@ -801,7 +912,7 @@
                     <div
                         class="flex items-center gap-4 w-full sm:w-auto order-2 sm:order-1 justify-center sm:justify-start">
                         <a href="{{ route('view.detail.unit', $unitSelected->id) }}"
-                            class="px-6 py-3 text-sm font-bold text-gray-600 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 hover:text-gray-900 transition shadow-sm w-full sm:w-auto text-center">
+                            class="w-full sm:w-auto text-center px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 transition shadow-sm">
                             Batalkan
                         </a>
 
@@ -1360,6 +1471,25 @@
                     this.open = false;
                 }
             }))
-        })
+        });
+
+        function sanitizeFileInput(input) {
+            if (!input || !input.files || input.files.length === 0) return '';
+            const file = input.files[0];
+            if (!file) return '';
+
+            const cleanName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+            if (cleanName !== file.name) {
+                try {
+                    const cleanFile = new File([file], cleanName, { type: file.type, lastModified: file.lastModified });
+                    const dt = new DataTransfer();
+                    dt.items.add(cleanFile);
+                    input.files = dt.files;
+                } catch (e) {
+                    console.warn('File sanitization error:', e);
+                }
+            }
+            return input.files[0]?.name || '';
+        }
     </script>
 @endsection

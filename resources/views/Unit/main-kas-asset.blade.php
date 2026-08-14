@@ -766,7 +766,7 @@
                                 <input type="hidden" name="_method" value="PUT">
                             </template>
 
-                            <template x-for="(entry, index) in entries" :key="index">
+                            <template x-for="(entry, index) in entries" :key="entry._uid">
                                 <div class="relative p-8 bg-white rounded-[2.5rem] border border-slate-200 mb-8 transition-all hover:shadow-2xl hover:shadow-slate-200/50 group">
                                     <input type="hidden" :name="activeType + '[' + index + '][id]'" x-model="entry.id">
                                     <div class="absolute -top-3 left-8 px-4 py-1 bg-slate-800 text-white text-[9px] font-black uppercase tracking-widest rounded-full shadow-lg">
@@ -1005,33 +1005,239 @@
         {{-- FLOATING MULTI-ACTION TOOLBAR --}}
         <div x-show="showModal && view === 'list' && selectedRows.length > 0"
             x-transition:enter="transition ease-out duration-300"
-            x-transition:enter-start="opacity-0 translate-y-20" x-transition:enter-end="opacity-100 translate-y-0"
-            class="fixed bottom-8 left-1/2 -translate-x-1/2 z-[200] w-max max-w-[90vw] bg-white rounded-2xl shadow-2xl text-slate-600 px-6 py-4 border border-slate-100 flex items-center gap-6 backdrop-blur-xl shadow-[0_20px_50px_rgba(0,0,0,0.15)]">
-            <div class="flex items-center gap-4 border-r border-slate-200 pr-6">
-                <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center font-black text-sm text-white shadow-lg shadow-blue-500/20" x-text="selectedRows.length"></div>
-                <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Data Terpilih</p>
+            x-transition:enter-start="opacity-0 translate-y-20"
+            x-transition:enter-end="opacity-100 translate-y-0"
+            x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100 translate-y-0"
+            x-transition:leave-end="opacity-0 translate-y-20"
+            class="fixed bottom-4 sm:bottom-8
+                left-1/2 -translate-x-1/2
+                z-[200]
+                w-[calc(100%-1rem)] sm:w-max
+                max-w-[90vw] sm:max-w-none
+                bg-white
+                rounded-2xl
+                shadow-2xl
+                text-slate-600
+                px-4 sm:px-6
+                py-4
+                border border-slate-100
+                flex flex-col sm:flex-row
+                sm:items-center
+                gap-3 sm:gap-6
+                backdrop-blur-xl
+                shadow-[0_20px_50px_rgba(0,0,0,0.15)]">
+
+            {{-- ============================= --}}
+            {{-- SELECTED DATA --}}
+            {{-- ============================= --}}
+            <div class="flex items-center justify-between sm:justify-start
+                        gap-4
+                        sm:border-r sm:border-slate-200
+                        sm:pr-6">
+
+                <div class="flex items-center gap-3">
+
+                    <div
+                        class="w-9 h-9 sm:w-10 sm:h-10
+                            bg-blue-500
+                            rounded-full
+                            flex items-center justify-center
+                            font-black text-xs sm:text-sm
+                            text-white
+                            shadow-lg shadow-blue-500/20"
+                        x-text="selectedRows.length">
+                    </div>
+
+                    <div class="flex flex-col">
+
+                        <p class="text-[10px]
+                                font-black
+                                uppercase
+                                tracking-widest
+                                text-slate-400">
+
+                            Data Terpilih
+
+                        </p>
+
+                        <span
+                            class="sm:hidden
+                                text-[9px]
+                                text-slate-400
+                                font-semibold
+                                mt-0.5">
+
+                            Pilih tindakan
+
+                        </span>
+
+                    </div>
+
+                </div>
+
             </div>
-            <div class="flex items-center gap-3 whitespace-nowrap">
-                <button type="button" @click="openExportSettings('excel')"
-                    class="px-6 py-2 bg-green-500/10 text-green-500 text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-green-500 hover:text-white transition">Export Excel (<span x-text="selectedRows.length"></span>)</button>
+
+
+            {{-- ============================= --}}
+            {{-- ACTIONS --}}
+            {{-- ============================= --}}
+            <div class="flex flex-col sm:flex-row
+                        gap-2
+                        w-full sm:w-auto">
+
+
+                {{-- EXPORT EXCEL --}}
+                <button
+                    type="button"
+                    @click="openExportSettings('excel')"
+                    class="w-full sm:w-auto
+                        px-4 sm:px-6
+                        py-2.5 sm:py-2
+                        bg-green-500/10
+                        text-green-500
+                        text-[10px]
+                        font-black
+                        uppercase
+                        tracking-widest
+                        rounded-xl
+                        hover:bg-green-500
+                        hover:text-white
+                        transition
+                        text-center">
+
+                    Export Excel
+                    (<span x-text="selectedRows.length"></span>)
+
+                </button>
+
 
                 @if(in_array(auth()->user()->role, ['admin', 'hrd', 'akuntan']))
-                <button type="button" @click="approveSelected()" x-show="!hasApprovedSelected()"
-                    class="px-6 py-2 bg-emerald-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-emerald-700 transition shadow-lg">Approve (<span x-text="selectedRows.length"></span>)</button>
-                <div x-show="hasApprovedSelected()" title="Terdapat data yang sudah disetujui dalam pilihan Anda" class="relative group">
-                    <button type="button" disabled
-                        class="px-6 py-2 bg-slate-200 text-slate-400 text-[10px] font-black uppercase tracking-widest rounded-xl cursor-not-allowed opacity-70 flex items-center gap-2">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
-                        </svg>
+
+                    {{-- ============================= --}}
+                    {{-- APPROVE AVAILABLE --}}
+                    {{-- ============================= --}}
+                    <button
+                        type="button"
+                        @click="approveSelected()"
+                        x-show="!hasApprovedSelected()"
+                        class="w-full sm:w-auto
+                            px-4 sm:px-6
+                            py-2.5 sm:py-2
+                            bg-emerald-600
+                            text-white
+                            text-[10px]
+                            font-black
+                            uppercase
+                            tracking-widest
+                            rounded-xl
+                            hover:bg-emerald-700
+                            transition
+                            shadow-lg
+                            text-center">
+
                         Approve
+                        (<span x-text="selectedRows.length"></span>)
+
                     </button>
-                    <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-80 px-3 py-2 bg-white rounded-2xl shadow-2xl text-slate-600 text-[11px] font-semibold text-center leading-relaxed opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                        Ada data yang sudah <span class="text-emerald-400">disetujui</span> dalam pilihan Anda.
+
+
+                    {{-- ============================= --}}
+                    {{-- APPROVE DISABLED --}}
+                    {{-- ============================= --}}
+                    <div
+                        x-show="hasApprovedSelected()"
+                        title="Terdapat data yang sudah disetujui dalam pilihan Anda"
+                        class="relative group w-full sm:w-auto">
+
+                        <button
+                            type="button"
+                            disabled
+                            class="w-full sm:w-auto
+                                px-4 sm:px-6
+                                py-2.5 sm:py-2
+                                bg-slate-200
+                                text-slate-400
+                                text-[10px]
+                                font-black
+                                uppercase
+                                tracking-widest
+                                rounded-xl
+                                cursor-not-allowed
+                                opacity-70
+                                flex items-center
+                                justify-center
+                                gap-2">
+
+                            <svg
+                                class="w-3.5 h-3.5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24">
+
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+
+                            </svg>
+
+                            Approve
+
+                        </button>
+
+
+                        {{-- DESKTOP TOOLTIP --}}
+                        <div
+                            class="hidden sm:block
+                                absolute bottom-full
+                                left-1/2
+                                -translate-x-1/2
+                                mb-2
+                                w-80
+                                px-3 py-2
+                                bg-white
+                                rounded-2xl
+                                shadow-2xl
+                                text-slate-600
+                                text-[11px]
+                                font-semibold
+                                text-center
+                                leading-relaxed
+                                opacity-0
+                                group-hover:opacity-100
+                                transition-opacity
+                                pointer-events-none">
+
+                            Ada data yang sudah
+                            <span class="text-emerald-400">
+                                disetujui
+                            </span>
+                            dalam pilihan Anda.
+
+                        </div>
+
+
+                        {{-- MOBILE EXPLANATION --}}
+                        <p
+                            class="sm:hidden
+                                text-[9px]
+                                text-slate-400
+                                text-center
+                                leading-relaxed
+                                mt-1">
+
+                            Ada data yang sudah disetujui dalam pilihan Anda.
+
+                        </p>
+
                     </div>
-                </div>
+
                 @endif
+
             </div>
+
         </div>
     </div>
 @endsection
@@ -1270,9 +1476,11 @@
                     this.view = 'form';
 
                     this.entries = ids.map(id => {
+                        const uid = ++this._uidCounter;
                         if (this.activeType === 'kas') {
                             const item = this.allData.find(d => d.id == id);
                             return {
+                                _uid: uid,
                                 id: item.id,
                                 tgl: item.tanggal,
                                 akun: item.akun,
@@ -1285,6 +1493,7 @@
                         } else {
                             const item = this.allDataAsset.find(d => d.id == id);
                             return {
+                                _uid: uid,
                                 id: item.id,
                                 nama_barang: item.nama_barang,
                                 jumlah: item.jumlah,
@@ -1298,9 +1507,13 @@
                     });
                 },
 
+                _uidCounter: 0,
+
                 getEmptyRow() {
+                    const uid = ++this._uidCounter;
                     if (this.activeType === 'kas') {
                         return {
+                            _uid: uid,
                             tgl: '',
                             keterangan: '',
                             debit: 0,
@@ -1312,6 +1525,7 @@
                         };
                     } else {
                         return {
+                            _uid: uid,
                             id: null,
                             nama_barang: '',
                             jumlah: 1,

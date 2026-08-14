@@ -14,7 +14,7 @@
         removeTunjangan(index) {
             this.tunjanganList.splice(index, 1);
         }
-    }" class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    }" class="max-w-6xl mx-auto px-2 sm:px-6 lg:px-8 py-8">
 
         {{-- HEADER SECTION --}}
         <div class="mb-8">
@@ -405,33 +405,51 @@
                     <div class="space-y-3">
                         <template x-for="(t, index) in tunjanganList" :key="index">
                             <div
-                                class="flex items-center justify-between p-4 bg-white border border-gray-100 rounded-[1.5rem] hover:border-emerald-300 transition-all group shadow-sm">
+                                class="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white border border-gray-100 rounded-[1.5rem] hover:border-emerald-300 transition-all group shadow-sm gap-3 sm:gap-0">
 
                                 {{-- Hidden input asli untuk dikirim ke Backend --}}
                                 <input type="hidden" name="tunjangan" :value="tunjanganJson">
 
-                                <div class="flex items-center gap-5 flex-1">
-                                    <div class="h-10 w-10 rounded-xl bg-gray-50 text-gray-400 flex items-center justify-center font-black text-xs"
+                                {{-- Mobile Header: Number and Trash Icon --}}
+                                <div class="flex items-center justify-between w-full sm:hidden">
+                                    <div class="h-10 w-10 shrink-0 rounded-xl bg-gray-50 text-gray-400 flex items-center justify-center font-black text-xs"
+                                        x-text="index + 1"></div>
+                                    <button type="button" @click="removeTunjangan(index)"
+                                        class="p-2.5 text-gray-300 hover:text-rose-500 transition-all shrink-0">
+                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                    </button>
+                                </div>
+
+                                {{-- Main Content --}}
+                                <div class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-5 w-full">
+                                    {{-- Desktop Number --}}
+                                    <div class="hidden sm:flex h-10 w-10 shrink-0 rounded-xl bg-gray-50 text-gray-400 items-center justify-center font-black text-xs"
                                         x-text="index + 1"></div>
 
-                                    <div class="flex-1 grid grid-cols-2 gap-4">
-                                        {{-- Edit Nama langsung di list --}}
+                                    {{-- Inputs --}}
+                                    <div class="flex-1 flex flex-col sm:grid sm:grid-cols-2 gap-2 sm:gap-4 w-full">
+                                        {{-- Edit Nama --}}
                                         <input type="text" x-model="t.nama"
-                                            class="w-full rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm font-black text-gray-900 focus:ring-2 focus:ring-emerald-100 focus:border-emerald-400 outline-none transition">
+                                            class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 sm:py-1.5 text-sm font-black text-gray-900 focus:ring-2 focus:ring-emerald-100 focus:border-emerald-400 outline-none transition"
+                                            placeholder="Nama Tunjangan">
 
-                                        {{-- Edit Nilai langsung di list (Formatted) --}}
-                                        <div class="flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-1.5">
+                                        {{-- Edit Nilai (Formatted) --}}
+                                        <div class="flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-2.5 sm:py-1.5 w-full">
                                             <span class="text-xs font-bold text-emerald-500 flex-shrink-0">Rp</span>
                                             <input type="text" :value="formatDisplay(t.value)"
                                                 @input="handleListInput($event, index)"
-                                                class="bg-transparent border-none p-0 text-sm font-black text-emerald-600 focus:ring-0 w-full outline-none">
+                                                class="bg-transparent border-none p-0 text-sm font-black text-emerald-600 focus:ring-0 w-full outline-none"
+                                                placeholder="0">
                                         </div>
                                     </div>
                                 </div>
 
-                                {{-- Remove Button --}}
+                                {{-- Desktop Remove Button --}}
                                 <button type="button" @click="removeTunjangan(index)"
-                                    class="p-2.5 text-gray-300 hover:text-rose-500 transition-all">
+                                    class="hidden sm:block p-2.5 text-gray-300 hover:text-rose-500 transition-all shrink-0">
                                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -663,13 +681,13 @@
             </div>
 
             {{-- FOOTER --}}
-            <div class="bg-gray-50/50 px-8 py-6 border-t border-gray-100 flex items-center justify-end gap-3">
+            <div class="bg-gray-50 px-8 py-5 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-3 border-t border-gray-200">
                 <a href="{{ route('view.mitra-kerja') }}"
-                    class="px-5 py-2.5 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 hover:text-gray-800 transition shadow-sm">
+                    class="w-full sm:w-auto text-center px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 transition shadow-sm">
                     Batal
                 </a>
                 <button type="button" id="save-btn"
-                    class="px-5 py-2.5 text-sm font-bold text-white bg-black border border-black rounded-xl hover:bg-gray-800 transition shadow-lg shadow-gray-200 flex items-center gap-2">
+                    class="w-full sm:w-auto justify-center flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition shadow-sm">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />

@@ -179,7 +179,6 @@ class PKWTController extends Controller
 
 
             $userRole = strtolower(trim(auth()->user()->role ?? ''));
-            $initialStatus = in_array($userRole, ['hrd', 'admin', 'superadmin']) ? 1 : 2;
 
             // ✅ LOOP PEKERJA
             foreach ($request->pekerja as $index => $data) {
@@ -192,6 +191,18 @@ class PKWTController extends Controller
                     $dokumen = file_get_contents($file->getRealPath());
                     $dokumenMime = $file->getMimeType();
                 }
+
+                // Cek apakah pekerja sudah terdaftar/approved di perusahaan
+                $pekerja = Pekerja::find($data['id_pekerja']);
+
+                $pekerjaSudahTerdaftar = $pekerja && $pekerja->status_aktif == 1;
+
+                // HRD/Admin/Superadmin selalu bisa langsung aktif
+                // PIC hanya langsung aktif jika pekerja sudah terdaftar
+                $initialStatus = (
+                    in_array($userRole, ['hrd', 'admin', 'superadmin']) ||
+                    $pekerjaSudahTerdaftar
+                ) ? 1 : 2;
 
                 $pkwt = PKWT::create([
                     'id_unit' => $request->id_unit,
