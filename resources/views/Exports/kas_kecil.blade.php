@@ -42,46 +42,51 @@
                 <td style="border: 1px solid black; text-align: center;">{{ $row->akun }}</td>
                 <td style="border: 1px solid black;">{{ $row->keterangan }}</td>
                 
-                <td style="border: 1px solid black; text-align: right;">{{ $row->debit }}</td>
-                <td style="border: 1px solid black; text-align: right;">{{ $row->kredit }}</td>
-                <td style="border: 1px solid black; text-align: right; background-color: #f9f9f9;">{{ $saldoBerjalan }}</td>
+                <!-- Format Rp diterapkan pada Debit, Kredit, dan Saldo Berjalan -->
+                <td style="border: 1px solid black; text-align: right;">Rp {{ number_format($row->debit, 0, ',', '.') }}</td>
+                <td style="border: 1px solid black; text-align: right;">Rp {{ number_format($row->kredit, 0, ',', '.') }}</td>
+                <td style="border: 1px solid black; text-align: right; background-color: #f9f9f9;">Rp {{ number_format($saldoBerjalan, 0, ',', '.') }}</td>
             </tr>
         @endforeach
 
         <tr>
             <td colspan="4" style="border: 1px solid black; font-weight: bold; text-align: right; background-color: #e6e6e6;">TOTAL KESELURUHAN</td>
-            <td style="border: 1px solid black; font-weight: bold; text-align: right; background-color: #e6e6e6;">{{ $saldoAwal }}</td>
-            <td style="border: 1px solid black; font-weight: bold; text-align: right; background-color: #e6e6e6;">{{ $totalPengeluaran }}</td>
-            <td style="border: 1px solid black; font-weight: bold; text-align: right; background-color: #e6e6e6;">{{ $sisaSaldo }}</td>
+            <!-- Format Rp diterapkan pada rekap baris TOTAL -->
+            <td style="border: 1px solid black; font-weight: bold; text-align: right; background-color: #e6e6e6;">Rp {{ number_format($saldoAwal, 0, ',', '.') }}</td>
+            <td style="border: 1px solid black; font-weight: bold; text-align: right; background-color: #e6e6e6;">Rp {{ number_format($totalPengeluaran, 0, ',', '.') }}</td>
+            <td style="border: 1px solid black; font-weight: bold; text-align: right; background-color: #e6e6e6;">Rp {{ number_format($sisaSaldo, 0, ',', '.') }}</td>
         </tr>
     </tbody>
     
     <!-- BAGIAN FOOTER & REKAP -->
     <tfoot>
         <tr></tr>
-        
-<tr>
+        <tr>
             <td colspan="3"></td> 
             <td style="border: 1px solid black; font-weight: bold; background-color: #e6e6e6;">Saldo Awal</td>
-            <td colspan="2" style="border: 1px solid black; font-weight: bold; text-align: right;">{{ number_format($saldoAwal, 0, ',', '.') }}</td>
+            <!-- Format Rp diterapkan di sini -->
+            <td colspan="2" style="border: 1px solid black; font-weight: bold; text-align: right;">Rp {{ number_format($saldoAwal, 0, ',', '.') }}</td>
             <td></td>
         </tr>
         <tr>
             <td colspan="3"></td>
             <td style="border: 1px solid black; font-weight: bold; background-color: #e6e6e6;">Total Pengeluaran</td>
-            <td colspan="2" style="border: 1px solid black; font-weight: bold; text-align: right; color: red;">{{ number_format($totalPengeluaran, 0, ',', '.') }}</td>
+            <!-- Format Rp diterapkan di sini -->
+            <td colspan="2" style="border: 1px solid black; font-weight: bold; text-align: right; color: red;">Rp {{ number_format($totalPengeluaran, 0, ',', '.') }}</td>
             <td></td>
         </tr>
         <tr>
             <td colspan="3"></td>
             <td style="border: 1px solid black; font-weight: bold; background-color: #e6e6e6;">Sisa Saldo</td>
-            <td colspan="2" style="border: 1px solid black; font-weight: bold; text-align: right;">{{ number_format($sisaSaldo, 0, ',', '.') }}</td>
+            <!-- Format Rp diterapkan di sini -->
+            <td colspan="2" style="border: 1px solid black; font-weight: bold; text-align: right;">Rp {{ number_format($sisaSaldo, 0, ',', '.') }}</td>
             <td></td>
         </tr>
         <tr>
             <td colspan="3"></td>
             <td style="border: 1px solid black; font-weight: bold; background-color: #e6e6e6;">Pengajuan Pengisian Kembali</td>
-            <td colspan="2" style="border: 1px solid black; font-weight: bold; text-align: right; color: green;">{{ number_format($pengajuanKembali, 0, ',', '.') }}</td>
+            <!-- Format Rp diterapkan di sini -->
+            <td colspan="2" style="border: 1px solid black; font-weight: bold; text-align: right; color: green;">Rp {{ number_format($pengajuanKembali, 0, ',', '.') }}</td>
             <td></td>
         </tr>
 
