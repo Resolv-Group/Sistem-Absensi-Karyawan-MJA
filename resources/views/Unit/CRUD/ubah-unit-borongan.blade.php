@@ -1,24 +1,84 @@
 @extends('layout')
 
 @section('content')
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="max-w-6xl mx-auto px-2 sm:px-6 lg:px-8 py-8">
 
         {{-- HEADER --}}
-        <div class="mb-8 flex items-center gap-4">
+        <div class="mb-6 sm:mb-8
+                    flex items-start sm:items-center
+                    gap-3 sm:gap-4">
+
+            {{-- Back Button --}}
             <a href="{{ url()->previous() }}"
-                class="p-2 rounded-xl border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 transition shadow-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                class="shrink-0
+                    p-2 sm:p-2
+                    rounded-xl
+                    border border-gray-200
+                    bg-white
+                    text-gray-500
+                    hover:bg-gray-50
+                    transition
+                    shadow-sm">
+
+                <svg xmlns="http://www.w3.org/2000/svg"
+                    class="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor">
+
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+
                 </svg>
+
             </a>
-            <div>
-                <nav class="flex text-sm font-medium text-gray-500 mb-1">
-                    <span class="hover:text-gray-700">Unit</span>
-                    <span class="mx-2 text-gray-300">/</span>
-                    <span class="text-blue-600">Ubah Borongan Unit</span>
+
+
+            {{-- Page Information --}}
+            <div class="min-w-0">
+
+                {{-- Breadcrumb --}}
+                <nav
+                    class="flex items-center
+                        text-[10px] sm:text-sm
+                        font-medium
+                        text-gray-500
+                        mb-1
+                        whitespace-nowrap
+                        overflow-hidden">
+
+                    <span class="hover:text-gray-700 shrink-0">
+                        Unit
+                    </span>
+
+                    <span class="mx-1.5 sm:mx-2 text-gray-300 shrink-0">
+                        /
+                    </span>
+
+                    <span class="text-blue-600 truncate">
+                        Ubah Borongan Unit
+                    </span>
+
                 </nav>
-                <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Ubah Borongan Unit</h1>
+
+
+                {{-- Title --}}
+                <h1
+                    class="text-xl sm:text-2xl
+                        font-bold
+                        text-gray-900
+                        tracking-tight
+                        leading-tight">
+
+                    Ubah Borongan Unit
+
+                </h1>
+
             </div>
+
         </div>
 
         @if ($errors->any())

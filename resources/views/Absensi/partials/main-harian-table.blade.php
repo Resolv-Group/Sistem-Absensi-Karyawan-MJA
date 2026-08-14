@@ -219,38 +219,33 @@
             </div>
         </td>
 
-        <td class="px-4 py-3 text-center">
-            <div class="flex flex-col items-center gap-1.5">
-                {{-- Row 1: Tunjangan Indicator --}}
-                @if ($absensi && $absensi->tunjangan)
-                    <div class="flex items-center gap-1 px-1.5 py-0.5 bg-emerald-50 text-emerald-600 rounded-md border border-emerald-100 shadow-sm"
-                        title="Ada Tunjangan">
-                        <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" stroke-width="4"
-                            viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
-                        <span class="text-[8px] font-black uppercase tracking-tighter">Plus</span>
-                    </div>
-                @else
-                    <div class="h-4 flex items-center">
-                        <span class="text-[10px] font-bold text-gray-200">-</span>
+        {{-- 8. Tunj / Pot --}}
+        <td class="px-4 py-4 text-center">
+            <div class="flex items-center justify-center gap-1.5">
+                @php
+                    $valTunjangan = $absensi?->tunjangan->total ?? 0;
+                    $valPotongan = $absensi?->potongan->total ?? 0;
+                @endphp
+                @if ($valTunjangan > 0)
+                    <div class="flex items-center gap-1.5 px-2 py-0.5 bg-emerald-50 border border-emerald-100 rounded-md w-full justify-between group-hover:bg-white transition-colors" title="Total Tunjangan">
+                        <span class="text-[9px] font-black text-emerald-500 uppercase tracking-tighter">Tunj</span>
+                        <span class="text-[11px] font-black text-emerald-700">
+                            +{{ number_format($valTunjangan, 0, ',', '.') }}
+                        </span>
                     </div>
                 @endif
 
-                {{-- Row 2: Potongan Indicator --}}
-                @if ($absensi && $absensi->potongan)
-                    <div class="flex items-center gap-1 px-1.5 py-0.5 bg-rose-50 text-rose-600 rounded-md border border-rose-100 shadow-sm"
-                        title="Ada Potongan">
-                        <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" stroke-width="4"
-                            viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
-                        <span class="text-[8px] font-black uppercase tracking-tighter">Min</span>
+                @if ($valPotongan > 0)
+                    <div class="flex items-center gap-1.5 px-2 py-0.5 bg-rose-50 border border-rose-100 rounded-md w-full justify-between group-hover:bg-white transition-colors" title="Total Potongan">
+                        <span class="text-[9px] font-black text-rose-400 uppercase tracking-tighter">Pot</span>
+                        <span class="text-[11px] font-black text-rose-700">
+                            -{{ number_format($valPotongan, 0, ',', '.') }}
+                        </span>
                     </div>
-                @else
-                    <div class="h-4 flex items-center">
-                        <span class="text-[10px] font-bold text-gray-200">-</span>
-                    </div>
+                @endif
+
+                @if ($valTunjangan == 0 && $valPotongan == 0)
+                    <span class="text-[11px] font-bold text-slate-200 tracking-widest">—</span>
                 @endif
             </div>
         </td>

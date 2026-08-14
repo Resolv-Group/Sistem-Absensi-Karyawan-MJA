@@ -60,7 +60,7 @@
                 <p class="text-sm text-gray-500">Menampilkan daftar borongan <span class="text-orange-600 font-medium"> 5
                         terbaru. </span></p>
             </div>
-            <div class="flex items-center gap-3 w-full sm:w-auto">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6 relative">
                 {{-- SEARCH INPUT --}}
                 <div class="relative w-full sm:w-64" x-data="{ showSearchTooltip: false }">
                     <svg class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none"
@@ -107,7 +107,7 @@
                 {{-- FILTER BUTTON --}}
                 <div class="relative z-[60]">
                     <button @click="showFilterDropdown = !showFilterDropdown"
-                        class="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none transition">
+                        class="w-full justify-center lg:w-auto flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
                         <svg class="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
@@ -125,7 +125,7 @@
                         x-transition:enter="transition ease-out duration-200"
                         x-transition:enter-start="opacity-0 scale-95 translate-y-2"
                         x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-                        class="absolute right-0 mt-3 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 z-[70] p-5 origin-top-right">
+                        class="absolute left-0 lg:right-0 lg:left-auto mt-3 w-full lg:w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 ring-1 ring-black ring-opacity-5 p-5 origin-top lg:origin-top-right transform transition-all">
 
                         <div class="flex justify-between items-center mb-5">
                             <h3 class="text-sm font-bold text-gray-800">Filter Borongan</h3>
@@ -253,7 +253,7 @@
                 </form> --}}
                 
                 <a href="{{ route('unit.export_borongan', $unit->id) }}" target="_blank"
-                    class="px-4 py-2 bg-emerald-600 text-white text-xs font-bold rounded-lg hover:bg-emerald-700 transition flex items-center gap-2 shadow-sm">
+                    class="w-full justify-center lg:w-auto px-4 py-2 bg-emerald-600 text-white text-xs font-bold rounded-lg hover:bg-emerald-700 transition flex items-center gap-2 shadow-sm">
                     <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                     </svg>
@@ -262,7 +262,7 @@
 
                 <button type="button"
                     onclick="checkUnitRequirements('{{ route('view.tambah.unit-borongan', $unit->id) }}')"
-                    class="px-4 py-2 bg-orange-600 text-white text-xs font-bold rounded-lg hover:bg-orange-700 transition flex items-center gap-2 shadow-sm">
+                    class="w-full justify-center lg:w-auto px-4 py-2 bg-orange-600 text-white text-xs font-bold rounded-lg hover:bg-orange-700 transition flex items-center gap-2 shadow-sm">
                     <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
@@ -272,110 +272,397 @@
         </div>
 
         {{-- Table Borongan --}}
-        <div class="overflow-x-auto rounded-b-2xl">
-            <table class="w-full text-left border-collapse">
-                <thead>
-                    <tr class="bg-gray-50/50 border-b border-gray-100">
-                        <th class="pl-6 py-4 w-10">
-                            <input type="checkbox" @click="toggleAll()"
-                                :checked="selectedItems.length === allIds.length && allIds.length > 0"
-                                class="rounded border-gray-300 text-orange-600 shadow-sm focus:ring-orange-200 cursor-pointer">
-                        </th>
-                        <th
-                            class="px-2 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider w-10 text-center">
-                            #</th>
-                        <th class="px-4 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider w-[250px]">
-                            Item Borongan</th>
-                        <th class="px-4 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Kategori
-                        </th>
-                        <th class="px-4 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider text-center">
-                            Max Rej Subkon (%)
-                        </th>
-                        <th class="px-4 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Harga Client
-                        </th>
-                        <th class="px-4 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Upah Pekerja
-                        </th>
-                        <th class="px-4 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Status</th>
-                        <th class="pr-6 py-4 text-right"></th>
-                    </tr>
-                </thead>
-                <tbody id="borongan-table-body" class="divide-y divide-gray-50 bg-white">
-                    @include('Unit.partials.borongan-table')
-                </tbody>
-            </table>
+        <div class="rounded-b-2xl">
+
+            {{-- TABLE SCROLL AREA --}}
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-50/50 border-b border-gray-100">
+
+                            <th class="pl-6 py-4 w-10">
+                                <input type="checkbox"
+                                    @click="toggleAll()"
+                                    :checked="selectedItems.length === allIds.length && allIds.length > 0"
+                                    class="rounded border-gray-300 text-orange-600 shadow-sm focus:ring-orange-200 cursor-pointer">
+                            </th>
+
+                            <th class="px-2 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider w-10 text-center">
+                                #
+                            </th>
+
+                            <th class="px-4 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider w-[250px]">
+                                Item Borongan
+                            </th>
+
+                            <th class="px-4 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                                Kategori
+                            </th>
+
+                            <th class="px-4 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider text-center">
+                                Max Rej Subkon (%)
+                            </th>
+
+                            <th class="px-4 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                                Harga Client
+                            </th>
+
+                            <th class="px-4 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                                Upah Pekerja
+                            </th>
+
+                            <th class="px-4 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                                Status
+                            </th>
+
+                            <th class="pr-6 py-4 text-right"></th>
+
+                        </tr>
+                    </thead>
+
+                    <tbody id="borongan-table-body" class="divide-y divide-gray-50 bg-white">
+                        @include('Unit.partials.borongan-table')
+                    </tbody>
+                </table>
+            </div>
+
+
             {{-- DEDICATED PAGE NAVIGATION FOOTER --}}
             <div
-                class="px-6 py-4 bg-gray-50/50 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+                class="px-4 sm:px-6 py-4
+                    bg-gray-50/50
+                    border-t border-gray-100
+                    flex flex-col sm:flex-row
+                    items-stretch sm:items-center
+                    justify-between
+                    gap-4">
 
-                <div class="flex items-center gap-3">
-                    <div class="flex-shrink-0 w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center">
+                {{-- INFO --}}
+                <div class="flex items-center gap-3 min-w-0">
+
+                    <div
+                        class="flex-shrink-0 w-10 h-10
+                            bg-orange-100
+                            rounded-xl
+                            flex items-center justify-center">
+
                         {{-- BORONGAN / PACKAGE ICON --}}
-                        <svg class="w-5 h-5 text-orange-600" fill="none" viewBox="0 0 24 24"
+                        <svg class="w-5 h-5 text-orange-600"
+                            fill="none"
+                            viewBox="0 0 24 24"
                             stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+
+                            <path stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
                                 d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                         </svg>
                     </div>
 
-                    <div>
+                    <div class="min-w-0">
+
                         <h4 class="text-xs font-bold text-gray-900 leading-tight">
                             Lihat Semua Borongan
                         </h4>
-                        <p class="text-[10px] text-gray-500 mt-0.5">
+
+                        <p class="text-[10px] text-gray-500 mt-0.5 leading-relaxed">
                             Buka halaman lengkap untuk melihat dan mengelola seluruh data borongan pada unit ini.
                         </p>
+
                     </div>
                 </div>
 
+
+                {{-- CTA --}}
                 <a href="{{ route('view.borongan', $unit->id) }}"
-                    class="group inline-flex items-center gap-2 px-4 py-2 bg-white border border-orange-200 text-orange-600 text-xs font-bold rounded-xl hover:bg-orange-600 hover:text-white hover:border-orange-600 transition-all shadow-sm active:scale-95">
+                    class="group inline-flex items-center justify-center
+                        gap-2
+                        w-full sm:w-auto
+                        px-4 py-2
+                        bg-white
+                        border border-orange-200
+                        text-orange-600
+                        text-xs font-bold
+                        rounded-xl
+                        hover:bg-orange-600
+                        hover:text-white
+                        hover:border-orange-600
+                        transition-all
+                        shadow-sm
+                        active:scale-95">
+
                     Lihat Semua Borongan
-                    <svg class="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+
+                    <svg class="w-3.5 h-3.5
+                                transform group-hover:translate-x-1
+                                transition-transform"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor">
+
+                        <path stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
                             d="M13 7l5 5m0 0l-5 5m5-5H6" />
+
                     </svg>
+
                 </a>
+
             </div>
 
         </div>
 
         {{-- Floating Action Bar (Orange Theme) --}}
-        <div x-show="selectedItems.length > 0" x-transition:enter="transition ease-out duration-300"
-            x-transition:enter-start="opacity-0 translate-y-10" x-transition:enter-end="opacity-100 translate-y-0"
+        <div x-show="selectedItems.length > 0"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 translate-y-10"
+            x-transition:enter-end="opacity-100 translate-y-0"
             x-transition:leave="transition ease-in duration-200"
-            class="fixed bottom-8 left-1/2 -translate-x-1/2 z-40 w-[95%] max-w-2xl">
-            <div
-                class="bg-white/80 backdrop-blur-md border border-orange-100 shadow-[0_8px_30px_rgb(0,0,0,0.12)] rounded-2xl px-5 py-3 flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <span
-                        class="flex items-center justify-center bg-orange-600 text-white text-[11px] font-black h-6 w-6 rounded-full"
-                        x-text="selectedItems.length"></span>
-                    <span class="text-sm font-bold text-gray-900">Item Dipilih</span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <button type="button" @click="selectedItems = []"
-                        class="px-3 py-2 text-xs font-bold text-gray-500 hover:text-gray-700 transition">Batal</button>
-                    <div class="h-6 w-px bg-gray-200 mx-1"></div>
-                    <button @click="showCategoryModal = true"
-                        class="px-4 py-2 bg-orange-50 text-orange-700 border border-orange-100 rounded-xl text-xs font-bold hover:bg-orange-600 hover:text-white transition-all">Ubah
-                        Kategori</button>
-                    <button @click="showStatusModal = true"
-                        class="px-4 py-2 bg-gray-50 text-gray-600 border border-gray-200 rounded-xl text-xs font-bold hover:bg-gray-800 hover:text-white transition-all">Update
-                        Status</button>
+            x-transition:leave-start="opacity-100 translate-y-0"
+            x-transition:leave-end="opacity-0 translate-y-10"
+            class="fixed bottom-4 sm:bottom-8 left-1/2 -translate-x-1/2 z-40
+                w-[calc(100%-1rem)] sm:w-[95%] max-w-2xl"
+            x-cloak>
 
-                    <form action="{{ route('bulk.update.borongan') }}" method="POST" class="inline">
-                        @csrf @method('PUT')
-                        <input type="hidden" name="ids" :value="JSON.stringify(selectedItems)">
-                        <button name="action" value="delete" onclick="return confirm('Hapus item terpilih?')"
-                            class="p-2 bg-red-50 text-red-600 border border-red-100 rounded-xl hover:bg-red-600 hover:text-white transition-all">
-                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                        </button>
-                    </form>
+            <div
+                class="bg-white/90 backdrop-blur-md
+                    border border-orange-100
+                    shadow-[0_8px_30px_rgb(0,0,0,0.12)]
+                    rounded-2xl
+                    px-4 sm:px-5 py-3
+                    flex flex-col sm:flex-row
+                    sm:items-center sm:justify-between
+                    gap-3 sm:gap-0">
+
+
+                {{-- ============================= --}}
+                {{-- SELECTED INFO --}}
+                {{-- ============================= --}}
+                <div class="flex items-center justify-between sm:justify-start gap-3">
+
+                    <div class="flex items-center gap-3">
+
+                        <span
+                            class="flex items-center justify-center
+                                bg-orange-600 text-white
+                                text-[11px] font-black
+                                h-7 w-7 rounded-full shadow-sm"
+                            x-text="selectedItems.length">
+                        </span>
+
+                        <div class="flex flex-col">
+                            <span class="text-sm font-bold text-gray-900 leading-none">
+                                Item Dipilih
+                            </span>
+
+                            <span class="sm:hidden text-[10px] text-gray-400 mt-1">
+                                Pilih tindakan untuk item
+                            </span>
+                        </div>
+
+                    </div>
+
+                    {{-- Mobile Batal --}}
+                    <button type="button"
+                        @click="selectedItems = []"
+                        class="sm:hidden px-3 py-1.5
+                            text-xs font-bold text-gray-500
+                            bg-gray-50 border border-gray-200
+                            rounded-lg hover:text-gray-700 transition">
+                        Batal
+                    </button>
+
                 </div>
+
+
+                {{-- ============================= --}}
+                {{-- DESKTOP ACTIONS --}}
+                {{-- ============================= --}}
+                <div class="hidden sm:flex items-center gap-2">
+
+                    <button type="button"
+                        @click="selectedItems = []"
+                        class="px-3 py-2 text-xs font-bold text-gray-500 hover:text-gray-700 transition">
+                        Batal
+                    </button>
+
+                    <div class="h-6 w-px bg-gray-200 mx-1"></div>
+
+
+                    {{-- Ubah Kategori --}}
+                    <button @click="showCategoryModal = true"
+                        class="px-4 py-2
+                            bg-orange-50 text-orange-700
+                            border border-orange-100
+                            rounded-xl text-xs font-bold
+                            hover:bg-orange-600 hover:text-white
+                            transition-all">
+
+                        Ubah Kategori
+                    </button>
+
+
+                    {{-- Update Status --}}
+                    <button @click="showStatusModal = true"
+                        class="px-4 py-2
+                            bg-gray-50 text-gray-600
+                            border border-gray-200
+                            rounded-xl text-xs font-bold
+                            hover:bg-gray-800 hover:text-white
+                            transition-all">
+
+                        Update Status
+                    </button>
+
+
+                    {{-- Delete --}}
+                    <form action="{{ route('bulk.update.borongan') }}"
+                        method="POST"
+                        class="inline">
+
+                        @csrf
+                        @method('PUT')
+
+                        <input type="hidden"
+                            name="ids"
+                            :value="JSON.stringify(selectedItems)">
+
+                        <button name="action"
+                            value="delete"
+                            onclick="return confirm('Hapus item terpilih?')"
+                            class="p-2
+                                bg-red-50 text-red-600
+                                border border-red-100
+                                rounded-xl
+                                hover:bg-red-600 hover:text-white
+                                transition-all">
+
+                            <svg class="w-4 h-4"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor">
+
+                                <path stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+
+                            </svg>
+
+                        </button>
+
+                    </form>
+
+                </div>
+
+
+                {{-- ============================= --}}
+                {{-- MOBILE ACTIONS --}}
+                {{-- ============================= --}}
+                <div class="grid grid-cols-2 gap-2 sm:hidden">
+
+                    {{-- Ubah Kategori --}}
+                    <button @click="showCategoryModal = true"
+                        class="flex items-center justify-center
+                            gap-1.5 px-3 py-2.5
+                            bg-orange-50 text-orange-700
+                            border border-orange-100
+                            rounded-xl
+                            text-[11px] font-bold
+                            hover:bg-orange-600 hover:text-white
+                            active:scale-[0.98]
+                            transition-all">
+
+                        <svg class="w-3.5 h-3.5 shrink-0"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor">
+
+                            <path stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M7 7h10M7 12h10M7 17h6" />
+
+                        </svg>
+
+                        Ubah Kategori
+                    </button>
+
+
+                    {{-- Update Status --}}
+                    <button @click="showStatusModal = true"
+                        class="flex items-center justify-center
+                            gap-1.5 px-3 py-2.5
+                            bg-gray-50 text-gray-600
+                            border border-gray-200
+                            rounded-xl
+                            text-[11px] font-bold
+                            hover:bg-gray-800 hover:text-white
+                            active:scale-[0.98]
+                            transition-all">
+
+                        <svg class="w-3.5 h-3.5 shrink-0"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor">
+
+                            <path stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 00-9.618 5.04A12.02 12.02 0 003 12c0 1.726.366 3.367 1.024 4.846M21 12a12.02 12.02 0 01-1.024 4.846" />
+
+                        </svg>
+
+                        Update Status
+                    </button>
+
+
+                    {{-- Delete --}}
+                    <form action="{{ route('bulk.update.borongan') }}"
+                        method="POST"
+                        class="col-span-2">
+
+                        @csrf
+                        @method('PUT')
+
+                        <input type="hidden"
+                            name="ids"
+                            :value="JSON.stringify(selectedItems)">
+
+                        <button name="action"
+                            value="delete"
+                            onclick="return confirm('Hapus item terpilih?')"
+                            class="w-full flex items-center justify-center
+                                gap-1.5 px-3 py-2.5
+                                bg-red-50 text-red-600
+                                border border-red-100
+                                rounded-xl
+                                text-[11px] font-bold
+                                hover:bg-red-600 hover:text-white
+                                active:scale-[0.98]
+                                transition-all">
+
+                            <svg class="w-3.5 h-3.5"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor">
+
+                                <path stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4v3M4 7h16" />
+
+                            </svg>
+
+                            Hapus Item Terpilih
+
+                        </button>
+
+                    </form>
+
+                </div>
+
             </div>
         </div>
 

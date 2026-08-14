@@ -71,7 +71,7 @@ $watch('filterStatus', () => updateTable());" class="relative">
             <p class="text-sm text-gray-500">Menampilkan daftar pekerja harian/kontrak <span class="text-blue-500 font-medium">5 terbaru. </span></p>
         </div>
 
-        <div class="flex items-center gap-3 w-full sm:w-auto">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6 relative">
             {{-- SEARCH INPUT --}}
             <div class="relative w-full sm:w-64" x-data="{ showSearchTooltip: false }">
                 {{-- Left Search Icon --}}
@@ -120,7 +120,7 @@ $watch('filterStatus', () => updateTable());" class="relative">
             {{-- FILTER BUTTON --}}
             <div class="relative"> {{-- Increased wrapper z-index --}}
                 <button @click="showFilterDropdown = !showFilterDropdown"
-                    class="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none transition">
+                    class="w-full justify-center lg:w-auto flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500" fill="none"
                         viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -143,7 +143,7 @@ $watch('filterStatus', () => updateTable());" class="relative">
                     x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                     x-transition:leave-end="opacity-0 scale-95 translate-y-2"
                     @click.outside="showFilterDropdown = false" x-cloak
-                    class="absolute right-0 mt-3 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 z-[70] p-5 origin-top-right">
+                    class="absolute left-0 lg:right-0 lg:left-auto mt-3 w-full lg:w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 ring-1 ring-black ring-opacity-5 p-5 origin-top lg:origin-top-right transform transition-all">
 
                     {{-- Header --}}
                     <div class="flex justify-between items-center mb-5">
@@ -308,17 +308,17 @@ $watch('filterStatus', () => updateTable());" class="relative">
                 </div>
             </div>
 
-        <a href="{{ route('unit.export_pekerja', $unit->id) }}" target="_blank"
-            class="px-4 py-2 bg-emerald-600 text-white text-xs font-bold rounded-lg hover:bg-emerald-700 transition flex items-center gap-2 shadow-sm">
-            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-            </svg>
-            Export Excel
-        </a>
+            <a href="{{ route('unit.export_pekerja', $unit->id) }}" target="_blank"
+                class="w-full justify-center lg:w-auto px-4 py-2 bg-emerald-600 text-white text-xs font-bold rounded-lg hover:bg-emerald-700 transition flex items-center gap-2 shadow-sm">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                Export Excel
+            </a>
 
             <button type="button"
                 onclick="checkUnitRequirements('{{ route('view.tambah.unit-pekerja', $unit->id) }}')"
-                class="px-4 py-2 bg-blue-600 text-white text-xs font-bold rounded-lg hover:bg-blue-700 transition flex items-center gap-2 shadow-sm">
+                class="w-full justify-center lg:w-auto px-4 py-2 bg-blue-600 text-white text-xs font-bold rounded-lg hover:bg-blue-700 transition flex items-center gap-2 shadow-sm">
                 <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                 </svg>
@@ -327,130 +327,385 @@ $watch('filterStatus', () => updateTable());" class="relative">
         </div>
     </div>
 
-    <div class="overflow-x-auto rounded-b-2xl">
-        <table class="w-full text-left border-collapse">
-            <thead>
-                <tr class="bg-gray-50/50 border-b border-gray-100">
-                    <th class="pl-6 py-4 w-10">
-                        <input type="checkbox" @click="toggleAll()"
-                            :checked="selectedItems.length === allIds.length && allIds.length > 0"
-                            class="rounded border-gray-300 text-blue-600 shadow-sm focus:ring-blue-200 cursor-pointer">
-                    </th>
-                    <th
-                        class="px-2 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider w-10 text-center">
-                        #</th>
-                    <th class="px-4 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider w-[250px]">Nama &
-                        NIK</th>
-                    <th class="px-4 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Jabatan & Divisi
-                    </th>
-                    <th class="px-4 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider text-center">PKWT
-                    </th>
-                    <th class="px-4 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider text-center">
-                        Periode PKWT</th>
-                    <th class="px-4 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider text-center">
-                        Status</th>
-                    <th class="pr-6 py-4 text-right"></th>
-                </tr>
-            </thead>
-            <tbody id="harian-table-body" class="divide-y divide-gray-50 bg-white">
-                @include('Unit.partials.harian-table')
-            </tbody>
-        </table>
+    <div class="rounded-b-2xl">
+
+        {{-- TABLE SCROLL AREA --}}
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-gray-50/50 border-b border-gray-100">
+                        <th class="pl-6 py-4 w-10">
+                            <input type="checkbox"
+                                @click="toggleAll()"
+                                :checked="selectedItems.length === allIds.length && allIds.length > 0"
+                                class="rounded border-gray-300 text-blue-600 shadow-sm focus:ring-blue-200 cursor-pointer">
+                        </th>
+
+                        <th class="px-2 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider w-10 text-center">
+                            #
+                        </th>
+
+                        <th class="px-4 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider w-[250px]">
+                            Nama & NIK
+                        </th>
+
+                        <th class="px-4 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                            Jabatan & Divisi
+                        </th>
+
+                        <th class="px-4 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider text-center">
+                            PKWT
+                        </th>
+
+                        <th class="px-4 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider text-center">
+                            Periode PKWT
+                        </th>
+
+                        <th class="px-4 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-wider text-center">
+                            Status
+                        </th>
+
+                        <th class="pr-6 py-4 text-right"></th>
+                    </tr>
+                </thead>
+
+                <tbody id="harian-table-body" class="divide-y divide-gray-50 bg-white">
+                    @include('Unit.partials.harian-table')
+                </tbody>
+            </table>
+        </div>
+
 
         {{-- DEDICATED PAGE NAVIGATION FOOTER --}}
         <div
-            class="px-6 py-4 bg-gray-50/50 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+            class="px-4 sm:px-6 py-4 bg-gray-50/50 border-t border-gray-100
+                flex flex-col sm:flex-row items-stretch sm:items-center
+                justify-between gap-4">
 
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-3 min-w-0">
+
                 <div class="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-                    {{-- USERS ICON --}}
-                    <svg class="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    <svg class="w-5 h-5 text-blue-600"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor">
+
+                        <path stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
                             d="M17 20h5v-2a4 4 0 00-4-4h-1m-4 6H2v-2a4 4 0 014-4h1m6-4a4 4 0 11-8 0 4 4 0 018 0zm6 4a3 3 0 10-6 0" />
                     </svg>
                 </div>
 
-                <div>
+                <div class="min-w-0">
                     <h4 class="text-xs font-bold text-gray-900 leading-tight">
                         Lihat Semua Pekerja
                     </h4>
-                    <p class="text-[10px] text-gray-500 mt-0.5">
+
+                    <p class="text-[10px] text-gray-500 mt-0.5 leading-relaxed">
                         Buka halaman lengkap untuk melihat dan mengelola seluruh pekerja pada unit ini.
                     </p>
                 </div>
             </div>
 
+
             <a href="{{ route('view.pkwt', $unit->id) }}"
-                class="group inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-blue-600 text-xs font-bold rounded-xl hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all shadow-sm active:scale-95">
+                class="group inline-flex items-center justify-center gap-2
+                    w-full sm:w-auto
+                    px-4 py-2
+                    bg-white border border-gray-200
+                    text-blue-600 text-xs font-bold rounded-xl
+                    hover:bg-blue-600 hover:text-white hover:border-blue-600
+                    transition-all shadow-sm active:scale-95">
+
                 Lihat Semua Pekerja
-                <svg class="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform" fill="none"
-                    viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+
+                <svg class="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor">
+
+                    <path stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
                         d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
             </a>
+
         </div>
+
     </div>
 
     {{-- Floating Bulk Action Bar --}}
-    <div x-show="selectedItems.length > 0" x-transition:enter="transition ease-out duration-300"
-        x-transition:enter-start="opacity-0 translate-y-10" x-transition:enter-end="opacity-100 translate-y-0"
-        x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0"
+    <div x-show="selectedItems.length > 0"
+        x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0 translate-y-10"
+        x-transition:enter-end="opacity-100 translate-y-0"
+        x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100 translate-y-0"
         x-transition:leave-end="opacity-0 translate-y-10"
-        class="fixed bottom-8 left-1/2 -translate-x-1/2 z-40 w-[95%] max-w-3xl"x-cloak>
+        class="fixed bottom-4 sm:bottom-8 left-1/2 -translate-x-1/2 z-40
+            w-[calc(100%-1rem)] sm:w-[95%] max-w-3xl"
+        x-cloak>
 
         <div
-            class="bg-white/80 backdrop-blur-md border border-blue-100 shadow-[0_8px_30px_rgb(0,0,0,0.12)] rounded-2xl px-5 py-3 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <span
-                    class="relative flex items-center justify-center bg-blue-600 text-white text-[11px] font-black h-6 w-6 rounded-full shadow-sm"
-                    x-text="selectedItems.length"></span>
-                <div class="flex flex-col">
-                    <span class="text-sm font-bold text-gray-900 leading-none">Pekerja Dipilih</span>
+            class="bg-white/90 backdrop-blur-md
+                border border-blue-100
+                shadow-[0_8px_30px_rgb(0,0,0,0.12)]
+                rounded-2xl
+                px-4 sm:px-5 py-3 sm:py-3
+                flex flex-col sm:flex-row
+                sm:items-center sm:justify-between
+                gap-3 sm:gap-0">
+
+
+            {{-- ============================= --}}
+            {{-- SELECTED INFO --}}
+            {{-- ============================= --}}
+            <div class="flex items-center justify-between sm:justify-start gap-3">
+
+                <div class="flex items-center gap-3">
+
+                    <span
+                        class="relative flex items-center justify-center
+                            bg-blue-600 text-white
+                            text-[11px] font-black
+                            h-7 w-7 rounded-full shadow-sm"
+                        x-text="selectedItems.length">
+                    </span>
+
+                    <div class="flex flex-col">
+                        <span class="text-sm font-bold text-gray-900 leading-none">
+                            Pekerja Dipilih
+                        </span>
+
+                        {{-- Mobile helper text --}}
+                        <span class="sm:hidden text-[10px] text-gray-400 mt-1">
+                            Pilih tindakan untuk pekerja
+                        </span>
+                    </div>
+
                 </div>
+
+                {{-- Mobile Batal --}}
+                <button type="button"
+                    @click="selectedItems = []"
+                    class="sm:hidden px-3 py-1.5
+                        text-xs font-bold text-gray-500
+                        bg-gray-50 border border-gray-200
+                        rounded-lg hover:text-gray-700 transition">
+                    Batal
+                </button>
+
             </div>
 
-            <div class="flex items-center gap-2">
-                <button type="button" @click="selectedItems = []"
-                    class="px-3 py-2 text-xs font-bold text-gray-500 hover:text-gray-700 transition">Batal</button>
+
+            {{-- ============================= --}}
+            {{-- DESKTOP ACTIONS --}}
+            {{-- ============================= --}}
+            <div class="hidden sm:flex items-center gap-2">
+
+                <button type="button"
+                    @click="selectedItems = []"
+                    class="px-3 py-2 text-xs font-bold text-gray-500 hover:text-gray-700 transition">
+                    Batal
+                </button>
+
                 <div class="h-6 w-px bg-gray-200 mx-1"></div>
 
-                {{-- Trigger Modal Button --}}
+
+                {{-- Ubah Jabatan --}}
                 <button @click="showJabatanModal = true"
-                    class="flex items-center gap-1.5 px-4 py-2 bg-blue-50 text-blue-700 border border-blue-100 rounded-xl text-xs font-bold hover:bg-blue-600 hover:text-white transition-all">
-                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    class="flex items-center gap-1.5 px-4 py-2
+                        bg-blue-50 text-blue-700
+                        border border-blue-100 rounded-xl
+                        text-xs font-bold
+                        hover:bg-blue-600 hover:text-white
+                        transition-all">
+
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
                             d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2m3 0h1a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h1m12 0H6" />
                     </svg>
+
                     Ubah Jabatan
                 </button>
 
-                {{-- Trigger Modal Button --}}
+
+                {{-- Ubah Divisi --}}
                 <button @click="showDivisionModal = true"
-                    class="flex items-center gap-1.5 px-4 py-2 bg-blue-50 text-blue-700 border border-blue-100 rounded-xl text-xs font-bold hover:bg-blue-600 hover:text-white transition-all">
-                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    class="flex items-center gap-1.5 px-4 py-2
+                        bg-blue-50 text-blue-700
+                        border border-blue-100 rounded-xl
+                        text-xs font-bold
+                        hover:bg-blue-600 hover:text-white
+                        transition-all">
+
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
                             d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                     </svg>
+
                     Ubah Divisi
                 </button>
 
-                {{-- Status Update Form - hidden when any selected pekerja is still pending (status_aktif == 2) --}}
-                <form action="{{ route('bulk.update.pekerja') }}" method="POST" class="flex gap-2">
-                    @csrf @method('put')
-                    <input type="hidden" name="ids" :value="JSON.stringify(selectedItems)">
-                    <button type="button" @click="showStatusModal = true"
+
+                {{-- Update Status --}}
+                <form action="{{ route('bulk.update.pekerja') }}"
+                    method="POST"
+                    class="flex gap-2">
+
+                    @csrf
+                    @method('put')
+
+                    <input type="hidden"
+                        name="ids"
+                        :value="JSON.stringify(selectedItems)">
+
+                    <button type="button"
+                        @click="showStatusModal = true"
                         x-show="!hasAnyPending"
-                        class="px-4 py-2 bg-gray-50 text-gray-600 border border-gray-200 rounded-xl text-xs font-bold hover:bg-gray-800 hover:text-white transition-all">
+                        class="px-4 py-2
+                            bg-gray-50 text-gray-600
+                            border border-gray-200 rounded-xl
+                            text-xs font-bold
+                            hover:bg-gray-800 hover:text-white
+                            transition-all">
                         Update Status
                     </button>
+
                     <div x-show="hasAnyPending"
                         title="Tidak bisa update status: salah satu pekerja yang dipilih masih berstatus Pending."
-                        class="px-4 py-2 bg-gray-100 text-gray-400 border border-gray-200 rounded-xl text-xs font-bold cursor-not-allowed select-none">
+                        class="px-4 py-2
+                            bg-gray-100 text-gray-400
+                            border border-gray-200 rounded-xl
+                            text-xs font-bold
+                            cursor-not-allowed select-none">
                         Update Status
                     </div>
+
                 </form>
+
             </div>
+
+
+            {{-- ============================= --}}
+            {{-- MOBILE ACTIONS --}}
+            {{-- ============================= --}}
+            <div class="grid grid-cols-2 gap-2 sm:hidden">
+
+                {{-- Ubah Jabatan --}}
+                <button @click="showJabatanModal = true"
+                    class="flex items-center justify-center gap-1.5
+                        px-3 py-2.5
+                        bg-blue-50 text-blue-700
+                        border border-blue-100 rounded-xl
+                        text-[11px] font-bold
+                        hover:bg-blue-600 hover:text-white
+                        active:scale-[0.98]
+                        transition-all">
+
+                    <svg class="w-3.5 h-3.5 shrink-0"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor">
+
+                        <path stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2m3 0h1a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h1m12 0H6" />
+                    </svg>
+
+                    Ubah Jabatan
+                </button>
+
+
+                {{-- Ubah Divisi --}}
+                <button @click="showDivisionModal = true"
+                    class="flex items-center justify-center gap-1.5
+                        px-3 py-2.5
+                        bg-blue-50 text-blue-700
+                        border border-blue-100 rounded-xl
+                        text-[11px] font-bold
+                        hover:bg-blue-600 hover:text-white
+                        active:scale-[0.98]
+                        transition-all">
+
+                    <svg class="w-3.5 h-3.5 shrink-0"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor">
+
+                        <path stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+
+                    Ubah Divisi
+                </button>
+
+
+                {{-- Update Status --}}
+                <form action="{{ route('bulk.update.pekerja') }}"
+                    method="POST"
+                    class="col-span-2">
+
+                    @csrf
+                    @method('put')
+
+                    <input type="hidden"
+                        name="ids"
+                        :value="JSON.stringify(selectedItems)">
+
+                    <button type="button"
+                        @click="showStatusModal = true"
+                        x-show="!hasAnyPending"
+                        class="w-full flex items-center justify-center
+                            gap-1.5 px-3 py-2.5
+                            bg-gray-50 text-gray-600
+                            border border-gray-200 rounded-xl
+                            text-[11px] font-bold
+                            hover:bg-gray-800 hover:text-white
+                            active:scale-[0.98]
+                            transition-all">
+
+                        <svg class="w-3.5 h-3.5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 00-9.618 5.04A12.02 12.02 0 003 12c0 1.726.366 3.367 1.024 4.846M21 12a12.02 12.02 0 01-1.024 4.846" />
+                        </svg>
+
+                        Update Status
+                    </button>
+
+                    <div x-show="hasAnyPending"
+                        title="Tidak bisa update status: salah satu pekerja yang dipilih masih berstatus Pending."
+                        class="w-full flex items-center justify-center
+                            px-3 py-2.5
+                            bg-gray-100 text-gray-400
+                            border border-gray-200 rounded-xl
+                            text-[11px] font-bold
+                            cursor-not-allowed select-none">
+
+                        Update Status
+
+                    </div>
+
+                </form>
+
+            </div>
+
         </div>
     </div>
 

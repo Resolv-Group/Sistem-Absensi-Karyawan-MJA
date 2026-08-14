@@ -36,6 +36,17 @@
             [x-cloak] {
                 display: none !important;
             }
+            /* Custom Scrollbar for Alert Lists */
+            .custom-scrollbar::-webkit-scrollbar {
+                width: 4px;
+            }
+            .custom-scrollbar::-webkit-scrollbar-track {
+                background: #f1f1f1;
+            }
+            .custom-scrollbar::-webkit-scrollbar-thumb {
+                background: #e2e8f0;
+                border-radius: 10px;
+            }
         </style>
 
         <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
@@ -123,7 +134,7 @@
             {{-- 3. CHART SECTION --}}
             <div class="mb-8">
                 <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                    <div class="flex items-center justify-between mb-4">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
                         <h3 class="text-lg font-bold text-gray-900">Pertumbuhan Karyawan</h3>
                         <div x-data="{
                             open: false,
@@ -134,11 +145,9 @@
                                 { val: '2026', label: 'Tahun 2026' },
                                 { val: '2025', label: 'Tahun 2025' },
                             ]
-                        }" class="relative w-40 z-10">
-                            <div @click="open = !open"
-                                class="border border-gray-300 bg-white text-sm rounded-lg py-2 px-3 cursor-pointer flex justify-between items-center hover:border-blue-500 transition-colors">
-                                <span x-text="list.find(x => x.val == selected)?.label || 'Pilih Tahun'"
-                                    class="text-gray-600 font-medium"></span>
+                        }" class="relative w-full md:w-40 z-10">
+                            <div @click="open = !open" class="border border-gray-300 bg-white text-sm rounded-lg py-2 px-3 cursor-pointer flex justify-between items-center hover:border-blue-500 transition-colors">
+                                <span x-text="list.find(x => x.val == selected)?.label || 'Pilih Tahun'" class="text-gray-600 font-medium"></span>
                                 <svg class="w-4 h-4 text-gray-400" :class="{ 'rotate-180': open }" fill="none"
                                     stroke="currentColor" viewBox="0 0 24 24" style="transition: transform 0.2s">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -158,13 +167,13 @@
                             </ul>
                         </div>
                     </div>
-                    <div id="employeeGrowthChart" class="w-full h-80" data-chart='@json($employeeChartData)'></div>
+                    <div id="employeeGrowthChart" class="w-full h-64 md:h-80" data-chart='@json($employeeChartData)'></div>
                 </div>
             </div>
 
             @if(in_array(strtolower(Auth::user()->role), ['pic', 'admin', 'hrd', 'akuntan', 'staff', 'head_supervisor', 'head supervisor']))
             {{-- 4. DAILY ATTENDANCE STATS --}}
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mb-8">
                 <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-start justify-between">
                     <div>
                         <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Hadir Hari Ini</p>
@@ -226,7 +235,7 @@
                 <div class="lg:col-span-2 space-y-8">
                     <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
                         <!-- Header -->
-                        <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-white">
+                        <div class="px-6 py-5 border-b border-slate-100 flex flex-col items-start md:flex-row md:items-center justify-between gap-3 bg-white">
                             <div>
                                 <h3 class="text-lg font-bold text-slate-800">Kehadiran Terbaru</h3>
                                 <p class="text-xs text-slate-400 font-medium">Aktivitas harian unit harian</p>
@@ -244,9 +253,10 @@
                             </div>
                         </div>
 
-                        <!-- Table -->
+                        <!-- Table Wrapper -->
                         <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-slate-100">
+                            <!-- Desktop Table -->
+                            <table class="hidden md:table min-w-full divide-y divide-slate-100">
                                 <thead class="bg-slate-50/50">
                                     <tr>
                                         <th
@@ -369,12 +379,73 @@
                                         @endforelse
                                     </tbody>
                                 </table>
+
+                                <!-- Mobile List View (Kehadiran Terbaru) -->
+                                <div class="md:hidden divide-y divide-slate-100 flex flex-col">
+                                    @forelse ($kehadiranTerbaru as $hadir)
+                                        @php
+                                            $pekerja = $hadir->absensi->pekerja;
+                                            $unitName = $hadir->absensi->unit->nama_unit ?? 'N/A';
+                                        @endphp
+                                        <div class="p-4 flex flex-col gap-3">
+                                            <div class="flex justify-between items-start">
+                                                <div>
+                                                    <p class="text-sm font-bold text-slate-800">{{ $pekerja->nama ?? 'N/A' }}</p>
+                                                    <p class="text-[10px] text-slate-400 font-bold uppercase">NIK: {{ $pekerja->nik ?? '-' }}</p>
+                                                </div>
+                                                @switch($hadir->status_kehadiran)
+                                                    @case(1)
+                                                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-black bg-emerald-50 text-emerald-600 border border-emerald-100 uppercase tracking-wider">Hadir</span>
+                                                    @break
+                                                    @case(2)
+                                                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-black bg-blue-50 text-blue-600 border border-blue-100 uppercase tracking-wider">Izin</span>
+                                                    @break
+                                                    @case(3)
+                                                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-black bg-indigo-50 text-indigo-600 border border-indigo-100 uppercase tracking-wider">Cuti</span>
+                                                    @break
+                                                    @case(4)
+                                                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-black bg-rose-50 text-rose-600 border border-rose-100 uppercase tracking-wider">Sakit</span>
+                                                    @break
+                                                    @default
+                                                        <span class="text-xs text-slate-400 italic">Unknown</span>
+                                                @endswitch
+                                            </div>
+                                            <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                                                <div>
+                                                    <span class="text-xs font-bold text-slate-600 block max-w-[150px] truncate">{{ $unitName }}</span>
+                                                </div>
+                                                <div class="flex items-center gap-4 text-right">
+                                                    <div class="flex flex-col">
+                                                        <span class="text-xs font-black text-slate-700">{{ number_format($hadir->jam_kerja_harian, 1) }}/{{ number_format($hadir->jam_kerja_normal, 0) }}</span>
+                                                        <span class="text-[8px] font-bold text-slate-400 uppercase">Jam</span>
+                                                    </div>
+                                                    @if ($hadir->overtime > 0)
+                                                    <div class="flex flex-col">
+                                                        <span class="text-xs font-black text-amber-600">+{{ number_format($hadir->overtime, 1) }}</span>
+                                                        <span class="text-[8px] font-bold text-amber-400 uppercase">OT</span>
+                                                    </div>
+                                                    @else
+                                                    <div class="flex flex-col">
+                                                        <span class="text-xs font-black text-slate-300">-</span>
+                                                        <span class="text-[8px] font-bold text-slate-300 uppercase">OT</span>
+                                                    </div>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @empty
+                                        <div class="px-6 py-8 text-center flex flex-col items-center">
+                                            <svg class="w-8 h-8 text-slate-200 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                            <p class="text-xs text-slate-400 font-medium">Belum ada aktivitas hari ini.</p>
+                                        </div>
+                                    @endforelse
+                                </div>
                             </div>
                         </div>
 
                         <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
                             <!-- Header -->
-                            <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-white">
+                            <div class="px-6 py-5 border-b border-slate-100 flex flex-col items-start md:flex-row md:items-center justify-between gap-3 bg-white">
                                 <div>
                                     <h3 class="text-lg font-bold text-slate-800">Absensi Terbaru (Borongan)</h3>
                                     <p class="text-xs text-slate-400 font-medium">Aktivitas produksi unit borongan</p>
@@ -392,9 +463,10 @@
                                 </div>
                             </div>
 
-                            <!-- Table -->
+                            <!-- Table Wrapper -->
                             <div class="overflow-x-auto">
-                                <table class="min-w-full divide-y divide-slate-100">
+                                <!-- Desktop Table -->
+                                <table class="hidden md:table min-w-full divide-y divide-slate-100">
                                     <thead class="bg-slate-50/50">
                                         <tr>
                                             <th
@@ -478,6 +550,37 @@
                                         @endforelse
                                     </tbody>
                                 </table>
+
+                                <!-- Mobile List View (Borongan) -->
+                                <div class="md:hidden divide-y divide-slate-100 flex flex-col">
+                                    @forelse ($boronganTerbaru as $hadir)
+                                        <div class="p-4 flex flex-col gap-3">
+                                            <div class="flex justify-between items-start">
+                                                <div>
+                                                    <p class="text-sm font-bold text-slate-800">{{ $hadir->nama_pekerja }}</p>
+                                                    <p class="text-[10px] text-slate-400 font-bold uppercase">NIK: {{ $hadir->nik_pekerja ?? '-' }}</p>
+                                                </div>
+                                                @if ($hadir->status_kehadiran == 1)
+                                                    <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-black bg-emerald-50 text-emerald-600 border border-emerald-100 uppercase tracking-wider">Produksi</span>
+                                                @else
+                                                    <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-black bg-blue-50 text-blue-600 border border-blue-100 uppercase tracking-wider">Izin</span>
+                                                @endif
+                                            </div>
+                                            <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                                                <span class="text-xs font-bold text-slate-600 truncate max-w-[180px]">{{ $hadir->nama_unit }}</span>
+                                                <div class="flex flex-col text-right">
+                                                    <span class="text-xs font-black text-slate-700">{{ number_format($hadir->total_sum_qty, 0, ',', '.') }}</span>
+                                                    <span class="text-[8px] font-bold text-blue-500 uppercase">Total PCS</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @empty
+                                        <div class="px-6 py-8 text-center flex flex-col items-center">
+                                            <svg class="w-8 h-8 text-slate-200 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
+                                            <p class="text-xs text-slate-400 font-medium">Belum ada data produksi hari ini.</p>
+                                        </div>
+                                    @endforelse
+                                </div>
                             </div>
                         </div>
 
@@ -487,7 +590,8 @@
                                 <h3 class="text-lg font-bold text-gray-900">Penilaian PKWT Terbaru</h3>
                             </div>
                             <div class="overflow-x-auto">
-                                <table class="min-w-full divide-y divide-gray-200">
+                                <!-- Desktop Table -->
+                                <table class="hidden md:table min-w-full divide-y divide-gray-200">
                                     <thead class="bg-gray-50">
                                         <tr>
                                             <th
@@ -574,6 +678,50 @@
                                         @endforelse
                                     </tbody>
                                 </table>
+
+                                <!-- Mobile List View (Penilaian PKWT) -->
+                                <div class="md:hidden divide-y divide-gray-100 flex flex-col">
+                                    @forelse ($penilaianTerbaru as $nilai)
+                                        @php
+                                            $score = $nilai->total;
+                                            if ($score >= 50) { $grade = 'A'; $color = 'green'; }
+                                            elseif ($score >= 41) { $grade = 'B'; $color = 'blue'; }
+                                            elseif ($score >= 29) { $grade = 'C'; $color = 'yellow'; }
+                                            else { $grade = 'D'; $color = 'red'; }
+                                        @endphp
+                                        <div class="p-4 flex flex-col gap-3">
+                                            <div class="flex items-center justify-between">
+                                                <div class="flex items-center gap-3">
+                                                    <img class="h-10 w-10 rounded-full object-cover shadow-sm" src="{{ $nilai->pekerja->foto ? asset('storage/' . $nilai->pekerja->foto) : 'https://ui-avatars.com/api/?name=' . urlencode($nilai->pekerja->nama) . '&background=random' }}">
+                                                    <div>
+                                                        <p class="text-sm font-bold text-gray-900">{{ $nilai->pekerja->nama }}</p>
+                                                        <p class="text-[10px] text-gray-400 uppercase font-bold">{{ $nilai->unit->nama_unit ?? 'Unit N/A' }}</p>
+                                                    </div>
+                                                </div>
+                                                <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg font-black text-sm bg-{{ $color }}-50 text-{{ $color }}-700 border border-{{ $color }}-100">{{ $grade }}</span>
+                                            </div>
+                                            <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg border border-gray-100">
+                                                <div class="flex flex-col">
+                                                    <span class="text-[10px] font-bold text-gray-400 uppercase mb-1">Skor</span>
+                                                    <div class="flex items-baseline gap-1">
+                                                        <span class="text-sm font-black text-gray-900">{{ $score }}</span>
+                                                        <span class="text-[10px] font-bold text-gray-400">/ 56</span>
+                                                    </div>
+                                                </div>
+                                                <div class="flex flex-col items-center border-l border-gray-200 px-3">
+                                                    <span class="text-[10px] font-bold text-gray-400 uppercase mb-1">Status</span>
+                                                    <div class="flex items-center gap-1">
+                                                        <div class="w-2 h-2 rounded-full {{ $nilai->status_pic ? 'bg-green-500' : 'bg-gray-200' }}"></div>
+                                                        <div class="w-2 h-2 rounded-full {{ $nilai->status_hrd ? 'bg-green-500' : 'bg-gray-200' }}"></div>
+                                                    </div>
+                                                </div>
+                                                <button @click="openDetail({{ Js::from($nilai) }})" class="px-3 py-1.5 bg-gray-900 text-white text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-blue-600 transition-all active:scale-95 shadow-md">View</button>
+                                            </div>
+                                        </div>
+                                    @empty
+                                        <div class="p-6 text-center text-sm text-gray-400 italic">Belum ada penilaian yang dicatat.</div>
+                                    @endforelse
+                                </div>
                                 <div x-show="showModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4"
                                     x-cloak>
                                     <div x-show="showModal" x-transition.opacity @click="showModal = false"
@@ -890,45 +1038,8 @@
                                             </svg>
                                         </div>
                                         <div class="flex-1">
-                                            <div class="flex items-center justify-between mb-1">
-                                                <p class="text-sm font-black text-red-900">Kontrak Pegawai Expired</p>
-                                                @if ($totalExpiredKontrak > 1)
-                                                    <div x-data="{ open: false }" class="relative" @mouseenter="open = true"
-                                                        @mouseleave="open = false">
-                                                        <span
-                                                            class="cursor-help px-1.5 py-0.5 bg-red-600 text-white text-[10px] font-black rounded-md uppercase tracking-tighter transition-colors hover:bg-red-700">
-                                                            +{{ $totalExpiredKontrak - 1 }} Lainnya
-                                                        </span>
-                                                        <div x-show="open" x-transition.opacity
-                                                            class="absolute right-0 mt-2 w-72 bg-white border border-red-100 shadow-xl rounded-2xl z-50 p-3"
-                                                            x-cloak>
-                                                            <p
-                                                                class="text-[9px] font-black text-red-400 uppercase tracking-widest mb-2 px-1 text-left">
-                                                                Daftar Expired (Masih Aktif)</p>
-                                                            <div class="space-y-1 max-h-48 overflow-y-auto custom-scrollbar">
-                                                                @foreach ($othersExpiredKontrak as $other)
-                                                                    @php $diff = abs(\Carbon\Carbon::today()->diffInDays(\Carbon\Carbon::parse($other->tgl_akhir_pkwt), false)); @endphp
-                                                                    <a href="{{ route('view.ubah.unit-pekerja', [
-                                                                        'unitId' => $other->id_unit ?? ($other->unit->id ?? 0), 
-                                                                        'pekerjaId' => $other->id
-                                                                    ])}}"
-                                                                        class="flex items-center justify-between p-2 rounded-xl hover:bg-red-50 gap-2 transition">
-                                                                        <div class="flex flex-col min-w-0 text-left">
-                                                                            <span
-                                                                                class="text-[11px] font-bold text-gray-700 truncate capitalize hover:underline">{{ $other->pekerja->nama }}</span>
-                                                                            <span
-                                                                                class="text-[9px] font-medium text-gray-400 uppercase">{{ $other->unit->nama_unit ?? 'No Unit' }}</span>
-                                                                        </div>
-                                                                        <span
-                                                                            class="shrink-0 text-[10px] font-black text-red-600 bg-red-100 px-2 py-0.5 rounded-lg">
-                                                                            {{ $diff > 30 ? '> 30 hari' : $diff . ' hari' }}
-                                                                        </span>
-                                                                    </a>
-                                                                @endforeach
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                @endif
+                                            <div class="mb-1">
+                                                <p class="text-sm font-black text-red-900 leading-tight">Kontrak Pegawai Expired</p>
                                             </div>
                                             <a href="{{ route('view.ubah.unit-pekerja', ['unitId' => $urgentExpiredKontrak->id_unit ?? 0, 'pekerjaId' => $urgentExpiredKontrak->id]) }}" class="text-xs text-red-800 hover:underline block text-left">
                                                 Kontrak <strong>{{ $urgentExpiredKontrak->pekerja->nama }}</strong>
@@ -937,6 +1048,42 @@
                                                     class="decoration-2">{{ $lewatHariKontrak > 30 ? 'lebih dari 30' : $lewatHariKontrak }}
                                                     hari</strong>.
                                             </a>
+                                            @if ($totalExpiredKontrak > 1)
+                                                <div x-data="{ open: false }" class="relative mt-2">
+                                                    <span @click="open = !open" @click.outside="open = false"
+                                                        class="cursor-pointer whitespace-nowrap px-2 py-1 bg-red-600 text-white text-[10px] font-black rounded-md uppercase tracking-tighter transition-colors hover:bg-red-700 shadow-sm inline-block">
+                                                        +{{ $totalExpiredKontrak - 1 }} Lainnya
+                                                    </span>
+                                                    <div x-show="open" x-transition.opacity
+                                                        class="absolute left-0 mt-2 w-72 bg-white border border-red-100 shadow-xl rounded-2xl z-50 p-3"
+                                                        x-cloak>
+                                                        <p
+                                                            class="text-[9px] font-black text-red-400 uppercase tracking-widest mb-2 px-1 text-left">
+                                                            Daftar Expired (Masih Aktif)</p>
+                                                        <div class="space-y-1 max-h-48 overflow-y-auto custom-scrollbar">
+                                                            @foreach ($othersExpiredKontrak as $other)
+                                                                @php $diff = abs(\Carbon\Carbon::today()->diffInDays(\Carbon\Carbon::parse($other->tgl_akhir_pkwt), false)); @endphp
+                                                                <a href="{{ route('view.ubah.unit-pekerja', [
+                                                                    'unitId' => $other->id_unit ?? ($other->unit->id ?? 0), 
+                                                                    'pekerjaId' => $other->id
+                                                                ])}}"
+                                                                    class="flex items-center justify-between p-2 rounded-xl hover:bg-red-50 gap-2 transition">
+                                                                    <div class="flex flex-col min-w-0 text-left">
+                                                                        <span
+                                                                            class="text-[11px] font-bold text-gray-700 truncate capitalize hover:underline">{{ $other->pekerja->nama }}</span>
+                                                                        <span
+                                                                            class="text-[9px] font-medium text-gray-400 uppercase">{{ $other->unit->nama_unit ?? 'No Unit' }}</span>
+                                                                    </div>
+                                                                    <span
+                                                                        class="shrink-0 text-[10px] font-black text-red-600 bg-red-100 px-2 py-0.5 rounded-lg">
+                                                                        {{ $diff > 30 ? '> 30 hari' : $diff . ' hari' }}
+                                                                    </span>
+                                                                </a>
+                                                            @endforeach
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endif
                                         </div>
                                     </div>
                                 @endif
@@ -952,48 +1099,8 @@
                                             </svg>
                                         </div>
                                         <div class="flex-1">
-                                            <div class="flex items-center justify-between">
-                                                <p class="text-sm font-bold text-red-900">Kontrak Berakhir</p>
-                                                @if ($totalKontrakMendekati > 1)
-                                                    <div x-data="{ open: false }" class="relative" @mouseenter="open = true"
-                                                        @mouseleave="open = false">
-                                                        <span
-                                                            class="cursor-help px-1.5 py-0.5 bg-red-600 text-white text-[10px] font-black rounded-md uppercase tracking-tighter transition-colors hover:bg-red-700">
-                                                            +{{ $totalKontrakMendekati - 1 }} Lainnya
-                                                        </span>
-
-                                                        <div x-show="open" x-transition.opacity
-                                                            class="absolute right-0 mt-2 w-72 bg-white border border-red-100 shadow-xl rounded-2xl z-50 p-3"
-                                                            x-cloak>
-                                                            <p
-                                                                class="text-[9px] font-black text-red-400 uppercase tracking-widest mb-2 px-1 text-left">
-                                                                Daftar Pegawai & Unit</p>
-                                                            <div class="space-y-1 max-h-48 overflow-y-auto custom-scrollbar">
-                                                                @foreach ($othersKontrak as $other)
-                                                                    @php $diff = \Carbon\Carbon::today()->diffInDays(\Carbon\Carbon::parse($other->tgl_akhir_pkwt), false); @endphp
-                                                                    <a href="{{ route('view.ubah.unit-pekerja', [
-                                                                        'unitId' => $other->id_unit ?? ($other->unit->id ?? 0), 
-                                                                        'pekerjaId' => $other->id
-                                                                    ])}}"
-                                                                        class="flex items-center justify-between p-2 rounded-xl hover:bg-red-50 transition-colors gap-2">
-                                                                        <div class="flex flex-col min-w-0 text-left">
-                                                                            <span
-                                                                                class="text-[11px] font-bold text-gray-700 truncate capitalize hover:underline">{{ $other->pekerja->nama }}</span>
-                                                                            <span
-                                                                                class="text-[9px] font-medium text-gray-500 uppercase tracking-tight truncate">
-                                                                                {{ $other->unit->nama_unit ?? 'No Unit' }}
-                                                                            </span>
-                                                                        </div>
-                                                                        <span
-                                                                            class="shrink-0 text-[10px] font-black text-red-600 bg-red-100/50 px-2 py-0.5 rounded-lg">
-                                                                            {{ $diff > 30 ? '> 30 hari' : ($diff <= 0 ? 'Hari Ini' : $diff . ' hari') }}
-                                                                        </span>
-                                                                    </a>
-                                                                @endforeach
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                @endif
+                                            <div class="mb-1">
+                                                <p class="text-sm font-bold text-red-900 leading-tight">Kontrak Berakhir</p>
                                             </div>
                                             <a href="{{ route('view.ubah.unit-pekerja', ['unitId' => $urgentKontrak->id_unit ?? 0, 'pekerjaId' => $urgentKontrak->id]) }}" class="text-xs text-red-700 mt-1 text-left block hover:underline">
                                                 Kontrak <strong>{{ $urgentKontrak->pekerja->nama }}</strong> pada
@@ -1004,6 +1111,45 @@
                                                 berakhir dalam
                                                 <strong>{{ $sisaHari > 30 ? '> 30 hari' : ($sisaHari <= 0 ? 'Hari Ini' : $sisaHari . ' hari') }}</strong>.
                                             </a>
+                                            @if ($totalKontrakMendekati > 1)
+                                                <div x-data="{ open: false }" class="relative mt-2">
+                                                    <span @click="open = !open" @click.outside="open = false"
+                                                        class="cursor-pointer whitespace-nowrap px-2 py-1 bg-red-600 text-white text-[10px] font-black rounded-md uppercase tracking-tighter transition-colors hover:bg-red-700 shadow-sm inline-block">
+                                                        +{{ $totalKontrakMendekati - 1 }} Lainnya
+                                                    </span>
+
+                                                    <div x-show="open" x-transition.opacity
+                                                        class="absolute left-0 mt-2 w-72 bg-white border border-red-100 shadow-xl rounded-2xl z-50 p-3"
+                                                        x-cloak>
+                                                        <p
+                                                            class="text-[9px] font-black text-red-400 uppercase tracking-widest mb-2 px-1 text-left">
+                                                            Daftar Pegawai & Unit</p>
+                                                        <div class="space-y-1 max-h-48 overflow-y-auto custom-scrollbar">
+                                                            @foreach ($othersKontrak as $other)
+                                                                @php $diff = \Carbon\Carbon::today()->diffInDays(\Carbon\Carbon::parse($other->tgl_akhir_pkwt), false); @endphp
+                                                                <a href="{{ route('view.ubah.unit-pekerja', [
+                                                                    'unitId' => $other->id_unit ?? ($other->unit->id ?? 0), 
+                                                                    'pekerjaId' => $other->id
+                                                                ])}}"
+                                                                    class="flex items-center justify-between p-2 rounded-xl hover:bg-red-50 transition-colors gap-2">
+                                                                    <div class="flex flex-col min-w-0 text-left">
+                                                                        <span
+                                                                            class="text-[11px] font-bold text-gray-700 truncate capitalize hover:underline">{{ $other->pekerja->nama }}</span>
+                                                                        <span
+                                                                            class="text-[9px] font-medium text-gray-500 uppercase tracking-tight truncate">
+                                                                            {{ $other->unit->nama_unit ?? 'No Unit' }}
+                                                                        </span>
+                                                                    </div>
+                                                                    <span
+                                                                        class="shrink-0 text-[10px] font-black text-red-600 bg-red-100/50 px-2 py-0.5 rounded-lg">
+                                                                        {{ $diff > 30 ? '> 30 hari' : ($diff <= 0 ? 'Hari Ini' : $diff . ' hari') }}
+                                                                    </span>
+                                                                </a>
+                                                            @endforeach
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endif
                                         </div>
                                     </div>
                                 @endif
@@ -1018,44 +1164,43 @@
                                             </svg>
                                         </div>
                                         <div class="flex-grow">
-                                            <div class="flex items-center justify-between mb-1">
-                                                <p class="text-sm font-bold text-red-900">Kontrak Mitra Expired</p>
-                                                @if ($totalExpiredMitra > 1)
-                                                    <div x-data="{ open: false }" class="relative" @mouseenter="open = true"
-                                                        @mouseleave="open = false">
-                                                        <span
-                                                            class="cursor-help px-1.5 py-0.5 bg-red-600 text-white text-[10px] font-black rounded-md uppercase tracking-tighter transition-colors hover:bg-red-700">
-                                                            +{{ $totalExpiredMitra - 1 }} Lainnya
-                                                        </span>
-                                                        <div x-show="open" x-transition.opacity
-                                                            class="absolute right-0 mt-2 w-64 bg-white border border-red-100 shadow-xl rounded-2xl z-50 p-3"
-                                                            x-cloak>
-                                                            <p
-                                                                class="text-[9px] font-black text-red-400 uppercase tracking-widest mb-2 px-1 text-left">
-                                                                Daftar Expired</p>
-                                                            <div class="space-y-1 max-h-48 overflow-y-auto custom-scrollbar">
-                                                                @foreach ($othersExpiredMitra as $other)
-                                                                    @php $diff = abs(\Carbon\Carbon::today()->diffInDays(\Carbon\Carbon::parse($other->tgl_akhir_mou), false)); @endphp
-                                                                    <a href="{{ route('view.ubah.mitra-kerja', $other->id) }}"
-                                                                        class="flex items-center justify-between p-2 rounded-xl hover:bg-red-50 transition">
-                                                                        <span
-                                                                            class="text-[11px] font-bold text-gray-700 truncate w-32 text-left hover:underline">{{ $other->nama_mitra }}</span>
-                                                                        <span
-                                                                            class="text-[10px] font-black text-red-600 bg-red-100 px-2 py-0.5 rounded-lg">
-                                                                            {{ $diff > 30 ? '> 30 hari' : $diff . ' hari' }}
-                                                                        </span>
-                                                                    </a>
-                                                                @endforeach
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                @endif
+                                            <div class="mb-1">
+                                                <p class="text-sm font-bold text-red-900 leading-tight">Kontrak Mitra Expired</p>
                                             </div>
                                             <a href="{{ route('view.ubah.mitra-kerja', $urgentExpiredMitra->id) }}" class="text-xs text-red-700 hover:underline block text-left">
                                                 MOU <strong>{{ $urgentExpiredMitra->nama_mitra }}</strong> sudah lewat
                                                 <strong>{{ $lewatHariMitra > 30 ? 'lebih dari 30' : $lewatHariMitra }}
                                                     hari</strong>, namun status masih Aktif.
                                             </a>
+                                            @if ($totalExpiredMitra > 1)
+                                                <div x-data="{ open: false }" class="relative mt-2">
+                                                    <span @click="open = !open" @click.outside="open = false"
+                                                        class="cursor-pointer whitespace-nowrap px-2 py-1 bg-red-600 text-white text-[10px] font-black rounded-md uppercase tracking-tighter transition-colors hover:bg-red-700 shadow-sm inline-block">
+                                                        +{{ $totalExpiredMitra - 1 }} Lainnya
+                                                    </span>
+                                                    <div x-show="open" x-transition.opacity
+                                                        class="absolute left-0 mt-2 w-64 bg-white border border-red-100 shadow-xl rounded-2xl z-50 p-3"
+                                                        x-cloak>
+                                                        <p
+                                                            class="text-[9px] font-black text-red-400 uppercase tracking-widest mb-2 px-1 text-left">
+                                                            Daftar Expired</p>
+                                                        <div class="space-y-1 max-h-48 overflow-y-auto custom-scrollbar">
+                                                            @foreach ($othersExpiredMitra as $other)
+                                                                @php $diff = abs(\Carbon\Carbon::today()->diffInDays(\Carbon\Carbon::parse($other->tgl_akhir_mou), false)); @endphp
+                                                                <a href="{{ route('view.ubah.mitra-kerja', $other->id) }}"
+                                                                    class="flex items-center justify-between p-2 rounded-xl hover:bg-red-50 transition">
+                                                                    <span
+                                                                        class="text-[11px] font-bold text-gray-700 truncate w-32 text-left hover:underline">{{ $other->nama_mitra }}</span>
+                                                                    <span
+                                                                        class="text-[10px] font-black text-red-600 bg-red-100 px-2 py-0.5 rounded-lg">
+                                                                        {{ $diff > 30 ? '> 30 hari' : $diff . ' hari' }}
+                                                                    </span>
+                                                                </a>
+                                                            @endforeach
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endif
                                         </div>
                                     </div>
                                 @endif
@@ -1071,44 +1216,43 @@
                                             </svg>
                                         </div>
                                         <div class="flex-grow">
-                                            <div class="flex items-center justify-between mb-1">
-                                                <p class="text-sm font-bold text-orange-900">Masa Mitra Kerja</p>
-                                                @if ($totalMitraMendekati > 1)
-                                                    <div x-data="{ open: false }" class="relative" @mouseenter="open = true"
-                                                        @mouseleave="open = false">
-                                                        <span
-                                                            class="cursor-help px-1.5 py-0.5 bg-red-600 text-white text-[10px] font-black rounded-md uppercase tracking-tighter transition-colors hover:bg-red-700">
-                                                            +{{ $totalMitraMendekati - 1 }} Lainnya
-                                                        </span>
-                                                        <div x-show="open" x-transition.opacity
-                                                            class="absolute right-0 mt-2 w-64 bg-white border border-orange-100 shadow-xl rounded-2xl z-50 p-3"
-                                                            x-cloak>
-                                                            <p
-                                                                class="text-[9px] font-black text-orange-400 uppercase tracking-widest mb-2 px-1 text-left">
-                                                                Daftar Mitra Mendekati</p>
-                                                            <div class="space-y-1 max-h-48 overflow-y-auto custom-scrollbar">
-                                                                @foreach ($othersMitra as $other)
-                                                                    @php $diff = \Carbon\Carbon::today()->diffInDays(\Carbon\Carbon::parse($other->tgl_akhir_mou), false); @endphp
-                                                                    <a href="{{ route('view.ubah.mitra-kerja', $other->id) }}"
-                                                                        class="flex items-center justify-between p-2 rounded-xl hover:bg-orange-50 transition">
-                                                                        <span
-                                                                            class="text-[11px] font-bold text-gray-700 truncate w-32 text-left hover:underline">{{ $other->nama_mitra }}</span>
-                                                                        <span
-                                                                            class="text-[10px] font-black text-orange-600 bg-orange-100/50 px-2 py-0.5 rounded-lg">
-                                                                            {{ $diff > 30 ? '> 30 hari' : ($diff <= 0 ? 'Hari Ini' : $diff . ' hari') }}
-                                                                        </span>
-                                                                    </a>
-                                                                @endforeach
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                @endif
+                                            <div class="mb-1">
+                                                <p class="text-sm font-bold text-orange-900 leading-tight">Masa Mitra Kerja</p>
                                             </div>
                                             <a href="{{ route('view.ubah.mitra-kerja', $urgentMitra->id) }}" class="text-xs text-orange-700 hover:underline block text-left">
                                                 Kontrak <strong>{{ $urgentMitra->nama_mitra }}</strong> berakhir dalam
                                                 <strong>{{ $sisaHariMitra > 30 ? 'lebih dari 30' : ($sisaHariMitra <= 0 ? 'Hari Ini' : $sisaHariMitra) }}
                                                     hari</strong>.
                                             </a>
+                                            @if ($totalMitraMendekati > 1)
+                                                <div x-data="{ open: false }" class="relative mt-2">
+                                                    <span @click="open = !open" @click.outside="open = false"
+                                                        class="cursor-pointer whitespace-nowrap px-2 py-1 bg-red-600 text-white text-[10px] font-black rounded-md uppercase tracking-tighter transition-colors hover:bg-red-700 shadow-sm inline-block">
+                                                        +{{ $totalMitraMendekati - 1 }} Lainnya
+                                                    </span>
+                                                    <div x-show="open" x-transition.opacity
+                                                        class="absolute left-0 mt-2 w-64 bg-white border border-orange-100 shadow-xl rounded-2xl z-50 p-3"
+                                                        x-cloak>
+                                                        <p
+                                                            class="text-[9px] font-black text-orange-400 uppercase tracking-widest mb-2 px-1 text-left">
+                                                            Daftar Mitra Mendekati</p>
+                                                        <div class="space-y-1 max-h-48 overflow-y-auto custom-scrollbar">
+                                                            @foreach ($othersMitra as $other)
+                                                                @php $diff = \Carbon\Carbon::today()->diffInDays(\Carbon\Carbon::parse($other->tgl_akhir_mou), false); @endphp
+                                                                <a href="{{ route('view.ubah.mitra-kerja', $other->id) }}"
+                                                                    class="flex items-center justify-between p-2 rounded-xl hover:bg-orange-50 transition">
+                                                                    <span
+                                                                        class="text-[11px] font-bold text-gray-700 truncate w-32 text-left hover:underline">{{ $other->nama_mitra }}</span>
+                                                                    <span
+                                                                        class="text-[10px] font-black text-orange-600 bg-orange-100/50 px-2 py-0.5 rounded-lg">
+                                                                        {{ $diff > 30 ? '> 30 hari' : ($diff <= 0 ? 'Hari Ini' : $diff . ' hari') }}
+                                                                    </span>
+                                                                </a>
+                                                            @endforeach
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endif
                                         </div>
                                     </div>
                                 @endif

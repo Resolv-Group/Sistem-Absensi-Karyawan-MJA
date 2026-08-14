@@ -42,25 +42,25 @@
 
     @if($currentPkwt)
         {{-- TAMPILKAN BOX JIKA ADA PKWT AKTIF (status_aktif = 1) --}}
-        <div class="bg-{{ $statusColor }}-50 rounded-xl p-6 border border-{{ $statusColor }}-100 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div class="flex items-center gap-4">
+        <div class="bg-{{ $statusColor }}-50 rounded-xl p-6 border border-{{ $statusColor }}-100 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-6 sm:gap-4">
+            <div class="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-4">
                 <div class="p-3 bg-white rounded-lg text-{{ $statusColor }}-600 shadow-sm">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                     </svg>
                 </div>
-                <div>
+                <div class="flex flex-col gap-1">
                     <p class="text-sm font-medium text-{{ $statusColor }}-800">Status PKWT Saat Ini</p>
-                    <p class="text-lg font-bold text-{{ $statusColor }}-900">
+                    <p class="text-lg font-bold text-{{ $statusColor }}-900 break-words">
                         {{ $statusColor == 'red' ? 'Kadaluarsa / Tidak Valid' : 'Aktif - Valid' }}
                     </p>
                 </div>
             </div>
 
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-3 w-full sm:w-auto">
                 @if ($currentPkwt->dokumen_pkwt)
                     <a href="{{ route('pkwt.dokumen.show', $currentPkwt->id) }}" target="_blank"
-                        class="flex items-center gap-2 px-4 py-2 bg-white text-{{ $statusColor }}-600 text-sm font-semibold rounded-lg border border-{{ $statusColor }}-200 shadow-sm hover:bg-{{ $statusColor }}-600 hover:text-white transition group">
+                        class="w-full sm:w-auto justify-center flex items-center gap-2 px-4 py-2 bg-white text-{{ $statusColor }}-600 text-sm font-semibold rounded-lg border border-{{ $statusColor }}-200 shadow-sm hover:bg-{{ $statusColor }}-600 hover:text-white transition group">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -105,12 +105,12 @@
 
 {{-- SECTION: HISTORI PKWT --}}
 <div class="mt-12" x-data="{ openModal: false, fileName: '' }">
-    <div class="flex items-center justify-between mb-6">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
         <div class="flex items-center gap-4 flex-1">
             <h3 class="text-lg font-bold text-gray-900 whitespace-nowrap">Histori PKWT</h3>
-            <div class="h-px bg-gray-200 w-full"></div>
+            <div class="h-px bg-gray-200 w-full hidden sm:block"></div>
         </div>
-        <button @click="openModal = true; fileName = ''" class="ml-4 flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-bold rounded-lg hover:bg-blue-700 transition shadow-sm">
+        <button @click="openModal = true; fileName = ''" class="w-full sm:w-auto justify-center flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-bold rounded-lg hover:bg-blue-700 transition shadow-sm">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
             </svg>

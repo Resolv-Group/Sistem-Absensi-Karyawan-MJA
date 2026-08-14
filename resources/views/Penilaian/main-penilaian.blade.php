@@ -139,12 +139,12 @@
                         {{-- Left Side: Identity & Branding --}}
                         <div class="space-y-4">
                             <div class="flex items-center gap-4">
-                                <div class="h-14 w-2 bg-blue-600 rounded-full shadow-[0_0_20px_rgba(37,99,235,0.4)]"></div>
-                                <div>
-                                    <h1 class="text-5xl font-black text-gray-900 tracking-tight leading-none">
+                                <div class="h-14 w-2 bg-blue-600 rounded-full shadow-[0_0_20px_rgba(37,99,235,0.4)] shrink-0"></div>
+                                <div class="min-w-0">
+                                    <h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tight leading-none break-words">
                                         Penilaian PKWT<span class="text-blue-600">.</span>
                                     </h1>
-                                    <div class="flex items-center gap-3 mt-3">
+                                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 mt-3">
                                         <div
                                             class="px-3 py-1 bg-gray-900 text-white text-[10px] font-black uppercase tracking-widest rounded-lg shadow-sm">
                                             {{ $unit->namaMitra->nama_mitra ?? 'Mitra Perusahaan' }}
@@ -167,7 +167,7 @@
                         </div>
 
                         {{-- Right Side: Grid Stats Cards --}}
-                        <div class="grid grid-cols-2 sm:grid-cols-2 gap-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
 
                             {{-- Total Card --}}
                             <div
@@ -225,99 +225,320 @@
 
                         <div class="relative">
                             {{-- Dropdown Filter UI (Gunakan yang sudah kita buat sebelumnya di sini) --}}
-                            <div x-show="selectedItems.length > 0" x-transition:enter="transition ease-out duration-300"
+                            <div x-show="selectedItems.length > 0"
+                                x-transition:enter="transition ease-out duration-300"
                                 x-transition:enter-start="opacity-0 translate-y-10"
                                 x-transition:enter-end="opacity-100 translate-y-0"
                                 x-transition:leave="transition ease-in duration-200"
                                 x-transition:leave-start="opacity-100 translate-y-0"
                                 x-transition:leave-end="opacity-0 translate-y-10"
-                                class="fixed bottom-8 left-1/2 -translate-x-1/2 z-40 w-[95%] max-w-3xl"x-cloak>
+                                class="fixed bottom-4 sm:bottom-8 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-1.5rem)] sm:w-[95%] max-w-3xl"
+                                x-cloak>
 
                                 <div
-                                    class="bg-white/80 backdrop-blur-md border border-blue-100 shadow-[0_8px_30px_rgb(0,0,0,0.12)] rounded-2xl px-5 py-3 flex items-center justify-between">
-                                    <div class="flex items-center gap-3">
-                                        <span
-                                            class="relative flex items-center justify-center bg-blue-600 text-white text-[11px] font-black h-6 w-6 rounded-full shadow-sm"
-                                            x-text="selectedItems.length"></span>
-                                        <div class="flex flex-col">
-                                            <span class="text-sm font-bold text-gray-900 leading-none">Pekerja
-                                                Dipilih</span>
+                                    class="bg-white/95 sm:bg-white/80 backdrop-blur-md
+                                        border border-blue-100
+                                        shadow-[0_8px_30px_rgb(0,0,0,0.12)]
+                                        rounded-2xl
+                                        p-4 sm:px-5 sm:py-3
+                                        flex flex-col sm:flex-row
+                                        gap-3 sm:gap-0
+                                        sm:items-center sm:justify-between">
+
+                                    {{-- ========================================= --}}
+                                    {{-- SELECTED INFO --}}
+                                    {{-- ========================================= --}}
+                                    <div class="flex items-center justify-between sm:justify-start gap-3">
+
+                                        <div class="flex items-center gap-3">
+                                            <span
+                                                class="relative flex items-center justify-center
+                                                    bg-blue-600 text-white text-[11px] font-black
+                                                    h-7 w-7 rounded-full shadow-sm"
+                                                x-text="selectedItems.length">
+                                            </span>
+
+                                            <div class="flex flex-col">
+                                                <span class="text-sm font-bold text-gray-900 leading-none">
+                                                    Pekerja Dipilih
+                                                </span>
+
+                                                <span class="text-[10px] text-gray-400 font-medium mt-1 sm:hidden">
+                                                    Pilih tindakan untuk data terpilih
+                                                </span>
+                                            </div>
                                         </div>
+
+                                        {{-- Batal: desktop stays in action row, mobile goes here --}}
+                                        <button type="button"
+                                            @click="selectedItems = []"
+                                            class="sm:hidden px-3 py-1.5
+                                                text-[11px] font-bold text-gray-500
+                                                bg-gray-50 border border-gray-200
+                                                rounded-lg hover:text-gray-700 transition">
+                                            Batal
+                                        </button>
                                     </div>
 
-                                    <div class="flex items-center gap-2">
-                                        <button type="button" @click="selectedItems = []"
-                                            class="px-3 py-2 text-xs font-bold text-gray-500 hover:text-gray-700 transition">Batal</button>
+
+                                    {{-- ========================================= --}}
+                                    {{-- DESKTOP ACTIONS --}}
+                                    {{-- ========================================= --}}
+                                    <div class="hidden sm:flex items-center gap-2">
+
+                                        <button type="button"
+                                            @click="selectedItems = []"
+                                            class="px-3 py-2 text-xs font-bold text-gray-500
+                                                hover:text-gray-700 transition">
+                                            Batal
+                                        </button>
+
                                         <div class="h-6 w-px bg-gray-200 mx-1"></div>
 
-                                        {{-- 1. TOMBOL BUAT PENILAIAN (Hanya muncul jika SEMUA pilihan belum dinilai) --}}
+
+                                        {{-- BUAT PENILAIAN --}}
                                         <template x-if="isSelectionClean">
                                             <button type="button"
                                                 @click="window.location.href = '{{ route('view.buat.penilaian', $unit->id) }}?ids=' + selectedItems.join(',')"
-                                                class="flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-xl text-xs font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-200">
-                                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
+                                                class="flex items-center gap-1.5
+                                                    px-4 py-2
+                                                    bg-blue-600 text-white
+                                                    rounded-xl text-xs font-bold
+                                                    hover:bg-blue-700
+                                                    transition-all
+                                                    shadow-lg shadow-blue-200">
+
+                                                <svg class="w-3.5 h-3.5"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
                                                     stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                                    <path stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                        stroke-width="2.5"
                                                         d="M12 4v16m8-8H4" />
                                                 </svg>
+
                                                 Buat Penilaian Baru
                                             </button>
                                         </template>
 
-                                        {{-- 2. PESAN PERINGATAN (Muncul jika ada campuran atau semua sudah dinilai) --}}
+
+                                        {{-- WARNING --}}
                                         <template x-if="selectedItems.length > 0 && hasSelectedAssessed">
                                             <div
-                                                class="flex items-center gap-3 px-4 py-2 bg-orange-50 border border-orange-100 rounded-xl shadow-sm">
-                                                {{-- Animated Icon --}}
+                                                class="flex items-center gap-3
+                                                    px-4 py-2
+                                                    bg-orange-50 border border-orange-100
+                                                    rounded-xl shadow-sm">
+
                                                 <div class="flex-shrink-0 relative flex h-2 w-2">
                                                     <span
-                                                        class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                                                        class="animate-ping absolute inline-flex h-full w-full
+                                                            rounded-full bg-orange-400 opacity-75">
+                                                    </span>
+
                                                     <span
-                                                        class="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
+                                                        class="relative inline-flex rounded-full
+                                                            h-2 w-2 bg-orange-500">
+                                                    </span>
                                                 </div>
 
                                                 <div class="flex flex-col">
                                                     <span
-                                                        class="text-[10px] font-black text-orange-700 uppercase tracking-tight">Pilihan
-                                                        Tidak Valid</span>
-                                                    <p class="text-[9px] font-bold text-orange-500 leading-none mt-0.5">
-                                                        Beberapa pekerja yang Anda pilih sudah memiliki data penilaian.
+                                                        class="text-[10px] font-black text-orange-700
+                                                            uppercase tracking-tight">
+                                                        Pilihan Tidak Valid
+                                                    </span>
+
+                                                    <p class="text-[9px] font-bold text-orange-500
+                                                            leading-none mt-0.5">
+                                                        Beberapa pekerja yang Anda pilih sudah memiliki
+                                                        data penilaian.
                                                     </p>
                                                 </div>
 
-                                                {{-- Action to fix --}}
                                                 <button
                                                     @click="selectedItems = selectedItems.filter(id => !alreadyAssessed.includes(id))"
-                                                    class="ml-2 px-2 py-1 bg-white border border-orange-200 text-[9px] font-black text-orange-600 rounded-lg hover:bg-orange-600 hover:text-white transition-all uppercase">
-                                                    batalkan pilihan yang sudah dinilai
+                                                    class="ml-2 px-2 py-1
+                                                        bg-white border border-orange-200
+                                                        text-[9px] font-black text-orange-600
+                                                        rounded-lg hover:bg-orange-600
+                                                        hover:text-white transition-all uppercase">
+                                                    Batalkan pilihan
                                                 </button>
                                             </div>
                                         </template>
 
-                                        {{-- Status Update Form --}}
-                                        <form action="{{ route('export.excel', $unit->id) }}" method="POST"
-                                            class="inline" {{-- Tombol hanya muncul jika:
-                                                1. Ada item yang dipilih (length > 0)
-                                                2. SEMUA id di selectedItems memiliki status_hrd == 1 --}}
+
+                                        {{-- EXPORT --}}
+                                        <form action="{{ route('export.excel', $unit->id) }}"
+                                            method="POST"
+                                            class="inline"
                                             x-show="selectedItems.length > 0 && selectedItems.every(id => hrdStatuses[id] > 0 && staffStatuses[id] > 0)"
                                             x-transition:enter="transition ease-out duration-200"
                                             x-transition:enter-start="opacity-0 scale-95"
-                                            x-transition:enter-end="opacity-100 scale-100" x-cloak>
+                                            x-transition:enter-end="opacity-100 scale-100"
+                                            x-cloak>
 
                                             @csrf
-                                            <input type="hidden" name="worker_ids"
+
+                                            <input type="hidden"
+                                                name="worker_ids"
                                                 :value="JSON.stringify(selectedItems)">
 
                                             <button type="submit"
-                                                class="flex items-center gap-1.5 px-4 py-2 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-xl text-xs font-bold hover:bg-emerald-600 hover:text-white transition-all shadow-sm">
-                                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
+                                                class="flex items-center gap-1.5
+                                                    px-4 py-2
+                                                    bg-emerald-50 text-emerald-700
+                                                    border border-emerald-100
+                                                    rounded-xl text-xs font-bold
+                                                    hover:bg-emerald-600 hover:text-white
+                                                    transition-all shadow-sm">
+
+                                                <svg class="w-3.5 h-3.5"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
                                                     stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    <path stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                        stroke-width="2"
                                                         d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                                 </svg>
+
                                                 Stream Excel
                                             </button>
                                         </form>
+
+                                    </div>
+
+
+                                    {{-- ========================================= --}}
+                                    {{-- MOBILE ACTIONS --}}
+                                    {{-- TOP → BOTTOM --}}
+                                    {{-- ========================================= --}}
+                                    <div class="sm:hidden flex flex-col gap-2">
+
+                                        {{-- Divider --}}
+                                        <div class="h-px bg-gray-100"></div>
+
+
+                                        {{-- BUAT PENILAIAN --}}
+                                        <template x-if="isSelectionClean">
+                                            <button type="button"
+                                                @click="window.location.href = '{{ route('view.buat.penilaian', $unit->id) }}?ids=' + selectedItems.join(',')"
+                                                class="w-full flex items-center justify-center gap-2
+                                                    px-4 py-3
+                                                    bg-blue-600 text-white
+                                                    rounded-xl text-xs font-bold
+                                                    hover:bg-blue-700
+                                                    transition-all
+                                                    shadow-md shadow-blue-100">
+
+                                                <svg class="w-4 h-4"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                    stroke="currentColor">
+                                                    <path stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                        stroke-width="2.5"
+                                                        d="M12 4v16m8-8H4" />
+                                                </svg>
+
+                                                Buat Penilaian Baru
+                                            </button>
+                                        </template>
+
+
+                                        {{-- WARNING --}}
+                                        <template x-if="selectedItems.length > 0 && hasSelectedAssessed">
+                                            <div class="flex flex-col gap-3
+                                                        p-3
+                                                        bg-orange-50
+                                                        border border-orange-100
+                                                        rounded-xl">
+
+                                                <div class="flex items-start gap-3">
+
+                                                    <div class="flex-shrink-0 relative flex h-2 w-2 mt-1">
+                                                        <span
+                                                            class="animate-ping absolute inline-flex h-full w-full
+                                                                rounded-full bg-orange-400 opacity-75">
+                                                        </span>
+
+                                                        <span
+                                                            class="relative inline-flex rounded-full
+                                                                h-2 w-2 bg-orange-500">
+                                                        </span>
+                                                    </div>
+
+                                                    <div class="flex flex-col min-w-0">
+                                                        <span
+                                                            class="text-[10px] font-black text-orange-700
+                                                                uppercase tracking-tight">
+                                                            Pilihan Tidak Valid
+                                                        </span>
+
+                                                        <p class="text-[9px] font-bold text-orange-500
+                                                                leading-relaxed mt-0.5">
+                                                            Beberapa pekerja yang Anda pilih sudah
+                                                            memiliki data penilaian.
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                <button
+                                                    @click="selectedItems = selectedItems.filter(id => !alreadyAssessed.includes(id))"
+                                                    class="w-full px-3 py-2
+                                                        bg-white border border-orange-200
+                                                        text-[9px] font-black text-orange-600
+                                                        rounded-lg
+                                                        hover:bg-orange-600 hover:text-white
+                                                        transition-all uppercase">
+                                                    Batalkan Pilihan yang Sudah Dinilai
+                                                </button>
+                                            </div>
+                                        </template>
+
+
+                                        {{-- EXPORT --}}
+                                        <form action="{{ route('export.excel', $unit->id) }}"
+                                            method="POST"
+                                            class="w-full"
+                                            x-show="selectedItems.length > 0 && selectedItems.every(id => hrdStatuses[id] > 0 && staffStatuses[id] > 0)"
+                                            x-transition:enter="transition ease-out duration-200"
+                                            x-transition:enter-start="opacity-0 scale-95"
+                                            x-transition:enter-end="opacity-100 scale-100"
+                                            x-cloak>
+
+                                            @csrf
+
+                                            <input type="hidden"
+                                                name="worker_ids"
+                                                :value="JSON.stringify(selectedItems)">
+
+                                            <button type="submit"
+                                                class="w-full flex items-center justify-center gap-2
+                                                    px-4 py-3
+                                                    bg-emerald-50 text-emerald-700
+                                                    border border-emerald-100
+                                                    rounded-xl text-xs font-bold
+                                                    hover:bg-emerald-600 hover:text-white
+                                                    transition-all shadow-sm">
+
+                                                <svg class="w-4 h-4"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                    stroke="currentColor">
+                                                    <path stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01-2 2V19a2 2 0 01-2 2z" />
+                                                </svg>
+
+                                                Stream Excel
+                                            </button>
+                                        </form>
+
                                     </div>
                                 </div>
                             </div>

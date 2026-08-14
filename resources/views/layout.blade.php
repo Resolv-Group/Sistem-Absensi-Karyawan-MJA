@@ -33,7 +33,7 @@
     <x-navbar />
     <x-notification />
 
-    <div class="px-16">
+    <div class="px-4 sm:px-8 lg:px-16">
         @yield('header')
         @yield('content')
     </div>

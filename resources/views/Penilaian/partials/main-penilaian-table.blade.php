@@ -67,62 +67,108 @@
                     @if ($first->status_hrd > 0 && $first->status_pic > 0)
                         {{-- LOCKED VERSION: Cannot click, no hover effects --}}
                         <div
-                            class="flex items-center justify-between bg-gray-50/50 border border-gray-100 rounded-[1.25rem] p-4 relative overflow-hidden cursor-not-allowed">
-                            {{-- Left Accent Line (Static opacity since it's locked) --}}
-                            <div class="absolute left-0 top-0 bottom-0 w-1.5 {{ $grade['accent'] }} opacity-40"></div>
+                            class="group/item flex flex-col sm:flex-row
+                                sm:items-center sm:justify-between
+                                gap-3 sm:gap-0
+                                bg-gray-50/50 border border-gray-100
+                                rounded-[1.25rem] p-4
+                                relative overflow-hidden cursor-not-allowed">
+
+                            {{-- Left Accent Line --}}
+                            <div
+                                class="absolute left-0 top-0 bottom-0 w-1.5
+                                    {{ $grade['accent'] }} opacity-40">
+                            </div>
                         @else
                             {{-- EDITABLE VERSION: Original Link --}}
                             <a href="{{ route('view.ubah.penilaian', ['penilaianId' => $first->id, 'unitId' => $pkwt->id_unit, 'pekerjaId' => $first->id_pekerja]) }}"
                                 @click.stop
-                                class="group/item flex items-center justify-between bg-white border border-gray-100 rounded-[1.25rem] p-4 shadow-sm hover:border-blue-300 hover:shadow-md transition-all relative overflow-hidden">
+                                class="group/item flex flex-col sm:flex-row
+                                        sm:items-center sm:justify-between
+                                        gap-3 sm:gap-0
+                                        bg-white border border-gray-100
+                                        rounded-[1.25rem] p-4
+                                        shadow-sm hover:border-blue-300
+                                        hover:shadow-md transition-all
+                                        relative overflow-hidden">
 
                                 {{-- Left Accent Line --}}
                                 <div
-                                    class="absolute left-0 top-0 bottom-0 w-1.5 {{ $grade['accent'] }} opacity-20 group-hover/item:opacity-100 transition-opacity">
+                                    class="absolute left-0 top-0 bottom-0 w-1.5
+                                        {{ $grade['accent'] }}
+                                        opacity-20
+                                        group-hover/item:opacity-100
+                                        transition-opacity">
                                 </div>
                     @endif
 
                     {{-- SHARED CONTENT START --}}
-                    <div class="pl-2">
-                        <div class="flex items-center gap-2">
-                            <p class="text-[11px] font-black text-gray-400 uppercase tracking-widest leading-none">
+                    <div class="pl-2 min-w-0 flex-1">
+                        {{-- Top Header Section: Evaluasi Terakhir & Status Ditinjau --}}
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
+                            <p
+                                class="text-[11px] font-black text-gray-400 uppercase tracking-widest leading-none">
                                 Evaluasi Terakhir</p>
 
                             @if ($first->status_hrd > 0 && $first->status_pic > 0)
                                 <div
-                                    class="flex items-center gap-1 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-100">
+                                    class="flex items-center gap-1 w-fit
+                                        bg-emerald-50 px-1.5 py-0.5
+                                        rounded border border-emerald-100">
                                     <svg class="w-2.5 h-2.5 text-emerald-500" fill="none" viewBox="0 0 24 24"
                                         stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
                                             d="M5 13l4 4L19 7" />
                                     </svg>
-                                    <span class="text-[10px] font-black text-emerald-600 uppercase">Sudah
+                                    <span class="text-[10px] font-black
+                               text-emerald-600 uppercase">Sudah
                                         Ditinjau</span>
                                 </div>
                                 {{-- Small Lock Icon to indicate it's read-only --}}
-                                <svg class="w-3 h-3 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
+                                <svg class="w-3 h-3 text-gray-300 hidden sm:inline-block" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd"
                                         d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
                                         clip-rule="evenodd" />
                                 </svg>
                             @else
                                 <div
-                                    class="flex items-center gap-1 bg-gray-50 px-1.5 py-0.5 rounded border border-gray-100">
+                                    class="flex items-center gap-1 w-fit
+                           bg-gray-50 px-1.5 py-0.5
+                           rounded border border-gray-100">
                                     <span class="w-1 h-1 rounded-full bg-gray-300 animate-pulse"></span>
                                     <span class="text-[10px] font-black text-gray-400 uppercase">Belum Ditinjau</span>
                                 </div>
                             @endif
                         </div>
-                        <div class="flex items-center gap-2">
-                            <span
-                                class="text-lg font-black text-gray-900 tracking-tighter">{{ number_format($first->total, 0) }}</span>
-                            <span class="text-[10px] font-bold text-gray-400 uppercase">Poin</span>
+
+                        {{-- Bottom Row on Mobile / Left on Desktop: Points & (Mobile Grade Badge) --}}
+                        <div class="flex items-center justify-between sm:justify-start sm:items-baseline gap-2 mt-2 sm:mt-1.5">
+                            <div class="flex items-baseline gap-1.5">
+                                <span
+                                    class="text-lg font-black text-gray-900
+                               tracking-tighter">{{ number_format($first->total, 0) }}</span>
+                                <span class="text-[10px] font-bold text-gray-400 uppercase">Poin</span>
+                            </div>
+
+                            {{-- Mobile Grade Badge (Right aligned with points) --}}
+                            <div
+                                class="sm:hidden w-8 h-8
+                                rounded-lg border {{ $grade['class'] }}
+                                flex items-center justify-center
+                                font-black text-sm shadow-sm flex-shrink-0">
+                                {{ $grade['label'] }}
+                            </div>
                         </div>
                     </div>
 
-                    {{-- Grade Badge --}}
+                    {{-- Desktop Grade Badge --}}
                     <div
-                        class="w-10 h-10 rounded-xl border {{ $grade['class'] }} flex items-center justify-center font-black text-lg shadow-sm">
+                        class="hidden sm:flex w-10 h-10
+                        rounded-xl border {{ $grade['class'] }}
+                        items-center justify-center
+                        font-black text-lg shadow-sm
+                        self-auto
+                        flex-shrink-0">
                         {{ $grade['label'] }}
                     </div>
                     {{-- SHARED CONTENT END --}}

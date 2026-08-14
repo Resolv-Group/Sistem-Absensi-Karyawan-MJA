@@ -153,13 +153,13 @@
                         {{-- Identity --}}
                         <div class="space-y-4">
                             <div class="flex items-center gap-4">
-                                <div class="h-14 w-2 bg-orange-500 rounded-full shadow-[0_0_20px_rgba(249,115,22,0.4)]">
+                                <div class="h-14 w-2 bg-orange-500 rounded-full shadow-[0_0_20px_rgba(249,115,22,0.4)] shrink-0">
                                 </div>
-                                <div>
-                                    <h1 class="text-5xl font-black text-gray-900 tracking-tight leading-none">
+                                <div class="min-w-0">
+                                    <h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tight leading-none break-words">
                                         Master Borongan<span class="text-orange-500">.</span>
                                     </h1>
-                                    <div class="flex items-center gap-3 mt-3">
+                                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 mt-3">
                                         <div
                                             class="px-3 py-1 bg-gray-900 text-white text-[10px] font-black uppercase tracking-widest rounded-lg shadow-sm">
                                             {{ $unit->namaMitra->nama_mitra ?? 'Mitra Perusahaan' }}
@@ -178,7 +178,7 @@
                         </div>
 
                         {{-- Stats --}}
-                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div
                                 class="bg-gray-50/50 border border-gray-100 rounded-3xl p-5 min-w-[140px] hover:bg-white hover:shadow-xl hover:shadow-orange-900/5 transition-all duration-300 group">
                                 <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Total Item</p>
@@ -222,8 +222,8 @@
             <div class="bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-200 overflow-hidden">
 
                 {{-- TOOLBAR --}}
-                <div class="px-6 py-6 border-b border-gray-100 flex flex-col md:flex-row justify-between gap-4 bg-white">
-                    <div class="flex items-center gap-4 flex-1">
+                <div class="px-4 sm:px-6 py-4 sm:py-6 border-b border-gray-100 flex flex-col md:flex-row justify-between gap-4 bg-white">
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 flex-1">
                         <div class="relative w-full max-w-md group" x-data="{ showSearchTooltip: false }">
                             <svg class="w-5 h-5 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2 group-focus-within:text-orange-500 transition"
                                 fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -252,9 +252,9 @@
                             </div>
                         </div>
 
-                        <div class="relative">
+                        <div class="relative w-full sm:w-auto">
                             <button @click="showFilterDropdown = !showFilterDropdown"
-                                class="flex items-center gap-2 px-5 py-3 bg-gray-50 rounded-2xl text-sm font-bold text-gray-600 hover:bg-gray-100 transition">
+                                class="flex w-full sm:w-auto justify-center sm:justify-start items-center gap-2 px-5 py-3 bg-gray-50 rounded-2xl text-sm font-bold text-gray-600 hover:bg-gray-100 transition">
                                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
@@ -266,7 +266,7 @@
 
                             {{-- Dropdown Filter UI --}}
                             <div x-show="showFilterDropdown" @click.outside="showFilterDropdown = false" x-cloak
-                                class="absolute left-0 mt-3 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 z-[70] p-5 origin-top-right">
+                                class="absolute left-0 sm:left-auto sm:right-0 mt-3 w-full sm:w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 z-[70] p-5 origin-top-right">
                                 <div class="flex justify-between items-center mb-5">
                                     <h3 class="text-sm font-bold text-gray-800">Filter Borongan</h3>
                                     <button @click="resetFilters()"
@@ -393,35 +393,38 @@
             x-transition:leave-end="opacity-0 translate-y-10"
             class="fixed bottom-8 left-1/2 -translate-x-1/2 z-40 w-[95%] max-w-3xl" x-cloak>
             <div
-                class="bg-white/80 backdrop-blur-md border border-orange-100 shadow-2xl rounded-2xl px-5 py-3 flex items-center justify-between">
-                <div class="flex items-center gap-3">
+                class="bg-white/80 backdrop-blur-md border border-orange-100 shadow-2xl rounded-2xl px-5 py-4 flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-0">
+                <div class="flex items-center gap-3 w-full sm:w-auto justify-center sm:justify-start">
                     <span
-                        class="flex items-center justify-center bg-orange-600 text-white text-[11px] font-black h-6 w-6 rounded-full"
+                        class="shrink-0 flex items-center justify-center bg-orange-600 text-white text-[11px] font-black h-6 w-6 rounded-full"
                         x-text="selectedItems.length"></span>
                     <span class="text-sm font-bold text-gray-900">Item Dipilih</span>
                 </div>
-                <div class="flex items-center gap-2">
+                <div class="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto">
                     <button type="button" @click="selectedItems = []"
-                        class="px-3 py-2 text-xs font-bold text-gray-500 hover:text-gray-700 transition">Batal</button>
-                    <div class="h-6 w-px bg-gray-200 mx-1"></div>
-                    <button @click="showKategoriModal = true"
-                        class="px-4 py-2 bg-orange-50 text-orange-700 border border-orange-100 rounded-xl text-xs font-bold hover:bg-orange-600 hover:text-white transition-all">Ubah
-                        Kategori</button>
-                    <button @click="showStatusModal = true"
-                        class="px-4 py-2 bg-gray-50 text-gray-600 border border-gray-200 rounded-xl text-xs font-bold hover:bg-gray-800 hover:text-white transition-all">Update
-                        Status</button>
-                    <form action="{{ route('bulk.update.borongan') }}" method="POST" class="inline">
-                        @csrf @method('PUT')
-                        <input type="hidden" name="ids" :value="JSON.stringify(selectedItems)">
-                        <button name="action" value="delete" onclick="return confirm('Hapus item?')"
-                            class="p-2 bg-red-50 text-red-600 border border-red-100 rounded-xl hover:bg-red-600 hover:text-white transition-all">
-                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path
-                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                    stroke-width="2" />
-                            </svg>
-                        </button>
-                    </form>
+                        class="w-full sm:w-auto px-3 py-2 text-xs font-bold text-gray-500 hover:text-gray-700 transition order-last sm:order-first">Batal</button>
+                    <div class="hidden sm:block h-6 w-px bg-gray-200 mx-1"></div>
+                    <div class="flex flex-wrap sm:flex-nowrap items-center justify-center gap-2 w-full sm:w-auto">
+                        <button @click="showKategoriModal = true"
+                            class="flex-1 sm:flex-none justify-center px-4 py-2 bg-orange-50 text-orange-700 border border-orange-100 rounded-xl text-xs font-bold hover:bg-orange-600 hover:text-white transition-all">Ubah
+                            Kategori</button>
+                        <button @click="showStatusModal = true"
+                            class="flex-1 sm:flex-none justify-center px-4 py-2 bg-gray-50 text-gray-600 border border-gray-200 rounded-xl text-xs font-bold hover:bg-gray-800 hover:text-white transition-all">Update
+                            Status</button>
+                        <form action="{{ route('bulk.update.borongan') }}" method="POST" class="inline flex gap-2 w-full sm:w-auto">
+                            @csrf @method('PUT')
+                            <input type="hidden" name="ids" :value="JSON.stringify(selectedItems)">
+                            <button name="action" value="delete" onclick="return confirm('Hapus item?')"
+                                class="flex-1 sm:flex-none justify-center flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 border border-red-100 rounded-xl text-xs font-bold hover:bg-red-600 hover:text-white transition-all">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path
+                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                        stroke-width="2" />
+                                </svg>
+                                <span>Hapus</span>
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>

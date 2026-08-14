@@ -6,8 +6,8 @@
 </script>
 
 @section('content')
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-
+    <div class="max-w-6xl mx-auto px-2 sm:px-6 lg:px-8 py-8">
+    
         {{-- HEADER SECTION --}}
         <div class="mb-8">
             <nav class="flex text-sm font-medium text-gray-500 mb-2">
@@ -415,7 +415,7 @@
                     </div>
 
                     {{-- Kecamatan & Provinsi --}}
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-1">Kecamatan<span
                                     class="text-red-500 font-semibold">*</span></label>
@@ -482,7 +482,7 @@
                         </div>
 
                         {{-- Bank Info --}}
-                        <div class="grid grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
                             <!-- CUSTOM DROPDOWN BANK -->
                             <div x-data="{ open: false, selected: '{{ old('nama_rek') }}' || '', banks: ['BCA', 'BRI', 'BNI', 'Mandiri', 'CIMB Niaga', 'BTN', 'Bank Permata', 'Bank Danamon', 'Bank Mega', 'Panin Bank', 'OCBC NISP', 'Maybank Indonesia', 'BSI', 'Bank Jago', 'SeaBank', 'Bank Neo Commerce'] }" class="relative">
@@ -807,13 +807,13 @@
             </div>
 
             {{-- FOOTER / ACTIONS --}}
-            <div class="bg-gray-50 px-8 py-5 flex items-center justify-end gap-3 border-t border-gray-200">
+            <div class="bg-gray-50 px-8 py-5 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-3 border-t border-gray-200">
                 <a href="{{ route('view.pekerja') }}"
-                    class="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 transition shadow-sm">
+                    class="w-full sm:w-auto text-center px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 transition shadow-sm">
                     Batalkan
                 </a>
                 {{-- <button type="submit" name="action" value="add_more"
-                    class="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition shadow-sm">
+                    class="w-full sm:w-auto justify-center flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition shadow-sm">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -821,7 +821,7 @@
                     Tambah
                 </button> --}}
                 <button type="button" name="action" value="save" id="save-btn"
-                    class="flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition shadow-sm">
+                    class="w-full sm:w-auto justify-center flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition shadow-sm">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />

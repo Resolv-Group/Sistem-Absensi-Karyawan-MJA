@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('content')
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="max-w-7xl mx-auto px-1 sm:px-2 lg:px-4 py-8">
 
         {{-- 1. HEADER SECTION (Unchanged) --}}
         @php
@@ -39,9 +39,9 @@
             </div>
 
             {{-- Action Buttons --}}
-            <div class="flex items-center gap-3">
+            <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-3">
                 <button onclick="confirmToggleStatus({{ $unit->id }}, {{ $unit->status_aktif }})"
-                    class="px-4 py-2 text-sm font-medium border rounded-lg transition shadow-sm flex items-center gap-2
+                    class="w-full sm:w-auto justify-center flex items-center gap-2 px-4 py-2 text-sm font-medium border rounded-lg transition shadow-sm
                     {{ $unit->status_aktif
                         ? 'text-red-600 bg-red-50 border-red-100 hover:bg-red-100'
                         : 'text-emerald-600 bg-emerald-50 border-emerald-100 hover:bg-emerald-100' }}">
@@ -134,7 +134,7 @@
                         </div>
 
                         {{-- 1. OPERATIONAL STATS GRID (Pekerja & PKWT Expiring) --}}
-                        <div class="mt-8 grid grid-cols-2 gap-3">
+                        <div class="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
                             {{-- Total Pekerja --}}
                             <div class="p-4 bg-slate-50 border border-slate-100 rounded-[1.25rem] text-center">
                                 <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Pekerja
@@ -207,16 +207,16 @@
 
                         {{-- 2. METADATA LIST --}}
                         <div class="mt-8 text-left space-y-4 border-t border-gray-100 pt-6">
-                            <div class="flex justify-between items-center group">
+                            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-0">
                                 <span class="text-[10px] text-slate-400 font-black uppercase tracking-widest">Induk
                                     Mitra</span>
                                 <span
-                                    class="text-xs font-bold text-slate-700 truncate max-w-[150px]">{{ $unit->namaMitra->nama_mitra ?? '-' }}</span>
+                                    class="text-sm font-bold text-gray-900 break-words sm:text-right sm:mt-0 mt-1">{{ $unit->namaMitra->nama_mitra ?? '-' }}</span>
                             </div>
-                            <div class="flex justify-between items-center group">
+                            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-0">
                                 <span class="text-[10px] text-slate-400 font-black uppercase tracking-widest">ID Unit</span>
                                 <span
-                                    class="font-mono text-[11px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md">{{ $unit->id }}</span>
+                                    class="text-sm font-bold text-gray-900 break-words sm:text-right sm:mt-0 mt-1">{{ $unit->id }}</span>
                             </div>
                         </div>
 
@@ -240,7 +240,7 @@
                         <div class="mt-8">
                             @if ($unit->sistem_pengajian == 1)
                                 {{-- Layout untuk Sistem Harian (2 Tombol) --}}
-                                <div class="grid grid-cols-2 gap-3">
+                                <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                                     <button type="button"
                                         onclick="checkUnitRequirements('{{ route('view.tambah.unit-pekerja', $unit->id) }}')"
                                         class="flex items-center justify-center gap-2 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-blue-500 hover:text-blue-600 transition active:scale-95 shadow-sm">
@@ -286,7 +286,7 @@
                             @else
                                 {{-- Layout untuk Sistem Borongan (3 Tombol) --}}
                                 <div class="space-y-3">
-                                    <div class="grid grid-cols-2 gap-3">
+                                    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                                         <button type="button"
                                             onclick="checkUnitRequirements('{{ route('view.tambah.unit-pekerja', $unit->id) }}')"
                                             class="flex items-center justify-center gap-2 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-blue-500 hover:text-blue-600 transition active:scale-95 shadow-sm">
@@ -371,114 +371,506 @@
                         class="relative w-full max-w-6xl bg-white rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col min-h-[600px] max-h-[90vh]">
 
                         {{-- HEADER --}}
-                        <div class="px-8 py-6 border-b border-slate-100 flex items-center justify-between"
-                            :class="activeType === 'kas' ? 'bg-emerald-50/50' : 'bg-blue-50/50'">
-                            <div>
-                                <h3 class="text-xl font-black text-slate-800 tracking-tight flex items-center gap-2">
-                                    <span
-                                        x-text="activeType === 'kas' ? 'Manajemen Kas Kecil' : 'Manajemen Asset Unit'"></span>
-                                </h3>
-                                <p class="text-xs text-slate-500 font-bold uppercase mt-1 tracking-tighter" x-show="view === 'list'">
-                                    periode <span x-text="formatPeriode()"></span> tertentu
-                                </p>
-                            </div>
+                        <div class="relative
+                            px-4 sm:px-8
+                            py-4 sm:py-6
+                            border-b border-slate-100
+                            flex flex-col sm:flex-row
+                            sm:items-center sm:justify-between
+                            gap-4"
+                    :class="activeType === 'kas'
+                        ? 'bg-emerald-50/50'
+                        : 'bg-blue-50/50'">
 
-                            <div class="flex items-center gap-2">
-                                {{-- Toggle Button --}}
-                                <button @click="view === 'list' ? openForm() : view = 'list'"
-                                    class="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all"
-                                    :class="view === 'list' ? 'bg-slate-800 text-white shadow-lg' :
-                                        'bg-slate-100 text-slate-500'">
-                                    <span x-text="view === 'list'  ? '+ Tambah Baru' : '← Lihat Daftar'"></span>
-                                </button>
-                                {{-- Close Button --}}
-                                <button @click="showModal = false"
-                                    class="p-2 text-slate-400 hover:text-rose-500 transition">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
+                    {{-- TITLE --}}
+                    <div class="min-w-0 pr-10 sm:pr-0">
+
+                        <h3 class="text-lg sm:text-xl
+                                font-black text-slate-800
+                                tracking-tight
+                                leading-tight">
+
+                            <span
+                                x-text="activeType === 'kas'
+                                    ? 'Manajemen Kas Kecil'
+                                    : 'Manajemen Asset Unit'">
+                            </span>
+
+                        </h3>
+
+                        <p
+                            class="text-[10px] sm:text-xs
+                                text-slate-500
+                                font-bold uppercase
+                                mt-1
+                                tracking-tighter"
+                            x-show="view === 'list'">
+
+                            periode
+                            <span x-text="formatPeriode()"></span>
+                            tertentu
+
+                        </p>
+
+                    </div>
+
+
+                    {{-- ACTIONS --}}
+                    <div class="flex items-center gap-2
+                                w-full sm:w-auto">
+
+                        {{-- Toggle Button --}}
+                        <button
+                            @click="view === 'list' ? openForm() : view = 'list'"
+                            class="flex-1 sm:flex-none
+                                px-4 py-2.5 sm:py-2
+                                rounded-xl
+                                text-[10px]
+                                font-black
+                                uppercase
+                                tracking-widest
+                                transition-all
+                                whitespace-nowrap"
+                            :class="view === 'list'
+                                ? 'bg-slate-800 text-white shadow-lg'
+                                : 'bg-slate-100 text-slate-500'">
+
+                            <span
+                                x-text="view === 'list'
+                                    ? '+ Tambah Baru'
+                                    : '← Lihat Daftar'">
+                            </span>
+
+                        </button>
+
+
+                        {{-- Close Button --}}
+                        <button
+                            @click="showModal = false"
+                            class="shrink-0
+                                p-2
+                                text-slate-400
+                                hover:text-rose-500
+                                transition">
+
+                            <svg
+                                class="w-5 h-5 sm:w-6 sm:h-6"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24">
+
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12" />
+
+                            </svg>
+
+                        </button>
+
+                    </div>
+
+                </div>
 
                         {{-- FILTERS BLOCK --}}
-                        <div x-show="view === 'list'" class="px-8 py-3 bg-slate-50 border-b border-slate-100 flex flex-wrap gap-4 items-center">
-                            <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Filter:</span>
-                            
-                            <!-- Month Selector -->
-                            <div class="relative" x-data="{ open: false }" @click.away="open = false">
-                                <button @click="open = !open" type="button" class="flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 text-slate-700 rounded-lg text-[10px] font-bold hover:bg-slate-50 transition shadow-sm">
+                        <div x-show="view === 'list'"
+                            class="px-4 sm:px-8 py-3
+                                bg-slate-50
+                                border-b border-slate-100
+                                flex flex-wrap
+                                gap-2 sm:gap-4
+                                items-center">
+
+                            {{-- FILTER LABEL --}}
+                            <span class="w-full sm:w-auto
+                                        text-[9px]
+                                        font-black
+                                        text-slate-400
+                                        uppercase
+                                        tracking-widest
+                                        sm:mr-1">
+                                Filter:
+                            </span>
+
+
+                            {{-- MONTH SELECTOR --}}
+                            <div class="relative flex-1 sm:flex-none"
+                                x-data="{ open: false }"
+                                @click.away="open = false">
+
+                                <button
+                                    @click="open = !open"
+                                    type="button"
+                                    class="w-full sm:w-auto
+                                        flex items-center justify-center sm:justify-start
+                                        gap-2
+                                        px-3 py-2 sm:py-1.5
+                                        bg-white
+                                        border border-slate-200
+                                        text-slate-700
+                                        rounded-lg
+                                        text-[10px]
+                                        font-bold
+                                        hover:bg-slate-50
+                                        transition
+                                        shadow-sm">
+
                                     <span>Bulan</span>
-                                    <span class="bg-blue-100 text-blue-600 px-1.5 py-0.2 rounded-full text-[9px]" x-show="selectedMonths.length > 0" x-text="selectedMonths.length"></span>
-                                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+
+                                    <span
+                                        class="bg-blue-100 text-blue-600
+                                            px-1.5 py-0.5
+                                            rounded-full text-[9px]"
+                                        x-show="selectedMonths.length > 0"
+                                        x-text="selectedMonths.length">
+                                    </span>
+
+                                    <svg class="w-3.5 h-3.5 text-slate-400"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24">
+
+                                        <path stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M19 9l-7 7-7-7" />
+
                                     </svg>
+
                                 </button>
-                                <div x-show="open" class="absolute left-0 mt-2 w-56 bg-white border border-slate-200 rounded-xl shadow-xl z-50 p-2 space-y-1 max-h-60 overflow-y-auto">
+
+
+                                <div
+                                    x-show="open"
+                                    x-transition
+                                    class="absolute left-0 mt-2
+                                        w-56
+                                        bg-white
+                                        border border-slate-200
+                                        rounded-xl
+                                        shadow-xl
+                                        z-[60]
+                                        p-2
+                                        space-y-1
+                                        max-h-60
+                                        overflow-y-auto">
+
                                     <template x-for="m in monthsList" :key="m.value">
-                                        <label class="flex items-center gap-2 px-2 py-1 hover:bg-slate-50 rounded-md cursor-pointer">
-                                            <input type="checkbox" :value="m.value" x-model="selectedMonths" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500">
-                                            <span class="text-[11px] font-semibold text-slate-700" x-text="m.label"></span>
+
+                                        <label
+                                            class="flex items-center gap-2
+                                                px-2 py-1.5
+                                                hover:bg-slate-50
+                                                rounded-md
+                                                cursor-pointer">
+
+                                            <input
+                                                type="checkbox"
+                                                :value="m.value"
+                                                x-model="selectedMonths"
+                                                class="rounded border-slate-300
+                                                    text-blue-600
+                                                    focus:ring-blue-500">
+
+                                            <span
+                                                class="text-[11px]
+                                                    font-semibold
+                                                    text-slate-700"
+                                                x-text="m.label">
+                                            </span>
+
                                         </label>
+
                                     </template>
+
                                 </div>
+
                             </div>
 
-                            <!-- Year Selector -->
-                            <div class="relative" x-data="{ open: false }" @click.away="open = false">
-                                <button @click="open = !open" type="button" class="flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 text-slate-700 rounded-lg text-[10px] font-bold hover:bg-slate-50 transition shadow-sm">
+
+                            {{-- YEAR SELECTOR --}}
+                            <div class="relative flex-1 sm:flex-none"
+                                x-data="{ open: false }"
+                                @click.away="open = false">
+
+                                <button
+                                    @click="open = !open"
+                                    type="button"
+                                    class="w-full sm:w-auto
+                                        flex items-center justify-center sm:justify-start
+                                        gap-2
+                                        px-3 py-2 sm:py-1.5
+                                        bg-white
+                                        border border-slate-200
+                                        text-slate-700
+                                        rounded-lg
+                                        text-[10px]
+                                        font-bold
+                                        hover:bg-slate-50
+                                        transition
+                                        shadow-sm">
+
                                     <span>Tahun</span>
-                                    <span class="bg-blue-100 text-blue-600 px-1.5 py-0.2 rounded-full text-[9px]" x-show="selectedYears.length > 0" x-text="selectedYears.length"></span>
-                                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+
+                                    <span
+                                        class="bg-blue-100 text-blue-600
+                                            px-1.5 py-0.5
+                                            rounded-full text-[9px]"
+                                        x-show="selectedYears.length > 0"
+                                        x-text="selectedYears.length">
+                                    </span>
+
+                                    <svg class="w-3.5 h-3.5 text-slate-400"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24">
+
+                                        <path stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M19 9l-7 7-7-7" />
+
                                     </svg>
+
                                 </button>
-                                <div x-show="open" class="absolute left-0 mt-2 w-48 bg-white border border-slate-200 rounded-xl shadow-xl z-50 p-2 space-y-1 max-h-60 overflow-y-auto">
+
+
+                                <div
+                                    x-show="open"
+                                    x-transition
+                                    class="absolute left-0 mt-2
+                                        w-48
+                                        bg-white
+                                        border border-slate-200
+                                        rounded-xl
+                                        shadow-xl
+                                        z-[60]
+                                        p-2
+                                        space-y-1
+                                        max-h-60
+                                        overflow-y-auto">
+
                                     <template x-for="y in getYears()" :key="y">
-                                        <label class="flex items-center gap-2 px-2 py-1 hover:bg-slate-50 rounded-md cursor-pointer">
-                                            <input type="checkbox" :value="y" x-model="selectedYears" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500">
-                                            <span class="text-[11px] font-semibold text-slate-700" x-text="y"></span>
+
+                                        <label
+                                            class="flex items-center gap-2
+                                                px-2 py-1.5
+                                                hover:bg-slate-50
+                                                rounded-md
+                                                cursor-pointer">
+
+                                            <input
+                                                type="checkbox"
+                                                :value="y"
+                                                x-model="selectedYears"
+                                                class="rounded border-slate-300
+                                                    text-blue-600
+                                                    focus:ring-blue-500">
+
+                                            <span
+                                                class="text-[11px]
+                                                    font-semibold
+                                                    text-slate-700"
+                                                x-text="y">
+                                            </span>
+
                                         </label>
+
                                     </template>
+
                                 </div>
+
                             </div>
 
-                            <!-- Status Selector -->
-                            <div class="relative" x-data="{ open: false }" @click.away="open = false">
-                                <button @click="open = !open" type="button" class="flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 text-slate-700 rounded-lg text-[10px] font-bold hover:bg-slate-50 transition shadow-sm">
+
+                            {{-- STATUS SELECTOR --}}
+                            <div class="relative flex-1 sm:flex-none"
+                                x-data="{ open: false }"
+                                @click.away="open = false">
+
+                                <button
+                                    @click="open = !open"
+                                    type="button"
+                                    class="w-full sm:w-auto
+                                        flex items-center justify-center sm:justify-start
+                                        gap-2
+                                        px-3 py-2 sm:py-1.5
+                                        bg-white
+                                        border border-slate-200
+                                        text-slate-700
+                                        rounded-lg
+                                        text-[10px]
+                                        font-bold
+                                        hover:bg-slate-50
+                                        transition
+                                        shadow-sm">
+
                                     <span>Status</span>
-                                    <span class="bg-blue-100 text-blue-600 px-1.5 py-0.2 rounded-full text-[9px]" x-show="selectedStatus !== ''" x-text="selectedStatus === 'approved' ? 'Approved' : 'Pending'"></span>
-                                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+
+                                    <span
+                                        class="bg-blue-100 text-blue-600
+                                            px-1.5 py-0.5
+                                            rounded-full text-[9px]"
+                                        x-show="selectedStatus !== ''"
+                                        x-text="selectedStatus === 'approved'
+                                            ? 'Approved'
+                                            : 'Pending'">
+                                    </span>
+
+                                    <svg class="w-3.5 h-3.5 text-slate-400"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24">
+
+                                        <path stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M19 9l-7 7-7-7" />
+
                                     </svg>
+
                                 </button>
-                                <div x-show="open" class="absolute left-0 mt-2 w-40 bg-white border border-slate-200 rounded-xl shadow-xl z-50 p-2 space-y-1">
-                                    <button type="button" @click="selectedStatus = ''; open = false" class="w-full text-left px-2 py-1.5 hover:bg-slate-50 rounded-md text-[11px] font-semibold text-slate-700 flex items-center justify-between">
+
+
+                                <div
+                                    x-show="open"
+                                    x-transition
+                                    class="absolute left-0 mt-2
+                                        w-40
+                                        bg-white
+                                        border border-slate-200
+                                        rounded-xl
+                                        shadow-xl
+                                        z-[60]
+                                        p-2
+                                        space-y-1">
+
+                                    <button
+                                        type="button"
+                                        @click="selectedStatus = ''; open = false"
+                                        class="w-full text-left
+                                            px-2 py-1.5
+                                            hover:bg-slate-50
+                                            rounded-md
+                                            text-[11px]
+                                            font-semibold
+                                            text-slate-700
+                                            flex items-center
+                                            justify-between">
+
                                         <span>Semua Status</span>
-                                        <svg x-show="selectedStatus === ''" class="w-3.5 h-3.5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+
+                                        <svg
+                                            x-show="selectedStatus === ''"
+                                            class="w-3.5 h-3.5 text-blue-600"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor">
+
+                                            <path stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="3"
+                                                d="M5 13l4 4L19 7" />
+
                                         </svg>
+
                                     </button>
-                                    <button type="button" @click="selectedStatus = 'pending'; open = false" class="w-full text-left px-2 py-1.5 hover:bg-slate-50 rounded-md text-[11px] font-semibold text-slate-700 flex items-center justify-between">
+
+
+                                    <button
+                                        type="button"
+                                        @click="selectedStatus = 'pending'; open = false"
+                                        class="w-full text-left
+                                            px-2 py-1.5
+                                            hover:bg-slate-50
+                                            rounded-md
+                                            text-[11px]
+                                            font-semibold
+                                            text-slate-700
+                                            flex items-center
+                                            justify-between">
+
                                         <span>Pending</span>
-                                        <svg x-show="selectedStatus === 'pending'" class="w-3.5 h-3.5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+
+                                        <svg
+                                            x-show="selectedStatus === 'pending'"
+                                            class="w-3.5 h-3.5 text-blue-600"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor">
+
+                                            <path stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="3"
+                                                d="M5 13l4 4L19 7" />
+
                                         </svg>
+
                                     </button>
-                                    <button type="button" @click="selectedStatus = 'approved'; open = false" class="w-full text-left px-2 py-1.5 hover:bg-slate-50 rounded-md text-[11px] font-semibold text-slate-700 flex items-center justify-between">
+
+
+                                    <button
+                                        type="button"
+                                        @click="selectedStatus = 'approved'; open = false"
+                                        class="w-full text-left
+                                            px-2 py-1.5
+                                            hover:bg-slate-50
+                                            rounded-md
+                                            text-[11px]
+                                            font-semibold
+                                            text-slate-700
+                                            flex items-center
+                                            justify-between">
+
                                         <span>Approved</span>
-                                        <svg x-show="selectedStatus === 'approved'" class="w-3.5 h-3.5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+
+                                        <svg
+                                            x-show="selectedStatus === 'approved'"
+                                            class="w-3.5 h-3.5 text-blue-600"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor">
+
+                                            <path stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="3"
+                                                d="M5 13l4 4L19 7" />
+
                                         </svg>
+
                                     </button>
+
                                 </div>
+
                             </div>
 
-                            <!-- Reset Button -->
-                            <button @click="selectedMonths = []; selectedYears = []; selectedStatus = ''" x-show="selectedMonths.length > 0 || selectedYears.length > 0 || selectedStatus !== ''" type="button" class="text-[10px] text-rose-500 hover:text-rose-700 font-black uppercase tracking-wider transition ml-2">
+
+                            {{-- RESET --}}
+                            <button
+                                @click="selectedMonths = [];
+                                        selectedYears = [];
+                                        selectedStatus = ''"
+                                x-show="selectedMonths.length > 0 ||
+                                        selectedYears.length > 0 ||
+                                        selectedStatus !== ''"
+                                type="button"
+                                class="w-full sm:w-auto
+                                    text-[10px]
+                                    text-rose-500
+                                    hover:text-rose-700
+                                    font-black
+                                    uppercase
+                                    tracking-wider
+                                    sm:ml-2
+                                    py-1
+                                    text-center
+                                    transition">
+
                                 Reset Filter
+
                             </button>
+
                         </div>
 
                         {{-- CONTENT: LIST VIEW --}}
@@ -914,7 +1306,7 @@
                                                             placeholder="Ketik keterangan di sini..."
                                                             class="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-blue-500/10 focus:bg-white transition-all">
                                                     </div>
-                                                    <div class="grid grid-cols-2 gap-6">
+                                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                                         {{-- DEBIT INPUT --}}
                                                         <div
                                                             class="p-6 bg-emerald-50/50 rounded-3xl border border-emerald-100 transition-all focus-within:border-emerald-400 focus-within:bg-white">
@@ -1245,61 +1637,239 @@
                     </div>
                 </div>
 
-                <div x-show="showModal && view === 'list' && selectedRows.length > 0" x-cloak
+                <div x-show="showModal && view === 'list' && selectedRows.length > 0"
                     x-transition:enter="transition ease-out duration-300"
-                    x-transition:enter-start="opacity-0 translate-y-20" x-transition:enter-end="opacity-100 translate-y-0"
-                    class="fixed bottom-8 left-1/2 -translate-x-1/2 z-[200] w-max max-w-[90vw] bg-white rounded-2xl shadow-2xl text-slate-600 px-6 py-4 border border-slate-100 flex items-center gap-6 backdrop-blur-xl shadow-[0_20px_50px_rgba(0,0,0,0.15)]">
-                    <div class="flex items-center gap-4 border-r border-slate-200 pr-6">
-                        <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center font-black text-sm text-white shadow-lg shadow-blue-500/20"
-                            x-text="selectedRows.length"></div>
-                        <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Data Terpilih</p>
-                    </div>
-                    <div class="flex items-center gap-3 whitespace-nowrap">
-                        <button @click="editEntries(selectedRows)"
-                            x-show="!hasApprovedSelected()"
-                            class="px-6 py-2 bg-blue-500 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-blue-600 transition shadow-lg">
-                            Ubah Terpilih
-                        </button>
+                    x-transition:enter-start="opacity-0 translate-y-20"
+                    x-transition:enter-end="opacity-100 translate-y-0"
+                    x-transition:leave="transition ease-in duration-200"
+                    x-transition:leave-start="opacity-100 translate-y-0"
+                    x-transition:leave-end="opacity-0 translate-y-20"
+                    class="fixed bottom-4 sm:bottom-8
+                        left-1/2 -translate-x-1/2
+                        z-[200]
+                        w-[calc(100%-1rem)] sm:w-max
+                        max-w-[90vw] sm:max-w-none
+                        bg-white
+                        rounded-2xl
+                        shadow-2xl
+                        text-slate-600
+                        px-4 sm:px-6
+                        py-4
+                        border border-slate-100
+                        flex flex-col sm:flex-row
+                        sm:items-center
+                        gap-3 sm:gap-6
+                        backdrop-blur-xl
+                        shadow-[0_20px_50px_rgba(0,0,0,0.15)]">
 
-                        {{-- Dynamic Delete Button --}}
-                        <button type="button"
-                            x-show="!hasApprovedSelected()"
-                            @click="activeType === 'kas' ? confirmDeleteKas(selectedRows, {{ $unit->id }}) : confirmDeleteAsset(selectedRows, {{ $unit->id }})"
-                            class="px-6 py-2 bg-rose-500/10 text-rose-500 text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-rose-500 hover:text-white transition">
-                            Hapus Terpilih
-                        </button>
+                    {{-- ============================= --}}
+                    {{-- SELECTED DATA --}}
+                    {{-- ============================= --}}
+                    <div class="flex items-center justify-between sm:justify-start
+                                gap-4
+                                sm:border-r sm:border-slate-200
+                                sm:pr-6">
 
-                        {{-- Download Excel Button --}}
-                        <button type="button" @click="openExportSettings('excel')"
-                            class="px-6 py-2 bg-green-500/10 text-green-500 text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-green-500 hover:text-white transition">
-                            Export Excel (<span x-text="selectedRows.length"></span>)
-                        </button>
+                        <div class="flex items-center gap-3">
 
-                        {{-- Approve Button (Beside export excel, only for HRD/Admin/Akuntan — works for both Kas Kecil & Asset) --}}
-                        @if(in_array(auth()->user()->role, ['admin', 'hrd', 'akuntan']))
-                        {{-- Active approve button: no approved items in selection --}}
-                        <button type="button" @click="approveSelected()"
-                            x-show="(activeType === 'kas' || activeType === 'asset') && !hasApprovedSelected()"
-                            class="px-6 py-2 bg-emerald-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-emerald-700 transition shadow-lg">
-                            Approve(<span x-text="selectedRows.length"></span>)
-                        </button>
-                        {{-- Disabled approve button: some selected items are already approved --}}
-                        <div x-show="(activeType === 'kas' || activeType === 'asset') && hasApprovedSelected()"
-                            title="Terdapat data yang sudah disetujui dalam pilihan Anda"
-                            class="relative group">
-                            <button type="button" disabled
-                                class="px-6 py-2 bg-slate-200 text-slate-400 text-[10px] font-black uppercase tracking-widest rounded-xl cursor-not-allowed opacity-70 flex items-center gap-2">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
-                                </svg>
-                                Approve
-                            </button>
-                            {{-- Tooltip --}}
-                            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-80 px-3 py-2 bg-white rounded-2xl shadow-2xl text-slate-600 text-[11px] font-semibold rounded-2xl shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none text-center leading-relaxed">
-                                Ada data yang sudah <span class="text-emerald-400">disetujui</span> dalam pilihan Anda.
+                            <div
+                                class="w-9 h-9 sm:w-10 sm:h-10
+                                    bg-blue-500
+                                    rounded-full
+                                    flex items-center justify-center
+                                    font-black text-xs sm:text-sm
+                                    text-white
+                                    shadow-lg shadow-blue-500/20"
+                                x-text="selectedRows.length">
                             </div>
+
+                            <div class="flex flex-col">
+
+                                <p class="text-[10px]
+                                        font-black
+                                        uppercase
+                                        tracking-widest
+                                        text-slate-400">
+
+                                    Data Terpilih
+
+                                </p>
+
+                                <span
+                                    class="sm:hidden
+                                        text-[9px]
+                                        text-slate-400
+                                        font-semibold
+                                        mt-0.5">
+
+                                    Pilih tindakan
+
+                                </span>
+
+                            </div>
+
                         </div>
+
+                    </div>
+
+
+                    {{-- ============================= --}}
+                    {{-- ACTIONS --}}
+                    {{-- ============================= --}}
+                    <div class="flex flex-col sm:flex-row
+                                gap-2
+                                w-full sm:w-auto">
+
+
+                        {{-- EXPORT EXCEL --}}
+                        <button
+                            type="button"
+                            @click="openExportSettings('excel')"
+                            class="w-full sm:w-auto
+                                px-4 sm:px-6
+                                py-2.5 sm:py-2
+                                bg-green-500/10
+                                text-green-500
+                                text-[10px]
+                                font-black
+                                uppercase
+                                tracking-widest
+                                rounded-xl
+                                hover:bg-green-500
+                                hover:text-white
+                                transition
+                                text-center">
+
+                            Export Excel
+                            (<span x-text="selectedRows.length"></span>)
+
+                        </button>
+
+
+                        @if(in_array(auth()->user()->role, ['admin', 'hrd', 'akuntan']))
+
+                            {{-- ============================= --}}
+                            {{-- APPROVE AVAILABLE --}}
+                            {{-- ============================= --}}
+                            <button
+                                type="button"
+                                @click="approveSelected()"
+                                x-show="!hasApprovedSelected()"
+                                class="w-full sm:w-auto
+                                    px-4 sm:px-6
+                                    py-2.5 sm:py-2
+                                    bg-emerald-600
+                                    text-white
+                                    text-[10px]
+                                    font-black
+                                    uppercase
+                                    tracking-widest
+                                    rounded-xl
+                                    hover:bg-emerald-700
+                                    transition
+                                    shadow-lg
+                                    text-center">
+
+                                Approve
+                                (<span x-text="selectedRows.length"></span>)
+
+                            </button>
+
+
+                            {{-- ============================= --}}
+                            {{-- APPROVE DISABLED --}}
+                            {{-- ============================= --}}
+                            <div
+                                x-show="hasApprovedSelected()"
+                                title="Terdapat data yang sudah disetujui dalam pilihan Anda"
+                                class="relative group w-full sm:w-auto">
+
+                                <button
+                                    type="button"
+                                    disabled
+                                    class="w-full sm:w-auto
+                                        px-4 sm:px-6
+                                        py-2.5 sm:py-2
+                                        bg-slate-200
+                                        text-slate-400
+                                        text-[10px]
+                                        font-black
+                                        uppercase
+                                        tracking-widest
+                                        rounded-xl
+                                        cursor-not-allowed
+                                        opacity-70
+                                        flex items-center
+                                        justify-center
+                                        gap-2">
+
+                                    <svg
+                                        class="w-3.5 h-3.5"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24">
+
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+
+                                    </svg>
+
+                                    Approve
+
+                                </button>
+
+
+                                {{-- DESKTOP TOOLTIP --}}
+                                <div
+                                    class="hidden sm:block
+                                        absolute bottom-full
+                                        left-1/2
+                                        -translate-x-1/2
+                                        mb-2
+                                        w-80
+                                        px-3 py-2
+                                        bg-white
+                                        rounded-2xl
+                                        shadow-2xl
+                                        text-slate-600
+                                        text-[11px]
+                                        font-semibold
+                                        text-center
+                                        leading-relaxed
+                                        opacity-0
+                                        group-hover:opacity-100
+                                        transition-opacity
+                                        pointer-events-none">
+
+                                    Ada data yang sudah
+                                    <span class="text-emerald-400">
+                                        disetujui
+                                    </span>
+                                    dalam pilihan Anda.
+
+                                </div>
+
+
+                                {{-- MOBILE EXPLANATION --}}
+                                <p
+                                    class="sm:hidden
+                                        text-[9px]
+                                        text-slate-400
+                                        text-center
+                                        leading-relaxed
+                                        mt-1">
+
+                                    Ada data yang sudah disetujui dalam pilihan Anda.
+
+                                </p>
+
+                            </div>
+
                         @endif
+
                     </div>
 
                 </div>
@@ -1309,20 +1879,35 @@
             <div class="lg:col-span-2 flex flex-col gap-6">
                 {{-- A. PIC Section (Interactive) --}}
                 <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-                    <div class="flex items-center justify-between mb-5">
-                        <h3 class="font-bold text-gray-900 flex items-center gap-2">
-                            <div class="p-1.5 bg-blue-50 text-blue-600 rounded-lg">
+                    <div class="flex items-start justify-between mb-5">
+                        <div class="flex items-start gap-2">
+                            <div class="p-1.5 bg-blue-50 text-blue-600 rounded-lg shrink-0">
                                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                                 </svg>
                             </div>
-                            Penanggung Jawab (PIC)
-                        </h3>
+
+                            <div>
+                                <h3 class="font-bold text-gray-900">
+                                    Penanggung Jawab (PIC)
+                                </h3>
+
+                                @if ($unit->picUnit->count() > 0)
+                                    <span
+                                        class="inline-block mt-1 text-xs font-bold bg-gray-100 text-gray-600 px-2 py-1 rounded-md
+                                            sm:hidden">
+                                        {{ $unit->picUnit->count() }} Orang
+                                    </span>
+                                @endif
+                            </div>
+                        </div>
+
                         @if ($unit->picUnit->count() > 0)
                             <span
-                                class="text-xs font-bold bg-gray-100 text-gray-600 px-2 py-1 rounded-md">{{ $unit->picUnit->count() }}
-                                Orang</span>
+                                class="hidden sm:inline-block text-xs font-bold bg-gray-100 text-gray-600 px-2 py-1 rounded-md">
+                                {{ $unit->picUnit->count() }} Orang
+                            </span>
                         @endif
                     </div>
 
@@ -1373,19 +1958,32 @@
                 {{-- C. Tunjangan Spesifik Unit (New Section) --}}
                 <div class="bg-white rounded-[1.5rem] shadow-sm border border-gray-200 p-6 flex flex-col h-full">
                     {{-- Header Section --}}
-                    <div class="flex items-center justify-between mb-6">
-                        <div class="flex items-center gap-3">
-                            <div class="p-2 bg-emerald-50 text-emerald-600 rounded-xl border border-emerald-100">
+                    <div class="flex items-start justify-between mb-6">
+                        <div class="flex items-start gap-3">
+                            <div class="p-2 bg-emerald-50 text-emerald-600 rounded-xl border border-emerald-100 shrink-0">
                                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"
                                     stroke-width="2.5">
                                     <path stroke-linecap="round" stroke-linejoin="round"
                                         d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                             </div>
-                            <h3 class="text-lg font-black text-slate-800 tracking-tight">Pengaturan Tunjangan</h3>
+
+                            <div>
+                                <h3 class="text-lg font-black text-slate-800 tracking-tight">
+                                    Pengaturan Tunjangan
+                                </h3>
+
+                                <span
+                                    class="inline-block mt-1 text-[9px] font-black text-emerald-600 bg-emerald-50
+                                        px-2 py-1 rounded-md uppercase tracking-[0.15em] border border-emerald-100 sm:hidden">
+                                    {{ count($unit->tunjangan ?? []) }} Kategori
+                                </span>
+                            </div>
                         </div>
+
                         <span
-                            class="text-[9px] font-black text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md uppercase tracking-[0.15em] border border-emerald-100">
+                            class="hidden sm:inline-block text-[9px] font-black text-emerald-600 bg-emerald-50
+                                px-2 py-1 rounded-md uppercase tracking-[0.15em] border border-emerald-100">
                             {{ count($unit->tunjangan ?? []) }} Kategori
                         </span>
                     </div>
@@ -1491,70 +2089,96 @@
 
                         {{-- 2. Payroll Configuration (Grid of Horizontal Rows) --}}
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-6 px-2">
+
                             {{-- BPJS Kesehatan --}}
-                            <div class="flex items-center justify-between border-b border-slate-50 pb-4">
-                                <div class="flex items-center gap-3 text-left">
-                                    <div class="p-2 bg-rose-50 text-rose-500 rounded-lg">
+                            <div class="flex items-center justify-between gap-4 border-b border-slate-50 pb-4">
+                                <div class="flex items-center gap-3 min-w-0">
+                                    <div class="shrink-0 p-2 bg-rose-50 text-rose-500 rounded-lg">
                                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                                         </svg>
                                     </div>
-                                    <span class="text-[11px] font-black text-slate-400 uppercase tracking-widest">BPJS
-                                        Kesehatan</span>
+
+                                    <span class="text-[10px] sm:text-[11px] font-black text-slate-400 uppercase tracking-widest truncate">
+                                        BPJS Kesehatan
+                                    </span>
                                 </div>
-                                <p class="text-sm font-black text-slate-800">{{ $unit->bpjs_kesehatan ?? 0 }}% <span
-                                        class="text-[9px] text-slate-300 font-bold ml-1 uppercase">UMK</span></p>
+
+                                <p class="shrink-0 text-sm font-black text-slate-800 text-right">
+                                    {{ $unit->bpjs_kesehatan ?? 0 }}%
+                                    <span class="text-[8px] sm:text-[9px] text-slate-300 font-bold ml-1 uppercase">
+                                        UMK
+                                    </span>
+                                </p>
                             </div>
 
+
                             {{-- BPJS Naker --}}
-                            <div class="flex items-center justify-between border-b border-slate-50 pb-4 text-left">
-                                <div class="flex items-center gap-3">
-                                    <div class="p-2 bg-amber-50 text-amber-500 rounded-lg">
+                            <div class="flex items-center justify-between gap-4 border-b border-slate-50 pb-4 text-left">
+                                <div class="flex items-center gap-3 min-w-0">
+                                    <div class="shrink-0 p-2 bg-amber-50 text-amber-500 rounded-lg">
                                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                                         </svg>
                                     </div>
-                                    <span class="text-[11px] font-black text-slate-400 uppercase tracking-widest">BPJS
-                                        Tenaga Kerja</span>
+
+                                    <span class="text-[10px] sm:text-[11px] font-black text-slate-400 uppercase tracking-widest truncate">
+                                        BPJS Tenaga Kerja
+                                    </span>
                                 </div>
-                                <p class="text-sm font-black text-slate-800 text-right">{{ $unit->bpjs_naker ?? 0 }}%
-                                    <span class="text-[9px] text-slate-300 font-bold ml-1 uppercase">UMK</span>
+
+                                <p class="shrink-0 text-sm font-black text-slate-800 text-right">
+                                    {{ $unit->bpjs_naker ?? 0 }}%
+                                    <span class="text-[8px] sm:text-[9px] text-slate-300 font-bold ml-1 uppercase">
+                                        UMK
+                                    </span>
                                 </p>
                             </div>
 
+
                             {{-- Mulai Kerjasama --}}
-                            <div class="flex items-center justify-between border-b border-slate-50 pb-4 text-left">
-                                <div class="flex items-center gap-3">
-                                    <div class="p-2 bg-blue-50 text-blue-500 rounded-lg">
+                            <div class="flex items-center justify-between gap-4 border-b border-slate-50 pb-4 text-left">
+                                <div class="flex items-center gap-3 min-w-0">
+                                    <div class="shrink-0 p-2 bg-blue-50 text-blue-500 rounded-lg">
                                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                                         </svg>
                                     </div>
-                                    <span class="text-[11px] font-black text-slate-400 uppercase tracking-widest">Mulai
-                                        Kerjasama</span>
+
+                                    <span class="text-[10px] sm:text-[11px] font-black text-slate-400 uppercase tracking-widest truncate">
+                                        Mulai Kerjasama
+                                    </span>
                                 </div>
-                                <p class="text-sm font-black text-slate-800 text-right">
-                                    {{ \Carbon\Carbon::parse($unit->mulai_perjanjian)->format('d M Y') }}</p>
+
+                                <p class="shrink-0 text-sm font-black text-slate-800 text-right">
+                                    {{ \Carbon\Carbon::parse($unit->mulai_perjanjian)->format('d M Y') }}
+                                </p>
                             </div>
 
-                            {{-- Status Pengajian --}}
-                            <div class="flex items-center justify-between border-b border-slate-50 pb-4 text-left">
-                                <div class="flex items-center gap-3">
-                                    <div class="p-2 bg-purple-50 text-purple-500 rounded-lg">
+
+                            {{-- Metode Gaji --}}
+                            <div class="flex items-center justify-between gap-4 border-b border-slate-50 pb-4 text-left">
+                                <div class="flex items-center gap-3 min-w-0">
+                                    <div class="shrink-0 p-2 bg-purple-50 text-purple-500 rounded-lg">
                                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
                                     </div>
-                                    <span class="text-[11px] font-black text-slate-400 uppercase tracking-widest">Metode
-                                        Gaji</span>
+
+                                    <span class="text-[10px] sm:text-[11px] font-black text-slate-400 uppercase tracking-widest truncate">
+                                        Metode Gaji
+                                    </span>
                                 </div>
-                                <p class="text-sm font-black text-indigo-600 text-right uppercase tracking-tighter">
-                                    {{ $unit->sistem_pengajian == 1 ? 'Harian' : 'Borongan' }}</p>
+
+                                <p class="shrink-0 text-sm font-black text-indigo-600 text-right uppercase tracking-tighter">
+                                    {{ $unit->sistem_pengajian == 1 ? 'Harian' : 'Borongan' }}
+                                </p>
                             </div>
+
                         </div>
                     </div>
                 </div>

@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('content')
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="max-w-7xl mx-auto px-1 sm:px-2 lg:px-4 py-8">
 
         {{-- HEADER SECTION --}}
         <div class="mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
@@ -34,7 +34,7 @@
             </div>
 
             {{-- Right Side: Action Buttons --}}
-            <div class="flex items-center gap-3">
+            <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-3">
                 <button onclick="confirmToggleStatus({{ $staff->id }}, {{ $staff->status_aktif }})"
                     class="px-4 py-2 text-sm font-medium
                         {{ $staff->status_aktif
@@ -48,7 +48,7 @@
                     Cetak Data
                 </button> --}}
                 <a href="{{ route('view.ubah.staff', $staff->id) }}"
-                    class="px-4 py-2 text-sm font-medium text-white bg-black border border-black rounded-lg hover:bg-gray-800 transition shadow-sm flex items-center gap-2">
+                    class="w-full sm:w-auto justify-center flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-black border border-black rounded-lg hover:bg-gray-800 transition shadow-sm">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -64,7 +64,6 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-            {{-- LEFT COLUMN: Profile Card --}}
             {{-- LEFT COLUMN: Profile Card --}}
             <div class="lg:col-span-1">
                 <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden sticky top-8">
@@ -118,7 +117,7 @@
                     {{-- Quick Stats Grid (Cleaner than a list) --}}
                     <div class="px-6 pb-6">
                         <div class="bg-gray-50 rounded-xl p-4 border border-gray-100">
-                            <div class="grid grid-cols-2 gap-y-4 gap-x-2">
+                            <div class="grid grid-cols-1 gap-y-4 gap-x-2 sm:grid-cols-2">
 
                                 {{-- ID Staff --}}
                                 <div class="col-span-1">
@@ -183,10 +182,10 @@
             <div class="lg:col-span-2">
                 <div x-data="{ tab: 'personal' }"
                     class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden min-h-full">
-                    <div class="border-b border-gray-200 bg-gray-50/50 px-6">
+                    <div class="border-b border-gray-200 bg-gray-50/50 px-6 overflow-x-auto">
 
                         {{-- Tabs --}}
-                        <nav class="-mb-px flex space-x-8">
+                        <nav class="-mb-px flex space-x-8 min-w-max">
                             <button @click="tab='personal'"
                                 :class="tab == 'personal' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'"
                                 class="whitespace-nowrap py-4 px-1 font-medium text-sm">

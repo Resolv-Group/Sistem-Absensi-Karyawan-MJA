@@ -11,15 +11,15 @@
         </div>
         <div>
             <dt class="text-sm font-medium text-gray-500">Nomor Telepon</dt>
-            <dd class="mt-1 text-sm text-gray-900 font-semibold">{{ $mitraKerja->telp_formatted }}</dd>
+            <dd class="mt-1 text-sm text-gray-900 font-semibold break-words">{{ $mitraKerja->telp_formatted }}</dd>
         </div>
         <div>
             <dt class="text-sm font-medium text-gray-500">Bidang Usaha</dt>
-            <dd class="mt-1 text-sm text-gray-900 font-semibold">{{ $mitraKerja->bidangUsaha->nama }}</dd>
+            <dd class="mt-1 text-sm text-gray-900 font-semibold break-words">{{ $mitraKerja->bidangUsaha->nama }}</dd>
         </div>
         <div>
             <dt class="text-sm font-medium text-gray-500">Status Pajak</dt>
-            <dd class="mt-1 text-sm text-gray-900 font-semibold">{{ $mitraKerja->status_pajak }}</dd>
+            <dd class="mt-1 text-sm text-gray-900 font-semibold break-words">{{ $mitraKerja->status_pajak }}</dd>
         </div>
         <div class="sm:col-span-2">
             <dt class="text-sm font-medium text-gray-500">Alamat Lengkap</dt>
