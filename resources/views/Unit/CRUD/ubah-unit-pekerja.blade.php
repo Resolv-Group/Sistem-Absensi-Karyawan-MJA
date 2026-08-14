@@ -470,7 +470,7 @@
                             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 leading-relaxed" x-show="!fileName">Klik atau drag file PDF/Gambar baru ke sini</p>
                             <p class="text-[10px] font-bold text-emerald-500 uppercase tracking-widest mt-1" x-show="fileName">File siap diunggah</p>
                         </div>
-                        <input type="file" class="hidden" :name="`pekerja[${index}][dokumen_pkwt]`" @change="fileName = $event.target.files[0]?.name || ''">
+                        <input type="file" class="hidden" :name="`pekerja[${index}][dokumen_pkwt]`" accept=".pdf,.jpg,.jpeg,.png" @change="fileName = sanitizeFileInput($event.target)">
                     </label>
                 </div>
             </div>
@@ -831,6 +831,25 @@
                     this.open = false;
                 }
             }))
-        })
+        });
+
+        function sanitizeFileInput(input) {
+            if (!input || !input.files || input.files.length === 0) return '';
+            const file = input.files[0];
+            if (!file) return '';
+
+            const cleanName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+            if (cleanName !== file.name) {
+                try {
+                    const cleanFile = new File([file], cleanName, { type: file.type, lastModified: file.lastModified });
+                    const dt = new DataTransfer();
+                    dt.items.add(cleanFile);
+                    input.files = dt.files;
+                } catch (e) {
+                    console.warn('File sanitization error:', e);
+                }
+            }
+            return input.files[0]?.name || '';
+        }
     </script>
 @endsection

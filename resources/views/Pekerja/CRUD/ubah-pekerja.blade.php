@@ -687,6 +687,19 @@
             const file = input.files[0];
             if (!file) return;
 
+            // Sanitize filename (remove '=' and illegal characters)
+            const cleanName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+            if (cleanName !== file.name) {
+                try {
+                    const cleanFile = new File([file], cleanName, { type: file.type, lastModified: file.lastModified });
+                    const dt = new DataTransfer();
+                    dt.items.add(cleanFile);
+                    input.files = dt.files;
+                } catch (e) {
+                    console.warn('File sanitization error:', e);
+                }
+            }
+
             // Validasi ukuran max 2MB
             if (file.size > 2 * 1024 * 1024) {
                 showToast('Ukuran foto maksimal 2MB');

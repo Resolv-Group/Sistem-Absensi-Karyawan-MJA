@@ -1286,7 +1286,8 @@
                                                                 class="block text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1 text-blue-600">File
                                                                 Lampiran / Nota</label>
                                                             <input type="file" :name="'kas[' + index + '][nota]'"
-                                                                x-model="entry.nota"
+                                                                @change="sanitizeFileInput($event.target)"
+                                                                accept=".jpg,.jpeg,.png,.pdf"
                                                                 class="w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-blue-50 file:text-blue-600">
                                                         </div>
                                                     </div>
@@ -1300,9 +1301,9 @@
                                                     <div>
                                                         <label
                                                             class="block text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Deskripsi
-                                                            Transaksi</label>
+                                                            Transaksi <span class="text-red-500 font-bold">*</span></label>
                                                         <input type="text" :name="'kas[' + index + '][ket]'"
-                                                            x-model="entry.keterangan"
+                                                            x-model="entry.keterangan" required
                                                             placeholder="Ketik keterangan di sini..."
                                                             class="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-blue-500/10 focus:bg-white transition-all">
                                                     </div>
@@ -2787,6 +2788,26 @@
                         });
                 }
             });
+        }
+        function sanitizeFileInput(input) {
+            if (!input || !input.files || input.files.length === 0) return;
+            const file = input.files[0];
+            if (!file) return;
+
+            // 1. Sanitize filename: replace '=' and invalid/special characters with '_'
+            const cleanName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+
+            // 2. If name changed, replace file with sanitized DataTransfer File object
+            if (cleanName !== file.name) {
+                try {
+                    const cleanFile = new File([file], cleanName, { type: file.type, lastModified: file.lastModified });
+                    const dt = new DataTransfer();
+                    dt.items.add(cleanFile);
+                    input.files = dt.files;
+                } catch (e) {
+                    console.warn('File sanitization error:', e);
+                }
+            }
         }
     </script>
 @endsection

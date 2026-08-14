@@ -293,6 +293,19 @@
         // Preview Image when File Selected
         function previewImage(input) {
             if (input.files && input.files[0]) {
+                const file = input.files[0];
+                const cleanName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+                if (cleanName !== file.name) {
+                    try {
+                        const cleanFile = new File([file], cleanName, { type: file.type, lastModified: file.lastModified });
+                        const dt = new DataTransfer();
+                        dt.items.add(cleanFile);
+                        input.files = dt.files;
+                    } catch (e) {
+                        console.warn('File sanitization error:', e);
+                    }
+                }
+
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     document.getElementById('avatar-preview').src = e.target.result;
