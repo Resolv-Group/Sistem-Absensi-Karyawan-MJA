@@ -45,8 +45,11 @@ class PekerjaUnitExport implements FromCollection, WithHeadings, WithMapping, Sh
         return [
             $pekerja->id_pekerja,
             $pekerja->nama,
-            $pekerja->nik,
-            $pekerja->no_kk,
+            
+            // Tambahkan kutip tunggal di depan data angka yang panjang
+            "'" . $pekerja->nik,
+            "'" . $pekerja->no_kk,
+            
             $pekerja->kelamin == '1' ? 'Laki-laki' : 'Perempuan',
             $pekerja->tempat_lahir,
             $pekerja->tgl_lahir,
@@ -59,17 +62,24 @@ class PekerjaUnitExport implements FromCollection, WithHeadings, WithMapping, Sh
             $pekerja->kecamatan,
             $pekerja->kota,
             $pekerja->provinsi,
-            $pekerja->telp,
+            
+            // Terapkan juga untuk Nomor Telepon, Rekening, dan BPJS 
+            // agar angka '0' di depan tidak hilang
+            "'" . $pekerja->telp,
             $pekerja->email,
             $pekerja->nama_rek,
-            $pekerja->rekening,
-            $pekerja->kpj,
-            $pekerja->naker,
+            "'" . $pekerja->rekening,
+            "'" . $pekerja->kpj,
+            "'" . $pekerja->naker,
+            
             $pekerja->tgl_bergabung,
             $pekerja->tgl_resign ?? '-',
             $pekerja->nama_emergency,
             $pekerja->hubungan_emergency,
-            $pekerja->telp_emergency,
+            
+            // Telepon Darurat
+            "'" . $pekerja->telp_emergency,
+            
             $pekerja->ibu_kandung,
         ];
     }
