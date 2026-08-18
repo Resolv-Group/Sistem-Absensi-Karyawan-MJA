@@ -90,46 +90,54 @@ class PekerjaImport implements ToModel, WithHeadingRow
         // =========================================================================
         // 1. BUAT/UPDATE DATA PEKERJA (Simpan ke Variabel $pekerja)
         // =========================================================================
+        // =========================================================================
+        // 1. BUAT/UPDATE DATA PEKERJA (Simpan ke Variabel $pekerja)
+        // =========================================================================
         $pekerja = Pekerja::updateOrCreate(
-            ['nik' => $nikBersih], // Kunci Pencarian Utama menggunakan NIK Bersih
+            ['nik' => $nikBersih], // Kunci Pencarian Utama
             [
-                'id_pekerja'         => $idPekerja, // Memasukkan hasil logika ID Pekerja
-                'nama'               => $row['nama_lengkap'] ?? null,
-                'kpj'                => $row['bpjs_ketenagakerjaan'] ?? null, 
-                'naker'              => $row['bpjs_kesehatan'] ?? null,       
-                'no_kk'              => $row['nomor_kk'] ?? null,
-                'tempat_lahir'       => $row['tempat_lahir'] ?? null,
-                'tgl_lahir'          => $tanggalLahir,
-                'kelamin'            => $row['jenis_kelamin'] ?? null,
-                'pendidikan'         => $row['pendidikan'] ?? null,
-                'status_kawin'       => $row['status_perkawinan'] ?? null,
-                'anak'               => $row['jumlah_anak'] ?? 0,
-                'tgl_bergabung'      => $tanggalBergabung,
-                'tgl_resign'         => $tanggalResign,
+                'id_pekerja'         => $idPekerja, 
                 
-                // Perbaikan minor: Sesuai komentarmu, jika tgl_resign kosong = 1, jika ada isinya = 0
+                // LOGIKA AMAN: Jika di Excel kosong, pertahankan data lama (jika ada)
+                'nama'               => !empty($row['nama_lengkap']) ? $row['nama_lengkap'] : ($pekerjaExisting->nama ?? null),
+                'kpj'                => !empty($row['bpjs_ketenagakerjaan']) ? $row['bpjs_ketenagakerjaan'] : ($pekerjaExisting->kpj ?? null), 
+                'naker'              => !empty($row['bpjs_kesehatan']) ? $row['bpjs_kesehatan'] : ($pekerjaExisting->naker ?? null),       
+                'no_kk'              => !empty($row['nomor_kk']) ? $row['nomor_kk'] : ($pekerjaExisting->no_kk ?? null),
+                'tempat_lahir'       => !empty($row['tempat_lahir']) ? $row['tempat_lahir'] : ($pekerjaExisting->tempat_lahir ?? null),
+                
+                // Ini yang membuat error tadi! Sekarang dijamin aman
+                'tgl_lahir'          => $tanggalLahir ?: ($pekerjaExisting->tgl_lahir ?? null),
+                
+                'kelamin'            => !empty($row['jenis_kelamin']) ? $row['jenis_kelamin'] : ($pekerjaExisting->kelamin ?? null),
+                'pendidikan'         => !empty($row['pendidikan']) ? $row['pendidikan'] : ($pekerjaExisting->pendidikan ?? null),
+                'status_kawin'       => !empty($row['status_perkawinan']) ? $row['status_perkawinan'] : ($pekerjaExisting->status_kawin ?? null),
+                'anak'               => $row['jumlah_anak'] ?? ($pekerjaExisting->anak ?? 0),
+                
+                'tgl_bergabung'      => $tanggalBergabung ?: ($pekerjaExisting->tgl_bergabung ?? null),
+                'tgl_resign'         => $tanggalResign ?: ($pekerjaExisting->tgl_resign ?? null),
+                
                 'status_aktif'       => empty($tanggalResign) ? 1 : 0,
 
                 // Data Alamat
-                'alamat'             => $row['jalannama_gedung'] ?? null, 
-                'desa'               => $row['kelurahandesa'] ?? null,
-                'rt'                 => $row['rt'] ?? null,
-                'rw'                 => $row['rw'] ?? null,
-                'kota'               => $row['kotakabupaten'] ?? null,
-                'kecamatan'          => $row['kecamatan'] ?? null,
-                'provinsi'           => $row['provinsi'] ?? null,
+                'alamat'             => !empty($row['jalannama_gedung']) ? $row['jalannama_gedung'] : ($pekerjaExisting->alamat ?? null), 
+                'desa'               => !empty($row['kelurahandesa']) ? $row['kelurahandesa'] : ($pekerjaExisting->desa ?? null),
+                'rt'                 => !empty($row['rt']) ? $row['rt'] : ($pekerjaExisting->rt ?? null),
+                'rw'                 => !empty($row['rw']) ? $row['rw'] : ($pekerjaExisting->rw ?? null),
+                'kota'               => !empty($row['kotakabupaten']) ? $row['kotakabupaten'] : ($pekerjaExisting->kota ?? null),
+                'kecamatan'          => !empty($row['kecamatan']) ? $row['kecamatan'] : ($pekerjaExisting->kecamatan ?? null),
+                'provinsi'           => !empty($row['provinsi']) ? $row['provinsi'] : ($pekerjaExisting->provinsi ?? null),
                 
                 // Kontak & Rekening
-                'email'              => $row['email_pribadi'] ?? null,
-                'telp'               => $row['nomor_telepon_pribadi'] ?? null,
-                'nama_rek'           => $row['nama_bank'] ?? null, 
-                'rekening'           => $row['no_rekening'] ?? null,
+                'email'              => !empty($row['email_pribadi']) ? $row['email_pribadi'] : ($pekerjaExisting->email ?? null),
+                'telp'               => !empty($row['nomor_telepon_pribadi']) ? $row['nomor_telepon_pribadi'] : ($pekerjaExisting->telp ?? null),
+                'nama_rek'           => !empty($row['nama_bank']) ? $row['nama_bank'] : ($pekerjaExisting->nama_rek ?? null), 
+                'rekening'           => !empty($row['no_rekening']) ? $row['no_rekening'] : ($pekerjaExisting->rekening ?? null),
                 
                 // Kontak Darurat
-                'nama_emergency'     => $row['nama_kontak_emergency'] ?? null,
-                'telp_emergency'     => $row['nomor_telepon_darurat'] ?? null,
-                'hubungan_emergency' => $row['hubungan'] ?? null,
-                'ibu_kandung'        => $row['ibu_kandung'] ?? null,
+                'nama_emergency'     => !empty($row['nama_kontak_emergency']) ? $row['nama_kontak_emergency'] : ($pekerjaExisting->nama_emergency ?? null),
+                'telp_emergency'     => !empty($row['nomor_telepon_darurat']) ? $row['nomor_telepon_darurat'] : ($pekerjaExisting->telp_emergency ?? null),
+                'hubungan_emergency' => !empty($row['hubungan']) ? $row['hubungan'] : ($pekerjaExisting->hubungan_emergency ?? null),
+                'ibu_kandung'        => !empty($row['ibu_kandung']) ? $row['ibu_kandung'] : ($pekerjaExisting->ibu_kandung ?? null),
             ]
         );
 
