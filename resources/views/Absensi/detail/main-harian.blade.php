@@ -1871,7 +1871,7 @@
 
                 <div id="new-pagination-provider" class="rounded-3xl">
                     @if ($pkwtPekerja->hasPages())
-                        {{ $pkwtPekerja->links('vendor.pagination.custom') }}
+                        {{ $pkwtPekerja->links('vendor.Pagination.custom') }}
                     @endif
                 </div>
             </div>
