@@ -540,13 +540,11 @@ class StaffController extends Controller
             }
 
             // ✅ Cari user berdasarkan staff_id (LEBIH AMAN)
-            $user = User::where('email', $staff->email)->first();
+            // $user = User::where('email', $staff->email)->first();
 
-            // dd($user);
-
-            if (!$user) {
-                return back()->with('error', 'User login staff tidak ditemukan.');
-            }
+            // if (!$user) {
+            //     return back()->with('error', 'User login staff tidak ditemukan.');
+            // }
 
             // ✅ Update akun user dengan fuzzy matching jabatan
             $rawJabatan = trim($request->jabatan ?? '');
@@ -581,19 +579,35 @@ class StaffController extends Controller
                 $userStatusAkun = 0;
             }
 
-            $user->update([
-                'name'        => $request->nama,
-                'email'       => $request->email,
-                'role'        => $role,
-                'status_akun' => $userStatusAkun,
-            ]);
+            // ==========================================================
+            // ✅ PERBAIKAN LOGIKA USER (Menggunakan firstOrNew)
+            // ==========================================================
+            
+            // 1. Cari user berdasarkan email lama staff. 
+            // Jika tidak ada, Laravel akan membuatkan objek user baru (belum tersimpan ke DB).
+            $user = User::firstOrNew(['email' => $staff->email]);
 
-            // ✅ Jika password diisi
+            // 2. Isi/Update kolom datanya
+            $user->name        = $request->nama;
+            $user->email       = $request->email; // Akan terupdate jika email di form diganti
+            $user->role        = $role;
+            $user->status_akun = $userStatusAkun;
+            $user->staff_id    = $staff->id; // ✅ staff_id langsung dimasukkan di sini
+
+            // 3. ✅ LOGIKA PASSWORD
             if ($request->filled('password')) {
-                $user->update([
-                    'password' => Hash::make($request->password),
-                ]);
+                // Jika form password diisi (untuk user baru maupun lama), gunakan password tersebut
+                $user->password = Hash::make($request->password);
+                
+            } elseif (!$user->exists) {
+                // Jika user ini BARU dibuat (belum ada di DB) dan form password kosong, set default tgl_lahir
+                $passwordDefault = \Carbon\Carbon::parse($request->tgl_lahir)->format('d-m-Y');
+                $user->password  = Hash::make($passwordDefault);
             }
+            // (Catatan: Jika user sudah ada di DB dan form password kosong, password lamanya akan aman/tidak disentuh)
+
+            // 4. Simpan seluruh data ke database secara bersamaan
+            $user->save();
 
             // ✅ UPDATE DATA
             $staff->update($data);
