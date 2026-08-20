@@ -747,7 +747,7 @@
                                     <div class="space-y-2">
                                         <label
                                             class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Iuran
-                                            BPJS Kesehatan<span class="text-red-500 font-semibold">*</span>
+                                            BPJS Ketenagakerjaan<span class="text-red-500 font-semibold">*</span>
                                             <span x-show="row.kpj"
                                                 class="ml-2 px-1.5 py-0.5 bg-emerald-50 text-emerald-600 text-[8px] rounded uppercase font-black">Editable</span>
                                         </label>
@@ -771,7 +771,7 @@
                                     <div class="space-y-2">
                                         <label
                                             class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Iuran
-                                            BPJS Ketenagakerjaan<span class="text-red-500 font-semibold">*</span>
+                                            BPJS Kesehatan<span class="text-red-500 font-semibold">*</span>
                                             <span x-show="row.naker"
                                                 class="ml-2 px-1.5 py-0.5 bg-emerald-50 text-emerald-600 text-[8px] rounded uppercase font-black">Editable</span>
                                         </label>
