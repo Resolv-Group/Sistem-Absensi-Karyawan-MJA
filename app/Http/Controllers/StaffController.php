@@ -540,13 +540,11 @@ class StaffController extends Controller
             }
 
             // ✅ Cari user berdasarkan staff_id (LEBIH AMAN)
-            $user = User::where('email', $staff->email)->first();
+            // $user = User::where('email', $staff->email)->first();
 
-            // dd($user);
-
-            if (!$user) {
-                return back()->with('error', 'User login staff tidak ditemukan.');
-            }
+            // if (!$user) {
+            //     return back()->with('error', 'User login staff tidak ditemukan.');
+            // }
 
             // ✅ Update akun user dengan fuzzy matching jabatan
             $rawJabatan = trim($request->jabatan ?? '');
@@ -603,9 +601,11 @@ class StaffController extends Controller
                     'password' => Hash::make($request->password),
                 ]);
             } elseif ($user->wasRecentlyCreated) {
-                // Berikan password default (misal 12345678 atau menggunakan NIK) jika staff baru dibuatkan akun
+                // Ubah format tgl_lahir (misal dari 2003-02-22) menjadi 22-02-2003
+                $passwordDefault = \Carbon\Carbon::parse($request->tgl_lahir)->format('d-m-Y');
+                
                 $user->update([
-                    'password' => Hash::make('12345678'), // Ganti sesuai kebijakan perusahaan Anda
+                    'password' => Hash::make($passwordDefault),
                 ]);
             }
 
