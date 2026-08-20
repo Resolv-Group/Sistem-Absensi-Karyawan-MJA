@@ -579,35 +579,35 @@ class StaffController extends Controller
                 $userStatusAkun = 0;
             }
 
-            $user = User::updateOrCreate(
-                // 1. KUNCI PENCARIAN (Cari user berdasarkan email lama staff)
-                ['email' => $staff->email], 
-                
-                // 2. DATA YANG MAU DIBUAT / DIUPDATE
-                [
-                    'name'        => $request->nama,
-                    'email'       => $request->email, // Akan terupdate jika email di form diganti
-                    'role'        => $role,
-                    'status_akun' => $userStatusAkun,
-                ]
-            );
+            // ==========================================================
+            // ✅ PERBAIKAN LOGIKA USER (Menggunakan firstOrNew)
+            // ==========================================================
+            
+            // 1. Cari user berdasarkan email lama staff. 
+            // Jika tidak ada, Laravel akan membuatkan objek user baru (belum tersimpan ke DB).
+            $user = User::firstOrNew(['email' => $staff->email]);
 
-            // ✅ UPDATE PASSWORD
-            // Cek apakah kolom password di form diisi. 
-            // Jika diisi, gunakan password baru dari form.
-            // Jika form kosong TAPI ini user baru dibuat, set default password (misal NIK).
+            // 2. Isi/Update kolom datanya
+            $user->name        = $request->nama;
+            $user->email       = $request->email; // Akan terupdate jika email di form diganti
+            $user->role        = $role;
+            $user->status_akun = $userStatusAkun;
+            $user->staff_id    = $staff->id; // ✅ staff_id langsung dimasukkan di sini
+
+            // 3. ✅ LOGIKA PASSWORD
             if ($request->filled('password')) {
-                $user->update([
-                    'password' => Hash::make($request->password),
-                ]);
-            } elseif ($user->wasRecentlyCreated) {
-                // Ubah format tgl_lahir (misal dari 2003-02-22) menjadi 22-02-2003
-                $passwordDefault = \Carbon\Carbon::parse($request->tgl_lahir)->format('d-m-Y');
+                // Jika form password diisi (untuk user baru maupun lama), gunakan password tersebut
+                $user->password = Hash::make($request->password);
                 
-                $user->update([
-                    'password' => Hash::make($passwordDefault),
-                ]);
+            } elseif (!$user->exists) {
+                // Jika user ini BARU dibuat (belum ada di DB) dan form password kosong, set default tgl_lahir
+                $passwordDefault = \Carbon\Carbon::parse($request->tgl_lahir)->format('d-m-Y');
+                $user->password  = Hash::make($passwordDefault);
             }
+            // (Catatan: Jika user sudah ada di DB dan form password kosong, password lamanya akan aman/tidak disentuh)
+
+            // 4. Simpan seluruh data ke database secara bersamaan
+            $user->save();
 
             // ✅ UPDATE DATA
             $staff->update($data);
