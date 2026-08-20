@@ -581,7 +581,7 @@ class StaffController extends Controller
                 $userStatusAkun = 0;
             }
 
-            $user->update([
+            $user->updateorcreate([
                 'name'        => $request->nama,
                 'email'       => $request->email,
                 'role'        => $role,
