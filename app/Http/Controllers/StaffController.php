@@ -581,17 +581,31 @@ class StaffController extends Controller
                 $userStatusAkun = 0;
             }
 
-            $user->updateorcreate([
-                'name'        => $request->nama,
-                'email'       => $request->email,
-                'role'        => $role,
-                'status_akun' => $userStatusAkun,
-            ]);
+            $user = User::updateOrCreate(
+                // 1. KUNCI PENCARIAN (Cari user berdasarkan email lama staff)
+                ['email' => $staff->email], 
+                
+                // 2. DATA YANG MAU DIBUAT / DIUPDATE
+                [
+                    'name'        => $request->nama,
+                    'email'       => $request->email, // Akan terupdate jika email di form diganti
+                    'role'        => $role,
+                    'status_akun' => $userStatusAkun,
+                ]
+            );
 
-            // ✅ Jika password diisi
+            // ✅ UPDATE PASSWORD
+            // Cek apakah kolom password di form diisi. 
+            // Jika diisi, gunakan password baru dari form.
+            // Jika form kosong TAPI ini user baru dibuat, set default password (misal NIK).
             if ($request->filled('password')) {
                 $user->update([
                     'password' => Hash::make($request->password),
+                ]);
+            } elseif ($user->wasRecentlyCreated) {
+                // Berikan password default (misal 12345678 atau menggunakan NIK) jika staff baru dibuatkan akun
+                $user->update([
+                    'password' => Hash::make('12345678'), // Ganti sesuai kebijakan perusahaan Anda
                 ]);
             }
 
