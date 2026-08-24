@@ -967,8 +967,8 @@ toggleWithGroup(id) {
 
                                 <form
                                     action="{{ route('absensi.borongan.bulk.update', ['id_unit' => $unit->id, 'date' => $date]) }}"
-                                    method="POST" enctype="multipart/form-data" x-ref="absenForm"
-                                    x-data="absenFormHandler()"
+                                    method="POST" enctype="multipart/form-data" x-ref="absenProduksiForm"
+                                    x-data="absenProduksiFormHandler()"
                                     class="relative bg-white rounded-3xl sm:rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.1)] w-full max-w-6xl overflow-hidden flex flex-col max-h-[92vh] sm:max-h-[90vh] border border-gray-100">
                                     @csrf
                                     @method('PUT')
@@ -2069,7 +2069,7 @@ toggleWithGroup(id) {
                                     {{-- Scrollable Table Area --}}
                                     <form
                                         action="{{ route('absensi.borongan.bulk.update', ['id_unit' => $unit->id, 'date' => $date]) }}"
-                                        method="POST" x-ref="absenForm" x-data="absenFormHandler()"
+                                        method="POST" x-ref="absenStatusForm" x-data="absenStatusFormHandler()"
                                         class="flex-1 overflow-y-auto custom-scrollbar bg-white p-4 sm:p-10 pt-4 sm:pt-6 flex flex-col">
                                         @csrf
                                         @method('PUT')
@@ -2830,25 +2830,12 @@ toggleWithGroup(id) {
             }
         });
 
-        function absenFormHandler() {
+        function absenProduksiFormHandler() {
             return {
                 confirmSubmit() {
-
-                    const hasStatusHadir = this.selectedItems.some(id => this.rowStatus[id] == 1);
-
-                    if (hasStatusHadir) {
-                        Swal.fire({
-                            title: 'Gagal!',
-                            text: 'Terdapat pekerja dengan status "Hadir". Silakan pilih tipe absensi terlebih dahulu.',
-                            icon: 'error',
-                            confirmButtonColor: '#EF4444',
-                        });
-                        return; // Berhenti di sini, jangan submit
-                    }
-
                     Swal.fire({
-                        title: 'Simpan Data Absensi?',
-                        text: 'Pastikan semua data sudah benar sebelum disimpan.',
+                        title: 'Simpan Data Produksi?',
+                        text: 'Pastikan semua data hasil produksi sudah benar sebelum disimpan.',
                         icon: 'question',
                         showCancelButton: true,
                         confirmButtonColor: '#EA580C',
@@ -2865,11 +2852,54 @@ toggleWithGroup(id) {
                                 didOpen: () => {
                                     Swal.showLoading()
                                 }
-                            })
+                            });
 
-                            this.$refs.absenForm.submit()
+                            this.$refs.absenProduksiForm.submit();
                         }
-                    })
+                    });
+                }
+            }
+        }
+
+        function absenStatusFormHandler() {
+            return {
+                confirmSubmit() {
+                    const hasStatusHadir = this.selectedItems.some(id => this.rowStatus[id] == 1);
+
+                    if (hasStatusHadir) {
+                        Swal.fire({
+                            title: 'Gagal!',
+                            text: 'Terdapat pekerja dengan status "Hadir". Silakan pilih tipe status absensi terlebih dahulu.',
+                            icon: 'error',
+                            confirmButtonColor: '#EF4444',
+                        });
+                        return; // Berhenti di sini, jangan submit
+                    }
+
+                    Swal.fire({
+                        title: 'Simpan Data Status Absensi?',
+                        text: 'Pastikan status ketidakhadiran sudah benar sebelum disimpan.',
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#EA580C',
+                        cancelButtonColor: '#6b7280',
+                        confirmButtonText: 'Ya, Simpan',
+                        cancelButtonText: 'Batal',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            Swal.fire({
+                                title: 'Menyimpan...',
+                                text: 'Mohon tunggu',
+                                allowOutsideClick: false,
+                                allowEscapeKey: false,
+                                didOpen: () => {
+                                    Swal.showLoading()
+                                }
+                            });
+
+                            this.$refs.absenStatusForm.submit();
+                        }
+                    });
                 }
             }
         }

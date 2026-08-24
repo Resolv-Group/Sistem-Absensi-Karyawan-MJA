@@ -467,60 +467,30 @@ class AbsensiController extends Controller
                     'tgl_absensi' => $date,
                 ])->first();
 
-                // 2. Jika Absensi belum ada, kita buat Parent-nya
+                // 2. Dapatkan atau Buat Parent Absensi
                 if (! $absensi) {
-                    // 1. Dapatkan atau Buat Parent Absensi
                     $absensi = Absensi::firstOrCreate(
                         ['id_pekerja' => $pkwt->id_pekerja, 'id_unit' => $pkwt->id_unit, 'tgl_absensi' => $date],
                         ['id_pic' => Auth::user()->staff->id ?? Auth::id(), 'tipe' => $pkwt->unit->sistem_pengajian, 'verifikasi' => 0]
                     );
                 }
 
-                $detil = $absensi->detilHarian;
-                $statusTerlarang = [5, 6]; // 5: Rencana Cuti, 6: Absen
-                $statusDilindungi = [2, 3, 4]; // 2: Izin, 3: Cuti, 4: Sakit
-
-                // 2. Siapkan data jam yang akan disimpan
+                // 3. Siapkan data jam yang akan disimpan (Status otomatis menjadi Hadir / 1)
                 $dataToSave = [
                     'jam_kerja_normal' => $values['jam_normal'] ?? 0,
                     'jam_kerja_harian' => $values['jam_aktual'] ?? 0,
                     'overtime' => $values['overtime'] ?? 0,
                     'hbn' => $values['is_hbn'] ?? 0,
+                    'status_kehadiran' => 1, // Pastikan status menjadi Hadir
+                    'isPaid' => 0,            // Reset status cuti berbayar
                     'catatan' => $values['catatan'] ?? null,
                     'updated_by' => Auth::id(),
                 ];
 
-                /**
-                 * LOGIKA BARU:
-                 */
-                // KONDISI 1: JIKA STATUS TERLARANG (5 atau 6)
-                if ($detil && in_array($detil->status_kehadiran, $statusTerlarang)) {
-                    $statusLabel = $detil->status_kehadiran == 5 ? 'Rencana Cuti' : 'Absen';
-
-                    return back()->with('error', "Gagal! Pekerja [{$pkwt->pekerja->nama}] berstatus {$statusLabel}. Ubah status kehadiran secara manual terlebih dahulu sebelum mengisi jam.")->withInput();
-                }
-
-                // KONDISI 2: JIKA STATUS IZIN/CUTI/SAKIT (2, 3, 4)
-                if ($detil && in_array($detil->status_kehadiran, $statusDilindungi)) {
-
-                    if ($detil->isPaid == 1) {
-                        // Izin Dibayar: Hanya update jam, status asli tetap (Izin/Cuti/Sakit)
-                        $detil->update($dataToSave);
-                    } else {
-                        // Izin Tidak Dibayar: Karena ada input jam, ubah jadi HADIR (1)
-                        $dataToSave['status_kehadiran'] = 1;
-                        $detil->update($dataToSave);
-                    }
-
-                } else {
-                    // KONDISI 3: INPUT NORMAL (Data Baru, Status 0, atau Status 1)
-                    $dataToSave['status_kehadiran'] = 1; // Pastikan jadi Hadir
-
-                    $absensi->detilHarian()->updateOrCreate(
-                        ['id_absensi' => $absensi->id],
-                        $dataToSave
-                    );
-                }
+                $absensi->detilHarian()->updateOrCreate(
+                    ['id_absensi' => $absensi->id],
+                    $dataToSave
+                );
 
                 // Reset verifikasi
                 $absensi->update(['verifikasi' => 0]);
