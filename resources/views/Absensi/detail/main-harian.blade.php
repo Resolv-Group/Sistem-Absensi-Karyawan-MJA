@@ -148,8 +148,15 @@
             this.selectedItems.forEach(id => {
                 const worker = this.workerMap[id];
                 if (worker) {
-                    // Jika ada data jam di DB, tampilkan. Jika null, kosongkan.
-                    this.rowJam[id] = worker.existing_jam !== null ? worker.existing_jam : '';
+                    // Jika pekerja berstatus Hadir (1) dan ada existing_jam, tampilkan.
+                    // Jika sebelumnya berstatus selain Hadir (misal Absen) atau belum absen, kosongkan agar dapat diisi.
+                    if (worker.existing_status === 1 && worker.existing_jam !== null) {
+                        this.rowJam[id] = worker.existing_jam;
+                    } else if (worker.existing_jam !== null && worker.existing_jam > 0) {
+                        this.rowJam[id] = worker.existing_jam;
+                    } else {
+                        this.rowJam[id] = '';
+                    }
 
                     // PAKSA KE BOOLEAN: Jika existing_hbn == 1 maka TRUE (Centang)
                     this.rowHBN[id] = worker.existing_hbn == 1;
@@ -907,7 +914,7 @@
                                     {{-- Scrollable List Area --}}
                                     <form
                                         action="{{ route('absensi.bulk.update', ['id_unit' => $unit->id, 'date' => $date]) }}"
-                                        method="POST" x-ref="absenForm" x-data="absenFormHandler()"
+                                        method="POST" x-ref="absenJamForm" x-data="absenJamFormHandler()"
                                         class="flex-1 overflow-y-auto custom-scrollbar bg-white">
                                         @csrf
                                         @method('PUT')
@@ -1075,7 +1082,7 @@
                                     {{-- Scrollable Table Area --}}
                                     <form
                                         action="{{ route('absensi.bulk.update-status', ['id_unit' => $unit->id, 'date' => $date]) }}"
-                                        method="POST" x-ref="absenForm" x-data="absenFormHandler()"
+                                        method="POST" x-ref="absenStatusForm" x-data="absenStatusFormHandler()"
                                         class="flex-1 overflow-y-auto custom-scrollbar bg-white p-4 sm:p-8 sm:pt-6">
                                         @csrf
                                         @method('PUT')
@@ -1903,25 +1910,12 @@
             }
         });
 
-        function absenFormHandler() {
+        function absenJamFormHandler() {
             return {
                 confirmSubmit() {
-
-                    const hasStatusHadir = this.selectedItems.some(id => this.rowStatus[id] == 1);
-
-                    if (hasStatusHadir) {
-                        Swal.fire({
-                            title: 'Gagal!',
-                            text: 'Terdapat pekerja dengan status "Hadir". Silakan pilih tipe absensi terlebih dahulu.',
-                            icon: 'error',
-                            confirmButtonColor: '#EF4444',
-                        });
-                        return; // Berhenti di sini, jangan submit
-                    }
-
                     Swal.fire({
-                        title: 'Simpan Data Absensi?',
-                        text: 'Pastikan semua data sudah benar sebelum disimpan.',
+                        title: 'Simpan Data Jam Kerja?',
+                        text: 'Pastikan semua data jam kerja sudah benar sebelum disimpan.',
                         icon: 'question',
                         showCancelButton: true,
                         confirmButtonColor: '#2563EB',
@@ -1938,11 +1932,54 @@
                                 didOpen: () => {
                                     Swal.showLoading()
                                 }
-                            })
+                            });
 
-                            this.$refs.absenForm.submit()
+                            this.$refs.absenJamForm.submit();
                         }
-                    })
+                    });
+                }
+            }
+        }
+
+        function absenStatusFormHandler() {
+            return {
+                confirmSubmit() {
+                    const hasStatusHadir = this.selectedItems.some(id => this.rowStatus[id] == 1);
+
+                    if (hasStatusHadir) {
+                        Swal.fire({
+                            title: 'Gagal!',
+                            text: 'Terdapat pekerja dengan status "Hadir". Silakan pilih tipe status absensi terlebih dahulu.',
+                            icon: 'error',
+                            confirmButtonColor: '#EF4444',
+                        });
+                        return; // Berhenti di sini, jangan submit
+                    }
+
+                    Swal.fire({
+                        title: 'Simpan Data Status Absensi?',
+                        text: 'Pastikan status ketidakhadiran sudah benar sebelum disimpan.',
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#2563EB',
+                        cancelButtonColor: '#6b7280',
+                        confirmButtonText: 'Ya, Simpan',
+                        cancelButtonText: 'Batal',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            Swal.fire({
+                                title: 'Menyimpan...',
+                                text: 'Mohon tunggu',
+                                allowOutsideClick: false,
+                                allowEscapeKey: false,
+                                didOpen: () => {
+                                    Swal.showLoading()
+                                }
+                            });
+
+                            this.$refs.absenStatusForm.submit();
+                        }
+                    });
                 }
             }
         }
