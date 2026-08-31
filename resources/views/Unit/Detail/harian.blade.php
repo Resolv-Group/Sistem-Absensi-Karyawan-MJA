@@ -68,7 +68,7 @@ $watch('filterStatus', () => updateTable());" class="relative">
     <div
         class="px-6 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gray-50/30">
         <div class="flex items-center gap-2">
-            <p class="text-sm text-gray-500">Menampilkan daftar pekerja harian/kontrak <span class="text-blue-500 font-medium">5 terbaru. </span></p>
+            <p class="text-sm text-gray-500">Menampilkan pekerja kontrak <span class="text-blue-500 font-medium">5 terbaru. </span></p>
         </div>
 
         <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6 relative">
