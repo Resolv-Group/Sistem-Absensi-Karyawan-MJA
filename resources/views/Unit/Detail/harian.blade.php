@@ -308,21 +308,16 @@ $watch('filterStatus', () => updateTable());" class="relative">
                 </div>
             </div>
 
-            <!-- Wrapper Dropdown (x-data Alpine.js) -->
-            <div x-data="{ open: false }" class="relative inline-block text-left w-full lg:w-auto">
+            <!-- Wrapper Dropdown & Modal (Tambahkan variabel state di x-data) -->
+            <div x-data="{ open: false, showPkwtModal: false, durasi: '3' }" class="relative inline-block text-left w-full lg:w-auto">
                 
-                <!-- Tombol Utama -->
+                <!-- Tombol Utama Dropdown -->
                 <button @click="open = !open" type="button" 
                     class="w-full justify-center lg:w-auto px-4 py-2 bg-emerald-600 text-white text-xs font-bold rounded-lg hover:bg-emerald-700 transition flex items-center gap-2 shadow-sm">
-                    
-                    <!-- Ikon Download -->
                     <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                     </svg>
-                    
                     Export Data
-                    
-                    <!-- Ikon Panah Bawah (berputar saat terbuka) -->
                     <svg class="w-3.5 h-3.5 ml-1 transition-transform duration-200" :class="{'rotate-180': open}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                     </svg>
@@ -337,14 +332,16 @@ $watch('filterStatus', () => updateTable());" class="relative">
                     x-transition:leave="transition ease-in duration-75"
                     x-transition:leave-start="transform opacity-100 scale-100"
                     x-transition:leave-end="transform opacity-0 scale-95"
-                    class="absolute right-0 z-50 mt-2 w-40 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                    class="absolute right-0 z-40 mt-2 w-40 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
                     style="display: none;">
                     
                     <div class="py-1">
-                        <a href="{{ route('unit.export_pekerja', $unit->id) }}" target="_blank" 
-                        class="block px-4 py-2 text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 font-medium transition-colors">
+                        <!-- Tombol PKWT (Berubah menjadi trigger modal) -->
+                        <button type="button" 
+                        @click="showPkwtModal = true; open = false"
+                        class="w-full text-left block px-4 py-2 text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 font-medium transition-colors">
                             PKWT
-                        </a>
+                        </button>
                         
                         <a href="{{ route('unit.export_pekerja', $unit->id) }}" target="_blank" 
                         class="block px-4 py-2 text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 font-medium transition-colors">
@@ -355,6 +352,66 @@ $watch('filterStatus', () => updateTable());" class="relative">
                         class="block px-4 py-2 text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 font-medium transition-colors">
                             Excel
                         </a>
+                    </div>
+                </div>
+
+                <!-- ========================================== -->
+                <!-- DIALOG / MODAL PKWT -->
+                <!-- ========================================== -->
+                <div x-show="showPkwtModal" 
+                    class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-900/50 backdrop-blur-sm"
+                    style="display: none;">
+                    
+                    <!-- Modal Box -->
+                    <div @click.away="showPkwtModal = false"
+                        x-transition:enter="transition ease-out duration-300"
+                        x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                        x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                        x-transition:leave="transition ease-in duration-200"
+                        x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                        x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                        class="relative bg-white rounded-xl shadow-2xl w-full max-w-sm p-6 mx-4">
+                        
+                        <h3 class="text-lg font-bold text-slate-800 mb-4 border-b pb-2">Opsi Export PKWT</h3>
+                        
+                        <!-- Gunakan form GET agar parameter durasi terkirim ke URL -->
+                        <form action="{{ route('unit.export_pekerja', $unit->id) }}" method="GET" target="_blank" @submit="showPkwtModal = false">
+                            
+                            <p class="text-sm text-slate-600 mb-3">Pilih durasi perpanjangan kontrak:</p>
+                            
+                            <!-- Radio Buttons -->
+                            <div class="space-y-3 mb-6">
+                                <label class="flex items-center gap-3 cursor-pointer p-2 rounded hover:bg-slate-50 transition">
+                                    <input type="radio" name="durasi" value="3" x-model="durasi" 
+                                        class="w-4 h-4 text-emerald-600 border-gray-300 focus:ring-emerald-500">
+                                    <span class="text-sm font-medium text-slate-700">3 Bulan</span>
+                                </label>
+
+                                <label class="flex items-center gap-3 cursor-pointer p-2 rounded hover:bg-slate-50 transition">
+                                    <input type="radio" name="durasi" value="6" x-model="durasi" 
+                                        class="w-4 h-4 text-emerald-600 border-gray-300 focus:ring-emerald-500">
+                                    <span class="text-sm font-medium text-slate-700">6 Bulan</span>
+                                </label>
+
+                                <label class="flex items-center gap-3 cursor-pointer p-2 rounded hover:bg-slate-50 transition">
+                                    <input type="radio" name="durasi" value="12" x-model="durasi" 
+                                        class="w-4 h-4 text-emerald-600 border-gray-300 focus:ring-emerald-500">
+                                    <span class="text-sm font-medium text-slate-700">12 Bulan</span>
+                                </label>
+                            </div>
+
+                            <!-- Tombol Aksi -->
+                            <div class="flex justify-end gap-3 mt-4">
+                                <button type="button" @click="showPkwtModal = false" 
+                                        class="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition">
+                                    Batal
+                                </button>
+                                <button type="submit" 
+                                        class="px-4 py-2 text-sm font-bold text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 transition shadow-sm">
+                                    Konfirmasi
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
