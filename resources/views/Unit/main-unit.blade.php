@@ -459,7 +459,7 @@
                         
                         <h3 class="text-lg font-bold text-slate-800 mb-4 border-b pb-2">Opsi Laporan Perputaran Pekerja</h3>
                         
-                        <form action="{{ route('unit.perputaran_pekerja') }}" method="GET" target="_blank" @submit="showPerputaranModal = false">    
+                        <form action="{{ route('') }}" method="GET" target="_blank" @submit="showPerputaranModal = false">    
                             <div class="mb-5">
                                 <label class="block text-sm font-medium text-slate-700 mb-1.5">Pilih Bulan & Tahun:</label>
                                 <input type="month" name="bulan_tahun" x-model="bulanTahun" required
