@@ -55,9 +55,9 @@
         <tr>
             <td style="border: 1px solid black; text-align: center;">{{ $index + 1 }}</td>
             <td style="border: 1px solid black;">{{ $pkwt->pekerja->nama ?? '-' }}</td>
-            <td style="border: 1px solid black;">{{ $pkwt->divisi->nama_divisi ?? '-' }}</td>
-            <td style="border: 1px solid black;">{{ $pkwt->jabatan->nama_jabatan ?? '-' }}</td>
-            
+            <td style="border: 1px solid black;">{{ $pkwt->divisi->nama ?? '-' }}</td>   <!-- Ubah dari nama_divisi ke nama -->
+            <td style="border: 1px solid black;">{{ $pkwt->jabatan->nama ?? '-' }}</td>  <!-- Ubah dari nama_jabatan ke nama -->
+                        
             <!-- LOOPING KOLOM BULAN -->
             @foreach($targetMonths as $idx => $month)
                 @if($formatYm === $month['format'])
