@@ -14,13 +14,11 @@ class PerputaranPekerjaExport implements FromView, ShouldAutoSize
 {
     protected $unitId;
     protected $bulanTahun;
-    protected $durasi;
 
-    public function __construct($unitId, $bulanTahun, $durasi)
+    public function __construct($unitId, $bulanTahun)
     {
         $this->unitId = $unitId;
         $this->bulanTahun = $bulanTahun;
-        $this->durasi = $durasi;
     }
 
     public function view(): View
@@ -39,24 +37,22 @@ class PerputaranPekerjaExport implements FromView, ShouldAutoSize
         $rekapData = [];
 
         foreach ($divisis as $divisi) {
-            $awal = PKWT::where('id_unit', $this->unitId)
+        $awal = PKWT::where('id_unit', $this->unitId)
                 ->where('divisi_id', $divisi->id)
-                ->where('status_aktif', '!=', 'pending')
-                ->where('tgl_mulai_pkwt', '<', $startPeriode)
-                ->where(function($q) use ($startPeriode) {
-                    $q->where('tgl_akhir_pkwt', '>=', $startPeriode)
-                      ->orWhere('status_aktif', 'aktif');
-                })->count();
+                ->where('status_aktif', 1)
+                ->where('created_at', '<', $startPeriode)
+                ->count();
 
+            // Menghitung pembaruan/data baru (dibuat di dalam rentang periode dan status aktif 1)
             $pembaruan = PKWT::where('id_unit', $this->unitId)
                 ->where('divisi_id', $divisi->id)
-                ->where('status_aktif', '!=', 'pending')
-                ->whereBetween('tgl_mulai_pkwt', [$startPeriode, $endPeriode])
+                ->where('status_aktif', 1)
+                ->whereBetween('created_at', [$startPeriode, $endPeriode])
                 ->count();
 
             $pengurangan = PKWT::where('id_unit', $this->unitId)
                 ->where('divisi_id', $divisi->id)
-                ->where('status_aktif', 'non-aktif')
+                ->where('status_aktif', 0)
                 ->whereMonth('updated_at', $baseDate->month)
                 ->whereYear('updated_at', $baseDate->year)
                 ->count();

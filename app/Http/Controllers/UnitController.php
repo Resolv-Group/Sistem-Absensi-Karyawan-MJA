@@ -1008,10 +1008,9 @@ class UnitController extends Controller
     public function perputaran_pekerja(Request $request, $unitId)
     {
         $bulanTahun = $request->input('bulan_tahun', now()->format('Y-m'));
-        $durasi     = (int) $request->input('durasi', 3);
         
         $fileName   = 'Laporan_Perputaran_Pekerja_Unit_' . $unitId . ' (' . $bulanTahun . ').xlsx';
 
-        return Excel::download(new PerputaranPekerjaExport($unitId, $bulanTahun, $durasi), $fileName);
+        return Excel::download(new PerputaranPekerjaExport($unitId, $bulanTahun), $fileName);
     }
 }
