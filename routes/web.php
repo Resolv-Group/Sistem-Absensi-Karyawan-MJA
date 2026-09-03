@@ -107,6 +107,9 @@ Route::middleware(['auth', 'role:hrd,admin,head_supervisor'])->group(function ()
     Route::get('/unit', [UnitController::class, 'viewUnitMain'])->name('view.unit');
     Route::get('/unit/tambah', [UnitController::class, 'viewTambahUnit'])->name('view.tambah.unit');
     Route::POST('/tambah-unit', [UnitController::class, 'tambahUnit'])->name('tambah.unit.post');
+
+    //Export Perputaran Global
+    Route::get('/laporan/perputaran-pekerja-global', [UnitController::class, 'exportGlobal'])->name('perputaran_pekerja.global');
 });
 
 Route::middleware(['auth', 'role:hrd,admin,head_supervisor,pic'])->group(function () {
@@ -206,6 +209,12 @@ Route::middleware(['auth', 'role:hrd,pic,admin,head_supervisor'])->group(functio
 
     // Unit -> Status
     Route::put('/unit/toggle-status/{id}', [UnitController::class, 'toggleStatus']);
+
+    // Export Monitoring PKWT
+    Route::get('/unit/{unit}/monitoring-pkwt', [UnitController::class, 'monitoring_pkwt'])->name('unit.monitoring_pkwt');
+
+    // Export Perputaran Pekerja
+    Route::get('/unit/{unit}/perputaran-pekerja', [UnitController::class, 'perputaran_pekerja'])->name('unit.perputaran_pekerja');
 });
 
 Route::middleware(['auth', 'role:hrd,pic,admin,head_supervisor,akuntan'])->group(function () {

@@ -426,6 +426,62 @@
             </div>
 
             {{-- ADD BUTTON --}}
+            <div x-data="{ 
+                    showPerputaranModal: false,
+                    bulanTahun: '{{ now()->format('Y-m') }}' 
+                }" 
+                class="inline-block">
+                
+                <!-- Tombol Tunggal Langsung Buka Modal -->
+                <button @click="showPerputaranModal = true" type="button" 
+                    class="px-4 py-2 bg-emerald-600 text-white text-xs font-bold rounded-lg hover:bg-emerald-700 transition flex items-center gap-2 shadow-sm">
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    Perputaran
+                </button>
+
+                <!-- ========================================== -->
+                <!-- DIALOG / MODAL PERPUTARAN KESELURUHAN UNIT -->
+                <!-- ========================================== -->
+                <div x-show="showPerputaranModal" 
+                    class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-900/50 backdrop-blur-sm"
+                    style="display: none;">
+                    
+                    <div @click.away="showPerputaranModal = false"
+                        x-transition:enter="transition ease-out duration-300"
+                        x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                        x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                        x-transition:leave="transition ease-in duration-200"
+                        x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                        x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                        class="relative bg-white rounded-xl shadow-2xl w-full max-w-sm p-6 mx-4">
+                        
+                        <h3 class="text-lg font-bold text-slate-800 mb-4 border-b pb-2">Laporan Perputaran Keseluruhan Unit</h3>
+                        
+                        <!-- Route tanpa parameter ID unit -->
+                        <form action="{{ route('perputaran_pekerja.global') }}" method="GET" target="_blank" @submit="showPerputaranModal = false">    
+                            <div class="mb-5">
+                                <label class="block text-sm font-medium text-slate-700 mb-1.5">Pilih Bulan & Tahun:</label>
+                                <input type="month" name="bulan_tahun" x-model="bulanTahun" required
+                                    class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 text-sm text-slate-700 shadow-sm transition">
+                            </div>
+
+                            <div class="flex justify-end gap-3 mt-4 pt-4 border-t border-slate-100">
+                                <button type="button" @click="showPerputaranModal = false" 
+                                        class="px-4 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition shadow-sm">
+                                    Batal
+                                </button>
+                                <button type="submit" 
+                                        class="px-4 py-2 text-sm font-bold text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 transition shadow-sm">
+                                    Konfirmasi
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
             <a href="{{ route('view.tambah.unit') }}"
                 class="w-full justify-center lg:w-auto inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">
                 <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
