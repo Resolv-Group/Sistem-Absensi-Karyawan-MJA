@@ -26,6 +26,7 @@ use App\Exports\PekerjaUnitExport;
 use App\Exports\BoronganUnitExport;
 use App\Exports\MonitoringPkwtExport;
 use App\Exports\PerputaranPekerjaExport;
+use App\Exports\PerputaranPekerjaGlobalExport;
 
 class UnitController extends Controller
 {
@@ -1012,5 +1013,13 @@ class UnitController extends Controller
         $fileName   = 'Laporan_Perputaran_Pekerja_Unit_' . $unitId . ' (' . $bulanTahun . ').xlsx';
 
         return Excel::download(new PerputaranPekerjaExport($unitId, $bulanTahun), $fileName);
+    }
+
+    public function exportGlobal(Request $request)
+    {
+        $bulanTahun = $request->query('bulan_tahun', now()->format('Y-m'));
+        $fileName = 'Laporan_Perputaran_Global_' . $bulanTahun . '.xlsx';
+        
+        return Excel::download(new PerputaranPekerjaGlobalExport($bulanTahun), $fileName);
     }
 }

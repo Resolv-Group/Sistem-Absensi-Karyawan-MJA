@@ -438,11 +438,11 @@
                     <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                     </svg>
-                    Laporan Perputaran Pekerja
+                    Laporan Perputaran Keseluruhan Unit
                 </button>
 
                 <!-- ========================================== -->
-                <!-- DIALOG / MODAL PERPUTARAN PEKERJA -->
+                <!-- DIALOG / MODAL PERPUTARAN KESELURUHAN UNIT -->
                 <!-- ========================================== -->
                 <div x-show="showPerputaranModal" 
                     class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-900/50 backdrop-blur-sm"
@@ -457,9 +457,10 @@
                         x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                         class="relative bg-white rounded-xl shadow-2xl w-full max-w-sm p-6 mx-4">
                         
-                        <h3 class="text-lg font-bold text-slate-800 mb-4 border-b pb-2">Opsi Laporan Perputaran Pekerja</h3>
+                        <h3 class="text-lg font-bold text-slate-800 mb-4 border-b pb-2">Opsi Laporan Perputaran Seluruh Unit</h3>
                         
-                        <form action="{{ route('') }}" method="GET" target="_blank" @submit="showPerputaranModal = false">    
+                        <!-- Route tanpa parameter ID unit -->
+                        <form action="{{ route('perputaran_pekerja.global') }}" method="GET" target="_blank" @submit="showPerputaranModal = false">    
                             <div class="mb-5">
                                 <label class="block text-sm font-medium text-slate-700 mb-1.5">Pilih Bulan & Tahun:</label>
                                 <input type="month" name="bulan_tahun" x-model="bulanTahun" required
