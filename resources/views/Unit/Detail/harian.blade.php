@@ -308,8 +308,14 @@ $watch('filterStatus', () => updateTable());" class="relative">
                 </div>
             </div>
 
-            <!-- Wrapper Dropdown & Modal (Tambahkan variabel state di x-data) -->
-            <div x-data="{ open: false, showPkwtModal: false, durasi: '3' }" class="relative inline-block text-left w-full lg:w-auto">
+            <!-- Wrapper Dropdown & Modal (Tambahkan state bulanTahun di x-data) -->
+            <div x-data="{ 
+                    open: false, 
+                    showPkwtModal: false, 
+                    durasi: '3',
+                    bulanTahun: '{{ now()->format('Y-m') }}' 
+                }" 
+                class="relative inline-block text-left w-full lg:w-auto">
                 
                 <!-- Tombol Utama Dropdown -->
                 <button @click="open = !open" type="button" 
@@ -372,38 +378,45 @@ $watch('filterStatus', () => updateTable());" class="relative">
                         x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                         class="relative bg-white rounded-xl shadow-2xl w-full max-w-sm p-6 mx-4">
                         
-                        <h3 class="text-lg font-bold text-slate-800 mb-4 border-b pb-2">Opsi Export PKWT</h3>
+                        <h3 class="text-lg font-bold text-slate-800 mb-4 border-b pb-2">Opsi Monitoring PKWT</h3>
                         
-                        <!-- Gunakan form GET agar parameter durasi terkirim ke URL -->
+                        <!-- Form GET -->
                         <form action="{{ route('unit.export_pekerja', $unit->id) }}" method="GET" target="_blank" @submit="showPkwtModal = false">
                             
-                            <p class="text-sm text-slate-600 mb-3">Pilih durasi perpanjangan kontrak:</p>
+                            <!-- INPUT BULAN & TAHUN -->
+                            <div class="mb-5">
+                                <label class="block text-sm font-medium text-slate-700 mb-1.5">Pilih Bulan & Tahun:</label>
+                                <input type="month" name="bulan_tahun" x-model="bulanTahun" required
+                                    class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 text-sm text-slate-700 shadow-sm transition">
+                            </div>
+
+                            <p class="text-sm font-medium text-slate-700 mb-2">Pilih jangka durasi :</p>
                             
                             <!-- Radio Buttons -->
-                            <div class="space-y-3 mb-6">
-                                <label class="flex items-center gap-3 cursor-pointer p-2 rounded hover:bg-slate-50 transition">
+                            <div class="space-y-2 mb-6">
+                                <label class="flex items-center gap-3 cursor-pointer p-2 rounded-lg border border-transparent hover:bg-slate-50 transition">
                                     <input type="radio" name="durasi" value="3" x-model="durasi" 
                                         class="w-4 h-4 text-emerald-600 border-gray-300 focus:ring-emerald-500">
-                                    <span class="text-sm font-medium text-slate-700">3 Bulan</span>
+                                    <span class="text-sm text-slate-700">3 Bulan</span>
                                 </label>
 
-                                <label class="flex items-center gap-3 cursor-pointer p-2 rounded hover:bg-slate-50 transition">
+                                <label class="flex items-center gap-3 cursor-pointer p-2 rounded-lg border border-transparent hover:bg-slate-50 transition">
                                     <input type="radio" name="durasi" value="6" x-model="durasi" 
                                         class="w-4 h-4 text-emerald-600 border-gray-300 focus:ring-emerald-500">
-                                    <span class="text-sm font-medium text-slate-700">6 Bulan</span>
+                                    <span class="text-sm text-slate-700">6 Bulan</span>
                                 </label>
 
-                                <label class="flex items-center gap-3 cursor-pointer p-2 rounded hover:bg-slate-50 transition">
+                                <label class="flex items-center gap-3 cursor-pointer p-2 rounded-lg border border-transparent hover:bg-slate-50 transition">
                                     <input type="radio" name="durasi" value="12" x-model="durasi" 
                                         class="w-4 h-4 text-emerald-600 border-gray-300 focus:ring-emerald-500">
-                                    <span class="text-sm font-medium text-slate-700">12 Bulan</span>
+                                    <span class="text-sm text-slate-700">12 Bulan</span>
                                 </label>
                             </div>
 
                             <!-- Tombol Aksi -->
-                            <div class="flex justify-end gap-3 mt-4">
+                            <div class="flex justify-end gap-3 mt-4 pt-4 border-t border-slate-100">
                                 <button type="button" @click="showPkwtModal = false" 
-                                        class="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition">
+                                        class="px-4 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition shadow-sm">
                                     Batal
                                 </button>
                                 <button type="submit" 
