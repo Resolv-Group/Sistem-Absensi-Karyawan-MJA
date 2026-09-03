@@ -206,6 +206,9 @@ Route::middleware(['auth', 'role:hrd,pic,admin,head_supervisor'])->group(functio
 
     // Unit -> Status
     Route::put('/unit/toggle-status/{id}', [UnitController::class, 'toggleStatus']);
+
+    // Export Monitoring PKWT
+    Route::get('/unit/{unit}/monitoring-pkwt', [UnitController::class, 'monitoring_pkwt'])->name('unit.monitoring_pkwt');
 });
 
 Route::middleware(['auth', 'role:hrd,pic,admin,head_supervisor,akuntan'])->group(function () {

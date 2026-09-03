@@ -5,7 +5,7 @@ namespace App\Exports;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
-use App\Models\PkWT;
+use App\Models\PKWT;
 use App\Models\Unit;
 use Carbon\Carbon;
 
@@ -45,7 +45,7 @@ class MonitoringPkwtExport implements FromView, ShouldAutoSize
             ->where('status_aktif', 1)
             ->get();
 
-        return view('exports.pkwt_monitoring', [
+        return view('Exports.pkwt_monitoring', [
             'unit'           => $unit,
             'tanggalSetelah' => $tanggalSetelah,
             'targetMonths'   => $targetMonths,
