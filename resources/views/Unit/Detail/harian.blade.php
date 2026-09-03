@@ -349,7 +349,8 @@ $watch('filterStatus', () => updateTable());" class="relative">
                             PKWT
                         </button>
                         
-                        <a href="{{ route('unit.export_pekerja', $unit->id) }}" target="_blank" 
+                        <a href="{{ route('unit.perputaran_pekerja', $unit->id) }}" target="_blank" 
+                        @click="showPerputaranModal = true; open = false"
                         class="block px-4 py-2 text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 font-medium transition-colors">
                             Perputaran
                         </a>
@@ -415,6 +416,46 @@ $watch('filterStatus', () => updateTable());" class="relative">
                             <!-- Tombol Aksi -->
                             <div class="flex justify-end gap-3 mt-4 pt-4 border-t border-slate-100">
                                 <button type="button" @click="showPkwtModal = false" 
+                                        class="px-4 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition shadow-sm">
+                                    Batal
+                                </button>
+                                <button type="submit" 
+                                        class="px-4 py-2 text-sm font-bold text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 transition shadow-sm">
+                                    Konfirmasi
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div x-show="showPerputaranModal" 
+                    class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-900/50 backdrop-blur-sm"
+                    style="display: none;">
+                    
+                    <!-- Modal Box -->
+                    <div @click.away="showPerputaranModal = false"
+                        x-transition:enter="transition ease-out duration-300"
+                        x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                        x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                        x-transition:leave="transition ease-in duration-200"
+                        x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                        x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                        class="relative bg-white rounded-xl shadow-2xl w-full max-w-sm p-6 mx-4">
+                        
+                        <h3 class="text-lg font-bold text-slate-800 mb-4 border-b pb-2">Opsi Laporan Perputaran Pekerja</h3>
+                        
+                        <!-- Form GET -->
+                        <form action="{{ route('unit.perputaran_pekerja', $unit->id) }}" method="GET" target="_blank" @submit="showPerputaranModal = false">    
+                            <!-- INPUT BULAN & TAHUN -->
+                            <div class="mb-5">
+                                <label class="block text-sm font-medium text-slate-700 mb-1.5">Pilih Bulan & Tahun:</label>
+                                <input type="month" name="bulan_tahun" x-model="bulanTahun" required
+                                    class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 text-sm text-slate-700 shadow-sm transition">
+                            </div>
+
+                            <!-- Tombol Aksi -->
+                            <div class="flex justify-end gap-3 mt-4 pt-4 border-t border-slate-100">
+                                <button type="button" @click="showPerputaranModal = false" 
                                         class="px-4 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition shadow-sm">
                                     Batal
                                 </button>

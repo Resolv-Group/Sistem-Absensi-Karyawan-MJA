@@ -209,6 +209,9 @@ Route::middleware(['auth', 'role:hrd,pic,admin,head_supervisor'])->group(functio
 
     // Export Monitoring PKWT
     Route::get('/unit/{unit}/monitoring-pkwt', [UnitController::class, 'monitoring_pkwt'])->name('unit.monitoring_pkwt');
+
+    // Export Perputaran Pekerja
+    Route::get('/unit/{unit}/perputaran-pekerja', [UnitController::class, 'perputaran_pekerja'])->name('unit.perputaran_pekerja');
 });
 
 Route::middleware(['auth', 'role:hrd,pic,admin,head_supervisor,akuntan'])->group(function () {

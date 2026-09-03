@@ -25,6 +25,7 @@ use App\Exports\AssetExport;
 use App\Exports\PekerjaUnitExport;
 use App\Exports\BoronganUnitExport;
 use App\Exports\MonitoringPkwtExport;
+use App\Exports\PerputaranPekerjaExport;
 
 class UnitController extends Controller
 {
@@ -1002,5 +1003,15 @@ class UnitController extends Controller
         $fileName = 'Laporan Monitoring Masa Berlaku PKWT - Unit ' . $unitId . ' (' . $bulanTahun . ').xlsx';
 
         return Excel::download(new MonitoringPkwtExport($unitId, $bulanTahun, $durasi), $fileName);
+    }
+
+    public function perputaran_pekerja(Request $request, $unitId)
+    {
+        $bulanTahun = $request->input('bulan_tahun', now()->format('Y-m'));
+        $durasi     = (int) $request->input('durasi', 3);
+        
+        $fileName   = 'Laporan_Perputaran_Pekerja_Unit_' . $unitId . ' (' . $bulanTahun . ').xlsx';
+
+        return Excel::download(new PerputaranPekerjaExport($unitId, $bulanTahun, $durasi), $fileName);
     }
 }
