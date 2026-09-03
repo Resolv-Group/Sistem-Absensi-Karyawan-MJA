@@ -381,8 +381,7 @@ $watch('filterStatus', () => updateTable());" class="relative">
                         <h3 class="text-lg font-bold text-slate-800 mb-4 border-b pb-2">Opsi Monitoring PKWT</h3>
                         
                         <!-- Form GET -->
-                        <form action="{{ route('unit.export_pekerja', $unit->id) }}" method="GET" target="_blank" @submit="showPkwtModal = false">
-                            
+                        <form action="{{ route('unit.monitoring_pkwt', $unit->id) }}" method="GET" target="_blank" @submit="showPkwtModal = false">    
                             <!-- INPUT BULAN & TAHUN -->
                             <div class="mb-5">
                                 <label class="block text-sm font-medium text-slate-700 mb-1.5">Pilih Bulan & Tahun:</label>

@@ -24,6 +24,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\AssetExport;
 use App\Exports\PekerjaUnitExport;
 use App\Exports\BoronganUnitExport;
+use App\Exports\MonitoringPkwtExport;
 
 class UnitController extends Controller
 {
@@ -991,5 +992,15 @@ class UnitController extends Controller
         $fileName = 'Data_Borongan_Aktif_' . str_replace(' ', '_', $unit->nama_unit) . '.xlsx';
         
         return Excel::download(new BoronganUnitExport($id), $fileName);
+    }
+
+    public function monitoring_pkwt(Request $request, $unitId)
+    {
+        $bulanTahun = $request->input('bulan_tahun', now()->format('Y-m')); 
+        $durasi     = (int) $request->input('durasi', 3);                   
+        
+        $fileName = 'Laporan Monitoring Masa Berlaku PKWT - Unit ' . $unitId . ' (' . $bulanTahun . ').xlsx';
+
+        return Excel::download(new MonitoringPkwtExport($unitId, $bulanTahun, $durasi), $fileName);
     }
 }
