@@ -310,164 +310,160 @@ $watch('filterStatus', () => updateTable());" class="relative">
 
             <!-- Wrapper Dropdown & Modal (Tambahkan state bulanTahun di x-data) -->
             <div x-data="{ 
-                    open: false, 
-                    showPkwtModal: false, 
-                    durasi: '3',
-                    bulanTahun: '{{ now()->format('Y-m') }}' 
-                }" 
-                class="relative inline-block text-left w-full lg:w-auto">
+                open: false, 
+                showPkwtModal: false, 
+                showPerputaranModal: false,
+                durasi: '3',
+                bulanTahun: '{{ now()->format('Y-m') }}' 
+            }" 
+            class="relative inline-block text-left w-full lg:w-auto">
+            
+            <!-- Tombol Utama Dropdown -->
+            <button @click="open = !open" type="button" 
+                class="w-full justify-center lg:w-auto px-4 py-2 bg-emerald-600 text-white text-xs font-bold rounded-lg hover:bg-emerald-700 transition flex items-center gap-2 shadow-sm">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                Export Data
+                <svg class="w-3.5 h-3.5 ml-1 transition-transform duration-200" :class="{'rotate-180': open}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+            </button>
+
+            <!-- Isi Dropdown Menu -->
+            <div x-show="open" 
+                @click.away="open = false"
+                x-transition:enter="transition ease-out duration-100"
+                x-transition:enter-start="transform opacity-0 scale-95"
+                x-transition:enter-end="transform opacity-100 scale-100"
+                x-transition:leave="transition ease-in duration-75"
+                x-transition:leave-start="transform opacity-100 scale-100"
+                x-transition:leave-end="transform opacity-0 scale-95"
+                class="absolute right-0 z-40 mt-2 w-40 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                style="display: none;">
                 
-                <!-- Tombol Utama Dropdown -->
-                <button @click="open = !open" type="button" 
-                    class="w-full justify-center lg:w-auto px-4 py-2 bg-emerald-600 text-white text-xs font-bold rounded-lg hover:bg-emerald-700 transition flex items-center gap-2 shadow-sm">
-                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                    </svg>
-                    Export Data
-                    <svg class="w-3.5 h-3.5 ml-1 transition-transform duration-200" :class="{'rotate-180': open}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                    </svg>
-                </button>
-
-                <!-- Isi Dropdown Menu -->
-                <div x-show="open" 
-                    @click.away="open = false"
-                    x-transition:enter="transition ease-out duration-100"
-                    x-transition:enter-start="transform opacity-0 scale-95"
-                    x-transition:enter-end="transform opacity-100 scale-100"
-                    x-transition:leave="transition ease-in duration-75"
-                    x-transition:leave-start="transform opacity-100 scale-100"
-                    x-transition:leave-end="transform opacity-0 scale-95"
-                    class="absolute right-0 z-40 mt-2 w-40 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-                    style="display: none;">
+                <div class="py-1">
+                    <!-- Tombol PKWT -->
+                    <button type="button" 
+                    @click="showPkwtModal = true; open = false"
+                    class="w-full text-left block px-4 py-2 text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 font-medium transition-colors">
+                        PKWT
+                    </button>
                     
-                    <div class="py-1">
-                        <!-- Tombol PKWT (Berubah menjadi trigger modal) -->
-                        <button type="button" 
-                        @click="showPkwtModal = true; open = false"
-                        class="w-full text-left block px-4 py-2 text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 font-medium transition-colors">
-                            PKWT
-                        </button>
-                        
-                        <a href="{{ route('unit.perputaran_pekerja', $unit->id) }}" target="_blank" 
-                        @click="showPerputaranModal = true; open = false"
-                        class="block px-4 py-2 text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 font-medium transition-colors">
-                            Perputaran
-                        </a>
-                        
-                        <a href="{{ route('unit.export_pekerja', $unit->id) }}" target="_blank" 
-                        class="block px-4 py-2 text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 font-medium transition-colors">
-                            Excel
-                        </a>
-                    </div>
-                </div>
-
-                <!-- ========================================== -->
-                <!-- DIALOG / MODAL PKWT -->
-                <!-- ========================================== -->
-                <div x-show="showPkwtModal" 
-                    class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-900/50 backdrop-blur-sm"
-                    style="display: none;">
+                    <!-- Tombol Perputaran (Diubah menjadi button type="button" agar memicu modal) -->
+                    <button type="button" 
+                    @click="showPerputaranModal = true; open = false"
+                    class="w-full text-left block px-4 py-2 text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 font-medium transition-colors">
+                        Perputaran
+                    </button>
                     
-                    <!-- Modal Box -->
-                    <div @click.away="showPkwtModal = false"
-                        x-transition:enter="transition ease-out duration-300"
-                        x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                        x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
-                        x-transition:leave="transition ease-in duration-200"
-                        x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
-                        x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                        class="relative bg-white rounded-xl shadow-2xl w-full max-w-sm p-6 mx-4">
-                        
-                        <h3 class="text-lg font-bold text-slate-800 mb-4 border-b pb-2">Opsi Monitoring PKWT</h3>
-                        
-                        <!-- Form GET -->
-                        <form action="{{ route('unit.monitoring_pkwt', $unit->id) }}" method="GET" target="_blank" @submit="showPkwtModal = false">    
-                            <!-- INPUT BULAN & TAHUN -->
-                            <div class="mb-5">
-                                <label class="block text-sm font-medium text-slate-700 mb-1.5">Pilih Bulan & Tahun:</label>
-                                <input type="month" name="bulan_tahun" x-model="bulanTahun" required
-                                    class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 text-sm text-slate-700 shadow-sm transition">
-                            </div>
-
-                            <p class="text-sm font-medium text-slate-700 mb-2">Pilih jangka durasi :</p>
-                            
-                            <!-- Radio Buttons -->
-                            <div class="space-y-2 mb-6">
-                                <label class="flex items-center gap-3 cursor-pointer p-2 rounded-lg border border-transparent hover:bg-slate-50 transition">
-                                    <input type="radio" name="durasi" value="3" x-model="durasi" 
-                                        class="w-4 h-4 text-emerald-600 border-gray-300 focus:ring-emerald-500">
-                                    <span class="text-sm text-slate-700">3 Bulan</span>
-                                </label>
-
-                                <label class="flex items-center gap-3 cursor-pointer p-2 rounded-lg border border-transparent hover:bg-slate-50 transition">
-                                    <input type="radio" name="durasi" value="6" x-model="durasi" 
-                                        class="w-4 h-4 text-emerald-600 border-gray-300 focus:ring-emerald-500">
-                                    <span class="text-sm text-slate-700">6 Bulan</span>
-                                </label>
-
-                                <label class="flex items-center gap-3 cursor-pointer p-2 rounded-lg border border-transparent hover:bg-slate-50 transition">
-                                    <input type="radio" name="durasi" value="12" x-model="durasi" 
-                                        class="w-4 h-4 text-emerald-600 border-gray-300 focus:ring-emerald-500">
-                                    <span class="text-sm text-slate-700">12 Bulan</span>
-                                </label>
-                            </div>
-
-                            <!-- Tombol Aksi -->
-                            <div class="flex justify-end gap-3 mt-4 pt-4 border-t border-slate-100">
-                                <button type="button" @click="showPkwtModal = false" 
-                                        class="px-4 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition shadow-sm">
-                                    Batal
-                                </button>
-                                <button type="submit" 
-                                        class="px-4 py-2 text-sm font-bold text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 transition shadow-sm">
-                                    Konfirmasi
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-                <div x-show="showPerputaranModal" 
-                    class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-900/50 backdrop-blur-sm"
-                    style="display: none;">
-                    
-                    <!-- Modal Box -->
-                    <div @click.away="showPerputaranModal = false"
-                        x-transition:enter="transition ease-out duration-300"
-                        x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                        x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
-                        x-transition:leave="transition ease-in duration-200"
-                        x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
-                        x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                        class="relative bg-white rounded-xl shadow-2xl w-full max-w-sm p-6 mx-4">
-                        
-                        <h3 class="text-lg font-bold text-slate-800 mb-4 border-b pb-2">Opsi Laporan Perputaran Pekerja</h3>
-                        
-                        <!-- Form GET -->
-                        <form action="{{ route('unit.perputaran_pekerja', $unit->id) }}" method="GET" target="_blank" @submit="showPerputaranModal = false">    
-                            <!-- INPUT BULAN & TAHUN -->
-                            <div class="mb-5">
-                                <label class="block text-sm font-medium text-slate-700 mb-1.5">Pilih Bulan & Tahun:</label>
-                                <input type="month" name="bulan_tahun" x-model="bulanTahun" required
-                                    class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 text-sm text-slate-700 shadow-sm transition">
-                            </div>
-
-                            <!-- Tombol Aksi -->
-                            <div class="flex justify-end gap-3 mt-4 pt-4 border-t border-slate-100">
-                                <button type="button" @click="showPerputaranModal = false" 
-                                        class="px-4 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition shadow-sm">
-                                    Batal
-                                </button>
-                                <button type="submit" 
-                                        class="px-4 py-2 text-sm font-bold text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 transition shadow-sm">
-                                    Konfirmasi
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+                    <a href="{{ route('unit.export_pekerja', $unit->id) }}" target="_blank" 
+                    class="block px-4 py-2 text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 font-medium transition-colors">
+                        Excel
+                    </a>
                 </div>
             </div>
+
+            <!-- ========================================== -->
+            <!-- DIALOG / MODAL PKWT -->
+            <!-- ========================================== -->
+            <div x-show="showPkwtModal" 
+                class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-900/50 backdrop-blur-sm"
+                style="display: none;">
+                
+                <div @click.away="showPkwtModal = false"
+                    x-transition:enter="transition ease-out duration-300"
+                    x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                    x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                    x-transition:leave="transition ease-in duration-200"
+                    x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                    x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                    class="relative bg-white rounded-xl shadow-2xl w-full max-w-sm p-6 mx-4">
+                    
+                    <h3 class="text-lg font-bold text-slate-800 mb-4 border-b pb-2">Opsi Monitoring PKWT</h3>
+                    
+                    <form action="{{ route('unit.monitoring_pkwt', $unit->id) }}" method="GET" target="_blank" @submit="showPkwtModal = false">    
+                        <div class="mb-5">
+                            <label class="block text-sm font-medium text-slate-700 mb-1.5">Pilih Bulan & Tahun:</label>
+                            <input type="month" name="bulan_tahun" x-model="bulanTahun" required
+                                class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 text-sm text-slate-700 shadow-sm transition">
+                        </div>
+
+                        <p class="text-sm font-medium text-slate-700 mb-2">Pilih jangka durasi :</p>
+                        
+                        <div class="space-y-2 mb-6">
+                            <label class="flex items-center gap-3 cursor-pointer p-2 rounded-lg border border-transparent hover:bg-slate-50 transition">
+                                <input type="radio" name="durasi" value="3" x-model="durasi" 
+                                    class="w-4 h-4 text-emerald-600 border-gray-300 focus:ring-emerald-500">
+                                <span class="text-sm text-slate-700">3 Bulan</span>
+                            </label>
+
+                            <label class="flex items-center gap-3 cursor-pointer p-2 rounded-lg border border-transparent hover:bg-slate-50 transition">
+                                <input type="radio" name="durasi" value="6" x-model="durasi" 
+                                    class="w-4 h-4 text-emerald-600 border-gray-300 focus:ring-emerald-500">
+                                <span class="text-sm text-slate-700">6 Bulan</span>
+                            </label>
+
+                            <label class="flex items-center gap-3 cursor-pointer p-2 rounded-lg border border-transparent hover:bg-slate-50 transition">
+                                <input type="radio" name="durasi" value="12" x-model="durasi" 
+                                    class="w-4 h-4 text-emerald-600 border-gray-300 focus:ring-emerald-500">
+                                <span class="text-sm text-slate-700">12 Bulan</span>
+                            </label>
+                        </div>
+
+                        <div class="flex justify-end gap-3 mt-4 pt-4 border-t border-slate-100">
+                            <button type="button" @click="showPkwtModal = false" 
+                                    class="px-4 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition shadow-sm">
+                                Batal
+                            </button>
+                            <button type="submit" 
+                                    class="px-4 py-2 text-sm font-bold text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 transition shadow-sm">
+                                Konfirmasi
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- DIALOG / MODAL PERPUTARAN PEKERJA -->
+            <!-- ========================================== -->
+            <div x-show="showPerputaranModal" 
+                class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-900/50 backdrop-blur-sm"
+                style="display: none;">
+                
+                <div @click.away="showPerputaranModal = false"
+                    x-transition:enter="transition ease-out duration-300"
+                    x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                    x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                    x-transition:leave="transition ease-in duration-200"
+                    x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                    x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                    class="relative bg-white rounded-xl shadow-2xl w-full max-w-sm p-6 mx-4">
+                    
+                    <h3 class="text-lg font-bold text-slate-800 mb-4 border-b pb-2">Opsi Laporan Perputaran Pekerja</h3>
+                    
+                    <form action="{{ route('unit.perputaran_pekerja', $unit->id) }}" method="GET" target="_blank" @submit="showPerputaranModal = false">    
+                        <div class="mb-5">
+                            <label class="block text-sm font-medium text-slate-700 mb-1.5">Pilih Bulan & Tahun:</label>
+                            <input type="month" name="bulan_tahun" x-model="bulanTahun" required
+                                class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 text-sm text-slate-700 shadow-sm transition">
+                        </div>
+
+                        <div class="flex justify-end gap-3 mt-4 pt-4 border-t border-slate-100">
+                            <button type="button" @click="showPerputaranModal = false" 
+                                    class="px-4 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition shadow-sm">
+                                Batal
+                            </button>
+                            <button type="submit" 
+                                    class="px-4 py-2 text-sm font-bold text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 transition shadow-sm">
+                                Konfirmasi
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+</div>
 
             <button type="button"
                 onclick="checkUnitRequirements('{{ route('view.tambah.unit-pekerja', $unit->id) }}')"
