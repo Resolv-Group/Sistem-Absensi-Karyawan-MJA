@@ -457,7 +457,7 @@
                         x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                         class="relative bg-white rounded-xl shadow-2xl w-full max-w-sm p-6 mx-4">
                         
-                        <h3 class="text-lg font-bold text-slate-800 mb-4 border-b pb-2">Opsi Laporan Perputaran Seluruh Unit</h3>
+                        <h3 class="text-lg font-bold text-slate-800 mb-4 border-b pb-2">Perputaran</h3>
                         
                         <!-- Route tanpa parameter ID unit -->
                         <form action="{{ route('perputaran_pekerja.global') }}" method="GET" target="_blank" @submit="showPerputaranModal = false">    

@@ -62,7 +62,7 @@ class PerputaranPekerjaGlobalExport implements FromView, ShouldAutoSize
             }
         }
 
-        return view('exports.perputaran_pekerja_global', [
+        return view('Exports.perputaran_pekerja_global', [
             'periodeLabel' => $periodeLabel,
             'rekapData'    => $rekapData
         ]);
