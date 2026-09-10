@@ -881,10 +881,8 @@
                                 <thead>
                                     <tr class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
                                         <th class="px-4 py-2 w-10 text-center">
-                                            {{-- Select All logic using the $kasIds from Controller --}}
-                                            <input type="checkbox" @click="toggleSelectAll({{ json_encode($kasIds) }})"
-                                                :checked="selectedRows.length === {{ count($kasIds) }} && {{ count($kasIds) }} >
-                                                    0"
+                                            <input type="checkbox" @click="toggleSelectAll(allKasIds)"
+                                                :checked="selectedRows.length === allKasIds.length && allKasIds.length > 0"
                                                 class="rounded-md border-slate-200 text-emerald-600 focus:ring-emerald-500 cursor-pointer">
                                         </th>
                                         <th class="px-4 py-2 w-32">Tanggal</th>
@@ -897,144 +895,46 @@
                                         <th class="px-4 py-2 text-center w-28">Aksi</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    @php $runningSaldo = 0; @endphp
-                                    @forelse($kasKecil as $kas)
-                                        @php $runningSaldo += ($kas->debit - $kas->kredit); @endphp
-
-                                        <tr
-                                            class="group bg-white hover:shadow-xl hover:shadow-slate-200/50 transition-all"
-                                            x-show="shouldShowRow('{{ $kas->tanggal }}', {{ $kas->status }})">
-                                            {{-- Checkbox --}}
-                                            <td
-                                                class="px-4 py-4 rounded-l-2xl border-l border-y border-slate-100 text-center">
-                                                <input type="checkbox" value="{{ $kas->id }}"
-                                                    x-model="selectedRows"
-                                                    class="rounded-md border-slate-200 text-emerald-600 focus:ring-emerald-500 cursor-pointer">
-                                            </td>
-
-                                            {{-- Tanggal --}}
-                                            <td
-                                                class="px-4 py-4 border-y border-slate-100 text-xs font-bold text-slate-500 tracking-tighter">
-                                                {{ \Carbon\Carbon::parse($kas->tanggal)->format('d M Y') }}
-                                            </td>
-
-                                            {{-- Akun --}}
-                                            <td class="px-4 py-4 border-y border-slate-100">
-                                                <p class="text-sm font-black text-slate-800">{{ $kas->akun }}</p>
-                                            </td>
-
-                                            {{-- Deskripsi --}}
-                                            <td class="px-4 py-4 border-y border-slate-100">
-                                                <p class="text-sm font-black text-slate-800">{{ $kas->keterangan }}</p>
-                                                @if ($kas->nota)
-                                                    <a href="{{ route('kas-kecil.nota', $kas->id) }}" target="_blank"
-                                                        class="text-[9px] text-blue-500 font-bold uppercase hover:underline">
-                                                        📂 Lihat Lampiran
-                                                    </a>
-                                                @else
-                                                    <span
-                                                        class="text-[9px] text-slate-300 font-bold uppercase italic">Tanpa
-                                                        Nota</span>
-                                                @endif
-                                            </td>
-
-                                            {{-- Debit --}}
-                                            <td
-                                                class="px-4 py-4 border-y border-slate-100 text-right text-sm font-black {{ $kas->debit > 0 ? 'text-emerald-600' : 'text-slate-300' }}">
-                                                {{ $kas->debit > 0 ? number_format($kas->debit, 0, ',', '.') : '-' }}
-                                            </td>
-
-                                            {{-- Kredit --}}
-                                            <td
-                                                class="px-4 py-4 border-y border-slate-100 text-right text-sm font-black {{ $kas->kredit > 0 ? 'text-rose-600' : 'text-slate-300' }}">
-                                                {{ $kas->kredit > 0 ? number_format($kas->kredit, 0, ',', '.') : '-' }}
-                                            </td>
-
-                                            {{-- Running Saldo --}}
-                                            <td
-                                                class="px-4 py-4 border-y border-slate-100 text-right text-sm font-black text-slate-800 italic">
-                                                {{ number_format($runningSaldo, 0, ',', '.') }}
-                                            </td>
-
-                                            {{-- Status --}}
-                                            <td class="px-4 py-4 border-y border-slate-100 text-center">
-                                                @if($kas->status == 2)
-                                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-emerald-50 text-emerald-600 border border-emerald-100">
-                                                        ✓ Approved
-                                                    </span>
-                                                @else
-                                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-amber-50 text-amber-600 border border-amber-100">
-                                                        Pending
-                                                    </span>
-                                                @endif
-                                            </td>
-
-                                            {{-- Actions --}}
-                                            <td
-                                                class="px-4 py-4 rounded-r-2xl border-r border-y border-slate-100 text-center">
-                                                @if($kas->status == 2)
-                                                    <span class="text-xs text-slate-400 italic">Locked</span>
-                                                @else
-                                                    <div
-                                                        class="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-all transform group-hover:scale-100 scale-90">
-                                                        {{-- Edit Button --}}
-                                                        <button @click="editEntries([{{ $kas->id }}])"
-                                                            title="Edit Transaksi"
-                                                            class="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-600 hover:text-white transition">
-                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                                viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                                    stroke-width="2"
-                                                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                                            </svg>
-                                                        </button>
-                                                        {{-- Delete Button --}}
-                                                        <button
-                                                            onclick="confirmDeleteKas({{ $kas->id }}, {{ $unit->id }})"
-                                                            title="Hapus"
-                                                            class="p-2 bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-600 hover:text-white transition">
-                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                                viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                                    stroke-width="2"
-                                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                            </svg>
-                                                        </button>
-                                                    </div>
-                                                @endif
-                                            </td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="9" class="py-20 text-center">
-                                                <div class="flex flex-col items-center opacity-20">
-                                                    <svg class="w-16 h-16 mb-4" fill="none" stroke="currentColor"
-                                                        viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="1"
-                                                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                                                    </svg>
-                                                    <p class="font-black uppercase tracking-widest text-sm">Belum ada
-                                                        transaksi</p>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @endforelse
-                                    <tr x-show="allData.length > 0 && !hasFilteredKas()" x-cloak>
-                                        <td colspan="9" class="py-20 text-center">
-                                            <div class="flex flex-col items-center opacity-20">
-                                                <svg class="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-                                                </svg>
-                                                <p class="font-black uppercase tracking-widest text-sm">Data tidak tersedia dengan filter saat ini</p>
-                                            </div>
-                                        </td>
-                                    </tr>
+                                <tbody id="kas-kecil-tbody">
+                                    @include('Unit.partials.kas-kecil-rows', ['kasKecil' => $kasKecil, 'unit' => $unit, 'carryForwardSaldo' => $carryForwardSaldo])
                                 </tbody>
                             </table>
                             </div>
+
+                            {{-- PAGINATION CONTROLS --}}
+                            <div x-show="kasPagination.last_page > 1" class="flex items-center justify-between px-2 py-3 border-t border-slate-100">
+                                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                    Hal <span x-text="kasPagination.current_page"></span> dari <span x-text="kasPagination.last_page"></span>
+                                    — <span x-text="kasPagination.total"></span> data
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <button @click="loadKasPage(kasPagination.current_page - 1)"
+                                        :disabled="kasPagination.current_page <= 1"
+                                        :class="kasPagination.current_page <= 1 ? 'opacity-30 cursor-not-allowed' : 'hover:bg-slate-100'"
+                                        class="px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-[10px] font-black uppercase tracking-widest text-slate-600 transition">
+                                        ← Sebelumnya
+                                    </button>
+                                    <button @click="loadKasPage(kasPagination.current_page + 1)"
+                                        :disabled="kasPagination.current_page >= kasPagination.last_page"
+                                        :class="kasPagination.current_page >= kasPagination.last_page ? 'opacity-30 cursor-not-allowed' : 'hover:bg-slate-100'"
+                                        class="px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-[10px] font-black uppercase tracking-widest text-slate-600 transition">
+                                        Selanjutnya →
+                                    </button>
+                                </div>
+                            </div>
+
+                            {{-- LOADING INDICATOR --}}
+                            <div x-show="isLoading" class="flex items-center justify-center py-8" x-cloak>
+                                <div class="flex items-center gap-3">
+                                    <svg class="animate-spin h-5 w-5 text-slate-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Memuat data...</span>
+                                </div>
+                            </div>
                         </div>
+
 
                         {{-- CONTENT: LIST VIEW (ASSET) --}}
                         <div x-show="view === 'list' && activeType === 'asset'"
@@ -1044,11 +944,9 @@
                                 <thead>
                                     <tr class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
                                         <th class="px-4 py-2 w-10 text-center">
-                                            {{-- Use Asset IDs for selection --}}
                                             <input type="checkbox"
-                                                @click="toggleSelectAll({{ json_encode($assets->pluck('id')) }})"
-                                                :checked="selectedRows.length === {{ $assets->count() }} &&
-                                                    {{ $assets->count() }} > 0"
+                                                @click="toggleSelectAll(allAssetIds)"
+                                                :checked="selectedRows.length === allAssetIds.length && allAssetIds.length > 0"
                                                 class="rounded-md border-slate-200 text-blue-600 focus:ring-blue-500 cursor-pointer">
                                         </th>
                                         <th class="px-4 py-2 w-12 text-center">No.</th>
@@ -1061,154 +959,46 @@
                                         <th class="px-4 py-2 text-center w-28">Aksi</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    @forelse($assets as $a)
-                                        <tr
-                                            class="group bg-white hover:shadow-xl hover:shadow-blue-900/5 transition-all duration-300"
-                                            x-show="shouldShowRow('{{ $a->tahun_perolehan }}', {{ $a->status }})">
-                                            {{-- 1. Checkbox --}}
-                                            <td
-                                                class="px-4 py-4 rounded-l-2xl border-l border-y border-slate-100 text-center">
-                                                <input type="checkbox" value="{{ $a->id }}"
-                                                    x-model="selectedRows"
-                                                    class="rounded-md border-slate-200 text-blue-600 focus:ring-blue-500 cursor-pointer">
-                                            </td>
-
-                                            {{-- 2. Index --}}
-                                            <td class="px-4 py-4 border-y border-slate-100 text-center">
-                                                <span
-                                                    class="text-xs font-bold text-slate-300">#{{ $loop->iteration }}</span>
-                                            </td>
-
-                                            {{-- 3. Nama & Keterangan (Grouped) --}}
-                                            <td class="px-4 py-4 border-y border-slate-100">
-                                                <p class="text-sm font-black text-slate-800 leading-tight">
-                                                    {{ $a->nama_barang }}</p>
-                                                @if ($a->keterangan)
-                                                    <p
-                                                        class="text-[9px] text-slate-400 font-bold uppercase mt-1 tracking-tighter">
-                                                        {{ $a->keterangan }}</p>
-                                                @else
-                                                    <p
-                                                        class="text-[9px] text-slate-300 italic mt-1 uppercase tracking-tighter">
-                                                        No Description</p>
-                                                @endif
-                                            </td>
-
-                                            {{-- 4. Jumlah (Badge Style) --}}
-                                            <td class="px-4 py-4 border-y border-slate-100 text-center">
-                                                <span
-                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-black bg-blue-50 text-blue-600 border border-blue-100">
-                                                    {{ $a->jumlah }}
-                                                </span>
-                                            </td>
-
-                                            {{-- 5. Tahun Perolehan --}}
-                                            <td class="px-4 py-4 border-y border-slate-100 text-center">
-                                                <div
-                                                    class="text-[10px] font-black text-slate-500 uppercase tracking-widest bg-slate-100 px-2 py-1 rounded-md inline-block">
-                                                    {{ \Carbon\Carbon::parse($a->tahun_perolehan)->format('d M Y') }}
-                                                </div>
-                                            </td>
-
-                                            {{-- 6. Harga --}}
-                                            <td class="px-4 py-4 border-y border-slate-100 text-right">
-                                                <p class="text-sm font-black text-slate-700">
-                                                    {{ number_format($a->harga_perolehan, 0, ',', '.') }}
-                                                </p>
-                                            </td>
-
-                                            {{-- 7. Lokasi (Badge Style) --}}
-                                            <td class="px-4 py-4 border-y border-slate-100 text-center">
-                                                <span class="text-[10px] font-black uppercase text-slate-600">
-                                                    <svg class="w-3 h-3 inline-block mb-0.5 mr-0.5 text-slate-400"
-                                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                    </svg>
-                                                    {{ $a->lokasi }}
-                                                </span>
-                                            </td>
-
-                                            {{-- 8. Status Badge --}}
-                                            <td class="px-4 py-4 border-y border-slate-100 text-center">
-                                                @if($a->status == 2)
-                                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-emerald-50 text-emerald-600 border border-emerald-100">
-                                                        ✓ Approved
-                                                    </span>
-                                                @else
-                                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-amber-50 text-amber-600 border border-amber-100">
-                                                        Pending
-                                                    </span>
-                                                @endif
-                                            </td>
-
-                                            {{-- 9. Actions (Hover Reveal) --}}
-                                            <td
-                                                class="px-4 py-4 rounded-r-2xl border-r border-y border-slate-100 text-center">
-                                                @if($a->status == 2)
-                                                    <span class="text-xs text-slate-400 italic">Locked</span>
-                                                @else
-                                                    <div
-                                                        class="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-all transform group-hover:scale-100 scale-90">
-                                                        <button @click="editEntries([{{ $a->id }}])"
-                                                            title="Edit Asset"
-                                                            class="p-2 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-600 hover:text-white transition shadow-sm">
-                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                                viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                                    stroke-width="2"
-                                                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                                            </svg>
-                                                        </button>
-                                                        <button
-                                                            onclick="confirmDeleteAsset({{ $a->id }}, {{ $unit->id }})"
-                                                            title="Hapus Asset"
-                                                            class="p-2 bg-rose-50 text-rose-600 rounded-xl hover:bg-rose-600 hover:text-white transition shadow-sm">
-                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                                viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                                    stroke-width="2"
-                                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                            </svg>
-                                                        </button>
-                                                    </div>
-                                                @endif
-                                            </td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="9" class="py-24 text-center">
-                                                <div class="flex flex-col items-center opacity-20">
-                                                    <svg class="w-16 h-16 mb-4" fill="none" stroke="currentColor"
-                                                        viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="1"
-                                                            d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                                                    </svg>
-                                                    <p class="font-black uppercase tracking-widest text-sm">Belum ada asset
-                                                        terdaftar</p>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @endforelse
-                                    <tr x-show="allDataAsset.length > 0 && !hasFilteredAssets()" x-cloak>
-                                        <td colspan="9" class="py-24 text-center">
-                                            <div class="flex flex-col items-center opacity-20">
-                                                <svg class="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-                                                </svg>
-                                                <p class="font-black uppercase tracking-widest text-sm">Data tidak tersedia dengan filter saat ini</p>
-                                            </div>
-                                        </td>
-                                    </tr>
+                                <tbody id="asset-tbody">
+                                    @include('Unit.partials.asset-rows', ['assets' => $assets, 'unit' => $unit])
                                 </tbody>
                             </table>
                             </div>
+
+                            {{-- PAGINATION CONTROLS --}}
+                            <div x-show="assetPagination.last_page > 1" class="flex items-center justify-between px-2 py-3 border-t border-slate-100">
+                                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                    Hal <span x-text="assetPagination.current_page"></span> dari <span x-text="assetPagination.last_page"></span>
+                                    — <span x-text="assetPagination.total"></span> data
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <button @click="loadAssetPage(assetPagination.current_page - 1)"
+                                        :disabled="assetPagination.current_page <= 1"
+                                        :class="assetPagination.current_page <= 1 ? 'opacity-30 cursor-not-allowed' : 'hover:bg-slate-100'"
+                                        class="px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-[10px] font-black uppercase tracking-widest text-slate-600 transition">
+                                        ← Sebelumnya
+                                    </button>
+                                    <button @click="loadAssetPage(assetPagination.current_page + 1)"
+                                        :disabled="assetPagination.current_page >= assetPagination.last_page"
+                                        :class="assetPagination.current_page >= assetPagination.last_page ? 'opacity-30 cursor-not-allowed' : 'hover:bg-slate-100'"
+                                        class="px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-[10px] font-black uppercase tracking-widest text-slate-600 transition">
+                                        Selanjutnya →
+                                    </button>
+                                </div>
+                            </div>
+
+                            {{-- LOADING INDICATOR --}}
+                            <div x-show="isLoading" class="flex items-center justify-center py-8" x-cloak>
+                                <div class="flex items-center gap-3">
+                                    <svg class="animate-spin h-5 w-5 text-slate-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Memuat data...</span>
+                                </div>
+                            </div>
                         </div>
+
 
                         {{-- CONTENT: FORM VIEW (Multiple Rows) --}}
                         <div x-show="view === 'form'" class="flex flex-col h-full overflow-hidden bg-slate-50/50">
@@ -2371,8 +2161,23 @@
                 selectedRows: [],
                 isEdit: false,
 
-                allData: {!! json_encode($kasKecil, JSON_INVALID_UTF8_SUBSTITUTE) !!},
-                allDataAsset: {!! json_encode($assets ?? [], JSON_INVALID_UTF8_SUBSTITUTE) !!},
+                allData: {!! json_encode($kasKecil->items(), JSON_INVALID_UTF8_SUBSTITUTE) !!},
+                allDataAsset: {!! json_encode($assets->items(), JSON_INVALID_UTF8_SUBSTITUTE) !!},
+                allKasIds: {!! json_encode($kasIds) !!},
+                allAssetIds: {!! json_encode($assetIds) !!},
+                kasPagination: {
+                    current_page: {{ $kasKecil->currentPage() }},
+                    last_page: {{ $kasKecil->lastPage() }},
+                    total: {{ $kasKecil->total() }},
+                    per_page: {{ $kasKecil->perPage() }}
+                },
+                assetPagination: {
+                    current_page: {{ $assets->currentPage() }},
+                    last_page: {{ $assets->lastPage() }},
+                    total: {{ $assets->total() }},
+                    per_page: {{ $assets->perPage() }}
+                },
+                isLoading: false,
 
                 selectedMonths: [],
                 selectedYears: [],
@@ -2392,15 +2197,29 @@
                     { value: '12', label: 'Desember' }
                 ],
 
+                init() {
+                    let fetchTimeout = null;
+                    const triggerFilter = () => {
+                        clearTimeout(fetchTimeout);
+                        fetchTimeout = setTimeout(() => {
+                            if (this.showModal && this.view === 'list') {
+                                this.fetchCurrent(1);
+                            }
+                        }, 250);
+                    };
+
+                    this.$watch('selectedMonths', triggerFilter);
+                    this.$watch('selectedYears', triggerFilter);
+                    this.$watch('selectedStatus', triggerFilter);
+                },
+
                 getYears() {
-                    let dates = this.activeType === 'kas' 
-                        ? this.allData.map(d => d.tanggal) 
-                        : this.allDataAsset.map(d => d.tahun_perolehan);
-                    let years = dates.map(d => d ? d.substring(0, 4) : '').filter((v, i, a) => v && a.indexOf(v) === i);
-                    if (years.length === 0) {
-                        years = [new Date().getFullYear().toString()];
+                    const currentYear = new Date().getFullYear();
+                    const years = [];
+                    for (let y = currentYear - 4; y <= currentYear + 1; y++) {
+                        years.push(y.toString());
                     }
-                    return years.sort();
+                    return years;
                 },
 
                 formatPeriode() {
@@ -2424,32 +2243,78 @@
                     return `${monthsStr} ${yearsStr}`;
                 },
 
-                shouldShowRow(dateString, status = null) {
-                    if (!dateString) return true;
-                    let parts = dateString.split('-');
-                    if (parts.length < 3) return true;
-                    let year = parts[0];
-                    let month = parts[1]; // '01', '02', etc.
+                loadKasPage(page = 1) {
+                    if (this.isLoading) return;
+                    this.isLoading = true;
+                    const params = new URLSearchParams({
+                        target: 'kas',
+                        page: page,
+                        filter_status: this.selectedStatus
+                    });
+                    this.selectedMonths.forEach(m => params.append('months[]', m));
+                    this.selectedYears.forEach(y => params.append('years[]', y));
 
-                    if (this.selectedMonths.length > 0 && !this.selectedMonths.includes(month)) {
-                        return false;
-                    }
-                    if (this.selectedYears.length > 0 && !this.selectedYears.includes(year)) {
-                        return false;
-                    }
-                    if (status !== null) {
-                        if (this.selectedStatus === 'approved' && status != 2) return false;
-                        if (this.selectedStatus === 'pending' && status == 2) return false;
-                    }
-                    return true;
+                    fetch(`{{ route('view.detail.unit', $unit->id) }}?${params.toString()}`, {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        const tbody = document.getElementById('kas-kecil-tbody');
+                        if (tbody) tbody.innerHTML = data.html;
+                        this.allData = data.allData;
+                        this.kasPagination = data.pagination;
+                        this.allKasIds = data.allIds;
+                        this.selectedRows = [];
+                    })
+                    .catch(err => {
+                        console.error('Error loading kas data:', err);
+                    })
+                    .finally(() => {
+                        this.isLoading = false;
+                    });
                 },
 
-                hasFilteredKas() {
-                    return this.allData.some(kas => this.shouldShowRow(kas.tanggal, kas.status));
+                loadAssetPage(page = 1) {
+                    if (this.isLoading) return;
+                    this.isLoading = true;
+                    const params = new URLSearchParams({
+                        target: 'asset',
+                        page: page,
+                        filter_status: this.selectedStatus
+                    });
+                    this.selectedMonths.forEach(m => params.append('months[]', m));
+                    this.selectedYears.forEach(y => params.append('years[]', y));
+
+                    fetch(`{{ route('view.detail.unit', $unit->id) }}?${params.toString()}`, {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        const tbody = document.getElementById('asset-tbody');
+                        if (tbody) tbody.innerHTML = data.html;
+                        this.allDataAsset = data.allData;
+                        this.assetPagination = data.pagination;
+                        this.allAssetIds = data.allIds;
+                        this.selectedRows = [];
+                    })
+                    .catch(err => {
+                        console.error('Error loading asset data:', err);
+                    })
+                    .finally(() => {
+                        this.isLoading = false;
+                    });
                 },
 
-                hasFilteredAssets() {
-                    return this.allDataAsset.some(a => this.shouldShowRow(a.tahun_perolehan, a.status));
+                fetchCurrent(page = 1) {
+                    if (this.activeType === 'kas') {
+                        this.loadKasPage(page);
+                    } else {
+                        this.loadAssetPage(page);
+                    }
                 },
 
                 hasApprovedSelected() {
@@ -2482,8 +2347,8 @@
                     }).then((result) => {
                         if (result.isConfirmed) {
                             const url = this.activeType === 'kas' 
-                                ? `/unit/${this.allData[0] ? this.allData[0].id_unit : '{{ $unit->id }}'}/kas-kecil/approve`
-                                : `/unit/${this.allDataAsset[0] ? this.allDataAsset[0].id_unit : '{{ $unit->id }}'}/asset/approve`;
+                                ? `/unit/{{ $unit->id }}/kas-kecil/approve`
+                                : `/unit/{{ $unit->id }}/asset/approve`;
 
                             fetch(url, {
                                 method: 'POST',
@@ -2648,7 +2513,7 @@
                     if (this.selectedRows.length === allIds.length) {
                         this.selectedRows = [];
                     } else {
-                        this.selectedRows = allIds;
+                        this.selectedRows = [...allIds];
                     }
                 },
 
