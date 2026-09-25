@@ -239,7 +239,7 @@ class PayrollController extends Controller
                                 // TAMBAHAN: JIKA STATUS 5 ATAU 6, GAJI HARI INI = 0
                                 $gajiHariIni = 0;
 
-                            }elseif (in_array($detil->status_kehadiran,$statusDilindungi) && $detil->isPaid == 1)
+                            }elseif (in_array($detil->status_kehadiran,$statusDilindungi) && $detil->paidLeave == 1)
                             {
                                 $gajiHariIni += ($jamHarian/$jamNormal) * $gajiHarianPkwt;
 
@@ -1091,7 +1091,7 @@ class PayrollController extends Controller
                 } elseif ($status == 5) { 
                     $warna = '#C6EFCE'; 
                 } elseif (in_array($status, [2, 3, 4])) { 
-                    if($detil->isPaid == 1) {
+                    if($detil->paidLeave == 1) {
                         $warna = '#87CEFA'; 
                     } elseif($jamKerja > 0) {
                         $warna = '#FFEB9C'; 
@@ -1470,9 +1470,9 @@ class PayrollController extends Controller
     //             } elseif ($status == 5) { // Sesuaikan angka ID Rencana Cuti Anda
     //                 $warna = '#C6EFCE'; // Hijau (Rencana Cuti)
     //             } elseif (in_array($status, [2, 3, 4])) { // Izin, Cuti, Sakit
-    //                 if($detil->isPaid == 1)
+    //                 if($detil->paidLeave == 1)
     //                 {
-    //                     $warna = '#87CEFA'; // Biru (isPaid)
+    //                     $warna = '#87CEFA'; // Biru (paidLeave)
     //                 }elseif($jamKerja > 0) {
     //                     $warna = '#FFEB9C'; // Kuning (Izin tapi ada jam)
     //                 }else{

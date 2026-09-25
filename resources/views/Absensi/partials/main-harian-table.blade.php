@@ -69,8 +69,8 @@
                         {{ $subLabel }}
                     </span>
 
-                    {{-- Optional: Small Payment Indicator if isPaid is active --}}
-                    @if ($detil->isPaid == 1)
+                    {{-- Optional: Small Payment Indicator if paidLeave is active --}}
+                    @if ($detil->paidLeave == 1)
                         <span
                             class="text-[9px] font-bold text-emerald-500 uppercase leading-none mt-0.5 tracking-widest">Dibayar
                             Penuh</span>
@@ -112,7 +112,7 @@
 
         {{-- 4. Cuti Berbayar (New Column) --}}
         <td class="px-4 py-5 text-center">
-            @if ($detil && $detil->isPaid == 1)
+            @if ($detil && $detil->paidLeave == 1)
                 <div class="flex justify-center">
                     <div
                         class="w-6 h-6 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center shadow-sm border border-emerald-200">

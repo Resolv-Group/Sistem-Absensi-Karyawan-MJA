@@ -195,7 +195,8 @@ class AbsensiController extends Controller
                     // Existing Values from saved attendance
                     'existing_jam' => $savedDetail ? (float) $savedDetail->jam_kerja_harian : null,
                     'existing_hbn' => $savedDetail ? (int) $savedDetail->hbn : 0,
-                    'existing_paid' => $savedDetail ? (int) $savedDetail->isPaid : 0,
+                    'existing_paid_leave' => $savedDetail ? (int) $savedDetail->paidLeave : 0,
+                    'existing_is_paid' => $savedDetail ? (int) $savedDetail->isPaid : 0,
                     'existing_status' => $savedDetail ? (int) $savedDetail->status_kehadiran : 0,
                     'existing_catatan' => $savedDetail ? $savedDetail->catatan : '',
                     'existing_potongan' => $uiPotongan,
@@ -314,6 +315,7 @@ class AbsensiController extends Controller
                                 'rej_mc_dibebankan' => $d->rej_mc_beban ?? 0,
                                 'bayaranPerusahaan' => $d->bayaranPerusahaan,
                                 'bayaranItem' => $d->bayaranItem,
+                                'keteranganSuratJalan' => $d->keteranganSuratJalan,
                                 'catatan' => $d->catatan,
                                 'fileName' => null,
                             ];
@@ -432,6 +434,7 @@ class AbsensiController extends Controller
             'date' => 'required|date',
             'data' => 'required|array',
             'data.*.jam_aktual' => 'required|numeric|min:0', // Pastikan jam diisi angka
+            'data.*.is_paid' => 'nullable|boolean',
         ]);
 
         // Custom validation untuk pesan error yang lebih user-friendly
@@ -482,7 +485,8 @@ class AbsensiController extends Controller
                     'overtime' => $values['overtime'] ?? 0,
                     'hbn' => $values['is_hbn'] ?? 0,
                     'status_kehadiran' => 1, // Pastikan status menjadi Hadir
-                    'isPaid' => 0,            // Reset status cuti berbayar
+                    'paidLeave' => 0,         // Reset status cuti berbayar
+                    'isPaid' => $values['is_paid'] ?? 1,
                     'catatan' => $values['catatan'] ?? null,
                     'updated_by' => Auth::id(),
                 ];
@@ -518,6 +522,7 @@ class AbsensiController extends Controller
         $validator = Validator::make($request->all(), [
             'date' => 'required|date',
             'data' => 'required|array',
+            'data.*.is_paid_leave' => 'nullable|boolean',
         ]);
 
         if ($validator->fails()) {
@@ -567,7 +572,8 @@ class AbsensiController extends Controller
                         'overtime' => 0,
                         'hbn' => 0,
                         'status_kehadiran' => $values['status_kehadiran'],
-                        'isPaid' => $values['is_paid_leave'],
+                        'paidLeave' => $values['is_paid_leave'] ?? 0,
+                        'isPaid' => 0,
                         'catatan' => $values['catatan'] ?? null,
                         'updated_by' => Auth::id(),
                     ],
@@ -780,6 +786,7 @@ class AbsensiController extends Controller
                 'data' => 'required|array|min:1',
 
                 'data.*.*.buktiSuratJalan' => 'nullable|file|mimes:png,jpg,jpeg,pdf|max:2048',
+                'data.*.*.keteranganSuratJalan' => 'nullable|string|max:2000',
             ],
             [
                 'date.required' => 'Tanggal tidak boleh kosong.',
@@ -932,6 +939,7 @@ class AbsensiController extends Controller
                             'bayaranPerusahaan' => $row['bayaranPerusahaan'] ?? 0,
                             'bayaranItem' => $row['bayaranItem'] ?? 0,
                             'buktiSuratJalan' => $fileContent,
+                            'keteranganSuratJalan' => $row['keteranganSuratJalan'] ?? null,
                             'catatan' => $row['catatan'] ?? null,
                             'updated_by' => Auth::id(),
                         ]);
@@ -968,6 +976,7 @@ class AbsensiController extends Controller
                 'group_data' => 'required|array|min:1',
                 'group_data.*.id_barang' => 'required',
                 'group_data.*.buktiSuratJalan' => 'nullable|file|mimes:png,jpg,jpeg,pdf|max:2048',
+                'group_data.*.keteranganSuratJalan' => 'nullable|string|max:2000',
             ],
             [
                 'date.required' => 'Tanggal tidak boleh kosong.',
@@ -1023,6 +1032,7 @@ class AbsensiController extends Controller
                     'bayaranPerusahaan' => $row['bayaranPerusahaan'] ?? 0,
                     'bayaranItem' => $row['bayaranItem'] ?? 0,
                     'buktiSuratJalan' => $fileContent,
+                    'keteranganSuratJalan' => $row['keteranganSuratJalan'] ?? null,
                     'catatan' => $row['catatan'] ?? null,
                     'updated_by' => Auth::id(),
                 ]);

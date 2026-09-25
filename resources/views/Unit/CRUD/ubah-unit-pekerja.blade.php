@@ -567,7 +567,7 @@
                 });
                 return formatted;
             })(),
-            tunjangan: @js($pkwt->tunjangan ?? []),
+            tunjangan: @js($unitSelected->normalizePkwtTunjangan($pkwt->tunjangan)),
         }];
 
         function workerCombobox(row) {

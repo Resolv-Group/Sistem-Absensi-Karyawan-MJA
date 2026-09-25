@@ -628,8 +628,20 @@ class UnitController extends Controller
                 'umk' => $validated['umk'],
                 'mulai_perjanjian' => $validated['mulai_perjanjian'],
                 'akhir_perjanjian' => $validated['akhir_perjanjian'],
-                'tunjangan' => json_decode($validated['tunjangan'], true),
+                'tunjangan' => json_decode($validated['tunjangan'] ?? 'null', true),
             ]);
+
+            // Remove obsolete allowances from existing contracts without changing retained amounts.
+            $allowedTunjangan = $unit->tunjangan ?? [];
+            $unit->pkwt()->chunkById(100, function ($contracts) use ($allowedTunjangan) {
+                foreach ($contracts as $contract) {
+                    $current = $contract->tunjangan ?? [];
+                    $filtered = array_intersect_key($current, $allowedTunjangan);
+                    if ($filtered !== $current) {
+                        $contract->update(['tunjangan' => $filtered]);
+                    }
+                }
+            });
 
             // ===============================
             // SYNC PIC

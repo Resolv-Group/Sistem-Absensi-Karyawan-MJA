@@ -95,45 +95,45 @@
         workerMap: @js($workerMap),
         rowItems: @js($existingBorongan),
         barangLookup: @js($barangLookup),
-    
+
         // --- Tunjangan ---
         showTunjanganModal: false,
         rowTunjangan: {},
         rowKeteranganTunjangan: {},
-    
+
         // --- Potongan ---
         showPotonganModal: false,
         rowPotongan: {},
         rowKeteranganPotongan: {},
-    
+
         currentIndex: 0,
         // Computed property to get current worker ID
         get currentWorkerId() {
             return this.selectedItems[this.currentIndex];
         },
-    
+
         formatRibuan(number) {
             if (!number) return '0';
             return new Intl.NumberFormat('id-ID').format(number);
         },
-    
+
         updatePrices(workerId, rIdx) {
             const row = this.rowItems[workerId][rIdx];
             const item = this.barangLookup[row.id_barang];
-    
+
             if (item && (row.max_rej_subkon === undefined || row.max_rej_subkon === null)) {
                 row.max_rej_subkon = item.max_rej_subkon;
             }
-    
+
             // 1. Calculate the current Total QTY
             const totalQTY = (parseInt(row.FD) || 0) +
                 (parseInt(row.act_rej) || 0) +
                 (parseInt(row.good_mc) || 0);
             row.totalQTY = totalQTY;
-    
+
             // 2. Hitung Max Reject yang Diizinkan (F9 di rumus Anda)
             row.act_rej_max = Math.round((row.max_rej_subkon / 100) * totalQTY);
-    
+
             // 3. Hitung Rej. MC Dibebankan (Rumus: =IF(F9>=G9;0;G9-F9))
             // F9 = row.act_rej_max | G9 = row.act_rej
             if (row.act_rej_max >= row.act_rej) {
@@ -141,13 +141,13 @@
             } else {
                 row.rej_mc_dibebankan = row.act_rej - row.act_rej_max;
             }
-    
+
             const totalBayar = row.FD + row.good_mc - row.rej_mc_dibebankan;
-    
+
             if (item && totalQTY > 0) {
                 // rumus: totalQTY * harga_unit
                 row.bayaranPerusahaan = totalBayar * item.harga_unit;
-    
+
                 // rumus: totalQTY * harga_pekerja
                 row.bayaranItem = totalBayar * item.harga_pekerja;
             } else {
@@ -156,10 +156,10 @@
                 row.bayaranItem = 0;
             }
         },
-    
+
         calculateAllExistingPrices() {
             if (!this.rowItems) return;
-    
+
             // Loop through every worker in the existing data
             Object.keys(this.rowItems).forEach(workerId => {
                 // Loop through every row for that worker
@@ -168,21 +168,21 @@
                 });
             });
         },
-    
+
         // Function to add a new row for a worker
         addBoronganRow(workerId) {
             if (!this.rowItems) this.rowItems = {};
             if (!this.rowItems[workerId]) this.rowItems[workerId] = [];
-    
+
             // Batasi jumlah baris berdasarkan jumlah barang yang tersedia
             const totalBarangTersedia = {{ count($barangs) }};
-    
+
             if (this.rowItems[workerId].length >= totalBarangTersedia) {
                 // Opsional: Anda bisa mengganti alert ini dengan toast notification yang lebih cantik
                 alert('Semua jenis barang sudah ditambahkan untuk pekerja ini.');
                 return;
             }
-    
+
             this.rowItems[workerId].push({
                 id_barang: '',
                 FD: 0,
@@ -195,22 +195,23 @@
                 bayaranPerusahaan: 0,
                 bayaranItem: 0,
                 totalQTY: 0,
+                keteranganSuratJalan: '',
                 catatan: '',
                 fileName: null // Pastikan variabel ini konsisten dengan input file Anda
             });
         },
-    
+
         // Track the current page number
         currentPage: {{ $pkwtPekerja->currentPage() }},
-    
+
         allIds: {{ json_encode($pkwtPekerja->pluck('id')) }},
-    
+
         globalMasuk: '08:00',
         globalKeluar: '17:00',
         globalStatus: '6', // default absen
         rowStatus: {},
         rowCatatan: {},
-    
+
         applyGlobalTime() {
             this.selectedItems.forEach(id => {
                 const rowMasuk = document.getElementById('masuk-' + id);
@@ -219,7 +220,7 @@
                 if (rowKeluar) rowKeluar.value = this.globalKeluar;
             });
         },
-    
+
         getEmptyRow() {
             return {
                 id_barang: '',
@@ -232,25 +233,26 @@
                 bayaranPerusahaan: 0,
                 bayaranItem: 0,
                 totalQTY: 0,
+                keteranganSuratJalan: '',
                 catatan: '',
                 fileName: null
             };
         },
-    
+
         updateGroupPrices(rIdx) {
             const row = this.groupRows[rIdx];
             const item = this.barangLookup[row.id_barang];
             if (item && (row.max_rej_subkon === undefined || row.max_rej_subkon === null)) {
                 row.max_rej_subkon = item.max_rej_subkon;
             }
-    
+
             const totalQTY = (parseInt(row.FD) || 0) + (parseInt(row.act_rej) || 0) + (parseInt(row.good_mc) || 0);
             row.totalQTY = totalQTY;
             row.act_rej_max = Math.round((row.max_rej_subkon / 100) * totalQTY);
             row.rej_mc_dibebankan = row.act_rej_max >= row.act_rej ? 0 : row.act_rej - row.act_rej_max;
-    
+
             const totalBayar = (parseInt(row.FD) || 0) + (parseInt(row.good_mc) || 0) - row.rej_mc_dibebankan;
-    
+
             if (item && totalQTY > 0) {
                 row.bayaranPerusahaan = totalBayar * item.harga_unit;
                 row.bayaranItem = totalBayar * item.harga_pekerja;
@@ -259,7 +261,7 @@
                 row.bayaranItem = 0;
             }
         },
-    
+
         initGroupModal() {
     // Check if first selected worker already has existing borongan data
     const firstId = this.selectedItems[0];
@@ -280,9 +282,9 @@
 
     this.showAbsenKelompokModal = true;
 },
-    
+
         groupRows: [],
-    
+
         // --- ADD THESE FUNCTIONS HERE ---
         validateAbsen() {
             const hasStatusHadir = this.selectedItems.some(id => this.rowStatus[id] == 1);
@@ -298,13 +300,13 @@
             }
             return true;
         },
-    
+
         confirmSubmitGroup() {
             if (!this.validateAbsen()) return;
-    
+
             const firstId = this.selectedItems[0];
             const rows = this.rowItems[firstId] || [];
-    
+
             if (rows.length === 0 || rows[0].id_barang === '') {
                 Swal.fire({
                     title: 'Data Kosong',
@@ -315,7 +317,7 @@
                 });
                 return;
             }
-    
+
             Swal.fire({
                 title: 'Simpan Data Kelompok?',
                 text: `Data ini akan diterapkan ke ${this.selectedItems.length} pekerja.`,
@@ -330,60 +332,60 @@
                 }
             });
         },
-    
-    
-    
+
+
+
         initStatusModal() {
             // Buat salinan objek baru untuk memicu reaktivitas
             let newStatus = { ...this.rowStatus };
             let newCatatan = { ...this.rowCatatan };
-    
+
             this.selectedItems.forEach(id => {
                 // Set default ke '2' (Cuti) jika datanya belum ada
                 if (!newStatus[id]) newStatus[id] = '2';
                 if (!newCatatan[id]) newCatatan[id] = '';
             });
-    
+
             this.rowStatus = newStatus;
             this.rowCatatan = newCatatan;
             this.showAbsenStatusModal = true;
         },
-    
+
         applyGlobalStatus() {
             this.selectedItems.forEach(id => {
                 this.rowStatus[id] = this.globalStatus;
             });
         },
-    
+
         toggleAll() {
             this.selectedItems = this.selectedItems.length === this.allIds.length ? [] : [...this.allIds];
         },
-    
+
         canShowTunjangan() {
             if (this.selectedItems.length === 0) return false;
             return this.selectedItems.every(id => {
                 return this.workerMap[id] && this.workerMap[id].has_absen === true;
             });
         },
-    
+
         canShowPotongan() {
             if (this.selectedItems.length === 0) return false;
             return this.selectedItems.every(id => {
                 return this.workerMap[id] && this.workerMap[id].has_absen === true;
             });
         },
-    
+
         initTunjanganModal() {
             // Data default dari Unit (Global)
             const unitConfig = (window.unitInfo && window.unitInfo.tunjanganConfig) ? window.unitInfo.tunjanganConfig : {};
             this.currentIndex = 0;
-    
+
             this.selectedItems.forEach(id => {
                 const worker = this.workerMap[id];
-    
+
                 if (!this.rowTunjangan[id]) {
                     let finalData = {};
-    
+
                     // 1. PRIORITAS UTAMA: Data yang sudah tersimpan di database untuk hari ini (Existing)
                     if (worker && worker.existing_tunjangan) {
                         finalData = JSON.parse(JSON.stringify(worker.existing_tunjangan));
@@ -391,18 +393,18 @@
                     } else {
                         // 2. PRIORITAS KEDUA: Data dari Kontrak PKWT (Spesifik per pekerja)
                         // 3. PRIORITAS KETIGA: Data dari Config Unit (Global)
-    
+
                         // Cek apakah pkwt_tunjangan ada isinya
                         const hasPkwtData = worker.pkwt_tunjangan && Object.keys(worker.pkwt_tunjangan).length > 0;
                         const baseSource = hasPkwtData ? worker.pkwt_tunjangan : unitConfig;
-    
+
                         // Transformasi format
                         Object.keys(baseSource).forEach(key => {
                             let val = baseSource[key];
-    
+
                             // Handle jika data di PKWT berbentuk angka langsung atau objek
                             let nominalValue = (typeof val === 'object' && val !== null) ? val.nominal : val;
-    
+
                             finalData[key] = {
                                 qty: 1,
                                 nominal: nominalValue
@@ -410,35 +412,35 @@
                         });
                         this.rowKeteranganTunjangan[id] = '';
                     }
-    
+
                     this.rowTunjangan[id] = finalData;
                 }
             });
             this.showTunjanganModal = true;
         },
-    
+
         nextWorker() { if (this.currentIndex < this.selectedItems.length - 1) this.currentIndex++; },
         prevWorker() { if (this.currentIndex > 0) this.currentIndex--; },
-    
+
         calculateCategoryTotal(workerId, key) {
             const item = this.rowTunjangan[workerId][key];
             return (parseInt(item.qty) || 0) * (parseInt(item.nominal) || 0);
         },
-    
+
         calculateWorkerTotal(id) {
             const categories = this.rowTunjangan[id] || {};
             return Object.keys(categories).reduce((sum, key) => sum + this.calculateCategoryTotal(id, key), 0);
         },
-    
+
         calculateGrandTotal() {
             return this.selectedItems.reduce((sum, id) => sum + this.calculateWorkerTotal(id), 0);
         },
-    
+
         initPotonganModal() {
             this.currentIndex = 0;
             this.selectedItems.forEach(id => {
                 const worker = this.workerMap[id];
-    
+
                 // Auto-fill jika ada data lama
                 if (worker && worker.existing_potongan && worker.existing_potongan.length > 0) {
                     this.rowPotongan[id] = JSON.parse(JSON.stringify(worker.existing_potongan));
@@ -451,12 +453,12 @@
             });
             this.showPotonganModal = true;
         },
-    
+
         // Fungsi Tambah Baris Baru
         addPotonganRow(workerId) {
             this.rowPotongan[workerId].push({ nama: '', nominal: 0 });
         },
-    
+
         // Fungsi Hapus Baris
         removePotonganRow(workerId, index) {
             this.rowPotongan[workerId].splice(index, 1);
@@ -465,21 +467,21 @@
                 this.rowPotongan[workerId] = [{ nama: '', nominal: 0 }];
             }
         },
-    
+
         // Hitung total per pekerja
         calculatePotonganWorkerTotal(id) {
             const items = this.rowPotongan[id] || [];
             return items.reduce((sum, item) => sum + (parseInt(item.nominal) || 0), 0);
         },
-    
+
         // Hitung Grand Total (seluruh pekerja terpilih)
         calculatePotonganGrandTotal() {
             return this.selectedItems.reduce((sum, id) => sum + this.calculatePotonganWorkerTotal(id), 0);
         },
-    
+
         async updateTable(targetUrl = null) {
             let url;
-    
+
             if (targetUrl) {
                 // If called from Pagination Link
                 url = new URL(targetUrl);
@@ -490,7 +492,7 @@
             } else {
                 // If called from Typing Search/Filter
                 url = new URL(window.location.href);
-    
+
                 // Logic: If user is typing, we force page 1 to find results.
                 // If user cleared everything, we restore the saved currentPage.
                 if (!this.searchQuery && !this.filterVerifikasi && !this.filterStatus) {
@@ -499,31 +501,31 @@
                     url.searchParams.set('page', '1');
                 }
             }
-    
+
             // Apply all filters to the URL
             url.searchParams.set('search', this.searchQuery);
             url.searchParams.set('status', this.filterStatus);
             url.searchParams.set('statusVerif', this.filterVerifikasi);
-    
+
             try {
                 const response = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
                 const html = await response.text();
-    
+
                 document.getElementById('main-table-body').innerHTML = html;
-    
+
                 // Update the pagination links at the bottom
                 const newPagination = document.getElementById('new-pagination-provider');
                 const paginationContainer = document.getElementById('search-pagination');
                 if (newPagination && paginationContainer) {
                     paginationContainer.innerHTML = newPagination.innerHTML;
                 }
-    
+
                 // Sync IDs for Bulk Actions
                 const provider = document.getElementById('new-ids-provider-full');
                 if (provider) this.allIds = JSON.parse(provider.dataset.ids);
             } catch (error) { console.error(error); }
         },
-    
+
         resetFilters() {
             this.searchQuery = '';
             this.filterStatus = '';
@@ -557,7 +559,7 @@ toggleWithGroup(id) {
         this.selectedItems = [...new Set([...this.selectedItems, ...idsToToggle])];
     }
 },
-    
+
     }" x-init="calculateAllExistingPrices();
     $watch('searchQuery', () => updateTable());
     $watch('filterStatus', () => updateTable());
@@ -889,7 +891,7 @@ toggleWithGroup(id) {
 
                                         <div class="grid grid-cols-1 sm:flex items-center gap-2">
                                             <!-- 1. Kelompok Absen -->
-                                            <button 
+                                            <button
                                                 x-show="!selectedItems.some(id => workerMap[id]?.is_individual)"
                                                 @click="initGroupModal()"
                                                 class="group flex items-center justify-center gap-2 px-4 py-2.5 bg-orange-50 hover:bg-orange-600 border border-orange-100 text-orange-700 hover:text-white rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all active:scale-95 shadow-sm">
@@ -901,7 +903,7 @@ toggleWithGroup(id) {
                                             </button>
 
                                             <!-- Individual Absen -->
-                                            <button 
+                                            <button
                                                 x-show="!selectedItems.some(id => workerMap[id]?.is_group)"
                                                 @click="showAbsenModal = true"
                                                 class="group flex items-center justify-center gap-2 px-4 py-2.5 bg-orange-50 hover:bg-orange-600 border border-orange-100 text-orange-700 hover:text-white rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all active:scale-95 shadow-sm">
@@ -1577,6 +1579,17 @@ toggleWithGroup(id) {
                                                                         </div>
                                                                     </div>
 
+                                                                    {{-- Keterangan Surat Jalan --}}
+                                                                    <div class="flex flex-col gap-1 sm:gap-1.5">
+                                                                        <label
+                                                                            class="text-[11px] sm:text-[12px] font-black text-slate-400 uppercase tracking-widest ml-1">Keterangan
+                                                                            Surat Jalan</label>
+                                                                        <textarea :name="'data[' + workerId + '][' + rIdx + '][keteranganSuratJalan]'" rows="2"
+                                                                            x-model="row.keteranganSuratJalan"
+                                                                            placeholder="Keterangan surat jalan (opsional)..."
+                                                                            class="w-full bg-slate-50 border border-slate-100 rounded-xl px-3.5 py-2 sm:px-4 sm:py-2.5 text-xs font-semibold text-slate-700 focus:bg-white focus:ring-2 focus:ring-orange-100 focus:border-orange-400 outline-none transition-all resize-none shadow-sm placeholder:text-slate-300"></textarea>
+                                                                    </div>
+
                                                                     {{-- Catatan --}}
                                                                     <div class="flex flex-col gap-1 sm:gap-1.5">
                                                                         <label
@@ -1995,6 +2008,15 @@ toggleWithGroup(id) {
                                                             </div>
                                                             <div class="flex flex-col gap-1 sm:gap-1.5">
                                                                 <label
+                                                                    class="text-[11px] sm:text-[12px] font-black text-slate-400 uppercase tracking-widest ml-1">Keterangan
+                                                                    Surat Jalan</label>
+                                                                <textarea :name="'group_data[' + rIdx + '][keteranganSuratJalan]'" rows="2"
+                                                                    x-model="row.keteranganSuratJalan"
+                                                                    placeholder="Keterangan surat jalan (opsional)..."
+                                                                    class="w-full bg-slate-50 border border-slate-100 rounded-xl px-3.5 py-2 sm:px-4 sm:py-2.5 text-xs font-semibold text-slate-700 focus:bg-white focus:ring-2 focus:ring-orange-100 focus:border-orange-400 outline-none transition-all resize-none shadow-sm placeholder:text-slate-300"></textarea>
+                                                            </div>
+                                                            <div class="flex flex-col gap-1 sm:gap-1.5">
+                                                                <label
                                                                     class="text-[11px] sm:text-[12px] font-black text-slate-400 uppercase tracking-widest ml-1">Catatan</label>
                                                                 <textarea :name="'group_data[' + rIdx + '][catatan]'" rows="2" x-model="row.catatan"
                                                                     placeholder="Keterangan tambahan..."
@@ -2396,20 +2418,21 @@ toggleWithGroup(id) {
                                                                         :key="key">
                                                                         <div
                                                                             class="flex flex-col sm:grid sm:grid-cols-12 gap-2 sm:gap-4 p-4 sm:px-6 sm:py-4 sm:items-center hover:bg-blue-50/30 transition-colors">
-                                                                            {{-- Title & Nominal (Mobile Header) --}}
-                                                                            <div class="sm:col-span-4 flex items-center justify-between sm:block">
+                                                                            {{-- Allowance Name --}}
+                                                                            <div class="sm:col-span-4">
                                                                                 <p class="text-[11px] font-black text-gray-900 uppercase tracking-tight"
                                                                                     x-text="key.replace(/_/g, ' ')"></p>
-                                                                                <span class="sm:hidden text-xs font-bold text-gray-400" x-text="'Rp ' + formatRibuan(rowTunjangan[id][key].nominal)"></span>
                                                                             </div>
 
-                                                                            {{-- Nominal Desktop --}}
-                                                                            <div class="hidden sm:block sm:col-span-3">
-                                                                                <div
-                                                                                    class="flex items-center gap-1.5 text-[11px] font-bold text-gray-400">
-                                                                                    <span>Rp</span>
-                                                                                    <span
-                                                                                        x-text="formatRibuan(rowTunjangan[id][key].nominal)"></span>
+                                                                            {{-- Nominal --}}
+                                                                            <div class="sm:col-span-3">
+                                                                                <label class="block sm:hidden text-[9px] font-bold text-gray-400 uppercase mb-1">Nominal</label>
+                                                                                <div class="relative">
+                                                                                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] font-black text-gray-300">Rp</span>
+                                                                                    <input type="text" inputmode="numeric"
+                                                                                        :value="formatRibuan(rowTunjangan[id][key].nominal)"
+                                                                                        @input="rowTunjangan[id][key].nominal = Number($event.target.value.replace(/\D/g, ''))"
+                                                                                        class="w-full pl-8 pr-3 py-2 bg-white border border-gray-100 rounded-xl text-xs font-black text-gray-700 focus:bg-white focus:border-blue-400 outline-none transition-all">
                                                                                 </div>
                                                                             </div>
 
@@ -2422,7 +2445,7 @@ toggleWithGroup(id) {
                                                                                         min="0" step="1"
                                                                                         @keydown="if(['-', '+', 'e', 'E'].includes($event.key)) $event.preventDefault()"
                                                                                         @input="if($event.target.value < 0) rowTunjangan[id][key].qty = 0"
-                                                                                        class="w-20 sm:w-full py-1.5 bg-gray-50 border border-gray-100 rounded-lg text-xs font-black text-center focus:bg-white focus:border-blue-400 outline-none transition-all">
+                                                                                        class="w-20 sm:w-full py-1.5 bg-white border border-gray-100 rounded-lg text-xs font-black text-center focus:bg-white focus:border-blue-400 outline-none transition-all">
                                                                                 </div>
                                                                                 <div class="sm:col-span-3 text-right">
                                                                                     <span class="sm:hidden text-[10px] font-bold text-gray-400 uppercase mr-1">Total:</span>

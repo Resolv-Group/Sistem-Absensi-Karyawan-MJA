@@ -178,6 +178,7 @@ class PKWTController extends Controller
             );
 
 
+            $unit = Unit::findOrFail($request->id_unit);
             $userRole = strtolower(trim(auth()->user()->role ?? ''));
 
             // ✅ LOOP PEKERJA
@@ -217,7 +218,7 @@ class PKWTController extends Controller
                     'rate_hbn' => $data['rate_hbn'],
                     'bpjs_kesehatan' => $data['bpjs_kesehatan'],
                     'bpjs_naker' => $data['bpjs_naker'],
-                    'tunjangan' => json_decode($data['tunjangan'], true),
+                    'tunjangan' => $unit->normalizePkwtTunjangan((array) json_decode($data['tunjangan'], true)),
                     'dokumen_pkwt' => $dokumen,
                     'dokumen_mime' => $dokumenMime,
                     'status_aktif' => $initialStatus, 
@@ -324,7 +325,7 @@ class PKWTController extends Controller
                 'jabatan_id' => $data['jabatan_id'],
                 'tgl_mulai_pkwt' => $data['tgl_mulai_pkwt'],
                 'tgl_akhir_pkwt' => $data['tgl_akhir_pkwt'],
-                'tunjangan' => json_decode($data['tunjangan'], true),
+                'tunjangan' => $pkwt->unit->normalizePkwtTunjangan((array) json_decode($data['tunjangan'], true)),
             ]);
 
             foreach ($data['days'] as $hari => $jam) {
@@ -381,7 +382,12 @@ class PKWTController extends Controller
             'reason' => 'nullable|string|max:500',
         ]);
 
-        $ids = json_decode($request->ids, true);
+        $ids = collect(json_decode($request->ids, true))
+            ->filter(fn ($id) => is_numeric($id))
+            ->map(fn ($id) => (int) $id)
+            ->unique()
+            ->values()
+            ->all();
 
         if (empty($ids)) {
             return back()->with('error', 'Tidak ada pekerja yang dipilih.');
@@ -391,25 +397,49 @@ class PKWTController extends Controller
             DB::beginTransaction();
 
             if ($request->action === 'update_status') {
-                // 🔥 JIKA MAU AKTIFKAN
                 if ((int) $request->status === 1) {
-                    // 1️⃣ Ambil daftar pekerja dari PKWT yang dipilih
-                    $pekerjaIds = PKWT::whereIn('id', $ids)->pluck('id_pekerja')->unique();
+                    $selectedPkwt = PKWT::whereIn('id', $ids)
+                        ->get(['id', 'id_pekerja', 'id_unit']);
 
-                    // 2️⃣ Cek apakah masih ada PKWT aktif lain
-                    $conflict = PKWT::whereIn('id_pekerja', $pekerjaIds)
-                        ->where('status_aktif', 1)
-                        ->whereNotIn('id', $ids) // ⬅️ selain yang sedang dipilih
-                        ->exists();
-
-                    if ($conflict) {
+                    if ($selectedPkwt->isEmpty()) {
                         DB::rollBack();
 
-                        return back()->with('error', 'Gagal mengaktifkan. Pastikan pekerja tidak memiliki PKWT aktif di unit lain.');
+                        return back()->with('error', 'Data PKWT yang dipilih tidak ditemukan.');
+                    }
+
+                    // A worker may be active in different units, but only once in the same unit.
+                    $selectedPairs = $selectedPkwt
+                        ->map(fn ($pkwt) => [
+                            'id_pekerja' => $pkwt->id_pekerja,
+                            'id_unit' => $pkwt->id_unit,
+                        ])
+                        ->unique(fn ($pair) => $pair['id_pekerja'].'|'.$pair['id_unit'])
+                        ->values();
+
+                    $hasDuplicateSelection = $selectedPkwt
+                        ->groupBy(fn ($pkwt) => $pkwt->id_pekerja.'|'.$pkwt->id_unit)
+                        ->contains(fn ($contracts) => $contracts->count() > 1);
+
+                    $hasExistingConflict = PKWT::where('status_aktif', 1)
+                        ->whereNotIn('id', $ids)
+                        ->where(function ($query) use ($selectedPairs) {
+                            foreach ($selectedPairs as $pair) {
+                                $query->orWhere(function ($pairQuery) use ($pair) {
+                                    $pairQuery
+                                        ->where('id_pekerja', $pair['id_pekerja'])
+                                        ->where('id_unit', $pair['id_unit']);
+                                });
+                            }
+                        })
+                        ->exists();
+
+                    if ($hasDuplicateSelection || $hasExistingConflict) {
+                        DB::rollBack();
+
+                        return back()->with('error', 'Gagal mengaktifkan. Pekerja sudah memiliki PKWT aktif pada unit yang sama.');
                     }
                 }
 
-                // 3️⃣ UPDATE AMAN
                 PKWT::whereIn('id', $ids)->update([
                     'status_aktif' => $request->status,
                     'updated_at' => now(),

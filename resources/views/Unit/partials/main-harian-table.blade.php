@@ -47,17 +47,17 @@
         {{-- Kolom BPJS --}}
         <td class="px-4 py-5">
             <div class="flex flex-col gap-2">
-                {{-- BPJS Kesehatan --}}
+                {{-- BPJS Naker --}}
                 <div class="flex items-center justify-between w-32 border-b border-gray-50 pb-1">
-                    <span class="text-[12px] font-extrabold text-gray-400 uppercase tracking-tighter">Kesehatan</span>
+                    <span class="text-[12px] font-extrabold text-gray-400 uppercase tracking-tighter">Naker</span>
                     <span class="text-[12px] font-bold text-gray-700 tracking-tight">
                         Rp.{{ number_format($pkwt->bpjs_kesehatan, 0, ',', '.') }}
                     </span>
                 </div>
 
-                {{-- BPJS Naker --}}
+                {{-- BPJS Kesehatan --}}
                 <div class="flex items-center justify-between w-32">
-                    <span class="text-[12px] font-extrabold text-gray-400 uppercase tracking-tighter">Naker</span>
+                    <span class="text-[12px] font-extrabold text-gray-400 uppercase tracking-tighter">Kesehatan</span>
                     <span class="text-[12px] font-bold text-gray-500 tracking-tight">
                         Rp.{{ number_format($pkwt->bpjs_naker, 0, ',', '.') }}
                     </span>

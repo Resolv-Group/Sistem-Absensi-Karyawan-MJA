@@ -15,6 +15,7 @@ class Detil_Harian extends Model
         'overtime',
         'hbn',
         'status_kehadiran',
+        'paidLeave',
         'isPaid',
         'catatan',
         'updated_by'

@@ -21,6 +21,7 @@ return new class extends Migration
             $table->decimal('overtime', 4, 1)->default(0);
             $table->integer('hbn')->default(0);
             $table->integer('status_kehadiran')->default(0);
+            $table->integer('paidLeave')->default(0);
             $table->integer('isPaid')->default(0);
             $table->char('catatan')->nullable();
 

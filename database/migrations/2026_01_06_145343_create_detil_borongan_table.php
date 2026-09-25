@@ -28,6 +28,7 @@ return new class extends Migration
             $table->float('bayaranItem');
 
             $table->binary('buktiSuratJalan')->nullable();
+            $table->text('keteranganSuratJalan')->nullable();
 
             $table->char('catatan')->nullable();
 

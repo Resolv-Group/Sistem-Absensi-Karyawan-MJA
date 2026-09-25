@@ -274,10 +274,20 @@
                                 </div>
                                 <div class="space-y-5">
                                     {{-- Kategori --}}
-                                    <div x-data="{ open: false, list: [{ val: '', label: 'Semua Kategori' }, @foreach ($boronganKategori as $c) { val: '{{ $c->id }}', label: '{{ $c->nama }}' }, @endforeach] }" class="relative">
+                                    <div x-data="{
+                                        open: false,
+                                        search: '',
+                                        list: @js(collect([['val' => '', 'label' => 'Semua Kategori']])->concat($boronganKategori->map(fn ($c) => ['val' => (string) $c->id, 'label' => $c->nama]))->values()),
+                                        get filteredList() {
+                                            const term = this.search.trim().toLocaleLowerCase('id-ID');
+                                            return term === '' ? this.list : this.list.filter(item =>
+                                                item.label.toLocaleLowerCase('id-ID').includes(term)
+                                            );
+                                        }
+                                    }" class="relative">
                                         <label
                                             class="block text-[10px] uppercase tracking-wider font-bold text-gray-400 mb-1.5">Kategori</label>
-                                        <div @click="open = !open"
+                                        <div @click="open = !open; search = ''; if (open) $nextTick(() => $refs.search.focus())"
                                             class="relative block w-full pl-3 pr-3 py-2.5 text-sm bg-gray-50 rounded-xl text-gray-700 cursor-pointer hover:bg-gray-100 transition flex justify-between items-center">
                                             <span class="truncate font-medium"
                                                 x-text="list.find(x => x.val == filterKategori)?.label || 'Semua Kategori'"></span>
@@ -288,14 +298,36 @@
                                         </div>
                                         <div x-show="open" @click.outside="open = false"
                                             class="absolute w-full mt-1 bg-white rounded-xl shadow-xl border border-gray-100 z-[80] overflow-hidden">
+                                            <div class="p-2 border-b border-gray-100">
+                                                <div class="relative">
+                                                    <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
+                                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            d="M21 21l-4.35-4.35m1.35-5.65a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                                    </svg>
+                                                    <input x-ref="search" type="text" x-model="search" @click.stop
+                                                        @keydown.escape.stop="open = false" placeholder="Cari kategori..."
+                                                        class="w-full pl-9 pr-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg text-gray-700 placeholder:text-gray-400 focus:border-orange-300 focus:ring-2 focus:ring-orange-100 outline-none transition">
+                                                </div>
+                                            </div>
                                             <ul class="max-h-40 overflow-y-auto py-1">
-                                                <template x-for="item in list" :key="item.val">
-                                                    <li @click="filterKategori = item.val; open = false"
+                                                <template x-for="item in filteredList" :key="item.val">
+                                                    <li @click="filterKategori = item.val; open = false; search = ''"
                                                         class="px-4 py-2 text-sm cursor-pointer hover:bg-orange-50 transition flex items-center gap-2"
-                                                        :class="filterKategori == item.val ? 'text-orange-600 font-bold' : ''">
+                                                        :class="filterKategori == item.val ? 'bg-orange-50 text-orange-600 font-bold' : 'text-gray-700'">
+                                                        <svg x-show="filterKategori == item.val" class="w-4 h-4 text-orange-500"
+                                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                d="M5 13l4 4L19 7" />
+                                                        </svg>
+                                                        <span x-show="filterKategori != item.val" class="w-4 h-4"></span>
                                                         <span x-text="item.label"></span>
                                                     </li>
                                                 </template>
+                                                <li x-show="filteredList.length === 0"
+                                                    class="px-4 py-3 text-sm text-center text-gray-400 italic">
+                                                    Kategori tidak ditemukan
+                                                </li>
                                             </ul>
                                         </div>
                                     </div>

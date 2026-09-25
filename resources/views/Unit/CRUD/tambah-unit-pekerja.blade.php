@@ -1092,7 +1092,12 @@
                     let parsedTunjangan = createFreshTunjangan();
                     if (item.tunjangan) {
                         try {
-                            parsedTunjangan = typeof item.tunjangan === 'string' ? JSON.parse(item.tunjangan) : item.tunjangan;
+                            const saved = typeof item.tunjangan === 'string' ? JSON.parse(item.tunjangan) : item.tunjangan;
+                            Object.keys(parsedTunjangan).forEach(key => {
+                                if (saved && Object.prototype.hasOwnProperty.call(saved, key)) {
+                                    parsedTunjangan[key] = saved[key];
+                                }
+                            });
                         } catch (e) {
                             console.error('Error parsing old tunjangan:', e);
                         }

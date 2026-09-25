@@ -107,9 +107,11 @@
         // --- Input Jam Kerja State ---
         rowJam: {},
         rowHBN: {},
+        rowIsPaid: {},
         rowCatatan: {},
         globalJam: '',
         globalHBN: false,
+        globalIsPaid: true,
 
         // --- Status Absen State ---
         rowStatus: {},
@@ -160,6 +162,7 @@
 
                     // PAKSA KE BOOLEAN: Jika existing_hbn == 1 maka TRUE (Centang)
                     this.rowHBN[id] = worker.existing_hbn == 1;
+                    this.rowIsPaid[id] = worker.existing_status === 1 ? (worker.existing_is_paid == 1) : true;
 
                     this.rowCatatan[id] = worker.existing_catatan || '';
                 }
@@ -195,7 +198,7 @@
 
                     // PERBAIKAN DI SINI:
                     // Paksa menjadi true jika nilainya 1, dan false jika 0
-                    this.rowPaidLeave[id] = (worker.existing_paid == 1);
+                    this.rowPaidLeave[id] = (worker.existing_paid_leave == 1);
                 }
             });
             this.showAbsenStatusModal = true;
@@ -208,6 +211,7 @@
                     this.rowJam[id] = this.globalJam;
                 }
                 this.rowHBN[id] = this.globalHBN;
+                this.rowIsPaid[id] = this.globalIsPaid;
             });
         },
 
@@ -252,11 +256,11 @@
                     if (worker && worker.existing_tunjangan) {
                         finalData = JSON.parse(JSON.stringify(worker.existing_tunjangan));
                         this.rowKeteranganTunjangan[id] = worker.existing_keterangan_tunjangan || '';
-                    } 
+                    }
                     else {
                         // 2. PRIORITAS KEDUA: Data dari Kontrak PKWT (Spesifik per pekerja)
                         // 3. PRIORITAS KETIGA: Data dari Config Unit (Global)
-                        
+
                         // Cek apakah pkwt_tunjangan ada isinya
                         const hasPkwtData = worker.pkwt_tunjangan && Object.keys(worker.pkwt_tunjangan).length > 0;
                         const baseSource = hasPkwtData ? worker.pkwt_tunjangan : unitConfig;
@@ -264,7 +268,7 @@
                         // Transformasi format
                         Object.keys(baseSource).forEach(key => {
                             let val = baseSource[key];
-                            
+
                             // Handle jika data di PKWT berbentuk angka langsung atau objek
                             let nominalValue = (typeof val === 'object' && val !== null) ? val.nominal : val;
 
@@ -397,7 +401,7 @@
         {{-- HEADER SECTION --}}
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
             <div
-                class="bg-white rounded-[2.5rem] p-8 md:p-10 shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-gray-100 relative overflow-hidden">
+                class="bg-white rounded-[2.5rem] p-5 sm:p-8 md:p-10 shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-gray-100 relative overflow-hidden">
 
                 {{-- Surprise Element: Background Pattern Decoration --}}
                 <div class="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-blue-50 rounded-full blur-3xl opacity-40">
@@ -444,7 +448,7 @@
                             <div class="flex items-center gap-5">
                                 <div class="h-14 w-2 bg-blue-600 rounded-full shadow-[0_0_20px_rgba(37,99,235,0.4)] shrink-0"></div>
                                 <div class="min-w-0">
-                                    <h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tight leading-none break-words">
+                                    <h1 class="text-xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tight leading-none whitespace-nowrap">
                                         Pengelolaan
                                         Absensi<span class="text-blue-600">.</span>
                                     </h1>
@@ -903,6 +907,15 @@
                                                         (Libur)</span>
                                                 </label>
 
+                                                {{-- Global Payment Status --}}
+                                                <label class="flex items-center gap-2 cursor-pointer group">
+                                                    <input type="checkbox" x-model="globalIsPaid"
+                                                        class="w-4 h-4 rounded border-emerald-300 text-emerald-600 focus:ring-emerald-500">
+                                                    <span
+                                                        class="text-[10px] font-bold text-emerald-500 uppercase group-hover:text-emerald-600 transition-colors">Tetap
+                                                        Dibayar</span>
+                                                </label>
+
                                                 <button type="button" @click="applyGlobalValues()"
                                                     class="w-full sm:w-auto px-4 py-2 sm:px-6 sm:py-2.5 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-blue-700 transition shadow-lg shadow-blue-200 active:scale-95 text-center">
                                                     Terapkan
@@ -923,31 +936,32 @@
                                         {{-- Table Header --}}
                                         <div
                                             class="px-10 py-4 bg-gray-50/80 border-b border-gray-100 hidden lg:flex items-center text-[11px] font-black text-gray-400 uppercase tracking-[0.15em]">
-                                            <div class="w-12 text-center">No.</div>
-                                            <div class="w-72">Informasi Pekerja</div>
-                                            <div class="w-24 text-center">Normal</div>
-                                            <div class="w-32 text-center">Jam Realita</div>
-                                            <div class="w-24 text-center">Overtime</div>
-                                            <div class="w-24 text-center">HBN</div>
+                                            <div class="w-8 text-center">No.</div>
+                                            <div class="w-52">Informasi Pekerja</div>
+                                            <div class="w-20 text-center">Normal</div>
+                                            <div class="w-28 text-center">Jam Realita</div>
+                                            <div class="w-20 text-center">Overtime</div>
+                                            <div class="w-16 text-center">HBN</div>
+                                            <div class="w-24 text-center">Tetap Dibayar</div>
                                             <div class="flex-1 px-4">Keterangan / Catatan</div>
                                         </div>
 
                                         <div class="divide-y divide-gray-100">
                                             <template x-for="(id, index) in selectedItems" :key="id">
                                                 <div
-                                                    class="group flex flex-col lg:flex-row lg:items-center p-4 sm:px-10 sm:py-4 hover:bg-blue-50/30 transition-all duration-300 gap-3 lg:gap-y-0">
+                                                    class="group flex flex-col lg:flex-row lg:items-center p-4 sm:px-10 sm:py-4 hover:bg-blue-50/30 transition-all duration-300 gap-3 lg:gap-0">
 
                                                     {{-- Top on Mobile / Left on Desktop: No & Identity --}}
-                                                    <div class="flex items-center gap-3 lg:w-auto">
+                                                    <div class="flex items-center gap-3 lg:gap-0 lg:w-auto">
                                                         {{-- No. Column --}}
-                                                        <div class="w-6 sm:w-12 flex-shrink-0 text-left lg:text-center">
+                                                        <div class="w-6 lg:w-8 flex-shrink-0 text-left lg:text-center">
                                                             <span
                                                                 class="text-[11px] font-bold text-gray-300 group-hover:text-blue-400 transition-colors"
                                                                 x-text="index + 1 + '.'"></span>
                                                         </div>
 
                                                         {{-- 1. Identity Column --}}
-                                                        <div class="w-full lg:w-72 flex-shrink-0 flex items-center gap-3 pr-2 lg:pr-4 min-w-0">
+                                                        <div class="w-full lg:w-52 flex-shrink-0 flex items-center gap-3 pr-2 lg:pr-4 min-w-0">
                                                             <div class="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-[10px] font-black text-gray-400 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300 shrink-0"
                                                                 x-text="workerMap[id]?.initials"></div>
                                                             <div class="min-w-0 flex-1">
@@ -960,9 +974,9 @@
                                                     </div>
 
                                                     {{-- Middle on Mobile / Inline on Desktop: Inputs & Stats --}}
-                                                    <div class="grid grid-cols-2 sm:grid-cols-4 lg:flex lg:items-center gap-2.5 lg:gap-0 pl-9 lg:pl-0">
+                                                    <div class="grid grid-cols-2 sm:grid-cols-5 lg:flex lg:items-center gap-2.5 lg:gap-0 pl-9 lg:pl-0">
                                                         {{-- 2. Jam Normal Column --}}
-                                                        <div class="lg:w-24 flex-shrink-0 text-left lg:text-center">
+                                                        <div class="lg:w-20 flex-shrink-0 text-left lg:text-center">
                                                             <div class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1 lg:hidden">Normal</div>
                                                             <div
                                                                 class="inline-block px-2.5 py-1 bg-gray-50 border border-gray-100 rounded-lg">
@@ -974,7 +988,7 @@
                                                         </div>
 
                                                         {{-- 3. Jam Realita Column --}}
-                                                        <div class="lg:w-32 flex-shrink-0 lg:px-4">
+                                                        <div class="lg:w-28 flex-shrink-0 lg:px-3">
                                                             <div class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1 lg:hidden">Jam Realita</div>
                                                             <div class="relative group/input flex items-center">
                                                                 <input type="number" step="0.5" min="0"
@@ -987,7 +1001,7 @@
                                                         </div>
 
                                                         {{-- 4. Overtime Column --}}
-                                                        <div class="lg:w-24 flex-shrink-0 text-left lg:text-center">
+                                                        <div class="lg:w-20 flex-shrink-0 text-left lg:text-center">
                                                             <div class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1 lg:hidden">Overtime</div>
                                                             <div class="py-1">
                                                                 <span class="text-sm font-black transition-colors"
@@ -1000,7 +1014,7 @@
                                                         </div>
 
                                                         {{-- 5. HBN Column --}}
-                                                        <div class="lg:w-24 flex-shrink-0 flex flex-col lg:items-center justify-center">
+                                                        <div class="lg:w-16 flex-shrink-0 flex flex-col lg:items-center justify-center">
                                                             <div class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1 lg:hidden">Libur (HBN)</div>
                                                             <div class="relative flex items-center lg:justify-center py-1">
                                                                 <input type="hidden" :name="'data[' + id + '][is_hbn]'"
@@ -1012,10 +1026,22 @@
                                                                     class="w-5 h-5 rounded-md border-gray-300 text-blue-600 focus:ring-blue-100 transition-all cursor-pointer shadow-sm">
                                                             </div>
                                                         </div>
+
+                                                        {{-- 6. Payment Status Column --}}
+                                                        <div class="lg:w-24 flex-shrink-0 flex flex-col lg:items-center justify-center">
+                                                            <div class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1 lg:hidden">Tetap Dibayar</div>
+                                                            <div class="relative flex items-center lg:justify-center py-1">
+                                                                <input type="hidden" :name="'data[' + id + '][is_paid]'"
+                                                                    value="0">
+                                                                <input type="checkbox" :name="'data[' + id + '][is_paid]'"
+                                                                    value="1" x-model="rowIsPaid[id]"
+                                                                    class="w-5 h-5 rounded-md border-gray-300 text-emerald-600 focus:ring-emerald-100 transition-all cursor-pointer shadow-sm">
+                                                            </div>
+                                                        </div>
                                                     </div>
 
-                                                    {{-- 6. Catatan Column --}}
-                                                    <div class="flex-1 min-w-[200px] pl-9 lg:pl-0 lg:px-4">
+                                                    {{-- 7. Catatan Column --}}
+                                                    <div class="flex-1 min-w-0 pl-9 lg:pl-0 lg:px-4">
                                                         <input type="text" :name="'data[' + id + '][catatan]'"
                                                             x-model="rowCatatan[id]"
                                                             placeholder="Tambah catatan harian..."
@@ -1462,20 +1488,21 @@
                                                                         :key="key">
                                                                         <div
                                                                             class="flex flex-col sm:grid sm:grid-cols-12 gap-2 sm:gap-4 p-4 sm:px-6 sm:py-4 sm:items-center hover:bg-blue-50/30 transition-colors">
-                                                                            {{-- Title & Nominal (Mobile Header) --}}
-                                                                            <div class="sm:col-span-4 flex items-center justify-between sm:block">
+                                                                            {{-- Allowance Name --}}
+                                                                            <div class="sm:col-span-4">
                                                                                 <p class="text-[11px] font-black text-gray-900 uppercase tracking-tight"
                                                                                     x-text="key.replace(/_/g, ' ')"></p>
-                                                                                <span class="sm:hidden text-xs font-bold text-gray-400" x-text="'Rp ' + formatRibuan(rowTunjangan[id][key].nominal)"></span>
                                                                             </div>
 
-                                                                            {{-- Nominal Desktop --}}
-                                                                            <div class="hidden sm:block sm:col-span-3">
-                                                                                <div
-                                                                                    class="flex items-center gap-1.5 text-[11px] font-bold text-gray-400">
-                                                                                    <span>Rp</span>
-                                                                                    <span
-                                                                                        x-text="formatRibuan(rowTunjangan[id][key].nominal)"></span>
+                                                                            {{-- Nominal --}}
+                                                                            <div class="sm:col-span-3">
+                                                                                <label class="block sm:hidden text-[9px] font-bold text-gray-400 uppercase mb-1">Nominal</label>
+                                                                                <div class="relative">
+                                                                                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] font-black text-gray-300">Rp</span>
+                                                                                    <input type="text" inputmode="numeric"
+                                                                                        :value="formatRibuan(rowTunjangan[id][key].nominal)"
+                                                                                        @input="rowTunjangan[id][key].nominal = Number($event.target.value.replace(/\D/g, ''))"
+                                                                                        class="w-full pl-8 pr-3 py-2 bg-white border border-gray-100 rounded-xl text-xs font-black text-gray-700 focus:bg-white focus:border-blue-400 outline-none transition-all">
                                                                                 </div>
                                                                             </div>
 
@@ -1488,7 +1515,7 @@
                                                                                         min="0" step="1"
                                                                                         @keydown="if(['-', '+', 'e', 'E'].includes($event.key)) $event.preventDefault()"
                                                                                         @input="if($event.target.value < 0) rowTunjangan[id][key].qty = 0"
-                                                                                        class="w-20 sm:w-full py-1.5 bg-gray-50 border border-gray-100 rounded-lg text-xs font-black text-center focus:bg-white focus:border-blue-400 outline-none transition-all">
+                                                                                        class="w-20 sm:w-full py-1.5 bg-white border border-gray-100 rounded-lg text-xs font-black text-center focus:bg-white focus:border-blue-400 outline-none transition-all">
                                                                                 </div>
                                                                                 <div class="sm:col-span-3 text-right">
                                                                                     <span class="sm:hidden text-[10px] font-bold text-gray-400 uppercase mr-1">Total:</span>
