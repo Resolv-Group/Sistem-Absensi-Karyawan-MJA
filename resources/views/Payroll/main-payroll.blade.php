@@ -534,7 +534,64 @@
                             </div>
 
                             <!-- STEP 2: PEKERJA DIBAYAR (DEFAULT TERPILIH SEMUA) -->
-                            <div class="space-y-3 sm:space-y-4">
+                            <div class="space-y-3 sm:space-y-4" x-data="{
+                                searchNama: '',
+                                filterDivisi: '',
+                                searchDivisi: '',
+                                divisiDropdownOpen: false,
+                                get isFiltered() {
+                                    return !!(this.searchNama || this.filterDivisi);
+                                },
+                                get divisiList() {
+                                    const divs = [...new Set($store.payslip.workers.map(w => w.divisi || '-'))].sort();
+                                    return divs;
+                                },
+                                get filteredDivisiList() {
+                                    const list = [{ val: '', label: 'Semua Divisi' }].concat(this.divisiList.map(d => ({ val: d, label: d })));
+                                    if (!this.searchDivisi) return list;
+                                    return list.filter(item => item.label.toLowerCase().includes(this.searchDivisi.toLowerCase()));
+                                },
+                                get filteredWorkers() {
+                                    return $store.payslip.workers.filter(w => {
+                                        const matchNama = !this.searchNama || w.nama.toLowerCase().includes(this.searchNama.toLowerCase());
+                                        const matchDivisi = !this.filterDivisi || (w.divisi || '-') === this.filterDivisi;
+                                        return matchNama && matchDivisi;
+                                    });
+                                },
+                                applyFilteredSelection() {
+                                    if (this.isFiltered) {
+                                        $store.payslip.selectedWorkers = this.filteredWorkers.map(w => w.id);
+                                    } else {
+                                        $store.payslip.selectedWorkers = $store.payslip.workers.map(w => w.id);
+                                    }
+                                },
+                                selectAll() {
+                                    if (this.isFiltered) {
+                                        $store.payslip.selectedWorkers = this.filteredWorkers.map(w => w.id);
+                                    } else {
+                                        $store.payslip.selectedWorkers = $store.payslip.workers.map(w => w.id);
+                                    }
+                                },
+                                deselectAll() {
+                                    $store.payslip.selectedWorkers = [];
+                                }
+                            }" x-init="
+                                $watch('$store.payslip.isOpen', val => {
+                                    if (val) {
+                                        searchNama = '';
+                                        filterDivisi = '';
+                                        searchDivisi = '';
+                                        divisiDropdownOpen = false;
+                                    }
+                                });
+                                $watch('filterDivisi', () => {
+                                    $nextTick(() => applyFilteredSelection());
+                                });
+                                $watch('searchNama', () => {
+                                    $nextTick(() => applyFilteredSelection());
+                                });
+                                $watch('divisiDropdownOpen', val => { if (!val) searchDivisi = ''; });
+                            ">
                                 <div class="flex items-center justify-between gap-2">
                                     <div class="flex items-center gap-2.5 sm:gap-3">
                                         <span
@@ -543,23 +600,119 @@
                                             class="block text-[10px] sm:text-[11px] font-black text-slate-700 uppercase tracking-widest">Pilih
                                             Pekerja yang Dibayar<span class="text-red-500 font-semibold">*</span></label>
                                     </div>
-                                    <div class="flex gap-2 shrink-0">
+                                    <div class="flex items-center gap-2 shrink-0">
                                         <button type="button"
-                                            @click="$store.payslip.selectedWorkers = $store.payslip.workers.map(w => w.id)"
-                                            class="text-[10px] sm:text-[11px] font-black text-emerald-600 hover:underline uppercase tracking-tighter">Pilih
+                                            @click="selectAll()"
+                                            class="text-[10px] sm:text-[11px] font-black text-emerald-600 hover:underline uppercase tracking-tighter"
+                                            x-text="isFiltered ? 'Pilih Semua (Terfilter)' : 'Pilih Semua'">Pilih
                                             Semua</button>
                                         <span class="text-slate-300 text-[11px]">|</span>
-                                        <button type="button" @click="$store.payslip.selectedWorkers = []"
-                                            class="text-[10px] sm:text-[11px] font-black text-slate-400 hover:underline uppercase tracking-tighter">Hapus
+                                        <button type="button"
+                                            @click="deselectAll()"
+                                            class="text-[10px] sm:text-[11px] font-black text-slate-400 hover:underline uppercase tracking-tighter"
+                                            x-text="isFiltered ? 'Hapus Terfilter' : 'Hapus Semua'">Hapus
                                             Semua</button>
                                     </div>
                                 </div>
                                 <div class="sm:ml-9">
+                                    {{-- Filter Bar --}}
+                                    <div class="flex flex-col sm:flex-row gap-2.5 mb-3">
+                                        {{-- Search Nama Pekerja --}}
+                                        <div class="relative flex-1">
+                                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                <svg class="h-3.5 w-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                                </svg>
+                                            </div>
+                                            <input type="text" x-model="searchNama" placeholder="Cari nama pekerja..."
+                                                class="w-full pl-9 pr-3 py-2 text-xs font-medium bg-white border border-slate-200 rounded-xl text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition shadow-sm">
+                                        </div>
+
+                                        {{-- Divisi Dropdown Filter --}}
+                                        <div class="relative sm:w-56" @click.outside="divisiDropdownOpen = false">
+                                            <div @click="divisiDropdownOpen = !divisiDropdownOpen"
+                                                class="w-full bg-white border border-slate-200 rounded-xl text-xs font-medium text-slate-700 py-2 px-3 flex justify-between items-center cursor-pointer hover:border-emerald-500 transition shadow-sm gap-2">
+                                                <div class="flex items-center gap-2 min-w-0">
+                                                    <svg class="h-3.5 w-3.5 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                                    </svg>
+                                                    <span class="truncate" x-text="filterDivisi || 'Semua Divisi'"></span>
+                                                </div>
+                                                <svg class="w-3.5 h-3.5 text-slate-400 transition-transform duration-200 shrink-0"
+                                                    :class="{ 'rotate-180': divisiDropdownOpen }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                                </svg>
+                                            </div>
+
+                                            {{-- Divisi Dropdown List --}}
+                                            <div x-show="divisiDropdownOpen" x-transition:enter="transition ease-out duration-100"
+                                                x-transition:enter-start="transform opacity-0 scale-95"
+                                                x-transition:enter-end="transform opacity-100 scale-100"
+                                                x-transition:leave="transition ease-in duration-75"
+                                                x-transition:leave-start="transform opacity-100 scale-100"
+                                                x-transition:leave-end="transform opacity-0 scale-95"
+                                                class="absolute w-full mt-1.5 bg-white rounded-xl shadow-lg border border-slate-100 overflow-hidden z-[60] flex flex-col">
+
+                                                {{-- Search Input Field inside Dropdown --}}
+                                                <div class="p-2 border-b border-slate-100 sticky top-0 bg-white" @click.stop>
+                                                    <div class="relative">
+                                                        <input type="text"
+                                                            x-model="searchDivisi"
+                                                            placeholder="Cari divisi..."
+                                                            class="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:bg-white transition">
+                                                        <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
+                                                            <svg class="h-3.5 w-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                                            </svg>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <ul class="max-h-48 overflow-y-auto py-1 custom-scrollbar">
+                                                    <template x-for="item in filteredDivisiList" :key="item.val">
+                                                        <li @click="filterDivisi = item.val; divisiDropdownOpen = false"
+                                                            class="px-3.5 py-2 text-xs cursor-pointer transition flex items-center gap-2"
+                                                            :class="filterDivisi === item.val ? 'bg-emerald-50 text-emerald-700 font-bold' : 'text-slate-600 hover:bg-slate-50'">
+                                                            <svg x-show="filterDivisi === item.val" class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                                            </svg>
+                                                            <span x-show="filterDivisi !== item.val" class="w-3.5 h-3.5 shrink-0"></span>
+                                                            <span x-text="item.label"></span>
+                                                        </li>
+                                                    </template>
+
+                                                    {{-- Empty State --}}
+                                                    <li x-show="filteredDivisiList.length === 0" class="px-3.5 py-3 text-xs text-center text-slate-400">
+                                                        Divisi tidak ditemukan
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {{-- Active Filter Badge --}}
+                                    <div x-show="searchNama || filterDivisi" x-transition class="flex items-center gap-2 mb-3">
+                                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Filter aktif:</span>
+                                        <template x-if="searchNama">
+                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-full text-[10px] font-bold border border-emerald-100">
+                                                <span x-text="'Nama: ' + searchNama"></span>
+                                                <button type="button" @click="searchNama = ''" class="hover:text-emerald-900 ml-0.5">&times;</button>
+                                            </span>
+                                        </template>
+                                        <template x-if="filterDivisi">
+                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full text-[10px] font-bold border border-blue-100">
+                                                <span x-text="'Divisi: ' + filterDivisi"></span>
+                                                <button type="button" @click="filterDivisi = ''" class="hover:text-blue-900 ml-0.5">&times;</button>
+                                            </span>
+                                        </template>
+                                        <span class="text-[10px] font-bold text-slate-400" x-text="'(' + filteredWorkers.length + ' dari ' + $store.payslip.workers.length + ')'"></span>
+                                    </div>
+
                                     <template x-if="$store.payslip.workers.length > 0">
                                         <div
                                             class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 max-h-56 overflow-y-auto p-3 sm:p-4 border border-slate-200 rounded-2xl sm:rounded-xl bg-slate-50/50 custom-scrollbar">
 
-                                            <template x-for="worker in $store.payslip.workers" :key="worker.id">
+                                            <template x-for="worker in filteredWorkers" :key="worker.id">
                                                 <label
                                                     class="flex items-center gap-2.5 px-3 py-2.5 bg-white border rounded-xl cursor-pointer transition-all duration-150"
                                                     :class="$store.payslip.selectedWorkers.includes(worker.id) ?
@@ -572,8 +725,8 @@
                                                         <span class="text-[12px] font-bold text-slate-700 leading-snug truncate"
                                                             x-text="worker.nama"></span>
                                                         <div class="flex items-center justify-between gap-1 mt-0.5">
-                                                            <span class="text-[10px] font-medium text-slate-400 tracking-tight"
-                                                                x-text="'ID: ' + worker.id"></span>
+                                                            <span class="text-[10px] font-medium text-slate-400 tracking-tight truncate"
+                                                                x-text="(worker.divisi && worker.divisi !== '-' ? worker.divisi : 'ID: ' + worker.id)"></span>
                                                             <span x-show="$store.payslip.sistemPengajian == 1"
                                                                 class="flex-shrink-0 text-[11px] sm:text-[12px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded tracking-tight"
                                                                 x-text="worker.total_alokasi_jam || '-'"></span>
@@ -581,6 +734,11 @@
                                                     </div>
                                                 </label>
                                             </template>
+
+                                            {{-- Empty filtered state --}}
+                                            <div x-show="filteredWorkers.length === 0" class="col-span-full py-6 text-center">
+                                                <p class="text-xs font-bold text-slate-400 italic">Tidak ada pekerja yang cocok dengan filter</p>
+                                            </div>
                                         </div>
                                     </template>
                                 </div>

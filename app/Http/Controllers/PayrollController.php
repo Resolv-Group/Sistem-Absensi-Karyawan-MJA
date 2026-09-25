@@ -55,7 +55,7 @@ class PayrollController extends Controller
                     $q->where('id_pic', $user->staff_id);
                 });
             })
-            ->with(['picUnit.staff', 'namaMitra', 'pkwt.pekerja.tunjangan', 'pkwt.pekerja.potongan']) 
+            ->with(['picUnit.staff', 'namaMitra', 'pkwt.pekerja.tunjangan', 'pkwt.pekerja.potongan', 'pkwt.divisi']) 
             ->withCount('pkwt');
 
         // A. Filter by Search (Name, NIK, KPJ)

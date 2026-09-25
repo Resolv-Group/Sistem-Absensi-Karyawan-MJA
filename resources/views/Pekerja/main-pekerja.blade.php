@@ -550,11 +550,145 @@
         @endif
 
         <!-- Content -->
-        <div class="p-6 max-h-[55vh] overflow-y-auto custom-scrollbar">
+        <div class="p-6 max-h-[55vh] overflow-y-auto custom-scrollbar" x-data="{
+            searchNama: '',
+            filterPic: '',
+            searchPic: '',
+            picDropdownOpen: false,
+            get allPics() {
+                const pics = [];
+                document.querySelectorAll('[data-pic-name]').forEach(el => {
+                    const name = el.dataset.picName;
+                    if (name && !pics.includes(name)) pics.push(name);
+                });
+                return pics.sort();
+            },
+            get filteredPicList() {
+                const list = [{ val: '', label: 'Semua Pengaju (PIC)' }].concat(this.allPics.map(p => ({ val: p, label: p })));
+                if (!this.searchPic) return list;
+                return list.filter(item => item.label.toLowerCase().includes(this.searchPic.toLowerCase()));
+            },
+            matchesFilter(row) {
+                const nama = (row.dataset.workerName || '').toLowerCase();
+                const pic = row.dataset.picName || '';
+                const matchNama = !this.searchNama || nama.includes(this.searchNama.toLowerCase());
+                const matchPic = !this.filterPic || pic === this.filterPic;
+                return matchNama && matchPic;
+            },
+            applyFilters() {
+                let visibleCount = 0;
+                document.querySelectorAll('.pending-pekerja-row').forEach(row => {
+                    if (this.matchesFilter(row)) {
+                        row.style.display = '';
+                        visibleCount++;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+                const emptyState = document.getElementById('pendingFilterEmpty');
+                if (emptyState) emptyState.style.display = visibleCount === 0 ? '' : 'none';
+                if (typeof window.updateBulkUI === 'function') {
+                    window.updateBulkUI();
+                }
+            }
+        }" x-init="$watch('searchNama', () => applyFilters()); $watch('filterPic', () => applyFilters()); $watch('picDropdownOpen', val => { if (!val) searchPic = ''; });">
+
             @if($count > 0)
+                {{-- Filter Bar --}}
+                <div class="flex flex-col sm:flex-row gap-2.5 mb-4">
+                    {{-- Search Nama Pekerja --}}
+                    <div class="relative flex-1">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-3.5 w-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+                        <input type="text" x-model="searchNama" placeholder="Cari nama pekerja..."
+                            class="w-full pl-9 pr-3 py-2 text-xs font-medium bg-white border border-gray-200 rounded-xl text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition shadow-sm">
+                    </div>
+
+                    {{-- PIC / Pengaju Dropdown Filter --}}
+                    <div class="relative sm:w-60" @click.outside="picDropdownOpen = false">
+                        <div @click="picDropdownOpen = !picDropdownOpen"
+                            class="w-full bg-white border border-gray-200 rounded-xl text-xs font-medium text-gray-700 py-2 px-3 flex justify-between items-center cursor-pointer hover:border-amber-500 transition shadow-sm gap-2">
+                            <div class="flex items-center gap-2 min-w-0">
+                                <svg class="h-3.5 w-3.5 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                                <span class="truncate" x-text="filterPic || 'Semua Pengaju (PIC)'"></span>
+                            </div>
+                            <svg class="w-3.5 h-3.5 text-gray-400 transition-transform duration-200 shrink-0"
+                                :class="{ 'rotate-180': picDropdownOpen }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </div>
+
+                        {{-- PIC Dropdown List --}}
+                        <div x-show="picDropdownOpen" x-transition:enter="transition ease-out duration-100"
+                            x-transition:enter-start="transform opacity-0 scale-95"
+                            x-transition:enter-end="transform opacity-100 scale-100"
+                            x-transition:leave="transition ease-in duration-75"
+                            x-transition:leave-start="transform opacity-100 scale-100"
+                            x-transition:leave-end="transform opacity-0 scale-95"
+                            class="absolute w-full mt-1.5 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden z-[60] flex flex-col">
+
+                            {{-- Search Input Field inside Dropdown --}}
+                            <div class="p-2 border-b border-gray-100 sticky top-0 bg-white" @click.stop>
+                                <div class="relative">
+                                    <input type="text"
+                                        x-model="searchPic"
+                                        placeholder="Cari pengaju (PIC)..."
+                                        class="w-full pl-8 pr-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-500 focus:bg-white transition">
+                                    <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
+                                        <svg class="h-3.5 w-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <ul class="max-h-48 overflow-y-auto py-1 custom-scrollbar">
+                                <template x-for="item in filteredPicList" :key="item.val">
+                                    <li @click="filterPic = item.val; picDropdownOpen = false"
+                                        class="px-3.5 py-2 text-xs cursor-pointer transition flex items-center gap-2"
+                                        :class="filterPic === item.val ? 'bg-amber-50 text-amber-700 font-bold' : 'text-gray-600 hover:bg-gray-50'">
+                                        <svg x-show="filterPic === item.val" class="w-3.5 h-3.5 text-amber-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                        <span x-show="filterPic !== item.val" class="w-3.5 h-3.5 shrink-0"></span>
+                                        <span x-text="item.label"></span>
+                                    </li>
+                                </template>
+
+                                {{-- Empty State --}}
+                                <li x-show="filteredPicList.length === 0" class="px-3.5 py-3 text-xs text-center text-gray-400">
+                                    Pengaju tidak ditemukan
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Active Filter Badges --}}
+                <div x-show="searchNama || filterPic" x-transition class="flex flex-wrap items-center gap-2 mb-3">
+                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Filter aktif:</span>
+                    <template x-if="searchNama">
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-50 text-amber-700 rounded-full text-[10px] font-bold border border-amber-100">
+                            <span x-text="'Nama: ' + searchNama"></span>
+                            <button type="button" @click="searchNama = ''" class="hover:text-amber-900 ml-0.5">&times;</button>
+                        </span>
+                    </template>
+                    <template x-if="filterPic">
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full text-[10px] font-bold border border-blue-100">
+                            <span x-text="'PIC: ' + filterPic"></span>
+                            <button type="button" @click="filterPic = ''" class="hover:text-blue-900 ml-0.5">&times;</button>
+                        </span>
+                    </template>
+                </div>
+
                 <div class="space-y-3">
                     @foreach($list as $item)
-                        <div id="pending-row-{{ $item->id }}" class="group bg-white/70 hover:bg-white border border-gray-100 hover:border-amber-200/70 p-3.5 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all">
+                        <div id="pending-row-{{ $item->id }}" data-worker-name="{{ $item->nama ?? '' }}" data-pic-name="{{ $item->user->name ?? '' }}" class="pending-pekerja-row group bg-white/70 hover:bg-white border border-gray-100 hover:border-amber-200/70 p-3.5 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all">
                             <div class="flex items-center gap-3">
                                 @if($isAdmin)
                                 <input type="checkbox" name="pekerja_ids[]" value="{{ $item->id }}" class="pekerja-checkbox w-4 h-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500 transition cursor-pointer mt-0.5 sm:mt-0">
@@ -596,6 +730,15 @@
                         </div>
                     @endforeach
                 </div>
+
+                {{-- Empty filtered state --}}
+                <div id="pendingFilterEmpty" style="display: none" class="text-center py-8 text-gray-500">
+                    <svg class="w-10 h-10 text-gray-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    <p class="font-bold text-gray-600 text-sm">Tidak ada data yang cocok</p>
+                    <p class="text-xs text-gray-400 mt-1">Coba ubah kata kunci atau filter Anda.</p>
+                </div>
             @else
                 <div class="text-center py-10 text-gray-500">
                     <svg class="w-12 h-12 text-amber-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -621,6 +764,9 @@
     <script>
     function openPendingModal() {
         document.getElementById('pendingPekerjaModal')?.classList.remove('hidden');
+        if (typeof window.updateBulkUI === 'function') {
+            window.updateBulkUI();
+        }
     }
     function closePendingModal() {
         document.getElementById('pendingPekerjaModal')?.classList.add('hidden');
@@ -712,10 +858,17 @@
         const bulkBtn = document.getElementById('bulkApproveBtn');
         const selectedCountSpan = document.getElementById('selectedCount');
 
+        function getVisibleCheckboxes() {
+            return Array.from(document.querySelectorAll('.pending-pekerja-row'))
+                .filter(row => row.style.display !== 'none')
+                .map(row => row.querySelector('.pekerja-checkbox'))
+                .filter(Boolean);
+        }
+
         if (selectAll) {
             selectAll.addEventListener('change', function() {
-                const checkboxes = document.querySelectorAll('.pekerja-checkbox');
-                checkboxes.forEach(cb => cb.checked = this.checked);
+                const visibleCheckboxes = getVisibleCheckboxes();
+                visibleCheckboxes.forEach(cb => cb.checked = selectAll.checked);
                 updateBulkUI();
             });
         }
@@ -727,10 +880,25 @@
         });
 
         function updateBulkUI() {
-            const checkedCount = document.querySelectorAll('.pekerja-checkbox:checked').length;
-            if (bulkBtn) bulkBtn.disabled = checkedCount === 0;
-            if (selectedCountSpan) selectedCountSpan.textContent = checkedCount;
+            const visibleCheckboxes = getVisibleCheckboxes();
+            const visibleCheckedCount = visibleCheckboxes.filter(cb => cb.checked).length;
+            const totalCheckedCount = document.querySelectorAll('.pekerja-checkbox:checked').length;
+
+            if (selectAll) {
+                if (visibleCheckboxes.length === 0) {
+                    selectAll.checked = false;
+                    selectAll.indeterminate = false;
+                } else {
+                    selectAll.checked = visibleCheckedCount === visibleCheckboxes.length;
+                    selectAll.indeterminate = visibleCheckedCount > 0 && visibleCheckedCount < visibleCheckboxes.length;
+                }
+            }
+
+            if (bulkBtn) bulkBtn.disabled = totalCheckedCount === 0;
+            if (selectedCountSpan) selectedCountSpan.textContent = totalCheckedCount;
         }
+
+        window.updateBulkUI = updateBulkUI;
     });
 
     function bulkApprove() {
