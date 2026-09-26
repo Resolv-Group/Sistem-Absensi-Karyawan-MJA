@@ -81,8 +81,9 @@
         </div>
     @endif
 
-    <div x-data="{
+    <div data-attendance-page x-data="{
         selectedItems: [],
+        selectedDates: @js($dates),
         showFilterDropdown: false,
         showAbsenModal: false,
         showAbsenStatusModal: false,
@@ -366,10 +367,17 @@
 
             try {
                 const response = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
-                const html = await response.text();
+                if (!response.ok) throw new Error('Gagal memuat absensi');
+                const result = await response.json();
+                const html = result.html;
+                this.workerMap = result.workers;
+                this.selectedItems = [];
+                this.rowTunjangan = {};
+                this.rowPotongan = {};
+                this.allIds = result.ids;
+                this.currentPage = result.page;
+                document.getElementById('attendance-pagination').innerHTML = result.pagination;
                 document.getElementById('main-table-body').innerHTML = html;
-                const provider = document.getElementById('new-ids-provider-full');
-                if (provider) this.allIds = JSON.parse(provider.dataset.ids);
             } catch (error) { console.error(error); }
         },
 
@@ -413,7 +421,7 @@
                 <div class="relative z-10">
                     {{-- Top Row: Breadcrumb & Date Capsule --}}
                     <div class="flex flex-wrap items-center justify-between gap-4 mb-8">
-                        <a href="{{ route('view.absensi') }}"
+                        <a href="{{ route('view.absensi', ['dates' => $dates]) }}"
                             class="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 hover:text-blue-600 transition group">
                             <svg class="w-3.5 h-3.5 transform group-hover:-translate-x-1 transition" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor">
@@ -430,7 +438,7 @@
                                     d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
                             <span class="text-[11px] font-black text-gray-600 uppercase tracking-widest">
-                                Periode: {{ \Carbon\Carbon::parse($date)->translatedFormat('d F Y') }}
+                                Tampilan tanggal: {{ \Carbon\Carbon::parse($date)->translatedFormat('d F Y') }}
                             </span>
                             @if (\Carbon\Carbon::parse($date)->isToday())
                                 <span class="flex h-2 w-2 relative">
@@ -562,7 +570,7 @@
                                 <div class="space-y-5">
 
                                     {{-- STATUS FILTER --}}
-                                    <div x-data="{
+                                    <div data-attendance-page x-data="{
                                         open: false,
                                         list: [{ val: '', label: 'Semua Status' },
                                             { val: '1', label: 'Hadir' },
@@ -619,7 +627,7 @@
                                 <div class="space-y-5 mt-7">
 
                                     {{-- STATUS FILTER --}}
-                                    <div x-data="{
+                                    <div data-attendance-page x-data="{
                                         open: false,
                                         list: [{ val: '', label: 'Semua Status' },
                                             { val: '1', label: 'Disetujui' },
@@ -927,11 +935,15 @@
                                     {{-- Scrollable List Area --}}
                                     <form
                                         action="{{ route('absensi.bulk.update', ['id_unit' => $unit->id, 'date' => $date]) }}"
-                                        method="POST" x-ref="absenJamForm" x-data="absenJamFormHandler()"
+                                        method="POST" x-ref="absenJamForm" x-data="absenJamFormHandler()" @submit.prevent="confirmSubmit()"
                                         class="flex-1 overflow-y-auto custom-scrollbar bg-white">
                                         @csrf
                                         @method('PUT')
                                         <input type="hidden" name="date" value="{{ $date }}">
+                                        @foreach ($dates as $selectedDate)
+                                            <input type="hidden" name="dates[]" value="{{ $selectedDate }}">
+                                        @endforeach
+                                        <input type="hidden" name="overwrite_confirmed" value="0">
 
                                         {{-- Table Header --}}
                                         <div
@@ -1108,11 +1120,15 @@
                                     {{-- Scrollable Table Area --}}
                                     <form
                                         action="{{ route('absensi.bulk.update-status', ['id_unit' => $unit->id, 'date' => $date]) }}"
-                                        method="POST" x-ref="absenStatusForm" x-data="absenStatusFormHandler()"
+                                        method="POST" x-ref="absenStatusForm" x-data="absenStatusFormHandler()" @submit.prevent="confirmSubmit()"
                                         class="flex-1 overflow-y-auto custom-scrollbar bg-white p-4 sm:p-8 sm:pt-6">
                                         @csrf
                                         @method('PUT')
                                         <input type="hidden" name="date" value="{{ $date }}">
+                                        @foreach ($dates as $selectedDate)
+                                            <input type="hidden" name="dates[]" value="{{ $selectedDate }}">
+                                        @endforeach
+                                        <input type="hidden" name="overwrite_confirmed" value="0">
 
                                         {{-- DESKTOP TABLE VIEW --}}
                                         <table class="hidden md:table w-full border-separate border-spacing-y-4">
@@ -1149,7 +1165,7 @@
 
                                                         {{-- 3. Tipe Absensi (Dropdown) --}}
                                                         <td class="py-4 px-2 bg-gray-50/50 border-y border-gray-100">
-                                                            <div x-data="{
+                                                            <div data-attendance-page x-data="{
                                                                 open: false,
                                                                 list: [
                                                                     { val: '2', label: 'Izin' },
@@ -1246,7 +1262,7 @@
 
                                                     {{-- Status Selection & Cuti Berbayar --}}
                                                     <div class="flex flex-col gap-2 pt-1 border-t border-gray-100">
-                                                        <div x-data="{
+                                                        <div data-attendance-page x-data="{
                                                             open: false,
                                                             list: [
                                                                 { val: '2', label: 'Izin' },
@@ -1411,12 +1427,16 @@
                                     {{-- Main Area --}}
                                     <form
                                         action="{{ route('absensi.bulk.store-tunjangan', ['id_unit' => $unit, 'date' => $date]) }}"
-                                        method="POST" enctype="multipart/form-data" x-ref="tunjPotForm" x-data="TunjPotFormHandler()"
+                                        method="POST" enctype="multipart/form-data" x-ref="tunjPotForm" x-data="TunjPotFormHandler()" @submit.prevent="confirmSubmitTunjPot()"
                                         class="flex-1 overflow-hidden flex flex-col">
                                         @csrf
                                         @method('post')
 
                                         <input type="hidden" name="date" value="{{ $date }}">
+                                        @foreach ($dates as $selectedDate)
+                                            <input type="hidden" name="dates[]" value="{{ $selectedDate }}">
+                                        @endforeach
+                                        <input type="hidden" name="overwrite_confirmed" value="0">
 
                                         {{-- Hidden Data --}}
                                         <template x-for="id in selectedItems" :key="'hidden-' + id">
@@ -1661,11 +1681,15 @@
 
                                     <form
                                         action="{{ route('absensi.bulk.store-potongan', ['id_unit' => $unit, 'date' => $date]) }}"
-                                        method="POST" enctype="multipart/form-data" x-ref="tunjPotForm" x-data="TunjPotFormHandler()"
+                                        method="POST" enctype="multipart/form-data" x-ref="tunjPotForm" x-data="TunjPotFormHandler()" @submit.prevent="confirmSubmitTunjPot()"
                                         class="flex-1 overflow-hidden flex flex-col">
                                         @csrf
                                         @method('post')
                                         <input type="hidden" name="date" value="{{ $date }}">
+                                        @foreach ($dates as $selectedDate)
+                                            <input type="hidden" name="dates[]" value="{{ $selectedDate }}">
+                                        @endforeach
+                                        <input type="hidden" name="overwrite_confirmed" value="0">
 
                                         {{-- Hidden Submit Data untuk semua pekerja --}}
                                         <template x-for="id in selectedItems" :key="'hidden-pot-' + id">
@@ -1903,7 +1927,7 @@
                 <div id="new-ids-provider-full" data-ids="{{ json_encode($pkwtPekerja->pluck('id')) }}" class="hidden">
                 </div>
 
-                <div id="new-pagination-provider" class="rounded-3xl">
+                <div id="attendance-pagination" class="rounded-3xl">
                     @if ($pkwtPekerja->hasPages())
                         {{ $pkwtPekerja->links('vendor.Pagination.custom') }}
                     @endif
@@ -1922,124 +1946,72 @@
 
         document.addEventListener("click", function(e) {
             // Find the closest anchor tag inside the pagination container
-            const anchor = e.target.closest("#search-pagination a");
+            const anchor = e.target.closest("#attendance-pagination a");
 
             if (anchor) {
                 e.preventDefault();
+                e.stopPropagation();
 
                 // Get the Alpine instance
-                const alpineElement = document.querySelector('[x-data]');
+                const alpineElement = document.querySelector('[data-attendance-page]');
                 if (alpineElement) {
                     const alpineData = Alpine.$data(alpineElement);
                     // Call updateTable with the URL from the clicked page link
                     alpineData.updateTable(anchor.href);
                 }
             }
-        });
+        }, true);
+
+        async function saveAttendanceForm(form, ids, dates) {
+            if (form.dataset.saving === '1' || !form.reportValidity()) return;
+            form.dataset.saving = '1';
+            form.elements.overwrite_confirmed.value = '0';
+            try {
+                const first = await Swal.fire({
+                    title: 'Simpan absensi?',
+                    text: `Simpan perubahan untuk ${ids.length} pekerja pada ${dates[0]}?`,
+                    icon: 'question', showCancelButton: true,
+                    confirmButtonText: 'Ya, lanjutkan', cancelButtonText: 'Batal',
+                });
+                if (!first.isConfirmed) return;
+                const response = await fetch(@js(route('absensi.bulk.preview', ['id_unit' => $unit->id])), {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': form.elements._token.value},
+                    body: JSON.stringify({dates, data: Object.fromEntries(ids.map(id => [id, {selected: true}]))}),
+                });
+                const preview = await response.json();
+                if (!response.ok) throw new Error(preview.message || 'Gagal memeriksa data absensi.');
+                if (preview.count > 0) {
+                    const overwrite = await Swal.fire({
+                        title: 'Apakah Anda yakin ingin mengganti data?',
+                        text: `Terdapat ${preview.count} data absensi pada tanggal ${preview.dates.join(', ')} untuk pekerja terpilih. Data pada bagian yang Anda simpan akan diganti dengan input massal terbaru. Perubahan jam/status akan mengatur ulang verifikasi. Apakah Anda yakin ingin melanjutkan?`,
+                        icon: 'warning', showCancelButton: true,
+                        confirmButtonColor: '#dc2626', confirmButtonText: 'Ya, ganti data', cancelButtonText: 'Batal',
+                    });
+                    if (!overwrite.isConfirmed) return;
+                    form.elements.overwrite_confirmed.value = '1';
+                }
+                Swal.fire({title: 'Menyimpan...', allowOutsideClick: false, allowEscapeKey: false, didOpen: () => Swal.showLoading()});
+                HTMLFormElement.prototype.submit.call(form);
+            } catch (error) {
+                await Swal.fire({title: 'Gagal menyimpan', text: error.message, icon: 'error'});
+            } finally {
+                form.dataset.saving = '0';
+            }
+        }
 
         function absenJamFormHandler() {
-            return {
-                confirmSubmit() {
-                    Swal.fire({
-                        title: 'Simpan Data Jam Kerja?',
-                        text: 'Pastikan semua data jam kerja sudah benar sebelum disimpan.',
-                        icon: 'question',
-                        showCancelButton: true,
-                        confirmButtonColor: '#2563EB',
-                        cancelButtonColor: '#6b7280',
-                        confirmButtonText: 'Ya, Simpan',
-                        cancelButtonText: 'Batal',
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            Swal.fire({
-                                title: 'Menyimpan...',
-                                text: 'Mohon tunggu',
-                                allowOutsideClick: false,
-                                allowEscapeKey: false,
-                                didOpen: () => {
-                                    Swal.showLoading()
-                                }
-                            });
-
-                            this.$refs.absenJamForm.submit();
-                        }
-                    });
-                }
-            }
+            return { confirmSubmit() { return saveAttendanceForm(this.$refs.absenJamForm, this.selectedItems, this.selectedDates); } };
         }
-
         function absenStatusFormHandler() {
-            return {
-                confirmSubmit() {
-                    const hasStatusHadir = this.selectedItems.some(id => this.rowStatus[id] == 1);
-
-                    if (hasStatusHadir) {
-                        Swal.fire({
-                            title: 'Gagal!',
-                            text: 'Terdapat pekerja dengan status "Hadir". Silakan pilih tipe status absensi terlebih dahulu.',
-                            icon: 'error',
-                            confirmButtonColor: '#EF4444',
-                        });
-                        return; // Berhenti di sini, jangan submit
-                    }
-
-                    Swal.fire({
-                        title: 'Simpan Data Status Absensi?',
-                        text: 'Pastikan status ketidakhadiran sudah benar sebelum disimpan.',
-                        icon: 'question',
-                        showCancelButton: true,
-                        confirmButtonColor: '#2563EB',
-                        cancelButtonColor: '#6b7280',
-                        confirmButtonText: 'Ya, Simpan',
-                        cancelButtonText: 'Batal',
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            Swal.fire({
-                                title: 'Menyimpan...',
-                                text: 'Mohon tunggu',
-                                allowOutsideClick: false,
-                                allowEscapeKey: false,
-                                didOpen: () => {
-                                    Swal.showLoading()
-                                }
-                            });
-
-                            this.$refs.absenStatusForm.submit();
-                        }
-                    });
+            return { confirmSubmit() {
+                if (this.selectedItems.some(id => this.rowStatus[id] == 1)) {
+                    return Swal.fire({title: 'Periksa status', text: 'Gunakan form jam kerja untuk status Hadir.', icon: 'error'});
                 }
-            }
+                return saveAttendanceForm(this.$refs.absenStatusForm, this.selectedItems, this.selectedDates);
+            } };
         }
-
         function TunjPotFormHandler() {
-            return {
-                confirmSubmitTunjPot() {
-                    Swal.fire({
-                        title: 'Finalisasi Data?',
-                        text: 'Pastikan semua data sudah benar sebelum disimpan. Setelah ini, data tidak dapat diubah lagi.',
-                        icon: 'warning',
-                        showCancelButton: true,
-                    confirmButtonColor: '#10B981',
-                    cancelButtonColor: '#6b7280',
-                    confirmButtonText: 'Ya, Finalisasi & Simpan',
-                    cancelButtonText: 'Batal',
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            Swal.fire({
-                                title: 'Menyimpan...',
-                                text: 'Mohon tunggu',
-                                allowOutsideClick: false,
-                                allowEscapeKey: false,
-                                didOpen: () => {
-                                    Swal.showLoading()
-                                }
-                            })
-
-                            this.$refs.tunjPotForm.submit()
-                        }
-                    })
-                }
-            }
-        }
-    </script>
+            return { confirmSubmitTunjPot() { return saveAttendanceForm(this.$refs.tunjPotForm, this.selectedItems, this.selectedDates); } };
+        }    </script>
 @endsection

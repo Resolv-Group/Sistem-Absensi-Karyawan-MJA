@@ -128,31 +128,13 @@
     {{-- ================================
     3. TOOLBAR & FILTERS
     ================================= --}}
-    <div
-        x-data="{
-            date: '{{ request('date') ?? now()->toDateString() }}',
-            go() {
-                window.location.href = '{{ route('view.absensi') }}?date=' + this.date
-            }
-        }"
-        class="mb-6 relative inline-flex items-center"
-    >
-        <div class="inline-flex items-center gap-2 px-3 py-2 bg-white border rounded-lg shadow-sm text-sm">
-            <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1z"/>
-            </svg>
-            <span x-text="new Date(date).toLocaleDateString('id-ID', { day:'2-digit', month:'long', year:'numeric' })"></span>
-        </div>
-
-        <input
-            type="date"
-            x-model="date"
-            @change="go()"
-            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-        >
+    @if ($errors->any())
+        <div class="mb-4 p-4 bg-red-50 text-red-700 rounded-xl">{{ $errors->first() }}</div>
+    @endif
+    <div class="mb-6">
+        @include('Absensi.partials.date-picker')
+        <p class="mt-2 text-xs text-gray-400">Ringkasan unit untuk {{ \Carbon\Carbon::parse($date)->translatedFormat('d F Y') }}. Pilihan beberapa tanggal berlaku untuk unit harian.</p>
     </div>
-
-
     {{-- ================================
         4. MAIN TABLE
     ================================= --}}
@@ -162,5 +144,6 @@
 @endsection
 
 @section('scripts')
+    <script src="/js/attendance-date-picker.js"></script>
     <script src="/js/main-absensi.js"></script>
 @endsection

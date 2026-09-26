@@ -229,7 +229,7 @@
         </div>
 
         {{-- MAIN CONTENT --}}
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 ">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 mb-8">
             <div class="bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-200">
 
                 {{-- TOOLBAR --}}
@@ -401,17 +401,27 @@
                                     </div>
 
                                     {{-- JABATAN FILTER --}}
-                                    <div x-data="{ open: false, list: [{ val: '', label: 'Semua Jabatan' }, @foreach ($jabatan as $j) { val: '{{ $j->id }}', label: '{{ $j->nama }}' }, @endforeach] }" class="relative">
+                                    <div x-data="{
+                                        open: false,
+                                        search: '',
+                                        list: @js(collect([['val' => '', 'label' => 'Semua Jabatan']])->concat($jabatan->map(fn ($j) => ['val' => (string) $j->id, 'label' => $j->nama]))->values()),
+                                        get filteredList() {
+                                            const term = this.search.trim().toLocaleLowerCase('id-ID');
+                                            return term === '' ? this.list : this.list.filter(item =>
+                                                item.label.toLocaleLowerCase('id-ID').includes(term)
+                                            );
+                                        }
+                                    }" class="relative">
                                         <label
                                             class="block text-[10px] uppercase tracking-wider font-bold text-gray-400 mb-1.5">Jabatan</label>
-                                        <div @click="open = !open"
+                                        <div @click="open = !open; search = ''; if (open) $nextTick(() => $refs.search.focus())"
                                             class="relative block w-full pl-9 pr-3 py-2.5 text-sm bg-gray-50 border border-transparent rounded-xl text-gray-700 cursor-pointer hover:bg-gray-100 transition flex justify-between items-center">
                                             <div
                                                 class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                                 <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24"
                                                     stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M21 13.255A2.396 2.396 0 0019.5 13H17c-1.105 0-2 .895-2 2s.895 2 2 2h2.5c.39 0 .753-.105 1.055-.255A5.002 5.002 0 1121 13.255zM11 13.255A2.396 2.396 0 009.5 13H7c-1.105 0-2 .895-2 2s.895 2 2 2h2.5c.39 0 .753-.105 1.055-.255A5.002 5.002 0 1111 13.255z" />
+                                                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                                                 </svg>
                                             </div>
                                             <span class="truncate font-medium"
@@ -425,9 +435,21 @@
                                         </div>
                                         <div x-show="open" @click.outside="open = false"
                                             class="absolute w-full mt-1 bg-white rounded-xl shadow-xl border border-gray-100 z-[80] overflow-hidden">
+                                            <div class="p-2 border-b border-gray-100">
+                                                <div class="relative">
+                                                    <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
+                                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            d="M21 21l-4.35-4.35m1.35-5.65a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                                    </svg>
+                                                    <input x-ref="search" type="text" x-model="search" @click.stop
+                                                        @keydown.escape.stop="open = false" placeholder="Cari jabatan..."
+                                                        class="w-full pl-9 pr-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg text-gray-700 placeholder:text-gray-400 focus:border-blue-300 focus:ring-2 focus:ring-blue-100 outline-none transition">
+                                                </div>
+                                            </div>
                                             <ul class="max-h-60 overflow-y-auto py-1">
-                                                <template x-for="item in list" :key="item.val">
-                                                    <li @click="filterJabatan = item.val; open = false"
+                                                <template x-for="item in filteredList" :key="item.val">
+                                                    <li @click="filterJabatan = item.val; open = false; search = ''"
                                                         class="px-4 py-2.5 text-sm cursor-pointer transition flex items-center gap-2"
                                                         :class="filterJabatan == item.val ?
                                                             'bg-blue-50 text-blue-700 font-semibold' :
@@ -442,9 +464,14 @@
                                                         <span x-text="item.label"></span>
                                                     </li>
                                                 </template>
+                                                <li x-show="filteredList.length === 0"
+                                                    class="px-4 py-3 text-sm text-center text-gray-400 italic">
+                                                    Jabatan tidak ditemukan
+                                                </li>
                                             </ul>
                                         </div>
                                     </div>
+
                                 </div>
 
                                 {{-- Info Helper for Preview Limitation --}}

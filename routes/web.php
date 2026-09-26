@@ -157,6 +157,9 @@ Route::middleware(['auth', 'role:hrd,admin,akuntan,pic'])->group(function () {
 Route::middleware(['auth', 'role:pic,admin'])->group(function () {
     // Absensi
     Route::get('/absensi', [AbsensiController::class, 'viewAbsensiMain'])->name('view.absensi');
+    Route::post('/absensi/{id_unit}/harian/rules/preview', [\App\Http\Controllers\BulkDailyAttendanceController::class, 'preview'])->name('absensi.rules.preview');
+    Route::post('/absensi/{id_unit}/harian/rules', [\App\Http\Controllers\BulkDailyAttendanceController::class, 'store'])->name('absensi.rules.store');
+    Route::post('/absensi/{id_unit}/harian/preview-bulk', [AbsensiController::class, 'previewBulkAttendance'])->name('absensi.bulk.preview');
     Route::get('/absensi/{id_unit}/harian/{date}', [AbsensiController::class, 'ViewHarian'])->name('view.absensi.harian');
     Route::get('/absensi/{id_unit}/borongan/{date}', [AbsensiController::class, 'ViewBorongan'])->name('view.absensi.borongan');
     Route::put('/absensi/{id_unit}/harian/{date}/bulk-update-harian', [AbsensiController::class, 'bulkAbsensiUpdate'])->name('absensi.bulk.update');

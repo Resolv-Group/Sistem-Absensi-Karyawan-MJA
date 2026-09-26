@@ -12,6 +12,7 @@ use App\Models\PKWT;
 use App\Models\Potongan;
 use App\Models\Tunjangan;
 use App\Models\Unit;
+use App\Support\AttendanceDates;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -22,6 +23,65 @@ use Illuminate\Validation\ValidationException;
 
 class AbsensiController extends Controller
 {
+    private function attendanceUnit($id): Unit
+    {
+        $unit = Unit::findOrFail($id);
+        $staff = Auth::user()->staff;
+        abort_unless($staff && (strtolower($staff->jabatan) === 'admin'
+            || $unit->picUnit()->where('id_pic', $staff->id)->exists()), 403);
+
+        return $unit;
+    }
+
+    private function attendanceWorkers(Request $request)
+    {
+        $unit = $this->attendanceUnit($request->route('id_unit'));
+        if ($request->has('dates')) {
+            abort_unless((int) $unit->sistem_pengajian === 1, 422);
+        }
+        $request->validate([
+            'data' => 'required|array|min:1|max:25',
+            'data.*' => 'required|array',
+            'overwrite_confirmed' => 'nullable|boolean',
+        ]);
+        $workers = PKWT::with(['unit', 'pekerja', 'hariKerja'])
+            ->where('id_unit', $unit->id)->where('status_aktif', 1)
+            ->whereIn('id', array_keys($request->data))->get()->keyBy('id');
+        if ($workers->count() !== count($request->data)) {
+            throw ValidationException::withMessages(['data' => 'Pekerja tidak aktif atau tidak terdaftar pada unit ini.']);
+        }
+
+        return $workers;
+    }
+
+    private function existingAttendance(Request $request, array $dates, $workers)
+    {
+        return Absensi::where('id_unit', $request->route('id_unit'))
+            ->whereIn('tgl_absensi', $dates)->whereIn('id_pekerja', $workers->pluck('id_pekerja'));
+    }
+
+    private function requireOverwriteConfirmation(Request $request, array $dates, $workers): void
+    {
+        if ($request->has('dates') && !$request->boolean('overwrite_confirmed')
+            && $this->existingAttendance($request, $dates, $workers)->exists()) {
+            throw ValidationException::withMessages([
+                'overwrite_confirmed' => 'Data absensi sudah ada. Silakan simpan kembali dan konfirmasi penggantian data.',
+            ]);
+        }
+    }
+
+    public function previewBulkAttendance(Request $request)
+    {
+        $dates = AttendanceDates::fromRequest($request);
+        $workers = $this->attendanceWorkers($request);
+        $existing = $this->existingAttendance($request, $dates, $workers)->get(['tgl_absensi']);
+
+        return response()->json([
+            'count' => $existing->count(),
+            'dates' => $existing->pluck('tgl_absensi')->unique()->sort()->values(),
+        ]);
+    }
+
     /**
      * Terjemahkan error code MySQL ke pesan ramah pengguna.
      */
@@ -46,7 +106,9 @@ class AbsensiController extends Controller
         $limit = Carbon::today()->addDays(30);
 
         // 🔥 1. Ambil tanggal (default: hari ini)
-        $date = $request->date ?? now()->toDateString();
+        $dates = AttendanceDates::fromRequest($request);
+        $date = $dates[0];
+        $request->merge(['date' => $date]);
 
         // 🔥 2. Unit yang dipegang PIC
         $unitsQuery = Unit::with(['namaMitra'])
@@ -96,23 +158,25 @@ class AbsensiController extends Controller
         }
 
         // 🔥 8. Return view
-        return view('Absensi.main-absensi', compact('totalUnit', 'totalHadir', 'totalAbsen', 'totalPenilaian', 'units', 'date'));
+        return view('Absensi.main-absensi', compact('totalUnit', 'totalHadir', 'totalAbsen', 'totalPenilaian', 'units', 'date', 'dates'));
     }
 
     public function ViewHarian(Request $request, $id_unit, $date)
     {
-        $unit = Unit::with(['namaMitra'])->findOrFail($id_unit);
+        $dates = AttendanceDates::fromRequest($request, $date);
+        abort_unless(in_array($date, $dates, true), 422);
+        $unit = $this->attendanceUnit($id_unit);
+        abort_unless((int) $unit->sistem_pengajian === 1, 422);
+        $unit->load('namaMitra');
+        if (count($dates) > 1) {
+            return app(BulkDailyAttendanceController::class)->show($request, $unit, $dates);
+        }
         $dayName = strtolower(\Carbon\Carbon::parse($date)->format('D'));
 
-        // 1. Sync Attendance Records (Tetap pertahankan ini agar record absensi utama tercipta)
-        $allPkwt = PKWT::with('pekerja', 'hariKerja')->where('id_unit', $id_unit)->get();
-
-        $existingAbsensi = Absensi::where('id_unit', $id_unit)->where('tgl_absensi', $date)->with('detilHarian')->get()->keyBy('id_pekerja'); // This makes searching instant
-
         // 2. Query Utama: Ambil PKWT + Pekerja + Absensi (pada tgl tsb) + DetilHarian + status aktif PKWT
-        $pkwtQuery = PKWT::with([
-            'pekerja.absensi' => function ($q) use ($date, $id_unit) {
-                $q->where('tgl_absensi', $date)->where('id_unit', $id_unit)->with('detilHarian');
+        $pkwtQuery = PKWT::with(['pekerja', 'hariKerja',
+            'pekerja.absensiPekerja' => function ($q) use ($date, $id_unit) {
+                $q->where('tgl_absensi', $date)->where('id_unit', $id_unit)->with(['detilHarian', 'tunjangan', 'potongan']);
             },
         ])
             ->where('id_unit', $id_unit)
@@ -145,12 +209,10 @@ class AbsensiController extends Controller
             });
         }
 
-        $pkwtPekerja = $pkwtQuery->paginate(25);
+        $pkwtPekerja = $pkwtQuery->paginate(25)->withQueryString();
 
-        // 4. Handle AJAX Response
-        if ($request->ajax()) {
-            return view('Absensi.partials.main-harian-table', compact('pkwtPekerja', 'unit', 'date'))->render();
-        }
+        $allPkwt = $pkwtPekerja->getCollection();
+        $existingAbsensi = $allPkwt->flatMap(fn ($pkwt) => $pkwt->pekerja->absensiPekerja)->keyBy('id_pekerja');
 
         // 5. Worker Map untuk Modal
         $workerMap = $allPkwt->mapWithKeys(function ($item) use ($dayName, $existingAbsensi) {
@@ -208,7 +270,15 @@ class AbsensiController extends Controller
             ];
         });
 
-        // dd($date,$dayName, $workerMap);
+        if ($request->ajax()) {
+            return response()->json([
+                'html' => view('Absensi.partials.main-harian-table', compact('pkwtPekerja', 'unit', 'date'))->render(),
+                'workers' => $workerMap,
+                'ids' => $pkwtPekerja->pluck('id'),
+                'page' => $pkwtPekerja->currentPage(),
+                'pagination' => (string) $pkwtPekerja->links('vendor.Pagination.custom'),
+            ]);
+        }
 
         $totalHadir = Absensi::where('id_unit', $unit->id)
             ->where('tgl_absensi', $date)
@@ -217,7 +287,7 @@ class AbsensiController extends Controller
             })
             ->count();
 
-        return view('Absensi.detail.main-harian', compact('unit', 'date', 'workerMap', 'pkwtPekerja', 'totalHadir'));
+        return view('Absensi.detail.main-harian', compact('unit', 'date', 'workerMap', 'pkwtPekerja', 'totalHadir', 'dates'));
     }
 
     public function ViewBorongan(Request $request, $id_unit, $date)
@@ -429,77 +499,79 @@ class AbsensiController extends Controller
 
     public function bulkAbsensiUpdate(Request $request)
     {
+        $dates = AttendanceDates::fromRequest($request);
         // 1. Validasi
         $validator = Validator::make($request->all(), [
             'date' => 'required|date',
             'data' => 'required|array',
             'data.*.jam_aktual' => 'required|numeric|min:0', // Pastikan jam diisi angka
             'data.*.is_paid' => 'nullable|boolean',
+            'data.*.is_hbn' => 'nullable|boolean',
+            'data.*.catatan' => 'nullable|string',
         ]);
-
-        // Custom validation untuk pesan error yang lebih user-friendly
-        $validator->after(function ($validator) use ($request) {
-            foreach ($request->data as $pkwtId => $values) {
-                if (! isset($values['jam_aktual']) || $values['jam_aktual'] === '') {
-                    $pkwt = PKWT::with('pekerja')->find($pkwtId);
-                    $nama = $pkwt?->pekerja?->nama ?? "Pekerja #$pkwtId";
-                    $validator->errors()->add("data.$pkwtId", "Jam kerja $nama belum diisi.");
-                }
-            }
-        });
 
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
         }
 
+
+        $workers = $this->attendanceWorkers($request);
+
         DB::beginTransaction();
 
         try {
-            $date = $request->date;
-            $errors = [];
+            // Serialize saves for this unit, including first-time attendance creation.
+            Unit::whereKey($request->route('id_unit'))->lockForUpdate()->firstOrFail();
+            $this->requireOverwriteConfirmation($request, $dates, $workers);
 
-            foreach ($request->data as $pkwtId => $values) {
-                $pkwt = PKWT::with('unit')->find($pkwtId);
-                if (! $pkwt) {
-                    continue;
-                }
 
-                $absensi = Absensi::where([
-                    'id_pekerja' => $pkwt->id_pekerja,
-                    'id_unit' => $pkwt->id_unit,
-                    'tgl_absensi' => $date,
-                ])->first();
 
-                // 2. Dapatkan atau Buat Parent Absensi
-                if (! $absensi) {
-                    $absensi = Absensi::firstOrCreate(
-                        ['id_pekerja' => $pkwt->id_pekerja, 'id_unit' => $pkwt->id_unit, 'tgl_absensi' => $date],
-                        ['id_pic' => Auth::user()->staff->id ?? Auth::id(), 'tipe' => $pkwt->unit->sistem_pengajian, 'verifikasi' => 0]
+            foreach ($dates as $date) {
+                foreach (($request->data ?? []) as $pkwtId => $values) {
+                    $pkwt = $workers->get($pkwtId);
+                    if (! $pkwt) {
+                        continue;
+                    }
+
+                    $absensi = Absensi::where([
+                        'id_pekerja' => $pkwt->id_pekerja,
+                        'id_unit' => $pkwt->id_unit,
+                        'tgl_absensi' => $date,
+                    ])->first();
+
+                    // 2. Dapatkan atau Buat Parent Absensi
+                    if (! $absensi) {
+                        $absensi = Absensi::firstOrCreate(
+                            ['id_pekerja' => $pkwt->id_pekerja, 'id_unit' => $pkwt->id_unit, 'tgl_absensi' => $date],
+                            ['id_pic' => Auth::user()->staff->id ?? Auth::id(), 'tipe' => $pkwt->unit->sistem_pengajian, 'verifikasi' => 0]
+                        );
+                    }
+
+                    // 3. Siapkan data jam yang akan disimpan (Status otomatis menjadi Hadir / 1)
+                    $normal = (float) ($pkwt->hariKerja->firstWhere('hari', strtolower(Carbon::parse($date)->format('D')))?->jam_kerja ?? 0);
+                    $actual = (float) $values['jam_aktual'];
+                    $dataToSave = [
+                        'jam_kerja_normal' => $normal,
+                        'jam_kerja_harian' => $values['jam_aktual'] ?? 0,
+                        'overtime' => max(0, $actual - (!empty($values['is_hbn']) ? 0 : $normal)),
+                        'hbn' => $values['is_hbn'] ?? 0,
+                        'status_kehadiran' => 1, // Pastikan status menjadi Hadir
+                        'paidLeave' => 0,         // Reset status cuti berbayar
+                        'isPaid' => $values['is_paid'] ?? 1,
+                        'catatan' => $values['catatan'] ?? null,
+                        'updated_by' => Auth::id(),
+                    ];
+
+                    $absensi->detilHarian()->updateOrCreate(
+                        ['id_absensi' => $absensi->id],
+                        $dataToSave
                     );
+
+                    // Reset verifikasi
+                    $absensi->update(['verifikasi' => 0]);
                 }
 
-                // 3. Siapkan data jam yang akan disimpan (Status otomatis menjadi Hadir / 1)
-                $dataToSave = [
-                    'jam_kerja_normal' => $values['jam_normal'] ?? 0,
-                    'jam_kerja_harian' => $values['jam_aktual'] ?? 0,
-                    'overtime' => $values['overtime'] ?? 0,
-                    'hbn' => $values['is_hbn'] ?? 0,
-                    'status_kehadiran' => 1, // Pastikan status menjadi Hadir
-                    'paidLeave' => 0,         // Reset status cuti berbayar
-                    'isPaid' => $values['is_paid'] ?? 1,
-                    'catatan' => $values['catatan'] ?? null,
-                    'updated_by' => Auth::id(),
-                ];
-
-                $absensi->detilHarian()->updateOrCreate(
-                    ['id_absensi' => $absensi->id],
-                    $dataToSave
-                );
-
-                // Reset verifikasi
-                $absensi->update(['verifikasi' => 0]);
             }
-
             DB::commit();
 
             return back()->with('success', 'Data jam kerja berhasil disimpan.');
@@ -519,72 +591,83 @@ class AbsensiController extends Controller
 
     public function bulkAbsensiUpdateStatus(Request $request)
     {
+        $dates = AttendanceDates::fromRequest($request);
         $validator = Validator::make($request->all(), [
             'date' => 'required|date',
             'data' => 'required|array',
             'data.*.is_paid_leave' => 'nullable|boolean',
+            'data.*.status_kehadiran' => 'required|integer|in:2,3,4,5,6',
+            'data.*.catatan' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
         }
 
+
+        $workers = $this->attendanceWorkers($request);
+
         DB::beginTransaction();
 
         try {
-            $date = $request->date;
+            // Serialize saves for this unit, including first-time attendance creation.
+            Unit::whereKey($request->route('id_unit'))->lockForUpdate()->firstOrFail();
+            $this->requireOverwriteConfirmation($request, $dates, $workers);
 
-            foreach ($request->data as $pkwtId => $values) {
-                $pkwt = PKWT::with('unit', 'hariKerja')->find($pkwtId);
 
-                $dayName = strtolower(\Carbon\Carbon::parse($date)->format('D'));
-                $jamKerja = $pkwt->hariKerja->firstWhere('hari', $dayName)->jam_kerja ?? 0;
+            foreach ($dates as $date) {
+                foreach ($request->data as $pkwtId => $values) {
+                    $pkwt = $workers->get($pkwtId);
 
-                // dd($jamKerja);
-                if (! $pkwt) {
-                    continue;
+                    $dayName = strtolower(\Carbon\Carbon::parse($date)->format('D'));
+                    $jamKerja = $pkwt->hariKerja->firstWhere('hari', $dayName)->jam_kerja ?? 0;
+
+                    // dd($jamKerja);
+                    if (! $pkwt) {
+                        continue;
+                    }
+
+                    /**
+                     * ✅ CREATE / GET ABSENSI
+                     */
+                    $absensi = Absensi::firstOrCreate(
+                        [
+                            'id_pekerja' => $pkwt->id_pekerja,
+                            'id_unit' => $pkwt->id_unit,
+                            'tgl_absensi' => $date,
+                        ],
+                        [
+                            'id_pic' => Auth::user()->staff->id,
+                            'tipe' => $pkwt->unit->sistem_pengajian,
+                            'verifikasi' => 0,
+                        ],
+                    );
+
+                    /**
+                     * ✅ UPDATE OR CREATE DETIL (TANPA DELETE)
+                     */
+                    Detil_Harian::updateOrCreate(
+                        ['id_absensi' => $absensi->id],
+                        [
+                            'jam_kerja_normal' => $jamKerja,
+                            'jam_kerja_harian' => 0,
+                            'overtime' => 0,
+                            'hbn' => 0,
+                            'status_kehadiran' => $values['status_kehadiran'],
+                            'paidLeave' => $values['is_paid_leave'] ?? 0,
+                            'isPaid' => 0,
+                            'catatan' => $values['catatan'] ?? null,
+                            'updated_by' => Auth::id(),
+                        ],
+                    );
+
+                    /**
+                     * 🔄 RESET VERIFIKASI
+                     */
+                    $absensi->update(['verifikasi' => 0]);
                 }
 
-                /**
-                 * ✅ CREATE / GET ABSENSI
-                 */
-                $absensi = Absensi::firstOrCreate(
-                    [
-                        'id_pekerja' => $pkwt->id_pekerja,
-                        'id_unit' => $pkwt->id_unit,
-                        'tgl_absensi' => $date,
-                    ],
-                    [
-                        'id_pic' => Auth::user()->staff->id,
-                        'tipe' => $pkwt->unit->sistem_pengajian,
-                        'verifikasi' => 0,
-                    ],
-                );
-
-                /**
-                 * ✅ UPDATE OR CREATE DETIL (TANPA DELETE)
-                 */
-                Detil_Harian::updateOrCreate(
-                    ['id_absensi' => $absensi->id],
-                    [
-                        'jam_kerja_normal' => $jamKerja,
-                        'jam_kerja_harian' => 0,
-                        'overtime' => 0,
-                        'hbn' => 0,
-                        'status_kehadiran' => $values['status_kehadiran'],
-                        'paidLeave' => $values['is_paid_leave'] ?? 0,
-                        'isPaid' => 0,
-                        'catatan' => $values['catatan'] ?? null,
-                        'updated_by' => Auth::id(),
-                    ],
-                );
-
-                /**
-                 * 🔄 RESET VERIFIKASI
-                 */
-                $absensi->update(['verifikasi' => 0]);
             }
-
             DB::commit();
 
             return back()->with('success', 'Status presensi berhasil diperbarui.');
@@ -604,6 +687,7 @@ class AbsensiController extends Controller
 
     public function bulkAbsensiUpdateTunjangan(Request $request)
     {
+        $dates = AttendanceDates::fromRequest($request);
         $validator = Validator::make($request->all(), [
             'date' => 'required|date',
             'data' => 'required|array',
@@ -613,64 +697,72 @@ class AbsensiController extends Controller
             return back()->withErrors($validator)->withInput();
         }
 
+
+        $workers = $this->attendanceWorkers($request);
+
         DB::beginTransaction();
 
         try {
-            foreach ($request->data as $pkwtId => $values) {
-                $pkwt = PKWT::with(['unit', 'pekerja'])->find($pkwtId);
-                if (! $pkwt) {
-                    continue;
-                }
+            // Serialize saves for this unit, including first-time attendance creation.
+            Unit::whereKey($request->route('id_unit'))->lockForUpdate()->firstOrFail();
+            $this->requireOverwriteConfirmation($request, $dates, $workers);
+            foreach ($dates as $date) {
+                foreach ($request->data as $pkwtId => $values) {
+                    $pkwt = $workers->get($pkwtId);
+                    if (! $pkwt) {
+                        continue;
+                    }
 
-                $absensi = Absensi::where([
-                    'id_pekerja' => $pkwt->id_pekerja,
-                    'id_unit' => $pkwt->id_unit,
-                    'tgl_absensi' => $request->date,
-                ])->first();
+                    $absensi = Absensi::where([
+                        'id_pekerja' => $pkwt->id_pekerja,
+                        'id_unit' => $pkwt->id_unit,
+                        'tgl_absensi' => $date,
+                    ])->first();
 
-                if (! $absensi) {
-                    throw new \Exception('Absensi untuk '.($pkwt->pekerja->nama ?? 'Pekerja').' belum dibuat pada tanggal tersebut.');
-                }
+                    if (! $absensi) {
+                        throw new \Exception('Absensi untuk '.($pkwt->pekerja->nama ?? 'Pekerja').' belum dibuat pada tanggal tersebut.');
+                    }
 
-                $kategoriArray = json_decode($values['kategori'], true);
+                    $kategoriArray = json_decode($values['kategori'], true);
 
-                // ============================================
-                // CHECK IF RECORD EXISTS FIRST
-                // ============================================
-                $existingTunjangan = Tunjangan::where([
-                    'id_pekerja' => $pkwt->id_pekerja,
-                    'id_unit' => $pkwt->id_unit,
-                    'id_absensi' => $absensi->id,
-                ])->first();
-
-                if ($existingTunjangan) {
                     // ============================================
-                    // UPDATE CASE - Only update updated_by
+                    // CHECK IF RECORD EXISTS FIRST
                     // ============================================
-                    $existingTunjangan->update([
-                        'kategori' => $kategoriArray,
-                        'total' => (float) $values['total'],
-                        'keterangan' => $values['keterangan'] ?? null,
-                        'updated_by' => Auth::id(),
-                    ]);
-                    // created_by remains unchanged!
-                } else {
-                    // ============================================
-                    // CREATE CASE - Set both created_by & updated_by
-                    // ============================================
-                    Tunjangan::create([
+                    $existingTunjangan = Tunjangan::where([
                         'id_pekerja' => $pkwt->id_pekerja,
                         'id_unit' => $pkwt->id_unit,
                         'id_absensi' => $absensi->id,
-                        'kategori' => $kategoriArray,
-                        'total' => (float) $values['total'],
-                        'keterangan' => $values['keterangan'] ?? null,
-                        'updated_by' => Auth::id(),
-                        'created_by' => Auth::id(),
-                    ]);
-                }
-            }
+                    ])->first();
 
+                    if ($existingTunjangan) {
+                        // ============================================
+                        // UPDATE CASE - Only update updated_by
+                        // ============================================
+                        $existingTunjangan->update([
+                            'kategori' => $kategoriArray,
+                            'total' => (float) $values['total'],
+                            'keterangan' => $values['keterangan'] ?? null,
+                            'updated_by' => Auth::id(),
+                        ]);
+                        // created_by remains unchanged!
+                    } else {
+                        // ============================================
+                        // CREATE CASE - Set both created_by & updated_by
+                        // ============================================
+                        Tunjangan::create([
+                            'id_pekerja' => $pkwt->id_pekerja,
+                            'id_unit' => $pkwt->id_unit,
+                            'id_absensi' => $absensi->id,
+                            'kategori' => $kategoriArray,
+                            'total' => (float) $values['total'],
+                            'keterangan' => $values['keterangan'] ?? null,
+                            'updated_by' => Auth::id(),
+                            'created_by' => Auth::id(),
+                        ]);
+                    }
+                }
+
+            }
             DB::commit();
 
             return back()->with('success', 'Data tunjangan berhasil disimpan.');
@@ -691,6 +783,7 @@ class AbsensiController extends Controller
 
     public function bulkAbsensiUpdatePotongan(Request $request)
     {
+        $dates = AttendanceDates::fromRequest($request);
         // dd($request->all());
         $validator = Validator::make($request->all(), [
             'date' => 'required|date',
@@ -701,64 +794,72 @@ class AbsensiController extends Controller
             return back()->withErrors($validator)->withInput();
         }
 
+
+        $workers = $this->attendanceWorkers($request);
+
         DB::beginTransaction();
 
         try {
-            foreach ($request->data as $pkwtId => $values) {
-                $pkwt = PKWT::with(['unit', 'pekerja'])->find($pkwtId);
-                if (! $pkwt) {
-                    continue;
-                }
+            // Serialize saves for this unit, including first-time attendance creation.
+            Unit::whereKey($request->route('id_unit'))->lockForUpdate()->firstOrFail();
+            $this->requireOverwriteConfirmation($request, $dates, $workers);
+            foreach ($dates as $date) {
+                foreach ($request->data as $pkwtId => $values) {
+                    $pkwt = $workers->get($pkwtId);
+                    if (! $pkwt) {
+                        continue;
+                    }
 
-                $absensi = Absensi::where([
-                    'id_pekerja' => $pkwt->id_pekerja,
-                    'id_unit' => $pkwt->id_unit,
-                    'tgl_absensi' => $request->date,
-                ])->first();
+                    $absensi = Absensi::where([
+                        'id_pekerja' => $pkwt->id_pekerja,
+                        'id_unit' => $pkwt->id_unit,
+                        'tgl_absensi' => $date,
+                    ])->first();
 
-                if (! $absensi) {
-                    throw new \Exception('Absensi untuk '.($pkwt->pekerja->nama ?? 'Pekerja').' belum dibuat pada tanggal tersebut.');
-                }
+                    if (! $absensi) {
+                        throw new \Exception('Absensi untuk '.($pkwt->pekerja->nama ?? 'Pekerja').' belum dibuat pada tanggal tersebut.');
+                    }
 
-                $kategoriArray = json_decode($values['kategori'], true);
+                    $kategoriArray = json_decode($values['kategori'], true);
 
-                // ============================================
-                // CHECK IF RECORD EXISTS FIRST
-                // ============================================
-                $existingPotongan = Potongan::where([
-                    'id_pekerja' => $pkwt->id_pekerja,
-                    'id_unit' => $pkwt->id_unit,
-                    'id_absensi' => $absensi->id,
-                ])->first();
-
-                if ($existingPotongan) {
                     // ============================================
-                    // UPDATE CASE - Only update updated_by
+                    // CHECK IF RECORD EXISTS FIRST
                     // ============================================
-                    $existingPotongan->update([
-                        'kategori' => $kategoriArray,
-                        'total' => (float) $values['total'],
-                        'keterangan' => $values['keterangan'] ?? null,
-                        'updated_by' => Auth::id(),
-                    ]);
-                    // created_by remains unchanged!
-                } else {
-                    // ============================================
-                    // CREATE CASE - Set both created_by & updated_by
-                    // ============================================
-                    Potongan::create([
+                    $existingPotongan = Potongan::where([
                         'id_pekerja' => $pkwt->id_pekerja,
                         'id_unit' => $pkwt->id_unit,
                         'id_absensi' => $absensi->id,
-                        'kategori' => $kategoriArray,
-                        'total' => (float) $values['total'],
-                        'keterangan' => $values['keterangan'] ?? null,
-                        'updated_by' => Auth::id(),
-                        'created_by' => Auth::id(),
-                    ]);
-                }
-            }
+                    ])->first();
 
+                    if ($existingPotongan) {
+                        // ============================================
+                        // UPDATE CASE - Only update updated_by
+                        // ============================================
+                        $existingPotongan->update([
+                            'kategori' => $kategoriArray,
+                            'total' => (float) $values['total'],
+                            'keterangan' => $values['keterangan'] ?? null,
+                            'updated_by' => Auth::id(),
+                        ]);
+                        // created_by remains unchanged!
+                    } else {
+                        // ============================================
+                        // CREATE CASE - Set both created_by & updated_by
+                        // ============================================
+                        Potongan::create([
+                            'id_pekerja' => $pkwt->id_pekerja,
+                            'id_unit' => $pkwt->id_unit,
+                            'id_absensi' => $absensi->id,
+                            'kategori' => $kategoriArray,
+                            'total' => (float) $values['total'],
+                            'keterangan' => $values['keterangan'] ?? null,
+                            'updated_by' => Auth::id(),
+                            'created_by' => Auth::id(),
+                        ]);
+                    }
+                }
+
+            }
             DB::commit();
 
             return back()->with('success', 'Data potongan berhasil disimpan.');

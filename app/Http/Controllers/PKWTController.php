@@ -63,7 +63,7 @@ class PKWTController extends Controller
             $query->where('divisi_id', $request->divisi);
         }
         if ($request->filled('jabatan')) {
-            $query->where('jabatan_pkwt_id', $request->jabatan);
+            $query->where('jabatan_id', $request->jabatan);
         }
         if ($request->filled('status')) {
             $query->where('status_aktif', $request->status);

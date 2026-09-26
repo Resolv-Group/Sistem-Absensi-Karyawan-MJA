@@ -73,7 +73,7 @@
                     @endphp
 
                     <a href="{{ $isHarian
-                        ? route('view.absensi.harian', [$un->id, request('date') ?? now()->toDateString()])
+                        ? route('view.absensi.harian', ['id_unit' => $un->id, 'date' => request('date') ?? now()->toDateString(), 'dates' => request('dates', [request('date') ?? now()->toDateString()])])
                         : route('view.absensi.borongan', [$un->id, request('date') ?? now()->toDateString()]) }}"
                         class="inline-flex items-center gap-2 px-4 py-2 border rounded-xl transition-all duration-200 group shadow-sm {{ $themeClasses }}">
 
