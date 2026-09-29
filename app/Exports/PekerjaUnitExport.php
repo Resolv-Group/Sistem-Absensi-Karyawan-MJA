@@ -77,8 +77,6 @@ class PekerjaUnitExport implements FromCollection, WithHeadings, WithMapping, Sh
             $pekerja->kota,
             $pekerja->provinsi,
             
-            // Terapkan juga untuk Nomor Telepon, Rekening, dan BPJS 
-            // agar angka '0' di depan tidak hilang
             "'" . $pekerja->telp,
             $pekerja->email,
             $pekerja->nama_rek,
@@ -91,7 +89,6 @@ class PekerjaUnitExport implements FromCollection, WithHeadings, WithMapping, Sh
             $pekerja->nama_emergency,
             $pekerja->hubungan_emergency,
             
-            // Telepon Darurat
             "'" . $pekerja->telp_emergency,
             
             $pekerja->ibu_kandung,
