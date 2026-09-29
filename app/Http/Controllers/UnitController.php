@@ -282,61 +282,100 @@ class UnitController extends Controller
         if ($request->ajax()) {
             // --- HANDLE KAS KECIL AJAX (with server-side filters + pagination) ---
             if ($request->target === 'kas') {
-                $query = Kas_Kecil::where('id_unit', $id)
-                    ->whereIn('status', [1, 2])
-                    ->select(['id', 'id_unit', 'akun', 'tanggal', 'keterangan', 'debit', 'kredit', 'status', 'created_at', 'updated_at'])
-                    ->selectRaw('CASE WHEN nota IS NOT NULL THEN 1 ELSE 0 END as has_nota');
 
-                // Apply month filter
-                if ($request->filled('months')) {
-                    $months = is_array($request->months) ? $request->months : explode(',', $request->months);
-                    $query->whereRaw('MONTH(tanggal) IN (' . implode(',', array_map('intval', $months)) . ')');
-                }
-
-                // Apply year filter
-                if ($request->filled('years')) {
-                    $years = is_array($request->years) ? $request->years : explode(',', $request->years);
-                    $query->whereRaw('YEAR(tanggal) IN (' . implode(',', array_map('intval', $years)) . ')');
-                }
-
-                // Apply status filter
-                if ($request->filled('filter_status')) {
-                    $query->where('status', $request->filter_status === 'approved' ? 2 : 1);
-                }
-
-                $query->orderBy('tanggal', 'desc');
-
-                // Calculate carry-forward saldo for pages > 1
-                $perPage = 25;
-                $page = $request->input('page', 1);
-                $carryForwardSaldo = 0;
-
-                if ($page > 1) {
-                    // Clone the query to get saldo from all previous pages
-                    $prevQuery = clone $query;
-                    $carryForwardSaldo = $prevQuery->getQuery()
-                        ->offset(0)
-                        ->limit(($page - 1) * $perPage)
-                        ->get()
-                        ->sum(fn ($row) => $row->debit - $row->kredit);
-                }
-
-                $allIds = (clone $query)->pluck('id')->toArray();
-                $kasKecil = $query->paginate($perPage);
-
-                // Return JSON with HTML + pagination meta
-                return response()->json([
-                    'html' => view('Unit.partials.kas-kecil-rows', compact('kasKecil', 'unit', 'carryForwardSaldo'))->render(),
-                    'allData' => $kasKecil->items(),
-                    'pagination' => [
-                        'current_page' => $kasKecil->currentPage(),
-                        'last_page' => $kasKecil->lastPage(),
-                        'total' => $kasKecil->total(),
-                        'per_page' => $kasKecil->perPage(),
-                    ],
-                    'allIds' => $allIds,
+            $query = Kas_Kecil::where('id_unit', $id)
+                ->whereIn('status', [1, 2])
+                ->select([
+                    'id',
+                    'id_unit',
+                    'akun',
+                    'tanggal',
+                    'keterangan',
+                    'debit',
+                    'kredit',
+                    'status',
+                    'nota',
+                    'created_at',
+                    'updated_at'
                 ]);
+
+            // Apply month filter
+            if ($request->filled('months')) {
+                $months = is_array($request->months)
+                    ? $request->months
+                    : explode(',', $request->months);
+
+                $query->whereRaw(
+                    'MONTH(tanggal) IN (' .
+                    implode(',', array_map('intval', $months)) .
+                    ')'
+                );
             }
+
+            // Apply year filter
+            if ($request->filled('years')) {
+                $years = is_array($request->years)
+                    ? $request->years
+                    : explode(',', $request->years);
+
+                $query->whereRaw(
+                    'YEAR(tanggal) IN (' .
+                    implode(',', array_map('intval', $years)) .
+                    ')'
+                );
+            }
+
+            // Apply status filter
+            if ($request->filled('filter_status')) {
+                $query->where(
+                    'status',
+                    $request->filter_status === 'approved' ? 2 : 1
+                );
+            }
+
+            $query->orderBy('tanggal', 'desc');
+
+            // Calculate carry-forward saldo for pages > 1
+            $perPage = 25;
+            $page = $request->input('page', 1);
+            $carryForwardSaldo = 0;
+
+            if ($page > 1) {
+                $prevQuery = clone $query;
+
+                $carryForwardSaldo = $prevQuery->getQuery()
+                    ->offset(0)
+                    ->limit(($page - 1) * $perPage)
+                    ->get()
+                    ->sum(fn ($row) => $row->debit - $row->kredit);
+            }
+
+            $allIds = (clone $query)->pluck('id')->toArray();
+
+            $kasKecil = $query->paginate($perPage);
+
+            return response()->json([
+                'html' => view(
+                    'Unit.partials.kas-kecil-rows',
+                    compact(
+                        'kasKecil',
+                        'unit',
+                        'carryForwardSaldo'
+                    )
+                )->render(),
+
+                'allData' => $kasKecil->items(),
+
+                'pagination' => [
+                    'current_page' => $kasKecil->currentPage(),
+                    'last_page' => $kasKecil->lastPage(),
+                    'total' => $kasKecil->total(),
+                    'per_page' => $kasKecil->perPage(),
+                ],
+
+                'allIds' => $allIds,
+            ]);
+        }
 
             // --- HANDLE ASSET AJAX (with server-side filters + pagination) ---
             if ($request->target === 'asset') {
@@ -451,9 +490,8 @@ class UnitController extends Controller
         $boronganKategori = Kategori::all();
         $jabatan = JabatanPKWT::all();
 
-        $kasKecil = Kas_Kecil::where('id_unit', $id)
+        $query = Kas_Kecil::where('id_unit', $id)
             ->whereIn('status', [1, 2])
-            ->orderBy('tanggal', 'desc')
             ->select([
                 'id',
                 'id_unit',
@@ -466,8 +504,7 @@ class UnitController extends Controller
                 'nota',
                 'created_at',
                 'updated_at'
-            ])
-            ->paginate(25);
+            ]);
             
         $kasIds = Kas_Kecil::where('id_unit', $id)->whereIn('status', [1, 2])->pluck('id')->toArray();
 
