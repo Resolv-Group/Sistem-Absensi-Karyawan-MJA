@@ -27,15 +27,20 @@
             </p>
 
             @if (!empty(trim($kas->nota ?? '')))
-                <a href="{{ route('kas-kecil.nota', $kas->id) }}"
+
+                <a
+                    href="{{ route('kas-kecil.nota', $kas->id) }}"
                     target="_blank"
                     class="text-[9px] text-blue-500 font-bold uppercase hover:underline">
                     📂 Lihat Lampiran
                 </a>
+
             @else
+
                 <span class="text-[9px] text-slate-300 font-bold uppercase italic">
                     Tanpa Nota
                 </span>
+
             @endif
         </td>
 

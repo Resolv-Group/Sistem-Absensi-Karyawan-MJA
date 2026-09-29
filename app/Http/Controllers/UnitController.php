@@ -294,7 +294,6 @@ class UnitController extends Controller
                     'debit',
                     'kredit',
                     'status',
-                    'nota',
                     'created_at',
                     'updated_at'
                 ]);
