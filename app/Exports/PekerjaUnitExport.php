@@ -9,6 +9,7 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithTitle;
+use Illuminate\Support\Facades\Log;
 
 class PekerjaUnitExport implements FromCollection, WithHeadings, WithMapping, ShouldAutoSize, WithTitle
 {
@@ -42,6 +43,14 @@ class PekerjaUnitExport implements FromCollection, WithHeadings, WithMapping, Sh
     */
     public function map($pekerja): array
     {
+        Log::info('Data Pekerja Export:', [
+            'id' => $pekerja->id_pekerja ?? $pekerja->id,
+            'nama' => $pekerja->nama,
+            'kelamin_mentah' => $pekerja->kelamin,
+            'tipe_data_kelamin' => gettype($pekerja->kelamin)
+        ]);
+
+
         return [
             $pekerja->id_pekerja,
             $pekerja->nama,
