@@ -456,22 +456,10 @@ class UnitController extends Controller
             ->orderBy('tanggal', 'desc')
             ->select([
                 'id', 'id_unit', 'akun', 'tanggal', 'keterangan', 'debit', 'kredit', 'status', 'created_at', 'updated_at',
-                DB::raw('CASE WHEN nota IS NOT NULL AND LENGTH(nota) > 0 THEN 1 ELSE 0 END as has_nota'),
-                DB::raw('LENGTH(nota) as nota_length') // Tambahan untuk melihat ukuran asli BLOB
+                // Kita ganti nama aliasnya menjadi ada_lampiran
+                \DB::raw('CASE WHEN nota IS NOT NULL AND LENGTH(nota) > 0 THEN 1 ELSE 0 END as ada_lampiran') 
             ])
             ->paginate(25);
-
-        // Catat data ke file log
-        $logData = collect($kasKecil->items())->map(function ($kas) {
-            return [
-                'id' => $kas->id,
-                'keterangan' => $kas->keterangan,
-                'has_nota' => $kas->has_nota,
-                'nota_length' => $kas->nota_length,
-            ];
-        });
-
-        Log::info('Debug Lampiran Kas Kecil Unit ' . $id, $logData->toArray());
 
         $kasIds = Kas_Kecil::where('id_unit', $id)->whereIn('status', [1, 2])->pluck('id')->toArray();
 
