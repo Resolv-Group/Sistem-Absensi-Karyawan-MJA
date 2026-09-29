@@ -50,7 +50,7 @@ class PekerjaUnitExport implements FromCollection, WithHeadings, WithMapping, Sh
             "'" . $pekerja->nik,
             "'" . $pekerja->no_kk,
             
-            $pekerja->kelamin == '1' ? 'Laki-laki' : 'Perempuan',
+            $pekerja->kelamin == 1 ? 'Laki-laki' : 'Perempuan',
             $pekerja->tempat_lahir,
             $pekerja->tgl_lahir,
             $pekerja->pendidikan,
