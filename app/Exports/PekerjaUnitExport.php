@@ -43,18 +43,17 @@ class PekerjaUnitExport implements FromCollection, WithHeadings, WithMapping, Sh
     */
     public function map($pekerja): array
     {
-        // Menangani nilai kelamin yang berupa Object Enum ataupun angka/string biasa
-        $kelaminVal = $pekerja->kelamin;
-        
-        if (is_object($kelaminVal)) {
-            // Jika objek enum memiliki properti value atau bisa di-cast ke string/int
-            $isLaki = (isset($kelaminVal->value) && $kelaminVal->value == 1) || ((string) $kelaminVal == '1');
+        $kelamin = $pekerja->kelamin;
+
+        // Jika berbentuk objek Enum Laravel, ambil properti ->value-nya
+        if (is_object($kelamin) && property_exists($kelamin, 'value')) {
+            $kelaminValue = $kelamin->value;
         } else {
-            // Jika berupa angka atau teks biasa
-            $isLaki = ($kelaminVal == 1 || $kelaminVal == '1' || strtolower($kelaminVal) == 'laki-laki');
+            $kelaminValue = $kelamin;
         }
 
-        $jenisKelaminText = $isLaki ? 'Laki-laki' : 'Perempuan';
+        // Cek apakah nilainya 1 (Laki-laki) atau lainnya (Perempuan)
+        $jenisKelaminText = ($kelaminValue == 1) ? 'Laki-laki' : 'Perempuan';
 
         return [
             $pekerja->id_pekerja,
