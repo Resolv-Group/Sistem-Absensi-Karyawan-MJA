@@ -43,13 +43,18 @@ class PekerjaUnitExport implements FromCollection, WithHeadings, WithMapping, Sh
     */
     public function map($pekerja): array
     {
-        Log::info('Data Pekerja Export:', [
-            'id' => $pekerja->id_pekerja ?? $pekerja->id,
-            'nama' => $pekerja->nama,
-            'kelamin_mentah' => $pekerja->kelamin,
-            'tipe_data_kelamin' => gettype($pekerja->kelamin)
-        ]);
+        // Menangani nilai kelamin yang berupa Object Enum ataupun angka/string biasa
+        $kelaminVal = $pekerja->kelamin;
+        
+        if (is_object($kelaminVal)) {
+            // Jika objek enum memiliki properti value atau bisa di-cast ke string/int
+            $isLaki = (isset($kelaminVal->value) && $kelaminVal->value == 1) || ((string) $kelaminVal == '1');
+        } else {
+            // Jika berupa angka atau teks biasa
+            $isLaki = ($kelaminVal == 1 || $kelaminVal == '1' || strtolower($kelaminVal) == 'laki-laki');
+        }
 
+        $jenisKelaminText = $isLaki ? 'Laki-laki' : 'Perempuan';
 
         return [
             $pekerja->id_pekerja,
@@ -59,7 +64,7 @@ class PekerjaUnitExport implements FromCollection, WithHeadings, WithMapping, Sh
             "'" . $pekerja->nik,
             "'" . $pekerja->no_kk,
             
-            $pekerja->kelamin == 1 ? 'Laki-laki' : 'Perempuan',
+            $jenisKelaminText,
             $pekerja->tempat_lahir,
             $pekerja->tgl_lahir,
             $pekerja->pendidikan,
