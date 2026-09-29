@@ -455,9 +455,11 @@ class UnitController extends Controller
             ->whereIn('status', [1, 2])
             ->orderBy('tanggal', 'desc')
             ->select(['id', 'id_unit', 'akun', 'tanggal', 'keterangan', 'debit', 'kredit', 'status', 'created_at', 'updated_at'])
-            ->selectRaw('CASE WHEN nota IS NOT NULL THEN 1 ELSE 0 END as has_nota')
+            ->selectRaw("CASE WHEN nota IS NOT NULL AND nota != '' THEN 1 ELSE 0 END as has_nota")
             ->paginate(25);
         $kasIds = Kas_Kecil::where('id_unit', $id)->whereIn('status', [1, 2])->pluck('id')->toArray();
+
+
 
         // Asset: use pagination
         $assets = Asset::where('id_unit', $id)
