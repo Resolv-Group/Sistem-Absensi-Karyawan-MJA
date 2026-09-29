@@ -23,9 +23,7 @@
         {{-- Deskripsi --}}
         <td class="px-4 py-4 border-y border-slate-100">
             <p class="text-sm font-black text-slate-800">{{ $kas->keterangan }}</p>
-            
-            {{-- Ubah variabelnya ke ada_lampiran dan pastikan nilainya 1 --}}
-            @if ($kas->ada_lampiran == 1)
+            @if ($kas->has_nota)
                 <a href="{{ route('kas-kecil.nota', $kas->id) }}" target="_blank"
                     class="text-[9px] text-blue-500 font-bold uppercase hover:underline">
                     📂 Lihat Lampiran
