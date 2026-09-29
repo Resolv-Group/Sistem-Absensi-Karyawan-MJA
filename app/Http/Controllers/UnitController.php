@@ -295,7 +295,8 @@ class UnitController extends Controller
                     'kredit',
                     'status',
                     'created_at',
-                    'updated_at'
+                    'updated_at',
+                    DB::raw('IFNULL(LENGTH(nota), 0) as ukuran_nota')
                 ]);
 
             // Apply month filter
@@ -481,16 +482,16 @@ class UnitController extends Controller
             ->limit(5)
             ->get();
 
-        // dd($pkwtPekerja);
-
         $borongan = Borongan::with('kategoriRel')->where('id_unit', $id)->latest()->limit(5)->get();
 
         $divisions = Divisi::all();
         $boronganKategori = Kategori::all();
         $jabatan = JabatanPKWT::all();
 
-        $query = Kas_Kecil::where('id_unit', $id)
+        // GANTI BAGIAN INI: Gunakan $kasKecil, jangan $query, dan jalankan paginate
+        $kasKecil = Kas_Kecil::where('id_unit', $id)
             ->whereIn('status', [1, 2])
+            ->orderBy('tanggal', 'desc')
             ->select([
                 'id',
                 'id_unit',
@@ -500,16 +501,16 @@ class UnitController extends Controller
                 'debit',
                 'kredit',
                 'status',
-                'nota',
                 'created_at',
-                'updated_at'
-            ]);
+                'updated_at',
+                DB::raw('IFNULL(LENGTH(nota), 0) as ukuran_nota') // Sama dengan AJAX
+            ])->paginate(25);
             
         $kasIds = Kas_Kecil::where('id_unit', $id)->whereIn('status', [1, 2])->pluck('id')->toArray();
 
-
         // Asset: use pagination
         $assets = Asset::where('id_unit', $id)
+        // ... (lanjutan kode asset sampai return view tetap sama)
             ->whereIn('status', [1, 2])
             ->orderBy('tahun_perolehan', 'desc')
             ->paginate(25);
