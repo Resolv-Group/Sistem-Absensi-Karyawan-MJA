@@ -9,6 +9,7 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithTitle;
+use Illuminate\Support\Facades\Log;
 
 class PekerjaUnitExport implements FromCollection, WithHeadings, WithMapping, ShouldAutoSize, WithTitle
 {
@@ -42,6 +43,18 @@ class PekerjaUnitExport implements FromCollection, WithHeadings, WithMapping, Sh
     */
     public function map($pekerja): array
     {
+        $kelamin = $pekerja->kelamin;
+
+        // Jika berbentuk objek Enum Laravel, ambil properti ->value-nya
+        if (is_object($kelamin) && property_exists($kelamin, 'value')) {
+            $kelaminValue = $kelamin->value;
+        } else {
+            $kelaminValue = $kelamin;
+        }
+
+        // Cek apakah nilainya 1 (Laki-laki) atau lainnya (Perempuan)
+        $jenisKelaminText = ($kelaminValue == 1) ? 'Laki-laki' : 'Perempuan';
+
         return [
             $pekerja->id_pekerja,
             $pekerja->nama,
@@ -50,7 +63,7 @@ class PekerjaUnitExport implements FromCollection, WithHeadings, WithMapping, Sh
             "'" . $pekerja->nik,
             "'" . $pekerja->no_kk,
             
-            $pekerja->kelamin == '1' ? 'Laki-laki' : 'Perempuan',
+            $jenisKelaminText,
             $pekerja->tempat_lahir,
             $pekerja->tgl_lahir,
             $pekerja->pendidikan,
@@ -63,8 +76,6 @@ class PekerjaUnitExport implements FromCollection, WithHeadings, WithMapping, Sh
             $pekerja->kota,
             $pekerja->provinsi,
             
-            // Terapkan juga untuk Nomor Telepon, Rekening, dan BPJS 
-            // agar angka '0' di depan tidak hilang
             "'" . $pekerja->telp,
             $pekerja->email,
             $pekerja->nama_rek,
@@ -77,7 +88,6 @@ class PekerjaUnitExport implements FromCollection, WithHeadings, WithMapping, Sh
             $pekerja->nama_emergency,
             $pekerja->hubungan_emergency,
             
-            // Telepon Darurat
             "'" . $pekerja->telp_emergency,
             
             $pekerja->ibu_kandung,
