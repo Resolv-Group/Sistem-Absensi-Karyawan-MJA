@@ -313,6 +313,7 @@ $watch('filterStatus', () => updateTable());" class="relative">
                 open: false, 
                 showPkwtModal: false, 
                 showPerputaranModal: false,
+                showExcelModal: false,
                 durasi: '3',
                 bulanTahun: '{{ now()->format('Y-m') }}' 
             }" 
