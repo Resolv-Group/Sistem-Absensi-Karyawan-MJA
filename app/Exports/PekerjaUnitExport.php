@@ -15,27 +15,43 @@ class PekerjaUnitExport implements FromCollection, WithHeadings, WithMapping, Sh
 {
     protected $unit_id;
     protected $nama_unit;
+    protected $status_angka = [];
 
-    // Menangkap ID unit dari controller
-    public function __construct($unit_id)
+    // Menangkap ID unit dan array status dari controller
+    public function __construct($unit_id, $statusArray = ['aktif'])
     {
         $this->unit_id = $unit_id;
         $unit = Unit::findOrFail($unit_id);
-        $this->nama_unit = $unit->nama_unit;
+        $this->nama_unit = $unit->nama_unit;    
+        
+        // Konversi nilai checkbox ('aktif', 'non-aktif', 'pending') menjadi angka untuk database
+        foreach ($statusArray as $status) {
+            if ($status === 'aktif') {
+                $this->status_angka[] = 1;
+            } elseif ($status === 'non-aktif') {
+                $this->status_angka[] = 0;
+            } elseif ($status === 'pending') {
+                $this->status_angka[] = 2;
+            }
+        }
+        
+        // Default (fallback) jika entah mengapa array kosong, tampilkan yang aktif saja
+        if (empty($this->status_angka)) {
+            $this->status_angka = [1];
+        }
     }
 
     /**
-    * Mengambil data PkwtPekerja yang aktif di unit ini, beserta data pekerjanya
+    * Mengambil data PkwtPekerja berdasarkan filter status, beserta data pekerjanya
     */
     public function collection()
     {
-        // Asumsi: Model PkwtPekerja memiliki relasi belongsTo ke Pekerja dengan nama 'pekerja'
         return PKWT::with('pekerja')
             ->where('id_unit', $this->unit_id)
-            ->where('status_aktif', 1) // Hanya pekerja yang aktif
+            ->whereIn('status_aktif', $this->status_angka) // Filter dinamis dari checkbox
             ->get()
-            ->pluck('pekerja') // Ambil data pekerjanya saja dari hasil relasi
-            ->filter(); // Hilangkan nilai null jika ada data relasi yang terputus
+            ->pluck('pekerja') 
+            ->filter(); 
     }
 
     /**
