@@ -38,11 +38,7 @@ class PekerjaUnitExport implements FromCollection, WithHeadings, WithMapping, Sh
         // Default (fallback) jika entah mengapa array kosong, tampilkan yang aktif saja
         if (empty($this->status_angka)) {
             $this->status_angka = [1];
-        }
-        Log::info('2. Hasil Konversi Status di Export:', [
-            'input_status' => $statusArray,
-            'hasil_angka' => $this->status_angka
-        ]);
+        };
     }
 
     /**
@@ -54,13 +50,6 @@ class PekerjaUnitExport implements FromCollection, WithHeadings, WithMapping, Sh
             ->where('id_unit', $this->unit_id)
             ->whereIn('status_aktif', $this->status_angka)
             ->get();
-
-        // --- LOGGING COLLECTION ---
-        Log::info('3. Hasil Query Database:', [
-            'query_pakai_status' => $this->status_angka,
-            'jumlah_data_ditemukan' => $data->count(),
-            'contoh_id_pkwt_ditemukan' => $data->pluck('id')->toArray()
-        ]);
 
         return $data->pluck('pekerja')->filter();
     }

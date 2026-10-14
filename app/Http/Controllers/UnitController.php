@@ -1152,13 +1152,6 @@ class UnitController extends Controller
         
         // Menangkap array status dari checkbox modal (default 'aktif' jika tidak ada yang dicentang)
         $statusArray = $request->input('status', ['aktif']); 
-
-        Log::info('--- EXPORT EXCEL DEBUG ---');
-        Log::info('1. Data Request Masuk:', [
-            'unit_id' => $id,
-            'url_query' => $request->all(),
-            'status_array_terbaca' => $statusArray
-        ]);
             
         // Format nama file disesuaikan agar lebih dinamis
         $fileName = 'Data_Pekerja_' . str_replace(' ', '_', $unit->nama_unit) . '.xlsx';
