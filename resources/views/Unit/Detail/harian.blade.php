@@ -465,7 +465,6 @@ $watch('filterStatus', () => updateTable());" class="relative">
                     </form>
                 </div>
             </div>
-            </div>
 
             <!-- ========================================== -->
             <!-- DIALOG / MODAL EXCEL EXPORT -->
@@ -525,6 +524,9 @@ $watch('filterStatus', () => updateTable());" class="relative">
                     </form>
                 </div>
             </div>
+            </div>
+
+            
 
             <button type="button"
                 onclick="checkUnitRequirements('{{ route('view.tambah.unit-pekerja', $unit->id) }}')"
