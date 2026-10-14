@@ -1771,7 +1771,7 @@
                                 </span>
                             </div>
                         </div>
-
+                        
                         <span
                             class="hidden sm:inline-block text-[9px] font-black text-emerald-600 bg-emerald-50
                                 px-2 py-1 rounded-md uppercase tracking-[0.15em] border border-emerald-100">

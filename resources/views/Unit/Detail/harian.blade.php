@@ -357,10 +357,12 @@ $watch('filterStatus', () => updateTable());" class="relative">
                         Perputaran
                     </button>
                     
-                    <a href="{{ route('unit.export_pekerja', $unit->id) }}" target="_blank" 
-                    class="block px-4 py-2 text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 font-medium transition-colors">
+                    <!-- Tombol Excel -->
+                    <button type="button" 
+                        @click="showExcelModal = true; open = false"
+                        class="w-full text-left block px-4 py-2 text-sm text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 font-medium transition-colors">
                         Excel
-                    </a>
+                    </button>
                 </div>
             </div>
 
@@ -463,6 +465,65 @@ $watch('filterStatus', () => updateTable());" class="relative">
                     </form>
                 </div>
             </div>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- DIALOG / MODAL EXCEL EXPORT -->
+            <!-- ========================================== -->
+            <div x-show="showExcelModal" 
+                class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-900/50 backdrop-blur-sm"
+                style="display: none;">
+                
+                <div @click.away="showExcelModal = false"
+                    x-transition:enter="transition ease-out duration-300"
+                    x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                    x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                    x-transition:leave="transition ease-in duration-200"
+                    x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                    x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                    class="relative bg-white rounded-xl shadow-2xl w-full max-w-sm p-6 mx-4">
+                    
+                    <h3 class="text-lg font-bold text-slate-800 mb-4 border-b pb-2">Opsi Export Excel</h3>
+                    
+                    <form action="{{ route('unit.export_pekerja', $unit->id) }}" method="GET" target="_blank" @submit="showExcelModal = false">    
+                        
+                        <p class="text-sm font-medium text-slate-700 mb-2">Pilih Status Pekerja :</p>
+                        
+                        <div class="space-y-2 mb-6">
+                            <!-- Aktif (Default checked) -->
+                            <label class="flex items-center gap-3 cursor-pointer p-2 rounded-lg border border-transparent hover:bg-slate-50 transition">
+                                <input type="checkbox" name="status[]" value="aktif" checked
+                                    class="w-4 h-4 rounded text-emerald-600 border-gray-300 focus:ring-emerald-500">
+                                <span class="text-sm text-slate-700">Aktif</span>
+                            </label>
+
+                            <!-- Non-Aktif -->
+                            <label class="flex items-center gap-3 cursor-pointer p-2 rounded-lg border border-transparent hover:bg-slate-50 transition">
+                                <input type="checkbox" name="status[]" value="non-aktif" 
+                                    class="w-4 h-4 rounded text-emerald-600 border-gray-300 focus:ring-emerald-500">
+                                <span class="text-sm text-slate-700">Non-Aktif</span>
+                            </label>
+
+                            <!-- Pending -->
+                            <label class="flex items-center gap-3 cursor-pointer p-2 rounded-lg border border-transparent hover:bg-slate-50 transition">
+                                <input type="checkbox" name="status[]" value="pending" 
+                                    class="w-4 h-4 rounded text-emerald-600 border-gray-300 focus:ring-emerald-500">
+                                <span class="text-sm text-slate-700">Pending</span>
+                            </label>
+                        </div>
+
+                        <div class="flex justify-end gap-3 mt-4 pt-4 border-t border-slate-100">
+                            <button type="button" @click="showExcelModal = false" 
+                                    class="px-4 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition shadow-sm">
+                                Batal
+                            </button>
+                            <button type="submit" 
+                                    class="px-4 py-2 text-sm font-bold text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 transition shadow-sm">
+                                Konfirmasi
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
 
             <button type="button"
