@@ -1146,19 +1146,26 @@ class UnitController extends Controller
         }
     }
 
-        public function exportExcelPekerja(Request $request, $id)
-        {
-            $unit = Unit::findOrFail($id);
+    public function exportExcelPekerja(Request $request, $id)
+    {
+        $unit = Unit::findOrFail($id);
+        
+        // Menangkap array status dari checkbox modal (default 'aktif' jika tidak ada yang dicentang)
+        $statusArray = $request->input('status', ['aktif']); 
+
+        Log::info('--- EXPORT EXCEL DEBUG ---');
+        Log::info('1. Data Request Masuk:', [
+            'unit_id' => $id,
+            'url_query' => $request->all(),
+            'status_array_terbaca' => $statusArray
+        ]);
             
-            // Menangkap array status dari checkbox modal (default 'aktif' jika tidak ada yang dicentang)
-            $statusArray = $request->input('status', ['aktif']); 
-            
-            // Format nama file disesuaikan agar lebih dinamis
-            $fileName = 'Data_Pekerja_' . str_replace(' ', '_', $unit->nama_unit) . '.xlsx';
-            
-            // Teruskan $id unit DAN $statusArray ke dalam class Export
-            return Excel::download(new PekerjaUnitExport($id, $statusArray), $fileName);
-        }
+        // Format nama file disesuaikan agar lebih dinamis
+        $fileName = 'Data_Pekerja_' . str_replace(' ', '_', $unit->nama_unit) . '.xlsx';
+        
+        // Teruskan $id unit DAN $statusArray ke dalam class Export
+        return Excel::download(new PekerjaUnitExport($id, $statusArray), $fileName);
+    }
 
         public function exportExcelBorongan($id)
     {
