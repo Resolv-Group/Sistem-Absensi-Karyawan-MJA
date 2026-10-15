@@ -300,7 +300,7 @@
                 </svg>
                 Unit
             </a>
-        @elseif(Auth::user()->role === 'pic' && Auth::user()->units->count())
+        @elseif(Auth::user()->role === 'pic' && Auth::user()->staff && Auth::user()->staff->units->count())
             <div x-data="{ open: false }">
                 <button @click="open = !open"
                     class="w-full flex items-center justify-between p-3 rounded-xl font-bold text-sm text-gray-600 hover:bg-gray-50">
@@ -323,7 +323,7 @@
         @endif
 
         {{-- 4. PENILAIAN LOGIC --}}
-        @if(Auth::user()->role === 'pic' && Auth::user()->units->count())
+        @if(Auth::user()->role === 'pic' && Auth::user()->staff && Auth::user()->staff->units->count())
             <div x-data="{ open: false }">
                 <button @click="open = !open"
                     class="w-full flex items-center justify-between p-3 rounded-xl font-bold text-sm text-gray-600 hover:bg-gray-50">
