@@ -81,8 +81,9 @@
         </div>
     @endif
 
-    <div x-data="{
+    <div data-attendance-page x-data="{
         selectedItems: [],
+        selectedDates: @js($dates),
         showFilterDropdown: false,
         showAbsenModal: false,
         showAbsenStatusModal: false,
@@ -107,9 +108,11 @@
         // --- Input Jam Kerja State ---
         rowJam: {},
         rowHBN: {},
+        rowIsPaid: {},
         rowCatatan: {},
         globalJam: '',
         globalHBN: false,
+        globalIsPaid: true,
 
         // --- Status Absen State ---
         rowStatus: {},
@@ -160,6 +163,7 @@
 
                     // PAKSA KE BOOLEAN: Jika existing_hbn == 1 maka TRUE (Centang)
                     this.rowHBN[id] = worker.existing_hbn == 1;
+                    this.rowIsPaid[id] = worker.existing_status === 1 ? (worker.existing_is_paid == 1) : true;
 
                     this.rowCatatan[id] = worker.existing_catatan || '';
                 }
@@ -195,7 +199,7 @@
 
                     // PERBAIKAN DI SINI:
                     // Paksa menjadi true jika nilainya 1, dan false jika 0
-                    this.rowPaidLeave[id] = (worker.existing_paid == 1);
+                    this.rowPaidLeave[id] = (worker.existing_paid_leave == 1);
                 }
             });
             this.showAbsenStatusModal = true;
@@ -208,6 +212,7 @@
                     this.rowJam[id] = this.globalJam;
                 }
                 this.rowHBN[id] = this.globalHBN;
+                this.rowIsPaid[id] = this.globalIsPaid;
             });
         },
 
@@ -252,11 +257,11 @@
                     if (worker && worker.existing_tunjangan) {
                         finalData = JSON.parse(JSON.stringify(worker.existing_tunjangan));
                         this.rowKeteranganTunjangan[id] = worker.existing_keterangan_tunjangan || '';
-                    } 
+                    }
                     else {
                         // 2. PRIORITAS KEDUA: Data dari Kontrak PKWT (Spesifik per pekerja)
                         // 3. PRIORITAS KETIGA: Data dari Config Unit (Global)
-                        
+
                         // Cek apakah pkwt_tunjangan ada isinya
                         const hasPkwtData = worker.pkwt_tunjangan && Object.keys(worker.pkwt_tunjangan).length > 0;
                         const baseSource = hasPkwtData ? worker.pkwt_tunjangan : unitConfig;
@@ -264,7 +269,7 @@
                         // Transformasi format
                         Object.keys(baseSource).forEach(key => {
                             let val = baseSource[key];
-                            
+
                             // Handle jika data di PKWT berbentuk angka langsung atau objek
                             let nominalValue = (typeof val === 'object' && val !== null) ? val.nominal : val;
 
@@ -362,10 +367,17 @@
 
             try {
                 const response = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
-                const html = await response.text();
+                if (!response.ok) throw new Error('Gagal memuat absensi');
+                const result = await response.json();
+                const html = result.html;
+                this.workerMap = result.workers;
+                this.selectedItems = [];
+                this.rowTunjangan = {};
+                this.rowPotongan = {};
+                this.allIds = result.ids;
+                this.currentPage = result.page;
+                document.getElementById('attendance-pagination').innerHTML = result.pagination;
                 document.getElementById('main-table-body').innerHTML = html;
-                const provider = document.getElementById('new-ids-provider-full');
-                if (provider) this.allIds = JSON.parse(provider.dataset.ids);
             } catch (error) { console.error(error); }
         },
 
@@ -397,7 +409,7 @@
         {{-- HEADER SECTION --}}
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
             <div
-                class="bg-white rounded-[2.5rem] p-8 md:p-10 shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-gray-100 relative overflow-hidden">
+                class="bg-white rounded-[2.5rem] p-5 sm:p-8 md:p-10 shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-gray-100 relative overflow-hidden">
 
                 {{-- Surprise Element: Background Pattern Decoration --}}
                 <div class="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-blue-50 rounded-full blur-3xl opacity-40">
@@ -409,7 +421,7 @@
                 <div class="relative z-10">
                     {{-- Top Row: Breadcrumb & Date Capsule --}}
                     <div class="flex flex-wrap items-center justify-between gap-4 mb-8">
-                        <a href="{{ route('view.absensi') }}"
+                        <a href="{{ route('view.absensi', ['dates' => $dates]) }}"
                             class="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 hover:text-blue-600 transition group">
                             <svg class="w-3.5 h-3.5 transform group-hover:-translate-x-1 transition" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor">
@@ -426,7 +438,7 @@
                                     d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
                             <span class="text-[11px] font-black text-gray-600 uppercase tracking-widest">
-                                Periode: {{ \Carbon\Carbon::parse($date)->translatedFormat('d F Y') }}
+                                Tampilan tanggal: {{ \Carbon\Carbon::parse($date)->translatedFormat('d F Y') }}
                             </span>
                             @if (\Carbon\Carbon::parse($date)->isToday())
                                 <span class="flex h-2 w-2 relative">
@@ -444,7 +456,7 @@
                             <div class="flex items-center gap-5">
                                 <div class="h-14 w-2 bg-blue-600 rounded-full shadow-[0_0_20px_rgba(37,99,235,0.4)] shrink-0"></div>
                                 <div class="min-w-0">
-                                    <h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tight leading-none break-words">
+                                    <h1 class="text-xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tight leading-none whitespace-nowrap">
                                         Pengelolaan
                                         Absensi<span class="text-blue-600">.</span>
                                     </h1>
@@ -558,7 +570,7 @@
                                 <div class="space-y-5">
 
                                     {{-- STATUS FILTER --}}
-                                    <div x-data="{
+                                    <div data-attendance-page x-data="{
                                         open: false,
                                         list: [{ val: '', label: 'Semua Status' },
                                             { val: '1', label: 'Hadir' },
@@ -615,7 +627,7 @@
                                 <div class="space-y-5 mt-7">
 
                                     {{-- STATUS FILTER --}}
-                                    <div x-data="{
+                                    <div data-attendance-page x-data="{
                                         open: false,
                                         list: [{ val: '', label: 'Semua Status' },
                                             { val: '1', label: 'Disetujui' },
@@ -903,6 +915,15 @@
                                                         (Libur)</span>
                                                 </label>
 
+                                                {{-- Global Payment Status --}}
+                                                <label class="flex items-center gap-2 cursor-pointer group">
+                                                    <input type="checkbox" x-model="globalIsPaid"
+                                                        class="w-4 h-4 rounded border-emerald-300 text-emerald-600 focus:ring-emerald-500">
+                                                    <span
+                                                        class="text-[10px] font-bold text-emerald-500 uppercase group-hover:text-emerald-600 transition-colors">Tetap
+                                                        Dibayar</span>
+                                                </label>
+
                                                 <button type="button" @click="applyGlobalValues()"
                                                     class="w-full sm:w-auto px-4 py-2 sm:px-6 sm:py-2.5 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-blue-700 transition shadow-lg shadow-blue-200 active:scale-95 text-center">
                                                     Terapkan
@@ -914,40 +935,45 @@
                                     {{-- Scrollable List Area --}}
                                     <form
                                         action="{{ route('absensi.bulk.update', ['id_unit' => $unit->id, 'date' => $date]) }}"
-                                        method="POST" x-ref="absenJamForm" x-data="absenJamFormHandler()"
+                                        method="POST" x-ref="absenJamForm" x-data="absenJamFormHandler()" @submit.prevent="confirmSubmit()"
                                         class="flex-1 overflow-y-auto custom-scrollbar bg-white">
                                         @csrf
                                         @method('PUT')
                                         <input type="hidden" name="date" value="{{ $date }}">
+                                        @foreach ($dates as $selectedDate)
+                                            <input type="hidden" name="dates[]" value="{{ $selectedDate }}">
+                                        @endforeach
+                                        <input type="hidden" name="overwrite_confirmed" value="0">
 
                                         {{-- Table Header --}}
                                         <div
                                             class="px-10 py-4 bg-gray-50/80 border-b border-gray-100 hidden lg:flex items-center text-[11px] font-black text-gray-400 uppercase tracking-[0.15em]">
-                                            <div class="w-12 text-center">No.</div>
-                                            <div class="w-72">Informasi Pekerja</div>
-                                            <div class="w-24 text-center">Normal</div>
-                                            <div class="w-32 text-center">Jam Realita</div>
-                                            <div class="w-24 text-center">Overtime</div>
-                                            <div class="w-24 text-center">HBN</div>
+                                            <div class="w-8 text-center">No.</div>
+                                            <div class="w-52">Informasi Pekerja</div>
+                                            <div class="w-20 text-center">Normal</div>
+                                            <div class="w-28 text-center">Jam Realita</div>
+                                            <div class="w-20 text-center">Overtime</div>
+                                            <div class="w-16 text-center">HBN</div>
+                                            <div class="w-24 text-center">Tetap Dibayar</div>
                                             <div class="flex-1 px-4">Keterangan / Catatan</div>
                                         </div>
 
                                         <div class="divide-y divide-gray-100">
                                             <template x-for="(id, index) in selectedItems" :key="id">
                                                 <div
-                                                    class="group flex flex-col lg:flex-row lg:items-center p-4 sm:px-10 sm:py-4 hover:bg-blue-50/30 transition-all duration-300 gap-3 lg:gap-y-0">
+                                                    class="group flex flex-col lg:flex-row lg:items-center p-4 sm:px-10 sm:py-4 hover:bg-blue-50/30 transition-all duration-300 gap-3 lg:gap-0">
 
                                                     {{-- Top on Mobile / Left on Desktop: No & Identity --}}
-                                                    <div class="flex items-center gap-3 lg:w-auto">
+                                                    <div class="flex items-center gap-3 lg:gap-0 lg:w-auto">
                                                         {{-- No. Column --}}
-                                                        <div class="w-6 sm:w-12 flex-shrink-0 text-left lg:text-center">
+                                                        <div class="w-6 lg:w-8 flex-shrink-0 text-left lg:text-center">
                                                             <span
                                                                 class="text-[11px] font-bold text-gray-300 group-hover:text-blue-400 transition-colors"
                                                                 x-text="index + 1 + '.'"></span>
                                                         </div>
 
                                                         {{-- 1. Identity Column --}}
-                                                        <div class="w-full lg:w-72 flex-shrink-0 flex items-center gap-3 pr-2 lg:pr-4 min-w-0">
+                                                        <div class="w-full lg:w-52 flex-shrink-0 flex items-center gap-3 pr-2 lg:pr-4 min-w-0">
                                                             <div class="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-[10px] font-black text-gray-400 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300 shrink-0"
                                                                 x-text="workerMap[id]?.initials"></div>
                                                             <div class="min-w-0 flex-1">
@@ -960,9 +986,9 @@
                                                     </div>
 
                                                     {{-- Middle on Mobile / Inline on Desktop: Inputs & Stats --}}
-                                                    <div class="grid grid-cols-2 sm:grid-cols-4 lg:flex lg:items-center gap-2.5 lg:gap-0 pl-9 lg:pl-0">
+                                                    <div class="grid grid-cols-2 sm:grid-cols-5 lg:flex lg:items-center gap-2.5 lg:gap-0 pl-9 lg:pl-0">
                                                         {{-- 2. Jam Normal Column --}}
-                                                        <div class="lg:w-24 flex-shrink-0 text-left lg:text-center">
+                                                        <div class="lg:w-20 flex-shrink-0 text-left lg:text-center">
                                                             <div class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1 lg:hidden">Normal</div>
                                                             <div
                                                                 class="inline-block px-2.5 py-1 bg-gray-50 border border-gray-100 rounded-lg">
@@ -974,7 +1000,7 @@
                                                         </div>
 
                                                         {{-- 3. Jam Realita Column --}}
-                                                        <div class="lg:w-32 flex-shrink-0 lg:px-4">
+                                                        <div class="lg:w-28 flex-shrink-0 lg:px-3">
                                                             <div class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1 lg:hidden">Jam Realita</div>
                                                             <div class="relative group/input flex items-center">
                                                                 <input type="number" step="0.5" min="0"
@@ -987,7 +1013,7 @@
                                                         </div>
 
                                                         {{-- 4. Overtime Column --}}
-                                                        <div class="lg:w-24 flex-shrink-0 text-left lg:text-center">
+                                                        <div class="lg:w-20 flex-shrink-0 text-left lg:text-center">
                                                             <div class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1 lg:hidden">Overtime</div>
                                                             <div class="py-1">
                                                                 <span class="text-sm font-black transition-colors"
@@ -1000,7 +1026,7 @@
                                                         </div>
 
                                                         {{-- 5. HBN Column --}}
-                                                        <div class="lg:w-24 flex-shrink-0 flex flex-col lg:items-center justify-center">
+                                                        <div class="lg:w-16 flex-shrink-0 flex flex-col lg:items-center justify-center">
                                                             <div class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1 lg:hidden">Libur (HBN)</div>
                                                             <div class="relative flex items-center lg:justify-center py-1">
                                                                 <input type="hidden" :name="'data[' + id + '][is_hbn]'"
@@ -1012,10 +1038,22 @@
                                                                     class="w-5 h-5 rounded-md border-gray-300 text-blue-600 focus:ring-blue-100 transition-all cursor-pointer shadow-sm">
                                                             </div>
                                                         </div>
+
+                                                        {{-- 6. Payment Status Column --}}
+                                                        <div class="lg:w-24 flex-shrink-0 flex flex-col lg:items-center justify-center">
+                                                            <div class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1 lg:hidden">Tetap Dibayar</div>
+                                                            <div class="relative flex items-center lg:justify-center py-1">
+                                                                <input type="hidden" :name="'data[' + id + '][is_paid]'"
+                                                                    value="0">
+                                                                <input type="checkbox" :name="'data[' + id + '][is_paid]'"
+                                                                    value="1" x-model="rowIsPaid[id]"
+                                                                    class="w-5 h-5 rounded-md border-gray-300 text-emerald-600 focus:ring-emerald-100 transition-all cursor-pointer shadow-sm">
+                                                            </div>
+                                                        </div>
                                                     </div>
 
-                                                    {{-- 6. Catatan Column --}}
-                                                    <div class="flex-1 min-w-[200px] pl-9 lg:pl-0 lg:px-4">
+                                                    {{-- 7. Catatan Column --}}
+                                                    <div class="flex-1 min-w-0 pl-9 lg:pl-0 lg:px-4">
                                                         <input type="text" :name="'data[' + id + '][catatan]'"
                                                             x-model="rowCatatan[id]"
                                                             placeholder="Tambah catatan harian..."
@@ -1082,11 +1120,15 @@
                                     {{-- Scrollable Table Area --}}
                                     <form
                                         action="{{ route('absensi.bulk.update-status', ['id_unit' => $unit->id, 'date' => $date]) }}"
-                                        method="POST" x-ref="absenStatusForm" x-data="absenStatusFormHandler()"
+                                        method="POST" x-ref="absenStatusForm" x-data="absenStatusFormHandler()" @submit.prevent="confirmSubmit()"
                                         class="flex-1 overflow-y-auto custom-scrollbar bg-white p-4 sm:p-8 sm:pt-6">
                                         @csrf
                                         @method('PUT')
                                         <input type="hidden" name="date" value="{{ $date }}">
+                                        @foreach ($dates as $selectedDate)
+                                            <input type="hidden" name="dates[]" value="{{ $selectedDate }}">
+                                        @endforeach
+                                        <input type="hidden" name="overwrite_confirmed" value="0">
 
                                         {{-- DESKTOP TABLE VIEW --}}
                                         <table class="hidden md:table w-full border-separate border-spacing-y-4">
@@ -1123,7 +1165,7 @@
 
                                                         {{-- 3. Tipe Absensi (Dropdown) --}}
                                                         <td class="py-4 px-2 bg-gray-50/50 border-y border-gray-100">
-                                                            <div x-data="{
+                                                            <div data-attendance-page x-data="{
                                                                 open: false,
                                                                 list: [
                                                                     { val: '2', label: 'Izin' },
@@ -1220,7 +1262,7 @@
 
                                                     {{-- Status Selection & Cuti Berbayar --}}
                                                     <div class="flex flex-col gap-2 pt-1 border-t border-gray-100">
-                                                        <div x-data="{
+                                                        <div data-attendance-page x-data="{
                                                             open: false,
                                                             list: [
                                                                 { val: '2', label: 'Izin' },
@@ -1385,12 +1427,16 @@
                                     {{-- Main Area --}}
                                     <form
                                         action="{{ route('absensi.bulk.store-tunjangan', ['id_unit' => $unit, 'date' => $date]) }}"
-                                        method="POST" enctype="multipart/form-data" x-ref="tunjPotForm" x-data="TunjPotFormHandler()"
+                                        method="POST" enctype="multipart/form-data" x-ref="tunjPotForm" x-data="TunjPotFormHandler()" @submit.prevent="confirmSubmitTunjPot()"
                                         class="flex-1 overflow-hidden flex flex-col">
                                         @csrf
                                         @method('post')
 
                                         <input type="hidden" name="date" value="{{ $date }}">
+                                        @foreach ($dates as $selectedDate)
+                                            <input type="hidden" name="dates[]" value="{{ $selectedDate }}">
+                                        @endforeach
+                                        <input type="hidden" name="overwrite_confirmed" value="0">
 
                                         {{-- Hidden Data --}}
                                         <template x-for="id in selectedItems" :key="'hidden-' + id">
@@ -1462,20 +1508,21 @@
                                                                         :key="key">
                                                                         <div
                                                                             class="flex flex-col sm:grid sm:grid-cols-12 gap-2 sm:gap-4 p-4 sm:px-6 sm:py-4 sm:items-center hover:bg-blue-50/30 transition-colors">
-                                                                            {{-- Title & Nominal (Mobile Header) --}}
-                                                                            <div class="sm:col-span-4 flex items-center justify-between sm:block">
+                                                                            {{-- Allowance Name --}}
+                                                                            <div class="sm:col-span-4">
                                                                                 <p class="text-[11px] font-black text-gray-900 uppercase tracking-tight"
                                                                                     x-text="key.replace(/_/g, ' ')"></p>
-                                                                                <span class="sm:hidden text-xs font-bold text-gray-400" x-text="'Rp ' + formatRibuan(rowTunjangan[id][key].nominal)"></span>
                                                                             </div>
 
-                                                                            {{-- Nominal Desktop --}}
-                                                                            <div class="hidden sm:block sm:col-span-3">
-                                                                                <div
-                                                                                    class="flex items-center gap-1.5 text-[11px] font-bold text-gray-400">
-                                                                                    <span>Rp</span>
-                                                                                    <span
-                                                                                        x-text="formatRibuan(rowTunjangan[id][key].nominal)"></span>
+                                                                            {{-- Nominal --}}
+                                                                            <div class="sm:col-span-3">
+                                                                                <label class="block sm:hidden text-[9px] font-bold text-gray-400 uppercase mb-1">Nominal</label>
+                                                                                <div class="relative">
+                                                                                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] font-black text-gray-300">Rp</span>
+                                                                                    <input type="text" inputmode="numeric"
+                                                                                        :value="formatRibuan(rowTunjangan[id][key].nominal)"
+                                                                                        @input="rowTunjangan[id][key].nominal = Number($event.target.value.replace(/\D/g, ''))"
+                                                                                        class="w-full pl-8 pr-3 py-2 bg-white border border-gray-100 rounded-xl text-xs font-black text-gray-700 focus:bg-white focus:border-blue-400 outline-none transition-all">
                                                                                 </div>
                                                                             </div>
 
@@ -1488,7 +1535,7 @@
                                                                                         min="0" step="1"
                                                                                         @keydown="if(['-', '+', 'e', 'E'].includes($event.key)) $event.preventDefault()"
                                                                                         @input="if($event.target.value < 0) rowTunjangan[id][key].qty = 0"
-                                                                                        class="w-20 sm:w-full py-1.5 bg-gray-50 border border-gray-100 rounded-lg text-xs font-black text-center focus:bg-white focus:border-blue-400 outline-none transition-all">
+                                                                                        class="w-20 sm:w-full py-1.5 bg-white border border-gray-100 rounded-lg text-xs font-black text-center focus:bg-white focus:border-blue-400 outline-none transition-all">
                                                                                 </div>
                                                                                 <div class="sm:col-span-3 text-right">
                                                                                     <span class="sm:hidden text-[10px] font-bold text-gray-400 uppercase mr-1">Total:</span>
@@ -1634,11 +1681,15 @@
 
                                     <form
                                         action="{{ route('absensi.bulk.store-potongan', ['id_unit' => $unit, 'date' => $date]) }}"
-                                        method="POST" enctype="multipart/form-data" x-ref="tunjPotForm" x-data="TunjPotFormHandler()"
+                                        method="POST" enctype="multipart/form-data" x-ref="tunjPotForm" x-data="TunjPotFormHandler()" @submit.prevent="confirmSubmitTunjPot()"
                                         class="flex-1 overflow-hidden flex flex-col">
                                         @csrf
                                         @method('post')
                                         <input type="hidden" name="date" value="{{ $date }}">
+                                        @foreach ($dates as $selectedDate)
+                                            <input type="hidden" name="dates[]" value="{{ $selectedDate }}">
+                                        @endforeach
+                                        <input type="hidden" name="overwrite_confirmed" value="0">
 
                                         {{-- Hidden Submit Data untuk semua pekerja --}}
                                         <template x-for="id in selectedItems" :key="'hidden-pot-' + id">
@@ -1876,7 +1927,7 @@
                 <div id="new-ids-provider-full" data-ids="{{ json_encode($pkwtPekerja->pluck('id')) }}" class="hidden">
                 </div>
 
-                <div id="new-pagination-provider" class="rounded-3xl">
+                <div id="attendance-pagination" class="rounded-3xl">
                     @if ($pkwtPekerja->hasPages())
                         {{ $pkwtPekerja->links('vendor.Pagination.custom') }}
                     @endif
@@ -1895,124 +1946,72 @@
 
         document.addEventListener("click", function(e) {
             // Find the closest anchor tag inside the pagination container
-            const anchor = e.target.closest("#search-pagination a");
+            const anchor = e.target.closest("#attendance-pagination a");
 
             if (anchor) {
                 e.preventDefault();
+                e.stopPropagation();
 
                 // Get the Alpine instance
-                const alpineElement = document.querySelector('[x-data]');
+                const alpineElement = document.querySelector('[data-attendance-page]');
                 if (alpineElement) {
                     const alpineData = Alpine.$data(alpineElement);
                     // Call updateTable with the URL from the clicked page link
                     alpineData.updateTable(anchor.href);
                 }
             }
-        });
+        }, true);
+
+        async function saveAttendanceForm(form, ids, dates) {
+            if (form.dataset.saving === '1' || !form.reportValidity()) return;
+            form.dataset.saving = '1';
+            form.elements.overwrite_confirmed.value = '0';
+            try {
+                const first = await Swal.fire({
+                    title: 'Simpan absensi?',
+                    text: `Simpan perubahan untuk ${ids.length} pekerja pada ${dates[0]}?`,
+                    icon: 'question', showCancelButton: true,
+                    confirmButtonText: 'Ya, lanjutkan', cancelButtonText: 'Batal',
+                });
+                if (!first.isConfirmed) return;
+                const response = await fetch(@js(route('absensi.bulk.preview', ['id_unit' => $unit->id])), {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': form.elements._token.value},
+                    body: JSON.stringify({dates, data: Object.fromEntries(ids.map(id => [id, {selected: true}]))}),
+                });
+                const preview = await response.json();
+                if (!response.ok) throw new Error(preview.message || 'Gagal memeriksa data absensi.');
+                if (preview.count > 0) {
+                    const overwrite = await Swal.fire({
+                        title: 'Apakah Anda yakin ingin mengganti data?',
+                        text: `Terdapat ${preview.count} data absensi pada tanggal ${preview.dates.join(', ')} untuk pekerja terpilih. Data pada bagian yang Anda simpan akan diganti dengan input massal terbaru. Perubahan jam/status akan mengatur ulang verifikasi. Apakah Anda yakin ingin melanjutkan?`,
+                        icon: 'warning', showCancelButton: true,
+                        confirmButtonColor: '#dc2626', confirmButtonText: 'Ya, ganti data', cancelButtonText: 'Batal',
+                    });
+                    if (!overwrite.isConfirmed) return;
+                    form.elements.overwrite_confirmed.value = '1';
+                }
+                Swal.fire({title: 'Menyimpan...', allowOutsideClick: false, allowEscapeKey: false, didOpen: () => Swal.showLoading()});
+                HTMLFormElement.prototype.submit.call(form);
+            } catch (error) {
+                await Swal.fire({title: 'Gagal menyimpan', text: error.message, icon: 'error'});
+            } finally {
+                form.dataset.saving = '0';
+            }
+        }
 
         function absenJamFormHandler() {
-            return {
-                confirmSubmit() {
-                    Swal.fire({
-                        title: 'Simpan Data Jam Kerja?',
-                        text: 'Pastikan semua data jam kerja sudah benar sebelum disimpan.',
-                        icon: 'question',
-                        showCancelButton: true,
-                        confirmButtonColor: '#2563EB',
-                        cancelButtonColor: '#6b7280',
-                        confirmButtonText: 'Ya, Simpan',
-                        cancelButtonText: 'Batal',
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            Swal.fire({
-                                title: 'Menyimpan...',
-                                text: 'Mohon tunggu',
-                                allowOutsideClick: false,
-                                allowEscapeKey: false,
-                                didOpen: () => {
-                                    Swal.showLoading()
-                                }
-                            });
-
-                            this.$refs.absenJamForm.submit();
-                        }
-                    });
-                }
-            }
+            return { confirmSubmit() { return saveAttendanceForm(this.$refs.absenJamForm, this.selectedItems, this.selectedDates); } };
         }
-
         function absenStatusFormHandler() {
-            return {
-                confirmSubmit() {
-                    const hasStatusHadir = this.selectedItems.some(id => this.rowStatus[id] == 1);
-
-                    if (hasStatusHadir) {
-                        Swal.fire({
-                            title: 'Gagal!',
-                            text: 'Terdapat pekerja dengan status "Hadir". Silakan pilih tipe status absensi terlebih dahulu.',
-                            icon: 'error',
-                            confirmButtonColor: '#EF4444',
-                        });
-                        return; // Berhenti di sini, jangan submit
-                    }
-
-                    Swal.fire({
-                        title: 'Simpan Data Status Absensi?',
-                        text: 'Pastikan status ketidakhadiran sudah benar sebelum disimpan.',
-                        icon: 'question',
-                        showCancelButton: true,
-                        confirmButtonColor: '#2563EB',
-                        cancelButtonColor: '#6b7280',
-                        confirmButtonText: 'Ya, Simpan',
-                        cancelButtonText: 'Batal',
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            Swal.fire({
-                                title: 'Menyimpan...',
-                                text: 'Mohon tunggu',
-                                allowOutsideClick: false,
-                                allowEscapeKey: false,
-                                didOpen: () => {
-                                    Swal.showLoading()
-                                }
-                            });
-
-                            this.$refs.absenStatusForm.submit();
-                        }
-                    });
+            return { confirmSubmit() {
+                if (this.selectedItems.some(id => this.rowStatus[id] == 1)) {
+                    return Swal.fire({title: 'Periksa status', text: 'Gunakan form jam kerja untuk status Hadir.', icon: 'error'});
                 }
-            }
+                return saveAttendanceForm(this.$refs.absenStatusForm, this.selectedItems, this.selectedDates);
+            } };
         }
-
         function TunjPotFormHandler() {
-            return {
-                confirmSubmitTunjPot() {
-                    Swal.fire({
-                        title: 'Finalisasi Data?',
-                        text: 'Pastikan semua data sudah benar sebelum disimpan. Setelah ini, data tidak dapat diubah lagi.',
-                        icon: 'warning',
-                        showCancelButton: true,
-                    confirmButtonColor: '#10B981',
-                    cancelButtonColor: '#6b7280',
-                    confirmButtonText: 'Ya, Finalisasi & Simpan',
-                    cancelButtonText: 'Batal',
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            Swal.fire({
-                                title: 'Menyimpan...',
-                                text: 'Mohon tunggu',
-                                allowOutsideClick: false,
-                                allowEscapeKey: false,
-                                didOpen: () => {
-                                    Swal.showLoading()
-                                }
-                            })
-
-                            this.$refs.tunjPotForm.submit()
-                        }
-                    })
-                }
-            }
-        }
-    </script>
+            return { confirmSubmitTunjPot() { return saveAttendanceForm(this.$refs.tunjPotForm, this.selectedItems, this.selectedDates); } };
+        }    </script>
 @endsection

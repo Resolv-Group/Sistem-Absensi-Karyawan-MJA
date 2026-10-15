@@ -678,8 +678,20 @@ class UnitController extends Controller
                 'umk' => $validated['umk'],
                 'mulai_perjanjian' => $validated['mulai_perjanjian'],
                 'akhir_perjanjian' => $validated['akhir_perjanjian'],
-                'tunjangan' => json_decode($validated['tunjangan'], true),
+                'tunjangan' => json_decode($validated['tunjangan'] ?? 'null', true),
             ]);
+
+            // Remove obsolete allowances from existing contracts without changing retained amounts.
+            $allowedTunjangan = $unit->tunjangan ?? [];
+            $unit->pkwt()->chunkById(100, function ($contracts) use ($allowedTunjangan) {
+                foreach ($contracts as $contract) {
+                    $current = $contract->tunjangan ?? [];
+                    $filtered = array_intersect_key($current, $allowedTunjangan);
+                    if ($filtered !== $current) {
+                        $contract->update(['tunjangan' => $filtered]);
+                    }
+                }
+            });
 
             // ===============================
             // SYNC PIC
@@ -1134,14 +1146,18 @@ class UnitController extends Controller
         }
     }
 
-        public function exportExcelPekerja($id)
+    public function exportExcelPekerja(Request $request, $id)
     {
         $unit = Unit::findOrFail($id);
         
-        // Format nama file: Data_Pekerja_Aktif_NamaUnit.xlsx
-        $fileName = 'Data_Pekerja_Aktif_' . str_replace(' ', '_', $unit->nama_unit) . '.xlsx';
+        // Menangkap array status dari checkbox modal (default 'aktif' jika tidak ada yang dicentang)
+        $statusArray = $request->input('status', ['aktif']); 
+            
+        // Format nama file disesuaikan agar lebih dinamis
+        $fileName = 'Data_Pekerja_' . str_replace(' ', '_', $unit->nama_unit) . '.xlsx';
         
-        return Excel::download(new PekerjaUnitExport($id), $fileName);
+        // Teruskan $id unit DAN $statusArray ke dalam class Export
+        return Excel::download(new PekerjaUnitExport($id, $statusArray), $fileName);
     }
 
         public function exportExcelBorongan($id)

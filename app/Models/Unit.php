@@ -34,6 +34,14 @@ class Unit extends Model
         'tunjangan' => 'json',
     ];
 
+    public function normalizePkwtTunjangan(?array $values = null): array
+    {
+        $config = $this->tunjangan ?? [];
+
+        // Keep worker-specific amounts only for allowances still configured on the unit.
+        return array_replace($config, array_intersect_key($values ?? [], $config));
+    }
+
     public function namaMitra()
     {
         return $this->belongsTo(MitraKerja::class, 'id_mitra_kerja');

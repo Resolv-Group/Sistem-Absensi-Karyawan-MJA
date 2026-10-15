@@ -20,6 +20,7 @@ class Detil_Borongan extends Model
         'bayaranPerusahaan',
         'bayaranItem',
         'buktiSuratJalan',
+        'keteranganSuratJalan',
         'catatan',
         'updated_by',
     ];

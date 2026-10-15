@@ -75,6 +75,7 @@
                     data-workers="{{ $u->pkwt->map(fn($p) => [
                         'id' => $p->id_pekerja,
                         'nama' => $p->pekerja?->nama ?? '-',
+                        'divisi' => $p->divisi?->nama ?? '-',
                         'total_tunjangan' => $p->pekerja?->tunjangan?->sum('total') ?? 0,
                         'total_potongan' => $p->pekerja?->potongan?->sum('total') ?? 0,
                         'total_alokasi_jam' => ($p->hariKerja->where('hari', 'sat')->first()?->jam_kerja == 5) ? '7 Jam/Hari' : '8 Jam/Hari'

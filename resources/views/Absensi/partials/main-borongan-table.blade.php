@@ -16,7 +16,7 @@
 
         {{-- CHECKBOX COLUMN --}}
         <td class="pl-6 py-4 w-10">
-            <input type="checkbox" 
+            <input type="checkbox"
                 :checked="selectedItems.includes({{ (int)$u->id }})"
                 @click.stop="toggleWithGroup({{ $u->id }})"
                 class="rounded border-gray-200 text-orange-600 focus:ring-orange-100 cursor-pointer">
@@ -39,14 +39,14 @@
             </td>
 
             {{-- TIPE & RINGKASAN PRODUKSI --}}
-            <td class="px-4 py-4 min-w-[280px] relative" x-data="{ openItems: false }" 
+            <td class="px-4 py-4 min-w-[280px] relative" x-data="{ openItems: false }"
                 {{-- This part ensures the row stays on top of other rows when hovered --}}
                 @mouseenter="openItems = true" @mouseleave="openItems = false"
                 :class="openItems ? 'z-[100]' : ''">
 
                 @if ($absensi && $effectiveDetil->isNotEmpty() && $statusKehadiran == 1)
                     <div class="flex items-start gap-3">
-                        
+
                         {{-- Type Badge --}}
                         <div class="flex-shrink-0 flex flex-col items-center gap-1.5 pt-0.5">
                             @php $isGroup = $absensi && $absensi->absensiBorongan->isNotEmpty(); @endphp
@@ -79,20 +79,20 @@
                             {{-- The Dropdown Trigger (Visible if > 1 item) --}}
                             @if ($itemCount > 1)
                                 <div class="relative">
-                                    <button type="button" 
+                                    <button type="button"
                                         class="flex items-center gap-1.5 px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-[10px] font-black text-orange-600 uppercase tracking-tighter hover:bg-orange-100 transition-all">
                                         +{{ $itemCount - 1 }} Item Lainnya
                                         <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7" /></svg>
                                     </button>
 
                                     {{-- Dropdown Card: The absolute fix --}}
-                                    <div x-show="openItems" 
+                                    <div x-show="openItems"
                                         x-transition:enter="transition ease-out duration-200"
                                         x-transition:enter-start="opacity-0 translate-y-2 scale-95"
                                         x-transition:enter-end="opacity-100 translate-y-0 scale-100"
                                         class="absolute left-0 top-full mt-2 w-[280px] z-[200] p-5 bg-white rounded-[1.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-slate-100 origin-top-left"
                                         x-cloak>
-                                        
+
                                         <div class="flex items-center justify-between mb-4 pb-2 border-b border-slate-50">
                                             <span class="text-[11px] font-black text-slate-400 uppercase tracking-widest">Daftar Item Tambahan</span>
                                             <span class="px-2 py-0.5 bg-orange-50 text-orange-600 text-[9px] font-bold rounded">{{ $itemCount }} Total</span>
