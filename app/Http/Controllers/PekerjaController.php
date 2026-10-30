@@ -74,39 +74,62 @@ class PekerjaController extends Controller
         // Start base queries for counters
         $totalQuery   = Pekerja::query();
         $baruQuery    = Pekerja::whereMonth('created_at', Carbon::now()->month)->whereYear('created_at', Carbon::now()->year);
-        $pendingQuery = Pekerja::where('status_aktif', 2);
+        $pendingQuery = Pekerja::where(function ($q) {
+            $q->where('status_aktif', 2)
+              ->orWhereHas('pkwt', function ($pq) {
+                  $pq->where('status_aktif', 2);
+              });
+        });
         $aktifQuery   = Pekerja::where('status_aktif', 0);
 
         // Apply unit scope if user is a restricted PIC
         if (!$isGlobalUser) {
-            $totalQuery->whereHas('pkwtAktif', function ($q) use ($assignedUnitIds) {
+            $totalQuery->whereHas('pkwt', function ($q) use ($assignedUnitIds) {
                 $q->whereIn('id_unit', $assignedUnitIds);
             });
-            $baruQuery->whereHas('pkwtAktif', function ($q) use ($assignedUnitIds) {
+            $baruQuery->whereHas('pkwt', function ($q) use ($assignedUnitIds) {
                 $q->whereIn('id_unit', $assignedUnitIds);
             });
-            $pendingQuery->whereHas('pkwtAktif', function ($q) use ($assignedUnitIds) {
-                $q->whereIn('id_unit', $assignedUnitIds);
+            $pendingQuery->where(function ($q) use ($assignedUnitIds) {
+                $q->where('created_by', Auth::id())
+                  ->orWhereHas('pkwt', function ($pq) use ($assignedUnitIds) {
+                      $pq->whereIn('id_unit', $assignedUnitIds);
+                  });
             });
-            $aktifQuery->whereHas('pkwtAktif', function ($q) use ($assignedUnitIds) {
+            $aktifQuery->whereHas('pkwt', function ($q) use ($assignedUnitIds) {
                 $q->whereIn('id_unit', $assignedUnitIds);
             });
         }
 
-        $totalPekerja        = $totalQuery->count();
-        $pekerjaBaru         = $baruQuery->count();
-        $pekerjaPendingCount = $pendingQuery->count();
-        $tidakAktif          = $aktifQuery->count();
-
-        $pendingPekerjaList = Pekerja::with(['pkwtAktif.unit'])
-            ->where('status_aktif', 2)
+        $pendingPekerjaList = Pekerja::with([
+                'pkwtAktif.unit',
+                'pkwtPending.unit',
+                'pkwtPending.jabatan',
+                'pkwtPending.divisi',
+                'latestPkwt.unit',
+                'user'
+            ])
+            ->where(function ($q) {
+                $q->where('status_aktif', 2)
+                  ->orWhereHas('pkwt', function ($pq) {
+                      $pq->where('status_aktif', 2);
+                  });
+            })
             ->when(!$isGlobalUser, function ($q) use ($assignedUnitIds) {
-                $q->whereHas('pkwtAktif', function ($qq) use ($assignedUnitIds) {
-                    $qq->whereIn('id_unit', $assignedUnitIds);
+                $q->where(function ($sub) use ($assignedUnitIds) {
+                    $sub->where('created_by', Auth::id())
+                        ->orWhereHas('pkwt', function ($qq) use ($assignedUnitIds) {
+                            $qq->whereIn('id_unit', $assignedUnitIds);
+                        });
                 });
             })
             ->orderBy('created_at', 'desc')
             ->get();
+
+        $totalPekerja        = $totalQuery->count();
+        $pekerjaBaru         = $baruQuery->count();
+        $pekerjaPendingCount = $isGlobalUser ? $pendingPekerjaList->count() : 0;
+        $tidakAktif          = $aktifQuery->count();
 
 
         // --- 3. BUILD MAIN QUERY ---
@@ -170,11 +193,31 @@ class PekerjaController extends Controller
         // --- 6a. PIC-SPECIFIC: their own pending submissions ---
         $myPendingList = collect();
         if (!$isGlobalUser) {
-            $myPendingList = Pekerja::with(['pkwtAktif.unit', 'user'])
-                ->where('status_aktif', 2)
-                ->where('created_by', Auth::id()) // Ensure this matches your foreign key for the inputter
+            $myPendingList = Pekerja::with([
+                    'pkwtAktif.unit',
+                    'pkwtPending.unit',
+                    'pkwtPending.jabatan',
+                    'pkwtPending.divisi',
+                    'latestPkwt.unit',
+                    'user'
+                ])
+                ->where(function ($q) {
+                    $q->where('status_aktif', 2)
+                      ->orWhereHas('pkwt', function ($pq) {
+                          $pq->where('status_aktif', 2);
+                      });
+                })
+                ->where(function ($q) use ($assignedUnitIds) {
+                    $q->where('created_by', Auth::id())
+                      ->orWhereHas('pkwt', function ($pq) use ($assignedUnitIds) {
+                          $pq->whereIn('id_unit', $assignedUnitIds)
+                             ->where('status_aktif', 2);
+                      });
+                })
                 ->orderBy('created_at', 'desc')
                 ->get();
+
+            $pekerjaPendingCount = $myPendingList->count();
         }
 
         // --- 6. RETURN RESPONSE ---
@@ -805,9 +848,9 @@ class PekerjaController extends Controller
                 return response()->json(['success' => false, 'message' => 'Tidak ada data terpilih.'], 400);
             }
 
-            // Mass update
-            Pekerja::whereIn('id', $ids)->update(['status_aktif' => 1]);
-            PKWT::whereIn('id_pekerja', $ids)->update(['status_aktif' => 1]);
+            // Mass update: Only activate records that are pending (status_aktif == 2)
+            Pekerja::whereIn('id', $ids)->where('status_aktif', 2)->update(['status_aktif' => 1]);
+            PKWT::whereIn('id_pekerja', $ids)->where('status_aktif', 2)->update(['status_aktif' => 1]);
 
             // Dynamic message based on count
             $count = count($ids);
@@ -831,25 +874,24 @@ class PekerjaController extends Controller
 
             $pekerja = \App\Models\Pekerja::findOrFail($id);
             
-            // 1. Safety Check: Ensure it's still pending
-            if ($pekerja->status_aktif != 2) {
+            // 1. Safety Check: Ensure either pekerja profile or PKWT is pending
+            $hasPendingPkwt = PKWT::where('id_pekerja', $id)->where('status_aktif', 2)->exists();
+            if ($pekerja->status_aktif != 2 && !$hasPendingPkwt) {
                 return response()->json(['success' => false, 'message' => 'Hanya pengajuan pending yang bisa dibatalkan.'], 403);
             }
 
-            // 2. Delete associated PKWT and PKWT_Hari_Kerja
-            // We find the PKWTs first to clean up the dependent Hari Kerja records
-            $pkwtIds = PKWT::where('id_pekerja', $id)->pluck('id');
+            // 2. Delete associated pending PKWT and PKWT_Hari_Kerja
+            $pendingPkwtIds = PKWT::where('id_pekerja', $id)->where('status_aktif', 2)->pluck('id');
 
-            if ($pkwtIds->isNotEmpty()) {
-                // Delete Working Hours linked to these PKWTs
-                PKWT_Hari_Kerja::whereIn('pkwt_id', $pkwtIds)->delete();
-                
-                // Delete the PKWT records themselves
-                PKWT::whereIn('id', $pkwtIds)->delete();
+            if ($pendingPkwtIds->isNotEmpty()) {
+                PKWT_Hari_Kerja::whereIn('pkwt_id', $pendingPkwtIds)->delete();
+                PKWT::whereIn('id', $pendingPkwtIds)->delete();
             }
 
-            // 3. Delete the Pekerja profile
-            $pekerja->delete();
+            // 3. Delete the Pekerja profile only if the profile itself was pending (new worker submission)
+            if ($pekerja->status_aktif == 2) {
+                $pekerja->delete();
+            }
 
             // Commit all deletions
             DB::commit();

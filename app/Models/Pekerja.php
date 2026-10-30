@@ -71,6 +71,21 @@ class Pekerja extends Model
             ->where('status_aktif', 1);
     }
 
+    // 🔥 PKWT yang PENDING APPROVAL (status_aktif = 2)
+    public function pkwtPending()
+    {
+        return $this->hasOne(PKWT::class, 'id_pekerja')
+            ->where('status_aktif', 2)
+            ->latestOfMany();
+    }
+
+    // 🔥 PKWT paling akhir
+    public function latestPkwt()
+    {
+        return $this->hasOne(PKWT::class, 'id_pekerja')
+            ->latestOfMany();
+    }
+
     public function absensiByUnitTanggal($unitId, $date)
     {
         return $this->hasOne(Absensi::class, 'id_pekerja')
