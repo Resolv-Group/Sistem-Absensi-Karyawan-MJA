@@ -121,6 +121,7 @@ Route::middleware(['auth', 'role:hrd,admin,head_supervisor,pic'])->group(functio
     Route::get('/pekerja/ubah/{id}', [PekerjaController::class, 'ubahPekerja'])->name('view.ubah.pekerja');
     Route::put('/pekerja/ubah/{id}', [PekerjaController::class, 'updatePekerja'])->name('update.pekerja');
     Route::post('/pekerja/approve-bulk', [PekerjaController::class, 'approvePekerjaBulk'])->name('pekerja.approve.bulk');
+    Route::post('/pekerja/reject-bulk', [PekerjaController::class, 'rejectPekerjaBulk'])->name('pekerja.reject.bulk');
     // Route::get('/pekerja/dokumen/{id}', [PekerjaController::class, 'showDokumen'])->name('pekerja.dokumen.show');
     Route::get('/pkwt/dokumen/{id}', [PekerjaController::class, 'showPkwtDokumen'])->name('pkwt.dokumen.show'); // Route for specific PKWT records (Current and History)
     Route::put('/pekerja/toggle-status/{id}', [PekerjaController::class, 'toggleStatus']);
