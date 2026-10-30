@@ -942,8 +942,8 @@
                         </div>
 
                         {{-- Save Button --}}
-                        <button type="button" @click="confirmSubmit()"
-                            class="w-full sm:w-auto px-8 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-200/50 transition transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
+                        <button type="button" @click="confirmSubmit()" :disabled="isSubmitting"
+                            class="w-full sm:w-auto px-8 py-3 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-xl shadow-lg shadow-emerald-200/50 transition transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
                             <span>Simpan</span>
                             <svg class="w-5 h-5 text-emerald-100" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor">
@@ -1325,7 +1325,11 @@
                     return withCurrency ? `Rp ${formatted}` : formatted;
                 },
 
+                isSubmitting: false,
+
                 confirmSubmit() {
+                    if (this.isSubmitting) return;
+
                     Swal.fire({
                         title: 'Konfirmasi Simpan Data',
                         text: 'Pastikan semua data yang Anda input sudah benar. Lanjutkan menyimpan?',
@@ -1340,6 +1344,7 @@
                         }
                     }).then((result) => {
                         if (result.isConfirmed) {
+                            this.isSubmitting = true;
                             Swal.fire({
                                 title: 'Sedang Menyimpan...',
                                 text: 'Mohon tunggu sebentar.',

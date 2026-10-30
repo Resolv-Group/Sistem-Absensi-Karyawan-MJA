@@ -102,8 +102,8 @@ class PKWTController extends Controller
         $units = Unit::select('id', 'nama_unit as nama')->get();
         $unitSelected = Unit::with('namaMitra')->where('id', $id_unit)->firstOrFail();
 
-        // 2. Get IDs of workers who ALREADY have an active contract (in any unit)
-        $assignedWorkerIds = PKWT::where('id_unit', $id_unit)->where('status_aktif', 1)->pluck('id_pekerja')->toArray();
+        // 2. Get IDs of workers who ALREADY have an active or pending contract in this unit
+        $assignedWorkerIds = PKWT::where('id_unit', $id_unit)->whereIn('status_aktif', [1, 2])->pluck('id_pekerja')->toArray();
 
         // 3. Get workers who are active but NOT in the assigned list
         // This handles the requirement: "cannot add worker if already in this or other unit"
@@ -181,6 +181,10 @@ class PKWTController extends Controller
             $unit = Unit::findOrFail($request->id_unit);
             $userRole = strtolower(trim(auth()->user()->role ?? ''));
 
+            // HRD/Admin/Superadmin bisa langsung aktif (status 1)
+            // PIC pengajuan selalu pending (status 2) dan harus ke approval HRD
+            $initialStatus = in_array($userRole, ['hrd', 'admin', 'superadmin']) ? 1 : 2;
+
             // ✅ LOOP PEKERJA
             foreach ($request->pekerja as $index => $data) {
                 // Upload file per pekerja
@@ -193,43 +197,60 @@ class PKWTController extends Controller
                     $dokumenMime = $file->getMimeType();
                 }
 
-                // Cek apakah pekerja sudah terdaftar/approved di perusahaan
-                $pekerja = Pekerja::find($data['id_pekerja']);
+                // Cek duplikasi: jika sudah ada PKWT aktif (1) atau pending (2) untuk pekerja ini di unit ini
+                $existingPkwt = PKWT::where('id_pekerja', $data['id_pekerja'])
+                    ->where('id_unit', $request->id_unit)
+                    ->whereIn('status_aktif', [1, 2])
+                    ->first();
 
-                $pekerjaSudahTerdaftar = $pekerja && $pekerja->status_aktif == 1;
+                if ($existingPkwt) {
+                    $existingPkwt->update([
+                        'divisi_id' => $data['divisi_id'],
+                        'jabatan_id' => $data['jabatan_id'],
+                        'tgl_mulai_pkwt' => $data['tgl_mulai_pkwt'],
+                        'tgl_akhir_pkwt' => $data['tgl_akhir_pkwt'],
+                        'gaji_bulanan' => $data['gaji_bulanan'],
+                        'gaji_harian' => $data['gaji_harian'],
+                        'gaji_overtime' => $data['gaji_overtime'],
+                        'rate_hbn' => $data['rate_hbn'],
+                        'bpjs_kesehatan' => $data['bpjs_kesehatan'],
+                        'bpjs_naker' => $data['bpjs_naker'],
+                        'tunjangan' => $unit->normalizePkwtTunjangan((array) json_decode($data['tunjangan'], true)),
+                        'dokumen_pkwt' => $dokumen ?? $existingPkwt->dokumen_pkwt,
+                        'dokumen_mime' => $dokumenMime ?? $existingPkwt->dokumen_mime,
+                        'status_aktif' => $initialStatus,
+                    ]);
+                    $pkwt = $existingPkwt;
 
-                // HRD/Admin/Superadmin selalu bisa langsung aktif
-                // PIC hanya langsung aktif jika pekerja sudah terdaftar
-                $initialStatus = (
-                    in_array($userRole, ['hrd', 'admin', 'superadmin']) ||
-                    $pekerjaSudahTerdaftar
-                ) ? 1 : 2;
-
-                $pkwt = PKWT::create([
-                    'id_unit' => $request->id_unit,
-                    'id_pekerja' => $data['id_pekerja'],
-                    'divisi_id' => $data['divisi_id'],
-                    'jabatan_id' => $data['jabatan_id'],
-                    'tgl_mulai_pkwt' => $data['tgl_mulai_pkwt'],
-                    'tgl_akhir_pkwt' => $data['tgl_akhir_pkwt'],
-                    'gaji_bulanan' => $data['gaji_bulanan'],
-                    'gaji_harian' => $data['gaji_harian'],
-                    'gaji_overtime' => $data['gaji_overtime'],
-                    'rate_hbn' => $data['rate_hbn'],
-                    'bpjs_kesehatan' => $data['bpjs_kesehatan'],
-                    'bpjs_naker' => $data['bpjs_naker'],
-                    'tunjangan' => $unit->normalizePkwtTunjangan((array) json_decode($data['tunjangan'], true)),
-                    'dokumen_pkwt' => $dokumen,
-                    'dokumen_mime' => $dokumenMime,
-                    'status_aktif' => $initialStatus, 
-                ]);
+                    // Hapus hari kerja lama untuk diperbarui
+                    PKWT_Hari_Kerja::where('pkwt_id', $pkwt->id)->delete();
+                } else {
+                    $pkwt = PKWT::create([
+                        'id_unit' => $request->id_unit,
+                        'id_pekerja' => $data['id_pekerja'],
+                        'divisi_id' => $data['divisi_id'],
+                        'jabatan_id' => $data['jabatan_id'],
+                        'tgl_mulai_pkwt' => $data['tgl_mulai_pkwt'],
+                        'tgl_akhir_pkwt' => $data['tgl_akhir_pkwt'],
+                        'gaji_bulanan' => $data['gaji_bulanan'],
+                        'gaji_harian' => $data['gaji_harian'],
+                        'gaji_overtime' => $data['gaji_overtime'],
+                        'rate_hbn' => $data['rate_hbn'],
+                        'bpjs_kesehatan' => $data['bpjs_kesehatan'],
+                        'bpjs_naker' => $data['bpjs_naker'],
+                        'tunjangan' => $unit->normalizePkwtTunjangan((array) json_decode($data['tunjangan'], true)),
+                        'dokumen_pkwt' => $dokumen,
+                        'dokumen_mime' => $dokumenMime,
+                        'status_aktif' => $initialStatus,
+                    ]);
+                }
 
                 foreach ($data['days'] as $hari => $jam) {
                     // Gunakan Model PkwtHariKerja
                     PKWT_Hari_Kerja::create([
-                        'pkwt_id' => $pkwt->id, // Ambil ID PKWT yang baru saja dibuat di atas
-                        'hari' => $hari,      // 'mon', 'tue', dst (sesuai key array)
-                        'jam_kerja' => $jam ?? 0,        // nilainya (0 - 24)
+                        'pkwt_id' => $pkwt->id,
+                        'hari' => $hari,
+                        'jam_kerja' => $jam ?? 0,
                     ]);
                 }
             }

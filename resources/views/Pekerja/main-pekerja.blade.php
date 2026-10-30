@@ -688,6 +688,12 @@
 
                 <div class="space-y-3">
                     @foreach($list as $item)
+                        @php
+                            $pendingPkwt = $item->pkwtPending ?? $item->pkwtAktif ?? $item->latestPkwt;
+                            $unitName = $pendingPkwt?->unit?->nama_unit;
+                            $jabatanName = $pendingPkwt?->jabatan?->nama;
+                            $divisiName = $pendingPkwt?->divisi?->nama;
+                        @endphp
                         <div id="pending-row-{{ $item->id }}" data-worker-name="{{ $item->nama ?? '' }}" data-pic-name="{{ $item->user->name ?? '' }}" class="pending-pekerja-row group bg-white/70 hover:bg-white border border-gray-100 hover:border-amber-200/70 p-3.5 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all">
                             <div class="flex items-center gap-3">
                                 @if($isAdmin)
@@ -699,9 +705,19 @@
                                 </div>
                                 
                                 <div>
-                                    <h4 class="font-bold text-gray-900 text-sm group-hover:text-amber-700 transition-colors">{{ $item->nama ?? 'Belum Diset' }}</h4>
+                                    <div class="flex items-center gap-2">
+                                        <h4 class="font-bold text-gray-900 text-sm group-hover:text-amber-700 transition-colors">{{ $item->nama ?? 'Belum Diset' }}</h4>
+                                        @if($unitName)
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-100">
+                                                {{ $unitName }}
+                                            </span>
+                                        @endif
+                                    </div>
                                     <p class="text-xs text-gray-500 font-mono">NIK: {{ $item->nik ?? 'Belum Diset' }} | KK: {{ $item->no_kk ?? 'Belum Diset' }}</p>
-                                    <p class="text-xs text-gray-500 font-mono">Telp: {{ $item->no_telp ?? 'Belum Diset' }}</p>
+                                    <p class="text-xs text-gray-500 font-mono">Telp: {{ $item->telp ?? 'Belum Diset' }}</p>
+                                    @if($jabatanName || $divisiName)
+                                        <p class="text-xs text-gray-600 font-medium">Posisi: {{ $jabatanName ?? '-' }} {{ $divisiName ? "({$divisiName})" : '' }}</p>
+                                    @endif
                                     <p class="text-xs text-amber-700 font-medium mt-0.5">Diajukan Oleh : {{ $item->user->name ?? 'Belum Diset' }}</p>
                                 </div>
                             </div>
