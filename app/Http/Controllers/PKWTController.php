@@ -404,7 +404,7 @@ class PKWTController extends Controller
         $request->validate([
             'ids' => 'required',
             'action' => 'required|string',
-            'status' => 'required_if:action,update_status|in:0,1',
+            'status' => 'required_if:action,update_status|in:0,1,2,4',
             'reason' => 'nullable|string|max:500',
         ]);
 
@@ -423,16 +423,16 @@ class PKWTController extends Controller
             DB::beginTransaction();
 
             if ($request->action === 'update_status') {
+                $selectedPkwt = PKWT::whereIn('id', $ids)
+                    ->get(['id', 'id_pekerja', 'id_unit']);
+
+                if ($selectedPkwt->isEmpty()) {
+                    DB::rollBack();
+
+                    return back()->with('error', 'Data PKWT yang dipilih tidak ditemukan.');
+                }
+
                 if ((int) $request->status === 1) {
-                    $selectedPkwt = PKWT::whereIn('id', $ids)
-                        ->get(['id', 'id_pekerja', 'id_unit']);
-
-                    if ($selectedPkwt->isEmpty()) {
-                        DB::rollBack();
-
-                        return back()->with('error', 'Data PKWT yang dipilih tidak ditemukan.');
-                    }
-
                     // A worker may be active in different units, but only once in the same unit.
                     $selectedPairs = $selectedPkwt
                         ->map(fn ($pkwt) => [
@@ -471,7 +471,20 @@ class PKWTController extends Controller
                     'updated_at' => now(),
                 ]);
 
-                $statusLabel = $request->status == 1 ? 'Aktif' : 'Nonaktif';
+                $pekerjaIds = $selectedPkwt->pluck('id_pekerja')->filter()->unique();
+                if ($pekerjaIds->isNotEmpty()) {
+                    Pekerja::whereIn('id', $pekerjaIds)->update([
+                        'status_aktif' => $request->status,
+                        'updated_at' => now(),
+                    ]);
+                }
+
+                $statusLabel = match ((int) $request->status) {
+                    1 => 'Aktif',
+                    2 => 'Pending',
+                    4 => 'Ditolak',
+                    default => 'Nonaktif',
+                };
                 $message = 'Berhasil mengubah '.count($ids)." pekerja menjadi $statusLabel.";
             } elseif ($request->action === 'delete') {
                 PKWT::whereIn('id', $ids)->delete();
