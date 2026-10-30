@@ -280,7 +280,7 @@
                                 <div class="space-y-5">
 
                                     {{-- STATUS FILTER --}}
-                                    <div x-data="{ open: false, list: [{ val: '', label: 'Semua Status' }, { val: '1', label: 'Aktif' }, { val: '0', label: 'Nonaktif' }] }" class="relative">
+                                    <div x-data="{ open: false, list: [{ val: '', label: 'Semua Status' }, { val: '1', label: 'Aktif' }, { val: '2', label: 'Pending' }, { val: '4', label: 'Ditolak' }, { val: '0', label: 'Nonaktif' }] }" class="relative">
                                         <label
                                             class="block text-[10px] uppercase tracking-wider font-bold text-gray-400 mb-1.5">Status
                                             Keaktifan</label>
@@ -548,15 +548,9 @@
                                                 @csrf @method('put')
                                                 <input type="hidden" name="ids" :value="JSON.stringify(selectedItems)">
                                                 <button type="button" @click="showStatusModal = true"
-                                                    x-show="!hasAnyPending"
                                                     class="flex-1 sm:flex-none justify-center px-4 py-2 bg-gray-50 text-gray-600 border border-gray-200 rounded-xl text-xs font-bold hover:bg-gray-800 hover:text-white transition-all">
                                                     Update Status
                                                 </button>
-                                                <div x-show="hasAnyPending"
-                                                    title="Tidak bisa update status: salah satu pekerja yang dipilih masih berstatus Pending."
-                                                    class="flex-1 sm:flex-none justify-center px-4 py-2 bg-gray-100 text-gray-400 border border-gray-200 rounded-xl text-xs font-bold cursor-not-allowed select-none">
-                                                    Update Status
-                                                </div>
                                                 <button name="action" value="delete" onclick="return confirm('Hapus data?')"
                                                     class="shrink-0 p-2 bg-red-50 text-red-600 border border-red-100 rounded-xl hover:bg-red-600 hover:text-white transition-all">
                                                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24"

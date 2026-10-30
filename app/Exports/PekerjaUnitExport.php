@@ -32,6 +32,8 @@ class PekerjaUnitExport implements FromCollection, WithHeadings, WithMapping, Sh
                 $this->status_angka[] = 0;
             } elseif ($status === 'pending') {
                 $this->status_angka[] = 2;
+            } elseif ($status === 'ditolak' || $status === 'tolak') {
+                $this->status_angka[] = 4;
             }
         }
         

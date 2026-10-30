@@ -157,7 +157,7 @@ $watch('filterStatus', () => updateTable());" class="relative">
                     <div class="space-y-5">
 
                         {{-- STATUS FILTER --}}
-                        <div x-data="{ open: false, list: [{ val: '', label: 'Semua Status' }, { val: '1', label: 'Aktif' }, { val: '0', label: 'Nonaktif' }] }" class="relative">
+                        <div x-data="{ open: false, list: [{ val: '', label: 'Semua Status' }, { val: '1', label: 'Aktif' }, { val: '2', label: 'Pending' }, { val: '4', label: 'Ditolak' }, { val: '0', label: 'Nonaktif' }] }" class="relative">
                             <label
                                 class="block text-[10px] uppercase tracking-wider font-bold text-gray-400 mb-1.5">Status
                                 Keaktifan</label>
@@ -510,6 +510,13 @@ $watch('filterStatus', () => updateTable());" class="relative">
                                     class="w-4 h-4 rounded text-emerald-600 border-gray-300 focus:ring-emerald-500">
                                 <span class="text-sm text-slate-700">Pending</span>
                             </label>
+
+                            <!-- Ditolak -->
+                            <label class="flex items-center gap-3 cursor-pointer p-2 rounded-lg border border-transparent hover:bg-slate-50 transition">
+                                <input type="checkbox" name="status[]" value="ditolak" 
+                                    class="w-4 h-4 rounded text-rose-600 border-gray-300 focus:ring-rose-500">
+                                <span class="text-sm text-slate-700">Ditolak</span>
+                            </label>
                         </div>
 
                         <div class="flex justify-end gap-3 mt-4 pt-4 border-t border-slate-100">
@@ -783,7 +790,6 @@ $watch('filterStatus', () => updateTable());" class="relative">
 
                     <button type="button"
                         @click="showStatusModal = true"
-                        x-show="!hasAnyPending"
                         class="px-4 py-2
                             bg-gray-50 text-gray-600
                             border border-gray-200 rounded-xl
@@ -792,16 +798,6 @@ $watch('filterStatus', () => updateTable());" class="relative">
                             transition-all">
                         Update Status
                     </button>
-
-                    <div x-show="hasAnyPending"
-                        title="Tidak bisa update status: salah satu pekerja yang dipilih masih berstatus Pending."
-                        class="px-4 py-2
-                            bg-gray-100 text-gray-400
-                            border border-gray-200 rounded-xl
-                            text-xs font-bold
-                            cursor-not-allowed select-none">
-                        Update Status
-                    </div>
 
                 </form>
 
@@ -879,7 +875,6 @@ $watch('filterStatus', () => updateTable());" class="relative">
 
                     <button type="button"
                         @click="showStatusModal = true"
-                        x-show="!hasAnyPending"
                         class="w-full flex items-center justify-center
                             gap-1.5 px-3 py-2.5
                             bg-gray-50 text-gray-600
@@ -901,19 +896,6 @@ $watch('filterStatus', () => updateTable());" class="relative">
 
                         Update Status
                     </button>
-
-                    <div x-show="hasAnyPending"
-                        title="Tidak bisa update status: salah satu pekerja yang dipilih masih berstatus Pending."
-                        class="w-full flex items-center justify-center
-                            px-3 py-2.5
-                            bg-gray-100 text-gray-400
-                            border border-gray-200 rounded-xl
-                            text-[11px] font-bold
-                            cursor-not-allowed select-none">
-
-                        Update Status
-
-                    </div>
 
                 </form>
 

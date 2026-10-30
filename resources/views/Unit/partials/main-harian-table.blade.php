@@ -107,6 +107,9 @@
             @elseif($pkwt->status_aktif == 2)
                 <span
                     class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-[10px] font-black uppercase tracking-widest">Pending</span>
+            @elseif($pkwt->status_aktif == 4)
+                <span
+                    class="px-3 py-1 bg-rose-100 text-rose-700 rounded-full text-[10px] font-black uppercase tracking-widest">Ditolak</span>
             @else
                 <span
                     class="px-3 py-1 bg-gray-100 text-gray-400 rounded-full text-[10px] font-black uppercase tracking-widest">Nonaktif</span>
