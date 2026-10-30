@@ -179,14 +179,20 @@ class PKWTController extends Controller
 
 
             $unit = Unit::findOrFail($request->id_unit);
-            $userRole = strtolower(trim(auth()->user()->role ?? ''));
 
-            // HRD/Admin/Superadmin bisa langsung aktif (status 1)
-            // PIC pengajuan selalu pending (status 2) dan harus ke approval HRD
-            $initialStatus = in_array($userRole, ['hrd', 'admin', 'superadmin']) ? 1 : 2;
+            $hasPending = false;
 
             // ✅ LOOP PEKERJA
             foreach ($request->pekerja as $index => $data) {
+                // Cek status keaktifan profil pekerja:
+                // Jika profil pekerjanya berstatus pending (2), maka PKWT-nya juga harus pending (2) menunggu approval HRD.
+                // Jika pekerjanya sudah aktif (1), maka PKWT langsung aktif (1) tanpa perlu approval lagi.
+                $targetPekerja = Pekerja::find($data['id_pekerja']);
+                $pkwtStatus = ($targetPekerja && $targetPekerja->status_aktif == 2) ? 2 : 1;
+                if ($pkwtStatus == 2) {
+                    $hasPending = true;
+                }
+
                 // Upload file per pekerja
                 $dokumen = null;
                 $dokumenMime = null;
@@ -197,10 +203,9 @@ class PKWTController extends Controller
                     $dokumenMime = $file->getMimeType();
                 }
 
-                // Cek duplikasi: jika sudah ada PKWT aktif (1) atau pending (2) untuk pekerja ini di unit ini
+                // Cek apakah sudah ada PKWT untuk pekerja ini di unit ini
                 $existingPkwt = PKWT::where('id_pekerja', $data['id_pekerja'])
                     ->where('id_unit', $request->id_unit)
-                    ->whereIn('status_aktif', [1, 2])
                     ->first();
 
                 if ($existingPkwt) {
@@ -218,7 +223,7 @@ class PKWTController extends Controller
                         'tunjangan' => $unit->normalizePkwtTunjangan((array) json_decode($data['tunjangan'], true)),
                         'dokumen_pkwt' => $dokumen ?? $existingPkwt->dokumen_pkwt,
                         'dokumen_mime' => $dokumenMime ?? $existingPkwt->dokumen_mime,
-                        'status_aktif' => $initialStatus,
+                        'status_aktif' => $pkwtStatus,
                     ]);
                     $pkwt = $existingPkwt;
 
@@ -241,7 +246,7 @@ class PKWTController extends Controller
                         'tunjangan' => $unit->normalizePkwtTunjangan((array) json_decode($data['tunjangan'], true)),
                         'dokumen_pkwt' => $dokumen,
                         'dokumen_mime' => $dokumenMime,
-                        'status_aktif' => $initialStatus,
+                        'status_aktif' => $pkwtStatus,
                     ]);
                 }
 
@@ -258,7 +263,7 @@ class PKWTController extends Controller
             DB::commit();
 
             // ✅ 5. DYNAMIC REDIRECT MESSAGE
-            $msg = ($initialStatus == 2) 
+            $msg = $hasPending
                 ? 'Penempatan unit berhasil diajukan. Menunggu approval HRD.' 
                 : 'Pekerja berhasil ditambahkan ke unit.';
 

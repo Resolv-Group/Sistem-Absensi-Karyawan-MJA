@@ -190,7 +190,7 @@ class PekerjaController extends Controller
         }
         $units = $unitQuery->get(['id', 'nama_unit']);
 
-        // --- 6a. PIC-SPECIFIC: their own pending submissions ---
+        // --- 6a. PIC-SPECIFIC: their own pending submissions & rejected items ---
         $myPendingList = collect();
         if (!$isGlobalUser) {
             $myPendingList = Pekerja::with([
@@ -199,10 +199,12 @@ class PekerjaController extends Controller
                     'pkwtPending.jabatan',
                     'pkwtPending.divisi',
                     'latestPkwt.unit',
+                    'latestPkwt.jabatan',
+                    'latestPkwt.divisi',
                     'user'
                 ])
                 ->where(function ($q) {
-                    $q->where('status_aktif', 2)
+                    $q->whereIn('status_aktif', [2, 4])
                       ->orWhereHas('pkwt', function ($pq) {
                           $pq->where('status_aktif', 2);
                       });
@@ -553,7 +555,15 @@ class PekerjaController extends Controller
 
     function ubahPekerja(request $request, $id)
     {
-        $pekerja = Pekerja::findOrFail($id);
+        $pekerja = Pekerja::with([
+            'pkwtAktif.unit',
+            'pkwtAktif.jabatan',
+            'pkwtPending.unit',
+            'pkwtPending.jabatan',
+            'latestPkwt.unit',
+            'latestPkwt.jabatan',
+            'pkwt'
+        ])->findOrFail($id);
 
         return view('Pekerja.CRUD.ubah-pekerja', compact('pekerja'));
     }
@@ -562,6 +572,8 @@ class PekerjaController extends Controller
     {
         try {
             $pekerja = Pekerja::findOrFail($id);
+            $userRole = strtolower(trim(auth()->user()->role ?? ''));
+            $isHrdOrAdmin = in_array($userRole, ['admin', 'hrd', 'superadmin']);
 
             $request->validate(
                 [
@@ -666,7 +678,24 @@ class PekerjaController extends Controller
                 ],
             );
 
-            $data = $request->except('foto', '_token', '_method');
+            $data = $request->except('foto', '_token', '_method', 'pkwt_id', 'pkwt_status_aktif');
+
+            // Handle status changes for Pekerja
+            if ($isHrdOrAdmin) {
+                if ($request->has('status_aktif')) {
+                    $data['status_aktif'] = (int) $request->status_aktif;
+                }
+            } else {
+                // If a PIC edits a rejected worker (status 4) or pending worker (status 2), keep/reset to pending (status 2) so HRD can approve
+                if (in_array($pekerja->status_aktif, [2, 4])) {
+                    $data['status_aktif'] = 2;
+                    // Reset PKWT status back to pending (status 2) as well so it is pending in the unit until approved
+                    $latestPkwt = PKWT::where('id_pekerja', $pekerja->id)->orderBy('id', 'desc')->first();
+                    if ($latestPkwt) {
+                        $latestPkwt->update(['status_aktif' => 2]);
+                    }
+                }
+            }
 
             if ($request->remove_foto == '1') {
                 $pekerja->foto = null;
@@ -678,8 +707,15 @@ class PekerjaController extends Controller
                 $pekerja->foto = $foto;
             }
 
-            // ✅ UPDATE DATA
+            // ✅ UPDATE DATA PEKERJA
             $pekerja->update($data);
+
+            // Update PKWT status if submitted by HRD/Admin
+            if ($isHrdOrAdmin && $request->filled('pkwt_id') && $request->has('pkwt_status_aktif')) {
+                PKWT::where('id', $request->pkwt_id)
+                    ->where('id_pekerja', $pekerja->id)
+                    ->update(['status_aktif' => (int) $request->pkwt_status_aktif]);
+            }
 
             History::create([
                 'foreign_id' => $pekerja->id,
@@ -689,8 +725,13 @@ class PekerjaController extends Controller
                 'when' => now(),
             ]);
 
+            $successMsg = 'Data pekerja berhasil diperbarui';
+            if (!$isHrdOrAdmin && (($data['status_aktif'] ?? null) == 2)) {
+                $successMsg = 'Data pekerja berhasil diperbarui dan diajukan kembali ke HRD untuk persetujuan.';
+            }
+
             // ✅ KEMBALI KE DETAIL PEKERJA (LEBIH BAGUS DARIPADA KE LIST)
-            return redirect()->route('view.detail.pekerja', $id)->with('success', 'Data pekerja berhasil diperbarui');
+            return redirect()->route('view.detail.pekerja', $id)->with('success', $successMsg);
         } catch (QueryException $e) {
             \Log::error('UpdatePekerja DB Error: ' . $e->getMessage());
             return back()->withInput()->with('error', $this->translateDbError($e));
@@ -866,6 +907,38 @@ class PekerjaController extends Controller
         }
     }
 
+    public function rejectPekerjaBulk(Request $request)
+    {
+        try {
+            $userRole = strtolower(trim(auth()->user()->role ?? ''));
+            if (!in_array($userRole, ['admin', 'hrd', 'superadmin'])) {
+                return response()->json(['success' => false, 'message' => 'Unauthorized.'], 403);
+            }
+
+            $ids = $request->input('ids', []);
+
+            if (empty($ids)) {
+                return response()->json(['success' => false, 'message' => 'Tidak ada data terpilih.'], 400);
+            }
+
+            // Set status to 4 (rejected)
+            Pekerja::whereIn('id', $ids)->where('status_aktif', 2)->update(['status_aktif' => 4]);
+            // Set pending PKWT to non-aktif (0)
+            PKWT::whereIn('id_pekerja', $ids)->where('status_aktif', 2)->update(['status_aktif' => 0]);
+
+            $count = count($ids);
+            $message = $count > 1 ? "$count pengajuan pekerja berhasil ditolak." : "Pengajuan pekerja berhasil ditolak.";
+
+            return response()->json([
+                'success' => true,
+                'message' => $message
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Error: ' . $e->getMessage()], 500);
+        }
+    }
+
     public function cancelPekerja($id)
     {
         try {
@@ -873,23 +946,30 @@ class PekerjaController extends Controller
             DB::beginTransaction();
 
             $pekerja = \App\Models\Pekerja::findOrFail($id);
+            $userRole = strtolower(trim(auth()->user()->role ?? ''));
+            $isGlobalUser = in_array($userRole, ['admin', 'hrd', 'superadmin']);
+
+            // PIC can only cancel/clear their own submissions
+            if (!$isGlobalUser && $pekerja->created_by !== Auth::id()) {
+                return response()->json(['success' => false, 'message' => 'Unauthorized.'], 403);
+            }
             
-            // 1. Safety Check: Ensure either pekerja profile or PKWT is pending
-            $hasPendingPkwt = PKWT::where('id_pekerja', $id)->where('status_aktif', 2)->exists();
-            if ($pekerja->status_aktif != 2 && !$hasPendingPkwt) {
-                return response()->json(['success' => false, 'message' => 'Hanya pengajuan pending yang bisa dibatalkan.'], 403);
+            // 1. Safety Check: Ensure either pekerja profile or PKWT is pending (2) or rejected (4)
+            $hasPendingOrRejectedPkwt = PKWT::where('id_pekerja', $id)->whereIn('status_aktif', [0, 2, 4])->exists();
+            if (!in_array($pekerja->status_aktif, [2, 4]) && !$hasPendingOrRejectedPkwt) {
+                return response()->json(['success' => false, 'message' => 'Hanya pengajuan pending atau yang ditolak yang bisa dibatalkan/dibersihkan.'], 403);
             }
 
-            // 2. Delete associated pending PKWT and PKWT_Hari_Kerja
-            $pendingPkwtIds = PKWT::where('id_pekerja', $id)->where('status_aktif', 2)->pluck('id');
+            // 2. Delete associated pending/rejected PKWT and PKWT_Hari_Kerja
+            $targetPkwtIds = PKWT::where('id_pekerja', $id)->whereIn('status_aktif', [0, 2, 4])->pluck('id');
 
-            if ($pendingPkwtIds->isNotEmpty()) {
-                PKWT_Hari_Kerja::whereIn('pkwt_id', $pendingPkwtIds)->delete();
-                PKWT::whereIn('id', $pendingPkwtIds)->delete();
+            if ($targetPkwtIds->isNotEmpty()) {
+                PKWT_Hari_Kerja::whereIn('pkwt_id', $targetPkwtIds)->delete();
+                PKWT::whereIn('id', $targetPkwtIds)->delete();
             }
 
-            // 3. Delete the Pekerja profile only if the profile itself was pending (new worker submission)
-            if ($pekerja->status_aktif == 2) {
+            // 3. Delete the Pekerja profile only if the profile itself was pending or rejected
+            if (in_array($pekerja->status_aktif, [2, 4])) {
                 $pekerja->delete();
             }
 
@@ -898,7 +978,7 @@ class PekerjaController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Pengajuan pekerja dan penempatan unit berhasil dibatalkan.'
+                'message' => 'Pengajuan pekerja berhasil dibatalkan / dibersihkan.'
             ]);
 
         } catch (\Exception $e) {

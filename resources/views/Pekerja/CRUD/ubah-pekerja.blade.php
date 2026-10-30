@@ -39,7 +39,26 @@
             </div>
         @endif
 
-
+        @if ($pekerja->status_aktif == 4)
+            <div class="mb-6 p-4 rounded-2xl bg-rose-50 border border-rose-200 shadow-sm flex items-start gap-3.5">
+                <div class="p-2.5 bg-rose-500 text-white rounded-xl shadow-sm shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                </div>
+                <div class="flex-1">
+                    <div class="flex items-center gap-2">
+                        <h4 class="text-sm font-bold text-rose-900">Pengajuan Pekerja Ditolak oleh HRD</h4>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-200 text-rose-800">
+                            Status 4 (Ditolak)
+                        </span>
+                    </div>
+                    <p class="text-xs text-rose-700 mt-1 leading-relaxed">
+                        Pengajuan data pekerja ini sebelumnya telah ditolak oleh HRD. Anda dapat memeriksa dan merevisi data pada formulir di bawah ini. Ketika Anda menekan tombol <strong>"Simpan & Ajukan Kembali"</strong>, status pekerja akan otomatis diajukan kembali ke HRD (Status 2 - Pending Approval).
+                    </p>
+                </div>
+            </div>
+        @endif
 
         {{-- FORM CARD --}}
         <form action="{{ route('update.pekerja', $pekerja->id) }}" method="POST" enctype="multipart/form-data"
@@ -48,6 +67,110 @@
 
             @csrf
             @method('PUT')
+
+            {{-- SECTION KHUSUS: STATUS & KEAKTIFAN (HRD / ADMIN) --}}
+            @if(in_array(strtolower(trim(Auth::user()->role ?? '')), ['admin', 'hrd', 'superadmin']))
+                @php
+                    $currentPkwt = $pekerja->pkwtAktif ?? $pekerja->pkwtPending ?? $pekerja->latestPkwt;
+                @endphp
+                <div class="p-8 bg-gradient-to-br from-amber-50/60 via-white to-blue-50/30 border-b border-gray-200">
+                    <div class="flex items-center gap-3 mb-6 pb-4 border-b border-amber-200/60">
+                        <div class="p-2.5 bg-amber-500 text-white rounded-xl shadow-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+                                Status & Keaktifan Pekerja & PKWT
+                                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-black bg-amber-100 text-amber-800 border border-amber-200 tracking-wide uppercase">
+                                    Panel HRD
+                                </span>
+                            </h2>
+                            <p class="text-xs text-gray-500 mt-0.5">Kelola status keaktifan profil pekerja serta status kontrak PKWT terkait.</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {{-- 1. Status Pekerja --}}
+                        <div class="bg-white p-5 rounded-xl border border-amber-200/80 shadow-sm">
+                            <div class="flex items-center justify-between mb-2">
+                                <label class="block text-sm font-bold text-gray-800">Status Keaktifan Pekerja</label>
+                                @if($pekerja->status_aktif == 1)
+                                    <span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-emerald-100 text-emerald-800">Aktif</span>
+                                @elseif($pekerja->status_aktif == 2)
+                                    <span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-amber-100 text-amber-800">Pending</span>
+                                @elseif($pekerja->status_aktif == 4)
+                                    <span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-rose-100 text-rose-800">Ditolak</span>
+                                @else
+                                    <span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-red-100 text-red-800">Non-Aktif</span>
+                                @endif
+                            </div>
+                            <p class="text-xs text-gray-500 mb-3">Tentukan status data pekerja ini dalam sistem absensi dan operasional.</p>
+                            
+                            <select name="status_aktif" class="w-full rounded-lg shadow-sm border border-gray-300 bg-gray-50 text-gray-900 py-2.5 px-3 text-sm font-semibold focus:bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition cursor-pointer">
+                                <option value="1" {{ old('status_aktif', $pekerja->status_aktif) == 1 ? 'selected' : '' }}>
+                                    🟢 1 - Aktif
+                                </option>
+                                <option value="2" {{ old('status_aktif', $pekerja->status_aktif) == 2 ? 'selected' : '' }}>
+                                    🟡 2 - Pending Approval
+                                </option>
+                                <option value="0" {{ old('status_aktif', $pekerja->status_aktif) == 0 ? 'selected' : '' }}>
+                                    ⚪ 0 - Non-Aktif / Resign
+                                </option>
+                                <option value="4" {{ old('status_aktif', $pekerja->status_aktif) == 4 ? 'selected' : '' }}>
+                                    🔴 4 - Ditolak (Rejected)
+                                </option>
+                            </select>
+                        </div>
+
+                        {{-- 2. Status PKWT Pekerja --}}
+                        <div class="bg-white p-5 rounded-xl border border-blue-200/80 shadow-sm">
+                            <div class="flex items-center justify-between mb-2">
+                                <label class="block text-sm font-bold text-gray-800">Status Kontrak PKWT</label>
+                                @if($currentPkwt)
+                                    @if($currentPkwt->status_aktif == 1)
+                                        <span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-emerald-100 text-emerald-800">PKWT Aktif</span>
+                                    @elseif($currentPkwt->status_aktif == 2)
+                                        <span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-amber-100 text-amber-800">PKWT Pending</span>
+                                    @elseif($currentPkwt->status_aktif == 4)
+                                        <span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-rose-100 text-rose-800">PKWT Ditolak</span>
+                                    @else
+                                        <span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-gray-100 text-gray-800">PKWT Non-Aktif</span>
+                                    @endif
+                                @endif
+                            </div>
+
+                            @if($currentPkwt)
+                                <p class="text-xs text-gray-600 mb-3 truncate">
+                                    Unit: <strong class="text-gray-900">{{ $currentPkwt->unit->nama_unit ?? 'Unit Tidak Dikenal' }}</strong>
+                                    @if($currentPkwt->jabatan) | Posisi: <strong>{{ $currentPkwt->jabatan->nama }}</strong> @endif
+                                </p>
+                                <input type="hidden" name="pkwt_id" value="{{ $currentPkwt->id }}">
+                                
+                                <select name="pkwt_status_aktif" class="w-full rounded-lg shadow-sm border border-gray-300 bg-gray-50 text-gray-900 py-2.5 px-3 text-sm font-semibold focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition cursor-pointer">
+                                    <option value="1" {{ old('pkwt_status_aktif', $currentPkwt->status_aktif) == 1 ? 'selected' : '' }}>
+                                        🟢 1 - PKWT Aktif
+                                    </option>
+                                    <option value="0" {{ old('pkwt_status_aktif', $currentPkwt->status_aktif) == 0 ? 'selected' : '' }}>
+                                        ⚪ 0 - PKWT Non-Aktif / Histori
+                                    </option>
+                                    <option value="2" {{ old('pkwt_status_aktif', $currentPkwt->status_aktif) == 2 ? 'selected' : '' }}>
+                                        🟡 2 - PKWT Pending
+                                    </option>
+                                    <option value="4" {{ old('pkwt_status_aktif', $currentPkwt->status_aktif) == 4 ? 'selected' : '' }}>
+                                        🔴 4 - PKWT Ditolak
+                                    </option>
+                                </select>
+                            @else
+                                <div class="p-3 bg-gray-50 rounded-lg text-xs text-gray-500 border border-gray-200 mt-2">
+                                    Pekerja ini belum memiliki penempatan kontrak PKWT.
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            @endif
 
             {{-- SECTION 1: Identitas Pribadi --}}
             <div class="p-8">
@@ -600,13 +723,23 @@
                     Batalkan
                 </a>
 
+                @php
+                    $isPicResubmit = ($pekerja->status_aktif == 4 && !in_array(strtolower(trim(Auth::user()->role ?? '')), ['admin', 'hrd', 'superadmin']));
+                @endphp
                 <button type="button" @click="confirmSubmit()"
-                    class="w-full sm:w-auto justify-center flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition shadow-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                    </svg>
-                    Simpan
+                    class="w-full sm:w-auto justify-center flex items-center gap-2 px-5 py-2.5 text-sm font-bold text-white {{ $isPicResubmit ? 'bg-amber-600 hover:bg-amber-700 focus:ring-amber-500' : 'bg-emerald-600 hover:bg-emerald-700 focus:ring-emerald-500' }} rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition shadow-sm">
+                    @if($isPicResubmit)
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                        </svg>
+                        Simpan & Ajukan Kembali ke HRD
+                    @else
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        Simpan
+                    @endif
                 </button>
 
             </div>

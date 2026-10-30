@@ -102,6 +102,12 @@
                     <span class="w-1.5 h-1.5 bg-amber-500 rounded-full mr-1.5"></span>
                     Pending
                 </span>
+            @elseif ($p->status_aktif == 4)
+                <span
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-rose-100 text-rose-800 border border-rose-200">
+                    <span class="w-1.5 h-1.5 bg-rose-500 rounded-full mr-1.5"></span>
+                    Ditolak
+                </span>
             @else
                 <span
                     class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 border border-red-200">
@@ -114,6 +120,14 @@
         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
             <div class="flex justify-end gap-2">
                 @if ($p->status_aktif == 2 && in_array(strtolower(trim(auth()->user()->role ?? '')), ['admin', 'hrd', 'superadmin']))
+                    <button type="button" onclick="rejectPekerjaDirect({{ $p->id }}, '{{ addslashes($p->nama) }}')"
+                        class="text-rose-600 hover:text-rose-900 border border-rose-200 hover:bg-rose-50 rounded-lg px-2 py-1 text-xs font-bold transition flex items-center gap-1"
+                        title="Tolak Pekerja">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                        Tolak
+                    </button>
                     <button type="button" onclick="approvePekerjaDirect({{ $p->id }}, '{{ addslashes($p->nama) }}')"
                         class="text-emerald-600 hover:text-emerald-900 border border-emerald-200 hover:bg-emerald-50 rounded-lg px-2 py-1 text-xs font-bold transition flex items-center gap-1"
                         title="Setujui Pekerja">

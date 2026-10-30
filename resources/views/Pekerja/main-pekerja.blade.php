@@ -201,7 +201,8 @@
                                 { val: '', label: 'Semua Status' },
                                 { val: '1', label: 'Aktif Bekerja' },
                                 { val: '2', label: 'Pending Approval' },
-                                { val: '0', label: 'Tidak Aktif / Resign' }
+                                { val: '0', label: 'Tidak Aktif / Resign' },
+                                { val: '4', label: 'Ditolak (Rejected)' }
                             ]
                         }" x-init="$watch('selected', value => {
                             document.getElementById('statusFilter').value = value;
@@ -449,16 +450,27 @@
                     </span>
                 </button>
             @elseif (strtolower(trim(Auth::user()->role ?? '')) === 'pic')
+                @php
+                    $pendingCount = $myPendingList->where('status_aktif', 2)->count();
+                    $rejectedCount = $myPendingList->where('status_aktif', 4)->count();
+                @endphp
                 <button type="button" onclick="openPendingModal()"
-                    class="w-full justify-center lg:w-auto flex items-center gap-2 px-3 py-2 bg-amber-50 border border-amber-200 rounded-lg text-sm font-bold text-amber-800 shadow-sm hover:bg-amber-100 focus:outline-none focus:ring-2 focus:ring-amber-500 transition">
-                    <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    class="w-full justify-center lg:w-auto flex items-center gap-2 px-3 py-2 {{ $rejectedCount > 0 ? 'bg-rose-50 border-rose-300 text-rose-800 hover:bg-rose-100' : 'bg-amber-50 border-amber-200 text-amber-800 hover:bg-amber-100' }} border rounded-lg text-sm font-bold shadow-sm focus:outline-none transition">
+                    <svg class="w-4 h-4 {{ $rejectedCount > 0 ? 'text-rose-600' : 'text-amber-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <span>Pengajuan Saya</span>
-                    <span class="inline-flex items-center justify-center px-2 py-0.5 text-xs font-black text-white bg-amber-600 rounded-full">
-                        {{ $myPendingList->count() ?? 0 }}
-                    </span>
+                    @if($pendingCount > 0)
+                        <span class="inline-flex items-center justify-center px-2 py-0.5 text-xs font-black text-white bg-amber-600 rounded-full" title="{{ $pendingCount }} Menunggu Persetujuan">
+                            {{ $pendingCount }}
+                        </span>
+                    @endif
+                    @if($rejectedCount > 0)
+                        <span class="inline-flex items-center justify-center px-2 py-0.5 text-xs font-black text-white bg-rose-600 rounded-full animate-pulse" title="{{ $rejectedCount }} Ditolak HRD">
+                            {{ $rejectedCount }} Ditolak
+                        </span>
+                    @endif
                 </button>
             @endif
 
@@ -511,7 +523,11 @@
 <div id="pendingPekerjaModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-gray-900/40 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white/90 backdrop-blur-md rounded-2xl max-w-3xl w-full shadow-2xl overflow-hidden border border-gray-200/80 transform transition-all">
         
-        <div class="px-6 py-4 bg-amber-500 text-white flex justify-between items-center">
+        @php
+            $picPendingCount = !$isAdmin ? ($myPendingList->where('status_aktif', 2)->count()) : 0;
+            $picRejectedCount = !$isAdmin ? ($myPendingList->where('status_aktif', 4)->count()) : 0;
+        @endphp
+        <div class="px-6 py-4 {{ !$isAdmin && $picRejectedCount > 0 ? 'bg-gradient-to-r from-amber-500 to-rose-600' : 'bg-amber-500' }} text-white flex justify-between items-center">
             <div class="flex items-center gap-3">
                 <div class="p-2 bg-white/20 rounded-xl">
                     <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -521,10 +537,15 @@
                 <div>
                     {{-- DYNAMIC TITLE --}}
                     <h3 class="font-bold text-base tracking-tight">
-                        {{ $isAdmin ? 'Daftar Approval Pekerja' : 'Pengajuan Saya (Pending Approval)' }}
+                        {{ $isAdmin ? 'Daftar Approval Pekerja' : 'Pengajuan & Status Pekerja Saya' }}
                     </h3>
-                    <p class="text-amber-100 text-xs font-medium">
-                        Total: <span class="font-bold text-white underline decoration-amber-300/60" id="total-count">{{ $count }}</span> Data
+                    <p class="text-amber-100 text-xs font-medium flex items-center gap-2">
+                        <span>Total: <strong class="text-white underline decoration-amber-300/60" id="total-count">{{ $count }}</strong> Data</span>
+                        @if(!$isAdmin && $picRejectedCount > 0)
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/20 text-white">
+                                {{ $picRejectedCount }} Ditolak HRD
+                            </span>
+                        @endif
                     </p>
                 </div>
             </div>
@@ -542,10 +563,16 @@
                 <input type="checkbox" id="selectAllPekerja" class="w-4 h-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500 transition cursor-pointer">
                 <span class="text-xs font-bold text-gray-700 uppercase tracking-wider">Pilih Semua</span>
             </label>
-            <button id="bulkApproveBtn" disabled onclick="bulkApprove()" class="px-4 py-1.5 bg-emerald-600 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white rounded-xl text-xs font-bold shadow-sm transition-all hover:bg-emerald-700 flex items-center gap-1.5">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                Setujui Terpilih (<span id="selectedCount">0</span>)
-            </button>
+            <div class="flex items-center gap-2">
+                <button id="bulkRejectBtn" disabled onclick="bulkReject()" class="px-4 py-1.5 bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white border border-rose-200 hover:border-rose-600 disabled:bg-gray-100 disabled:text-gray-400 disabled:border-gray-200 disabled:cursor-not-allowed rounded-xl text-xs font-bold shadow-sm transition-all flex items-center gap-1.5">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    Tolak Terpilih (<span id="selectedRejectCount">0</span>)
+                </button>
+                <button id="bulkApproveBtn" disabled onclick="bulkApprove()" class="px-4 py-1.5 bg-emerald-600 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white rounded-xl text-xs font-bold shadow-sm transition-all hover:bg-emerald-700 flex items-center gap-1.5">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    Setujui Terpilih (<span id="selectedCount">0</span>)
+                </button>
+            </div>
         </div>
         @endif
 
@@ -693,20 +720,32 @@
                             $unitName = $pendingPkwt?->unit?->nama_unit;
                             $jabatanName = $pendingPkwt?->jabatan?->nama;
                             $divisiName = $pendingPkwt?->divisi?->nama;
+                            $isRejected = ($item->status_aktif == 4);
                         @endphp
-                        <div id="pending-row-{{ $item->id }}" data-worker-name="{{ $item->nama ?? '' }}" data-pic-name="{{ $item->user->name ?? '' }}" class="pending-pekerja-row group bg-white/70 hover:bg-white border border-gray-100 hover:border-amber-200/70 p-3.5 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all">
+                        <div id="pending-row-{{ $item->id }}" data-worker-name="{{ $item->nama ?? '' }}" data-pic-name="{{ $item->user->name ?? '' }}" class="pending-pekerja-row group {{ $isRejected ? 'bg-rose-50/50 hover:bg-rose-50/80 border-rose-200' : 'bg-white/70 hover:bg-white border-gray-100 hover:border-amber-200/70' }} border p-3.5 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all">
                             <div class="flex items-center gap-3">
                                 @if($isAdmin)
                                 <input type="checkbox" name="pekerja_ids[]" value="{{ $item->id }}" class="pekerja-checkbox w-4 h-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500 transition cursor-pointer mt-0.5 sm:mt-0">
                                 @endif
                                 
-                                <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 font-bold flex items-center justify-center text-sm border border-amber-100 shrink-0">
+                                <div class="w-10 h-10 rounded-xl {{ $isRejected ? 'bg-rose-100 text-rose-700 border-rose-200' : 'bg-amber-50 text-amber-700 border-amber-100' }} font-bold flex items-center justify-center text-sm border shrink-0">
                                     {{ strtoupper(substr($item->nama, 0, 1)) }}
                                 </div>
                                 
                                 <div>
-                                    <div class="flex items-center gap-2">
+                                    <div class="flex items-center gap-2 flex-wrap">
                                         <h4 class="font-bold text-gray-900 text-sm group-hover:text-amber-700 transition-colors">{{ $item->nama ?? 'Belum Diset' }}</h4>
+                                        @if($isRejected)
+                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-200">
+                                                <span class="w-1.5 h-1.5 bg-rose-500 rounded-full"></span>
+                                                Ditolak HRD
+                                            </span>
+                                        @elseif($item->status_aktif == 2)
+                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
+                                                <span class="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse"></span>
+                                                Pending Approval
+                                            </span>
+                                        @endif
                                         @if($unitName)
                                             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-100">
                                                 {{ $unitName }}
@@ -719,14 +758,25 @@
                                         <p class="text-xs text-gray-600 font-medium">Posisi: {{ $jabatanName ?? '-' }} {{ $divisiName ? "({$divisiName})" : '' }}</p>
                                     @endif
                                     <p class="text-xs text-amber-700 font-medium mt-0.5">Diajukan Oleh : {{ $item->user->name ?? 'Belum Diset' }}</p>
+                                    @if($isRejected && !$isAdmin)
+                                        <p class="text-[11px] text-rose-600 font-medium mt-1">
+                                            ⚠️ Pengajuan ditolak oleh HRD. Klik <strong>Ajukan Balik</strong> untuk merevisi data, atau <strong>Bersihkan</strong> untuk menghapus pengajuan ini.
+                                        </p>
+                                    @endif
                                 </div>
                             </div>
 
-                            <div class="flex items-center gap-2 self-end sm:self-center">
+                            <div class="flex items-center gap-2 self-end sm:self-center shrink-0">
                                 <a href="{{ route('view.detail.pekerja', $item->id) }}" target="_blank" class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-xs font-bold transition">
                                     Detail
                                 </a>
                                 @if($isAdmin)
+                                <button type="button" onclick="rejectPekerjaDirect({{ $item->id }}, '{{ addslashes($item->nama) }}')" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white rounded-lg text-xs font-bold shadow-sm transition flex items-center gap-1 border border-rose-200 hover:border-rose-600">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                    Tolak
+                                </button>
                                 <button type="button" onclick="approvePekerjaDirect({{ $item->id }}, '{{ addslashes($item->nama) }}')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shadow-sm transition flex items-center gap-1">
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
@@ -734,13 +784,36 @@
                                     Setujui
                                 </button>
                                 @else
-                                <button type="button" onclick="cancelPekerjaDirect({{ $item->id }}, '{{ addslashes($item->nama) }}')"
-                                    class="px-3 py-1.5 bg-red-50 hover:bg-red-600 text-red-600 hover:text-white rounded-lg text-xs font-bold shadow-sm transition flex items-center gap-1 border border-red-200 hover:border-red-600">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                    </svg>
-                                    Batalkan
-                                </button>
+                                    @if($isRejected)
+                                        <a href="{{ route('view.ubah.pekerja', $item->id) }}"
+                                            class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-xs font-bold shadow-sm transition flex items-center gap-1.5"
+                                            title="Ubah data & ajukan ulang ke HRD">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                            </svg>
+                                            Ajukan Balik
+                                        </a>
+                                        <button type="button" onclick="cancelPekerjaDirect({{ $item->id }}, '{{ addslashes($item->nama) }}')"
+                                            class="px-3 py-1.5 bg-white hover:bg-rose-600 text-rose-600 hover:text-white rounded-lg text-xs font-bold shadow-sm transition flex items-center gap-1 border border-rose-200 hover:border-rose-600"
+                                            title="Bersihkan pemberitahuan penolakan ini">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                            </svg>
+                                            Bersihkan
+                                        </button>
+                                    @else
+                                        <a href="{{ route('view.ubah.pekerja', $item->id) }}"
+                                            class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-xs font-bold transition">
+                                            Edit
+                                        </a>
+                                        <button type="button" onclick="cancelPekerjaDirect({{ $item->id }}, '{{ addslashes($item->nama) }}')"
+                                            class="px-3 py-1.5 bg-red-50 hover:bg-red-600 text-red-600 hover:text-white rounded-lg text-xs font-bold shadow-sm transition flex items-center gap-1 border border-red-200 hover:border-red-600">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                            </svg>
+                                            Batalkan
+                                        </button>
+                                    @endif
                                 @endif
                             </div>
                         </div>
@@ -853,6 +926,17 @@
         );
     }
 
+    function rejectPekerjaDirect(id, nama) {
+        handleAjaxAction(
+            '{{ route("pekerja.reject.bulk") }}',
+            'POST',
+            { ids: [id] },
+            'Tolak Pekerja?',
+            `Tolak pengajuan data pekerja: ${nama}?`,
+            'Pekerja telah ditolak.'
+        );
+    }
+
     function cancelPekerjaDirect(id, nama) {
         // Generate the URL using the route name, replacing the placeholder with the actual ID
         let url = '{{ route("pekerja.cancel", ":id") }}'.replace(':id', id);
@@ -861,9 +945,9 @@
             url, 
             'POST', 
             {}, // No need for _method: DELETE since we changed the route to POST
-            'Batalkan Pengajuan?',
-            `Hapus pengajuan untuk: ${nama}? Tindakan ini permanen.`,
-            'Pengajuan telah dihapus.'
+            'Batalkan / Bersihkan Pengajuan?',
+            `Hapus / bersihkan pengajuan untuk: ${nama}? Tindakan ini permanen.`,
+            'Pengajuan telah dibatalkan / dibersihkan.'
         );
     }
 
@@ -872,7 +956,9 @@
     document.addEventListener('DOMContentLoaded', function() {
         const selectAll = document.getElementById('selectAllPekerja');
         const bulkBtn = document.getElementById('bulkApproveBtn');
+        const bulkRejectBtn = document.getElementById('bulkRejectBtn');
         const selectedCountSpan = document.getElementById('selectedCount');
+        const selectedRejectCountSpan = document.getElementById('selectedRejectCount');
 
         function getVisibleCheckboxes() {
             return Array.from(document.querySelectorAll('.pending-pekerja-row'))
@@ -911,7 +997,9 @@
             }
 
             if (bulkBtn) bulkBtn.disabled = totalCheckedCount === 0;
+            if (bulkRejectBtn) bulkRejectBtn.disabled = totalCheckedCount === 0;
             if (selectedCountSpan) selectedCountSpan.textContent = totalCheckedCount;
+            if (selectedRejectCountSpan) selectedRejectCountSpan.textContent = totalCheckedCount;
         }
 
         window.updateBulkUI = updateBulkUI;
@@ -928,6 +1016,20 @@
             'Approve Massal?',
             `Setujui ${ids.length} pekerja terpilih sekaligus?`,
             'Semua pekerja terpilih telah aktif.'
+        );
+    }
+
+    function bulkReject() {
+        const ids = Array.from(document.querySelectorAll('.pekerja-checkbox:checked')).map(cb => cb.value);
+        if (ids.length === 0) return;
+
+        handleAjaxAction(
+            '{{ route("pekerja.reject.bulk") }}',
+            'POST',
+            { ids: ids },
+            'Tolak Massal?',
+            `Tolak ${ids.length} pengajuan pekerja terpilih sekaligus?`,
+            'Semua pekerja terpilih telah ditolak.'
         );
     }
 </script>
