@@ -14,6 +14,16 @@ class PekerjaImport implements ToModel, WithHeadingRow
     private $idPrefix;
     private $currentIdCounter;
 
+    private function pick($value, $fallback = null)
+    {
+        if (is_string($value)) {
+            $value = trim($value);
+        }
+
+        // filled() bawaan Laravel: angka 0 dan '0' dianggap ADA isinya (true), hanya null/'' yang false
+        return filled($value) ? $value : $fallback;
+    }
+
     public function __construct()
     {
         // 1. Buat prefix berdasarkan hari ini: MJA + dmy (Contoh: MJA040625)
@@ -86,7 +96,7 @@ class PekerjaImport implements ToModel, WithHeadingRow
             // Skenario 3: Jika di Excel kosong DAN ini adalah pekerja baru, buatkan ID MJA otomatis
             $idPekerja = $this->generateIdPekerja();
         }
-        
+            
         // =========================================================================
         // 1. BUAT/UPDATE DATA PEKERJA (Simpan ke Variabel $pekerja)
         // =========================================================================
@@ -94,50 +104,46 @@ class PekerjaImport implements ToModel, WithHeadingRow
         // 1. BUAT/UPDATE DATA PEKERJA (Simpan ke Variabel $pekerja)
         // =========================================================================
         $pekerja = Pekerja::updateOrCreate(
-            ['nik' => $nikBersih], // Kunci Pencarian Utama
+            ['nik' => $nikBersih],
             [
-                'id_pekerja'         => $idPekerja, 
-                
-                // LOGIKA AMAN: Jika di Excel kosong, pertahankan data lama (jika ada)
-                'nama'               => !empty($row['nama_lengkap']) ? $row['nama_lengkap'] : ($pekerjaExisting->nama ?? null),
-                'kpj'                => !empty($row['bpjs_ketenagakerjaan']) ? $row['bpjs_ketenagakerjaan'] : ($pekerjaExisting->kpj ?? null), 
-                'naker'              => !empty($row['bpjs_kesehatan']) ? $row['bpjs_kesehatan'] : ($pekerjaExisting->naker ?? null),       
-                'no_kk'              => !empty($row['nomor_kk']) ? $row['nomor_kk'] : ($pekerjaExisting->no_kk ?? null),
-                'tempat_lahir'       => !empty($row['tempat_lahir']) ? $row['tempat_lahir'] : ($pekerjaExisting->tempat_lahir ?? null),
-                
-                // Ini yang membuat error tadi! Sekarang dijamin aman
+                'id_pekerja'         => $idPekerja,
+                'nama'               => $this->pick($row['nama_lengkap'] ?? null, $pekerjaExisting->nama ?? null),
+                'kpj'                => $this->pick($row['bpjs_ketenagakerjaan'] ?? null, $pekerjaExisting->kpj ?? null),
+                'naker'              => $this->pick($row['bpjs_kesehatan'] ?? null, $pekerjaExisting->naker ?? null),
+                'no_kk'              => $this->pick($row['nomor_kk'] ?? null, $pekerjaExisting->no_kk ?? null),
+                'tempat_lahir'       => $this->pick($row['tempat_lahir'] ?? null, $pekerjaExisting->tempat_lahir ?? null),
                 'tgl_lahir'          => $tanggalLahir ?: ($pekerjaExisting->tgl_lahir ?? null),
-                
-                'kelamin'            => !empty($row['jenis_kelamin']) ? $row['jenis_kelamin'] : ($pekerjaExisting->kelamin ?? null),
-                'pendidikan'         => !empty($row['pendidikan']) ? $row['pendidikan'] : ($pekerjaExisting->pendidikan ?? null),
-                'status_kawin'       => !empty($row['status_perkawinan']) ? $row['status_perkawinan'] : ($pekerjaExisting->status_kawin ?? null),
-                'anak'               => $row['jumlah_anak'] ?? ($pekerjaExisting->anak ?? 0),
-                
+                'kelamin'            => $this->pick($row['jenis_kelamin'] ?? null, $pekerjaExisting->kelamin ?? null), // ⬅️ Angka 0 sekarang aman!
+                'pendidikan'         => $this->pick($row['pendidikan'] ?? null, $pekerjaExisting->pendidikan ?? null),
+                'status_kawin'       => $this->pick($row['status_perkawinan'] ?? null, $pekerjaExisting->status_kawin ?? null), // ⬅️ ' TK' otomatis jadi 'TK'
+                'anak'               => $this->pick($row['jumlah_anak'] ?? null, $pekerjaExisting->anak ?? 0),
                 'tgl_bergabung'      => $tanggalBergabung ?: ($pekerjaExisting->tgl_bergabung ?? null),
                 'tgl_resign'         => $tanggalResign ?: ($pekerjaExisting->tgl_resign ?? null),
-                
                 'status_aktif'       => empty($tanggalResign) ? 1 : 0,
 
                 // Data Alamat
-                'alamat'             => !empty($row['jalannama_gedung']) ? $row['jalannama_gedung'] : ($pekerjaExisting->alamat ?? null), 
-                'desa'               => !empty($row['kelurahandesa']) ? $row['kelurahandesa'] : ($pekerjaExisting->desa ?? null),
-                'rt'                 => !empty($row['rt']) ? $row['rt'] : ($pekerjaExisting->rt ?? null),
-                'rw'                 => !empty($row['rw']) ? $row['rw'] : ($pekerjaExisting->rw ?? null),
-                'kota'               => !empty($row['kotakabupaten']) ? $row['kotakabupaten'] : ($pekerjaExisting->kota ?? null),
-                'kecamatan'          => !empty($row['kecamatan']) ? $row['kecamatan'] : ($pekerjaExisting->kecamatan ?? null),
-                'provinsi'           => !empty($row['provinsi']) ? $row['provinsi'] : ($pekerjaExisting->provinsi ?? null),
-                
+                'alamat'             => $this->pick($row['jalannama_gedung'] ?? null, $pekerjaExisting->alamat ?? null),
+                'desa'               => $this->pick($row['kelurahandesa'] ?? null, $pekerjaExisting->desa ?? null),
+                'rt'                 => $this->pick($row['rt'] ?? null, $pekerjaExisting->rt ?? null),
+                'rw'                 => $this->pick($row['rw'] ?? null, $pekerjaExisting->rw ?? null), // ⬅️ RW 0 juga aman!
+                'kota'               => $this->pick($row['kotakabupaten'] ?? null, $pekerjaExisting->kota ?? null),
+                'kecamatan'          => $this->pick($row['kecamatan'] ?? null, $pekerjaExisting->kecamatan ?? null),
+                'provinsi'           => $this->pick($row['provinsi'] ?? null, $pekerjaExisting->provinsi ?? null),
+
                 // Kontak & Rekening
-                'email'              => !empty($row['email_pribadi']) ? $row['email_pribadi'] : ($pekerjaExisting->email ?? null),
-                'telp'               => !empty($row['nomor_telepon_pribadi']) ? $row['nomor_telepon_pribadi'] : ($pekerjaExisting->telp ?? null),
-                'nama_rek'           => !empty($row['nama_bank']) ? $row['nama_bank'] : ($pekerjaExisting->nama_rek ?? null), 
-                'rekening'           => !empty($row['no_rekening']) ? $row['no_rekening'] : ($pekerjaExisting->rekening ?? null),
-                
+                'email'              => $this->pick($row['email_pribadi'] ?? null, $pekerjaExisting->email ?? null),
+                'telp'               => $this->pick($row['nomor_telepon_pribadi'] ?? null, $pekerjaExisting->telp ?? null),
+                'nama_rek'           => $this->pick($row['nama_bank'] ?? null, $pekerjaExisting->nama_rek ?? null),
+                'rekening'           => $this->pick(
+                    isset($row['no_rekening']) ? str_replace(' ', '', $row['no_rekening']) : null, // ⬅️ Opsional: bersihkan spasi no rekening
+                    $pekerjaExisting->rekening ?? null
+                ),
+
                 // Kontak Darurat
-                'nama_emergency'     => !empty($row['nama_kontak_emergency']) ? $row['nama_kontak_emergency'] : ($pekerjaExisting->nama_emergency ?? null),
-                'telp_emergency'     => !empty($row['nomor_telepon_darurat']) ? $row['nomor_telepon_darurat'] : ($pekerjaExisting->telp_emergency ?? null),
-                'hubungan_emergency' => !empty($row['hubungan']) ? $row['hubungan'] : ($pekerjaExisting->hubungan_emergency ?? null),
-                'ibu_kandung'        => !empty($row['ibu_kandung']) ? $row['ibu_kandung'] : ($pekerjaExisting->ibu_kandung ?? null),
+                'nama_emergency'     => $this->pick($row['nama_kontak_emergency'] ?? null, $pekerjaExisting->nama_emergency ?? null),
+                'telp_emergency'     => $this->pick($row['nomor_telepon_darurat'] ?? null, $pekerjaExisting->telp_emergency ?? null),
+                'hubungan_emergency' => $this->pick($row['hubungan'] ?? null, $pekerjaExisting->hubungan_emergency ?? null),
+                'ibu_kandung'        => $this->pick($row['ibu_kandung'] ?? null, $pekerjaExisting->ibu_kandung ?? null),
             ]
         );
 
@@ -165,7 +171,7 @@ class PekerjaImport implements ToModel, WithHeadingRow
                         ],
                         [
                             // Jika belum ada, buat baru dengan status history (0)
-                            'status_aktif'   => 0, 
+                             
                         ]
                     );
                 }
@@ -218,17 +224,11 @@ class PekerjaImport implements ToModel, WithHeadingRow
             return Carbon::parse($valueTranslated)->format('Y-m-d');
 
         } catch (\Exception $e) {
-            
-            // 4. PLAN B: JIKA FORMATNYA TERBALIK (Contoh: DD/MM/YYYY seperti 31/12/2026 atau 31-12-2026)
+            // 4. PLAN B: Tangani garis miring/strip ganda (seperti 11//07/2004) dan format DD/MM/YYYY
             try {
-                // Ubah semua garis miring (/) menjadi strip (-) agar seragam
-                $valueCleaned = str_replace('/', '-', $value);
-                
-                // Paksa baca dengan format Tanggal-Bulan-Tahun
+                $valueCleaned = preg_replace('/[\/\-]+/', '-', $value);
                 return Carbon::createFromFormat('d-m-Y', $valueCleaned)->format('Y-m-d');
-                
             } catch (\Exception $e2) {
-                // Jika semua percobaan di atas gagal (berarti isi Excel-nya benar-benar bukan tanggal, misal: "Tidak Tahu")
                 return null;
             }
         }
